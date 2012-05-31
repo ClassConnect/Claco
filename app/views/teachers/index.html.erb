@@ -1,0 +1,5 @@
+<h3>Teachers#index</h3>
+<p>app/views/teachers/index.html.erb</p>
+<% @teachers.each do |teacher| %>
+  <p>Teacher: <%=link_to teacher.email, teacher %></p>
+<% end %>

@@ -1,0 +1,21 @@
+<%= link_to "Claco", root_path, :class => 'brand' %>
+<ul class="nav">
+  <% if teacher_signed_in? %>
+    <li>
+    <%= link_to 'Logout', destroy_teacher_session_path, :method=>'delete' %>        
+    </li>
+  <% else %>
+    <li>
+    <%= link_to 'Login', new_teacher_session_path %>  
+    </li>
+  <% end %>
+  <% if teacher_signed_in? %>
+    <li>
+    <%= link_to 'Edit account', edit_teacher_registration_path %>
+    </li>
+  <% else %>
+    <li>
+    <%= link_to 'Sign up', new_teacher_registration_path %>
+    </li>
+  <% end %>
+</ul>

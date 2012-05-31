@@ -8,12 +8,12 @@ class TeachersController < ApplicationController
    	@teachers = Teacher.all
    end
 
-   #/teachers/id
+   #/teachers/:id
    #Teacher Profiles
    def show
    	@teacher = Teacher.find(params[:id])
 
-      @title = @teacher.title + " " + @teacher.fname + " " + @teacher.lname
+      @title = "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile"
 
       if !@teacher.info
          @teacher.info = Info.new
@@ -27,15 +27,6 @@ class TeachersController < ApplicationController
 
    end
 
-   #/sub/:id
-   #link to subscribe to :id
-   def sub
-      if params[:id] == current_teacher.id
-         redirect_to ("/teachers/" + current_teacher.id.to_s)
-      end
-      @teacher = Teacher.find(params[:id])
-   end
-
    #/editinfo
    def editinfo
       @title = "Edit your information"
@@ -45,6 +36,7 @@ class TeachersController < ApplicationController
       @info = @teacher.info
    end
 
+   #PUT /updateinfo
    def updateinfo
 
       @teacher = current_teacher
@@ -60,10 +52,11 @@ class TeachersController < ApplicationController
       @info.profile_picture = params[:info][:profile_picture]
       @info.save
 
-      redirect_to ("/teachers/" + current_teacher.id.to_s)
+      redirect_to teacher_path(current_teacher)
 
    end
 
+   #/tags
    def tags
       @title = "Manage your subscribed tags"
 
@@ -77,7 +70,7 @@ class TeachersController < ApplicationController
          @teacher.tag.grade_levels = []
          @teacher.tag.subjects = []
          @teacher.tag.standards = []
-         @teacher.tag.other_tag = []
+         @teacher.tag.other = []
 
          @teachers.tag = @teacher.tag
 
@@ -89,7 +82,24 @@ class TeachersController < ApplicationController
 
    end
 
-   def newsub
+   #/sub/:id
+   #link to subscribe to :id
+   def sub
+
+      #Prevent subscription to self
+      if params[:id].to_s == current_teacher.id.to_s
+         redirect_to teacher_path(current_teacher)
+      end
+
+      @teacher = Teacher.find(params[:id])
+
+      @title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
+
+
+   end
+
+   #GET /confsub/:id <- To be changed to PUT/POST
+   def confsub
       if !current_teacher.relationships.find(params[:id])
          @relationship = Relationship.new
 
@@ -98,7 +108,5 @@ class TeachersController < ApplicationController
          @relationship.status = 0
       end
    end
-
-
 
 end

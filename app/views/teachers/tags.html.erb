@@ -1,16 +1,16 @@
 <p>app/views/teachers/tags.html.erb</p>
-<%= @teacher.fname %>
-
-<br /><br />
+<h1><%= "#{@teacher.fname}'s Tags" %></h1>
 
 <%= form_for @tag, :url => "/editinfo" do |f| %>
 	
   <% (1..12).each do |g| %>
 
-    <div><%= f.label :grade_levels[g], g.ordinalize %><br />
+    <div><%= f.label :grade_levels[g], "#{g.ordinalize} grade" %>
     <%= check_box_tag :grade_levels[g] %> </div>
 
   <% end %>
+
+  <br />
 
   <div><%= f.label :subjects, "Subject Tags" %><br />
   <%= f.text_field :subjects %></div>

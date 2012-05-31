@@ -50,13 +50,25 @@ Claco::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
+
+#Root to home
 root :to => 'home#index'
 
+#Edit Info Form/Process
 get '/editinfo'     => "teachers#editinfo"
 put '/updateinfo'   => "teachers#updateinfo"
+
+#Profile Page
 get '/teachers/:id' => 'teachers#show'
+
+#Edit Tags Form/Process
 get '/tags'         => "teachers#tags"
+
+#Subscribe to :id
 get '/sub/:id'      => 'teachers#sub'
+
+#Subsciption to :id confirmed
+get '/confsub/:id'  => 'teachers#confsub'
 
 resources :teachers
 

@@ -81,6 +81,11 @@ embeds_many :relationships, validate: false
 
   ## Token authenticatable
   # field :authentication_token, :type => String
+
+def subscribed_to?(id)
+  return self.relationships.find_or_initialize_by(:id => id).subscribed
+end
+
 end
 
 class Tag
@@ -97,8 +102,8 @@ end
 class Relationship
   include Mongoid::Document
 
-  field :user_id, :type => String
-  field :is_subscribed, :type => Boolean, :default => true
+  field :user_id, :type => String, :unique => true
+  field :subscribed, :type => Boolean, :default => false
   field :relationship_status, :type => Integer
 
   embedded_in :teacher

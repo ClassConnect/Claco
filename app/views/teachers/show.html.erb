@@ -26,5 +26,11 @@
 
 <% #Check if is current logged in teacher %>
 <% if current_teacher.id != @teacher.id %>
-	<p><%= link_to "Subcribe to this teacher", ("/sub/" + @teacher.id.to_s) %></p>
+
+	<% if current_teacher.subscribed_to?(@teacher.id) %>
+		<p><%= link_to "Subcribe to this teacher", ("/sub/" + @teacher.id.to_s) %></p>
+	<% else %>
+		<p><%= link_to "Subcribe to this teacher", ("/sub/" + @teacher.id.to_s) %></p>
+	<% end %>
+
 <% end %>

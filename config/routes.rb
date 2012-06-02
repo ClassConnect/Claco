@@ -63,12 +63,18 @@ get '/teachers/:id' => 'teachers#show'
 
 #Edit Tags Form/Process
 get '/tags'         => "teachers#tags"
+put '/updatetags'   => "teachers#updatetags"
 
 #Subscribe to :id
 get '/sub/:id'      => 'teachers#sub'
 
 #Subsciption to :id confirmed
 get '/confsub/:id'  => 'teachers#confsub'
+
+#Unsubscribed to :id
+get '/unsub/:id'    => 'teachers#unsub'
+
+get 'confunsub/:id' => 'teachers#confunsub'
 
 resources :teachers
 

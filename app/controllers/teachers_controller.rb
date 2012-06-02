@@ -15,6 +15,7 @@ class TeachersController < ApplicationController
 
       @title = "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile"
 
+      #Create info for teacher if not yet created
       if !@teacher.info
          @teacher.info = Info.new
 
@@ -82,31 +83,105 @@ class TeachersController < ApplicationController
 
    end
 
+   #PUT /updatetags
+   def updatetags
+      @teacher = current_teacher
+
+      @teacher.tag.grade_levels = params[:tag][:grade_levels]
+
+      @teacher.tag.subjects = params[:tag][:subjects].split
+
+      @teacher.tag.standards = params[:tag][:standards].split
+
+      @teacher.tag.other = params[:tag][:other].split
+
+      @teacher.tag.save
+
+      redirect_to tags_path
+   end
+
    #/sub/:id
    #link to subscribe to :id
    def sub
 
       #Prevent subscription to self
-      if params[:id].to_s == current_teacher.id.to_s
-         redirect_to teacher_path(current_teacher)
+      if params[:id] == current_teacher.id.to_s
+         redirect_to teacher_path(current_teacher) and return
       end
 
       @teacher = Teacher.find(params[:id])
 
-      @title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
+      @relationship = current_teacher.relationships.find_or_create_by(:id => params[:id])
 
+      if @relationship.subscribed
+         redirect_to teacher_path(params[:id]) and return
+      end
+
+      @title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
 
    end
 
    #GET /confsub/:id <- To be changed to PUT/POST
    def confsub
-      if !current_teacher.relationships.find(params[:id])
-         @relationship = Relationship.new
 
-         @relationship.user_id = params[:id]
+      @teacher = Teacher.find(params[:id])
 
-         @relationship.status = 0
-      end
+      @title = "You are now subscribed to #{@teacher.title} #{@teacher.lname}"
+
+      @realtionship = current_teacher.relationships.find_or_create_by(:id => params[:id])
+
+      @relationship.subscribed = true
+
+      @relationship.save
+
    end
+
+   #GET /unsub/:id
+   def unsub
+
+      @teacher = Teacher.find(params[:id])
+
+      if @teacher == current_teacher
+         redirect_to teacher_path(current_teacher) and return
+      end
+
+      @title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
+
+      @relationship = current_teacher.relationships.find_or_create_by(:id => params[:id])
+
+      if !@relationship.subscribed
+         redirect_to teacher_path(params[:id]) and return
+      end
+
+   end
+
+   #GET /confunsub/:id
+   def confunsub
+      
+      @teacher = Teacher.find(params[:id])
+
+
+   end
+
+   #/subs 
+   def subs
+
+   end
+
+   #GET /add/:id
+   def add
+
+   end
+
+   #GET /confadd/:id
+   def confadd
+
+   end
+
+   #GET /remove/:id
+   def remove
+
+   end
+
 
 end

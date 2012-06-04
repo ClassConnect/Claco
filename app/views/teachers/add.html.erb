@@ -1,0 +1,5 @@
+<p>app/views/teachers/add.html.erb</p>
+<h1>Confirm Colleague Request</h1>
+<p>Are you want to add <%= "#{@teacher.title} #{@teacher.lname}" %> as a colleague?</p>
+
+<%= link_to "Yes", "/confadd/#{@teacher.id.to_s}" %> <%= link_to "No", teacher_path(@teacher) %>

@@ -1,0 +1,5 @@
+<p>app/views/teachers/unsub.html.erb</p>
+<h1>Confirm Subscription</h1>
+<p>Are you sure you want to unsubscribe from <%= "#{@teacher.title} #{@teacher.lname}" %>?</p>
+
+<%= link_to "Yes", "/confunsub/#{@teacher.id.to_s}" %> <%= link_to "No", teacher_path(@teacher) %>

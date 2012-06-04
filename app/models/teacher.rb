@@ -71,8 +71,6 @@ field :fname, :type => String
 field :lname, :type => String
 field :username, :type => String, :default => nil, :allow_nil => true, :unique => true
 
-#validates_uniqueness_of :username
-
 embeds_one :info, validate: false
 
 embeds_one :tag, validate: false
@@ -83,7 +81,11 @@ embeds_many :relationships, validate: false
   # field :authentication_token, :type => String
 
 def subscribed_to?(id)
-  return self.relationships.find_or_initialize_by(:id => id).subscribed
+  return self.relationships.find_or_initialize_by(:user_id => id).subscribed
+end
+
+def colleague_status(id)
+  return self.relationships.find_or_initialize_by(:user_id => id).colleague_status
 end
 
 end
@@ -104,7 +106,7 @@ class Relationship
 
   field :user_id, :type => String, :unique => true
   field :subscribed, :type => Boolean, :default => false
-  field :relationship_status, :type => Integer
+  field :colleague_status, :type => Integer, :default => 0
 
   embedded_in :teacher
 end

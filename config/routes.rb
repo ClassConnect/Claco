@@ -55,26 +55,31 @@ Claco::Application.routes.draw do
 root :to => 'home#index'
 
 #Edit Info Form/Process
-get '/editinfo'     => "teachers#editinfo"
-put '/updateinfo'   => "teachers#updateinfo"
+get '/editinfo'       => "teachers#editinfo"
+put '/updateinfo'     => "teachers#updateinfo"
 
 #Profile Page
-get '/teachers/:id' => 'teachers#show'
+get '/teachers/:id'   => 'teachers#show'
 
 #Edit Tags Form/Process
-get '/tags'         => "teachers#tags"
-put '/updatetags'   => "teachers#updatetags"
+get '/tags'           => "teachers#tags"
+put '/updatetags'     => "teachers#updatetags"
 
 #Subscribe to :id
-get '/sub/:id'      => 'teachers#sub'
-
-#Subsciption to :id confirmed
-get '/confsub/:id'  => 'teachers#confsub'
+get '/sub/:id'        => 'teachers#sub'
+get '/confsub/:id'    => 'teachers#confsub'
 
 #Unsubscribed to :id
-get '/unsub/:id'    => 'teachers#unsub'
+get '/unsub/:id'      => 'teachers#unsub'
+get 'confunsub/:id'   => 'teachers#confunsub'
 
-get 'confunsub/:id' => 'teachers#confunsub'
+#Add :id as colleague
+get '/add/:id'        => 'teachers#add'
+get '/confadd/:id'    => 'teachers#confadd'
+
+#Remove :id as colleague
+get '/remove/:id'     => 'teachers#remove'
+get '/confremove/:id' => 'teachers#confremove'
 
 resources :teachers
 

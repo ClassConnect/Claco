@@ -5,16 +5,16 @@
 <p><%= "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile" %></p>
 
 
-<% if @teacher.info.bio %>
+<% if !@teacher.info.bio.empty? %>
 <p>Bio:</p>
 	<p><%= @teacher.info.bio %></p>
 <% end %>
 
-<% if @teacher.info.website %>
+<% if !@teacher.info.website.empty? %>
 	<p>Website: <%= @teacher.info.website %></p>
 <% end %>
 
-<% if @teacher.info.profile_picture %>
+<% if !@teacher.info.profile_picture.empty? %>
 	<%= @teacher.info.profile_picture %>
 <% end %>
 
@@ -23,14 +23,22 @@
 	<p><%= link_to "Edit Info", "/editinfo" %></p>
 <% end %>
 
-
-<% #Check if is current logged in teacher %>
 <% if current_teacher.id != @teacher.id %>
 
-	<% if current_teacher.subscribed_to?(@teacher.id) %>
-		<p><%= link_to "Subcribe to this teacher", ("/sub/" + @teacher.id.to_s) %></p>
+	<% if !current_teacher.subscribed_to?(@teacher.id) %>
+		<p><%= link_to "Subcribe to this teacher", "/sub/" + @teacher.id.to_s %></p>
 	<% else %>
-		<p><%= link_to "Subcribe to this teacher", ("/sub/" + @teacher.id.to_s) %></p>
+		<p><%= link_to "Unsubcribe from this teacher", "/unsub/" + @teacher.id.to_s %></p>
 	<% end %>
 
+	<% case current_teacher.colleague_status(@teacher.id) %>
+	<% when 0 %>
+		<p><%= link_to "Add as colleague", "/add/" + @teacher.id.to_s %></p>
+	<% when 1 %>
+		<p>Colleague request sent</p>
+	<% when 2%>
+		<p><%= link_to "Accept colleague request", "/add/" + @teacher.id.to_s %></p>
+	<% when 3%>
+		<p><%= link_to "Remove colleague", "/remove/" + @teacher.id.to_s %></p>
+	<% end %>
 <% end %>

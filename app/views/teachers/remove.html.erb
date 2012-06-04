@@ -1,0 +1,5 @@
+<p>app/views/teachers/remove.html.erb</p>
+<h1>Confirm Subscription</h1>
+<p>Are you sure you want to remove <%= "#{@teacher.title} #{@teacher.lname}" %> from your colleagues?</p>
+
+<%= link_to "Yes", "/confremove/#{@teacher.id.to_s}" %> <%= link_to "No", teacher_path(@teacher) %>

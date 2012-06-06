@@ -73,7 +73,7 @@ class TeachersController < ApplicationController
          @teacher.tag.standards = [""]
          @teacher.tag.other = [""]
 
-         @teachers.tag.save
+         @teacher.tag.save
 
       end
 
@@ -87,12 +87,11 @@ class TeachersController < ApplicationController
 
       @teacher.tag.grade_levels = params[:tag][:grade_levels]
 
-      #TODO: Don't allow/consolidate duplicate tags
-      @teacher.tag.subjects = params[:tag][:subjects].split
+      @teacher.tag.subjects = params[:tag][:subjects].downcase.split.uniq
 
-      @teacher.tag.standards = params[:tag][:standards].split
+      @teacher.tag.standards = params[:tag][:standards].downcase.split.uniq
 
-      @teacher.tag.other = params[:tag][:other].split
+      @teacher.tag.other = params[:tag][:other].downcase.split.uniq
 
       @teacher.tag.save
 

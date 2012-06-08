@@ -1,307 +1,338 @@
 class TeachersController < ApplicationController
-   before_filter :authenticate_teacher!
-   
-   #/teachers
-   #Lists all teachers
-   def index
-      @title = "Teacher Listing"
-      @teachers = Teacher.all
-   end
+	before_filter :authenticate_teacher!
 
-   #/teachers/:id
-   #Teacher Profiles
-   def show
-      @teacher = Teacher.find(params[:id])
+	#/teachers
+	#Lists all teachers
+	def index
+		@title = "Teacher Listing"
+		@teachers = Teacher.all
+	end
 
-      @title = "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile"
+	#/teachers/:id
+	#Teacher Profiles
+	def show
+		@teacher = Teacher.find(params[:id])
 
-      #Create info for teacher if not yet created
-      if !@teacher.info
-         @teacher.info = Info.new
+		@title = "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile"
 
-         @teacher.info.bio = ""
-         @teacher.info.website = ""
-         @teacher.info.profile_picture = ""
+		#Create info for teacher if not yet created
+		if !@teacher.info
+			@teacher.info = Info.new
 
-         @teacher.info.save
-      end
+#			@teacher.info.bio = ""
+#			@teacher.info.website = ""
+#			@teacher.info.profile_picture = ""
 
-   end
+			@teacher.info.update_attributes(:bio => "",
+							:website => "",
+							:profile_picture => "")
 
-   #/editinfo
-   def editinfo
-      @title = "Edit your information"
+			@teacher.info.save
+		end
 
-      @teacher = current_teacher
-      
-      @info = @teacher.info
-   end
+	end
 
-   #PUT /updateinfo
-   def updateinfo
+	#/editinfo
+	def editinfo
+		@title = "Edit your information"
 
-      @teacher = current_teacher
+		#@teacher = current_teacher
 
-      @info = @teacher.info
+		#f@info = @teacher.info
+	end
 
-      #TODO: Add validation to make sure that the profile_picture is actually a link to picture,
-      #or add image upload form
-      #Make sure htmlcode is not allowed in @info.bio
+	#PUT /updateinfo
+	def updateinfo
 
-      @info.bio = params[:info][:bio]
-      @info.website = params[:info][:website]
-      @info.profile_picture = params[:info][:profile_picture]
-      @info.save
+		#@teacher = current_teacher
 
-      redirect_to teacher_path(current_teacher)
+		#@info = @teacher.info
 
-   end
+		#@info = current_teacher.info
 
-   #/tags
-   def tags
-      @title = "Manage your subscribed tags"
+		#newinfo = params[:info]
 
-      @teacher = current_teacher
+		#TODO: Add validation to make sure that the profile_picture is actually a link to picture,
+		#or add image upload form
+		#Make sure htmlcode is not allowed in @info.bio
 
-      #Create tags object for current teacher if it doesn't already exist
-      if !@teacher.tag
+#		@info.bio = params[:info][:bio]
+#		@info.website = params[:info][:website]
+#		@info.profile_picture = params[:info][:profile_picture]
 
-         @teacher.tag = Tag.new
+		current_teacher.info.update_attributes(	:bio => params[:info][:bio],
+							:website => params[:info][:website],
+							:profile_picture => params[:info][:profile_picture])
 
-         @teacher.tag.grade_levels = [""]
-         @teacher.tag.subjects = [""]
-         @teacher.tag.standards = [""]
-         @teacher.tag.other = [""]
+		current_teacher.info.save
 
-         @teacher.tag.save
+		redirect_to teacher_path(current_teacher)
 
-      end
+	end
 
-      @tag = @teacher.tag
+	#/tags
+	def tags
+		@title = "Manage your subscribed tags"
 
-   end
+#		@teacher = current_teacher
 
-   #PUT /updatetags
-   def updatetags
-      @teacher = current_teacher
+#		#Create tags object for current teacher if it doesn't already exist
+#		if !@teacher.tag
 
-      @teacher.tag.grade_levels = params[:tag][:grade_levels]
+#			@teacher.tag = Tag.new
 
-      @teacher.tag.subjects = params[:tag][:subjects].downcase.split.uniq
+#			@teacher.tag.grade_levels = [""]
+#			@teacher.tag.subjects = [""]
+#			@teacher.tag.standards = [""]
+#			@teacher.tag.other = [""]
 
-      @teacher.tag.standards = params[:tag][:standards].downcase.split.uniq
+#			@teacher.tag.save
 
-      @teacher.tag.other = params[:tag][:other].downcase.split.uniq
+		if !current_teacher.tag
+			current_teacher.tag = Tag.new
 
-      @teacher.tag.save
+			current_teacher.tag.update_attributes(	:grade_levels => [""],
+								:subjects => [""],
+								:standards => [""],
+								:other => [""])
 
-      redirect_to tags_path
-   end
+			current_teacher.tag.save
+		end
 
-   #/sub/:id
-   #link to subscribe to :id
-   def sub
+#		end
 
-      #Prevent subscription to self
-      if params[:id] == current_teacher.id.to_s
-         redirect_to teacher_path(current_teacher) and return
-      end
+#		@tag = @teacher.tag
 
-      @teacher = Teacher.find(params[:id])
+	end
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+	#PUT /updatetags
+	def updatetags
+#		@teacher = current_teacher
 
-      if @relationship.subscribed
-         redirect_to teacher_path(params[:id]) and return
-      end
+#		@teacher.tag.grade_levels = params[:tag][:grade_levels]
 
-      @title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
+#		@teacher.tag.subjects = params[:tag][:subjects].downcase.split.uniq
 
-   end
+#		@teacher.tag.standards = params[:tag][:standards].downcase.split.uniq
 
-   #GET /confsub/:id <- To be changed to PUT/POST
-   def confsub
+#		@teacher.tag.other = params[:tag][:other].downcase.split.uniq
 
-      @teacher = Teacher.find(params[:id])
+#		@teacher.tag.save
 
-      @title = "You are now subscribed to #{@teacher.title} #{@teacher.lname}"
+		current_teacher.tag.update_attributes(	:grade_levels => params[:tag][:grade_levels],
+							:subjects => params[:tag][:subjects].downcase.split.uniq,
+							:standards => params[:tag][:standards].downcase.split.uniq,
+							:other => params[:tag][:other].downcase.split.uniq)
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+		current_teacher.tag.save
 
-      #if !@relationship
-      #   @relationship = Relationship.new
-      #end
+		redirect_to tags_path
+	end
 
-      @relationship.subscribed = true
+	#/sub/:id
+	#link to subscribe to :id
+	def sub
 
-      @relationship.save
+		#Prevent subscription to self
+		if params[:id] == current_teacher.id.to_s
+			redirect_to teacher_path(current_teacher) and return
+		end
 
-   end
+		@teacher = Teacher.find(params[:id])
 
-   #GET /unsub/:id
-   def unsub
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-      @teacher = Teacher.find(params[:id])
+		if @relationship.subscribed
+			redirect_to teacher_path(params[:id]) and return
+		end
 
-      if @teacher == current_teacher
-         redirect_to teacher_path(current_teacher) and return
-      end
+		@title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
 
-      @title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
+	end
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+	#GET /confsub/:id <- To be changed to PUT/POST
+	def confsub
 
-      if !@relationship.subscribed
-         redirect_to teacher_path(params[:id]) and return
-      end
+		@teacher = Teacher.find(params[:id])
 
-   end
+		@title = "You are now subscribed to #{@teacher.title} #{@teacher.lname}"
 
-   #GET /confunsub/:id
-   def confunsub
-      
-      @teacher = Teacher.find(params[:id])
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+		#if !@relationship
+		#   @relationship = Relationship.new
+		#end
 
-      if !@relationship.subscribed
-         redirect_to teacher_path(params[:id])
-      end
+		@relationship.subscribed = true
 
-      @relationship.subscribed = false
+		@relationship.save
 
-      @relationship.save
+	end
 
-   end
+	#GET /unsub/:id
+	def unsub
 
-   #/subs 
-   def subs
+		@teacher = Teacher.find(params[:id])
 
-      @title = "#{current_teacher.fname} #{current_teacher.lname}'s Subscriptions"
+		if @teacher == current_teacher
+			redirect_to teacher_path(current_teacher) and return
+		end
 
-      @subs = current_teacher.relationships.find(:subscribed => false)
+		@title = "Subscribe to #{@teacher.title} #{@teacher.lname}"
 
-   end
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-   #Relationships Schema:
-   #
-   #Subscriptions:
-   #When a teacher subscribes to another teacher, a new Relationship is created where .subscribed = true
-   #Unsubscribing sets .subscribed = false
-   #
-   #If teacher1 subscribes to teacher2, and teacher2 was already subscribed to teacher1, prompt teacher1
-   #if they wish to send a collegue request
-   #
-   #Colleagues:
-   #Default status is 0 => no colleague relationship
-   #Changes to 1 => pending outgoing request
-   #Changes to 2 => pending incoming request
-   #Changes to 3 => colleagues
-   #
-   #Relationship status between two colleagues will either be:
-   #Both 0 or both 3, when two teachers are collegues or not colleagues, with no pending requests
-   #One will be 1 and the other must be 2 when a request has been made
+		if !@relationship.subscribed
+			redirect_to teacher_path(params[:id]) and return
+		end
 
+	end
 
-   #Will be changed to one-step process (remove the add method and change link to form)
-   #GET /add/:id
-   def add
+	#GET /confunsub/:id
+	def confunsub
 
-      #Teacher to be added
-      @teacher = Teacher.find(params[:id])
+		@teacher = Teacher.find(params[:id])
 
-      @title = "Add #{@teacher.fname} #{@teacher.lname} as a Colleague"
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+		if !@relationship.subscribed
+			redirect_to teacher_path(params[:id])
+		end
 
-      if @relationship.colleague_status == 3
-         redirect_to teacher_path(@teacher)
-      end
+		@relationship.subscribed = false
 
-   end
+		@relationship.save
 
-   #GET /confadd/:id <= To be changed to PUT/POST
-   def confadd
+	end
 
-      #Teacher to be added
-      @teacher = Teacher.find(params[:id])
+	#/subs
+	def subs
 
-      @title = "Add #{@teacher.fname} #{@teacher.lname} as a Colleague"
+		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Subscriptions"
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+		@subs = current_teacher.relationships.find(:subscribed => false)
 
-      if @relationship.colleague_status == 0 #Then the colleague_status for @teacher should also be 0
-         @relationship.colleague_status = 1
+	end
 
-         @relationship.save
+	#Relationships Schema:
+	#
+	#Subscriptions:
+	#When a teacher subscribes to another teacher, a new Relationship is created where .subscribed = true
+	#Unsubscribing sets .subscribed = false
+	#
+	#If teacher1 subscribes to teacher2, and teacher2 was already subscribed to teacher1, prompt teacher1
+	#if they wish to send a collegue request
+	#
+	#Colleagues:
+	#Default status is 0 => no colleague relationship
+	#Changes to 1 => pending outgoing request
+	#Changes to 2 => pending incoming request
+	#Changes to 3 => colleagues
+	#
+	#Relationship status between two colleagues will either be:
+	#Both 0 or both 3, when two teachers are collegues or not colleagues, with no pending requests
+	#One will be 1 and the other must be 2 when a request has been made
 
-         @effected_relationship = @teacher.relationships.find_or_initialize_by(:user_id => current_teacher.id)
 
-         @effected_relationship.colleague_status = 2
+	#Will be changed to one-step process (remove the add method and change link to form)
+	#GET /add/:id
+	def add
 
-         @effected_relationship.save
-      end
+		#Teacher to be added
+		@teacher = Teacher.find(params[:id])
 
-      #if adding colleage due to incoming request, create colleague relationshikp
-      if @relationship.colleague_status == 2
-         @relationship.colleague_status = 3
+		@title = "Add #{@teacher.fname} #{@teacher.lname} as a Colleague"
 
-         @relationship.save
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-         @effected_relationship = @teacher.relationships.find_or_initialize_by(:user_id => current_teacher.id)
+		if @relationship.colleague_status == 3
+			redirect_to teacher_path(@teacher)
+		end
 
-         @effected_relationship.colleague_status = 3
+	end
 
-         @effected_relationship.save
-      end
+	#GET /confadd/:id <= To be changed to PUT/POST
+	def confadd
 
-   end
+		#Teacher to be added
+		@teacher = Teacher.find(params[:id])
 
+		@title = "Add #{@teacher.fname} #{@teacher.lname} as a Colleague"
 
-   #Will be changed to one-step process (remove the add method and change link to form)
-   #GET /remove/:id
-   def remove
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-      #Teacher to be removed
-      @teacher = Teacher.find(params[:id])
+		if @relationship.colleague_status == 0 #Then the colleague_status for @teacher should also be 0
+			@relationship.colleague_status = 1
 
-      @title = "Remove #{@teacher.fname} #{@teacher.lname} as a Colleague"
+			@relationship.save
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+			@affected_relationship = @teacher.relationships.find_or_initialize_by(:user_id => current_teacher.id)
 
+			@affected_relationship.colleague_status = 2
 
-      if !@relationship.colleague_status == 3
-         redirect_to teacher_path(@teacher)
-      end
+			@affected_relationship.save
+		end
 
-   end
+		#if adding colleage due to incoming request, create colleague relationshikp
+		if @relationship.colleague_status == 2
+			@relationship.colleague_status = 3
 
-   #GET /confremove/:id <= To be changed to PUT/POST
-   def confremove
+			@relationship.save
 
-      #Teacher to be removed
-      @teacher = Teacher.find(params[:id])
+			@affected_relationship = @teacher.relationships.find_or_initialize_by(:user_id => current_teacher.id)
 
-      @title = "Remove #{@teacher.fname} #{@teacher.lname} as a Colleague"
+			@affected_relationship.colleague_status = 3
 
-      @relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+			@affected_relationship.save
+		end
 
-      if @relationship.colleague_status == 3
+	end
 
-         @relationship.colleague_status = 0
 
-         @relationship.save
+	#Will be changed to one-step process (remove the add method and change link to form)
+	#GET /remove/:id
+	def remove
 
-         @effected_relationship = @teacher.relationships.find_or_initialize_by(:user_id => current_teacher.id)
+		#Teacher to be removed
+		@teacher = Teacher.find(params[:id])
 
-         @effected_relationship.colleague_status = 0
+		@title = "Remove #{@teacher.fname} #{@teacher.lname} as a Colleague"
 
-         @effected_relationship.save
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
 
-      else
-         redirect_to teacher_path(@teacher)
-      end
 
-   end
+		if !@relationship.colleague_status == 3
+			redirect_to teacher_path(@teacher)
+		end
+
+	end
+
+	#GET /confremove/:id <= To be changed to PUT/POST
+	def confremove
+
+		#Teacher to be removed
+		@teacher = Teacher.find(params[:id])
+
+		@title = "Remove #{@teacher.fname} #{@teacher.lname} as a Colleague"
+
+		@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
+
+		if @relationship.colleague_status == 3
+
+			@relationship.colleague_status = 0
+
+			@relationship.save
+
+			@affected_relationship = @teacher.relationships.find_or_initialize_by(:user_id => current_teacher.id)
+
+			@affected_relationship.colleague_status = 0
+
+			@affected_relationship.save
+
+		else
+			redirect_to teacher_path(@teacher)
+		end
+
+	end
 
 end

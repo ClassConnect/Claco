@@ -1,8 +1,8 @@
 <p>app/views/teachers/tags.html.erb</p>
-<h1><%= "#{@teacher.fname}'s Tags" %></h1>
+<h1><%= "#{current_teacher.fname}'s Tags" %></h1>
 
-<%= form_for @tag, :url => updatetags_path do |f| %>
-	
+<%= form_for current_teacher.tag, :url => updatetags_path do |f| %>
+
   <% (1..12).each do |g| %>
 
   <div><label ><%= "#{g.ordinalize} grade" %>
@@ -18,13 +18,13 @@
   <br />
 
   <div><%= f.label :subjects, "Subject Tags" %><br />
-  <%= f.text_field :subjects, :value => @tag.subjects.join(' ') %></div>
+  <%= f.text_field :subjects, :value => current_teacher.tag.subjects.join(' ') %></div>
 
   <div><%= f.label :standards, "Standard Tags" %> <br />
-  <%= f.text_field :standards, :value => @tag.standards.join(' ') %></div>
+  <%= f.text_field :standards, :value => current_teacher.tag.standards.join(' ') %></div>
 
   <div><%= f.label :other, "Other Tags" %> <br />
-  <%= f.text_field :other, :value => @tag.other.join(' ') %></div>
+  <%= f.text_field :other, :value => current_teacher.tag.other.join(' ') %></div>
 
   <div><%= f.submit "Update" %></div>
 

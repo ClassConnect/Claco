@@ -1,9 +1,10 @@
 <p>app/views/teachers/editinfo.html.erb</p>
-<%= @teacher.fname %>
-
-<br /><br />
-
-<%= form_for @info, :url => updateinfo_path do |f| %>
+<!-- <%= @teacher.fname %> -->
+<%= current_teacher.fname %>
+<br
+/><br />
+<!-- form_for @info, :url => updateinfo_path do |f| -->
+<%= form_for current_teacher.info, :url => updateinfo_path do |f| %>
 
   <div><%= f.label :bio, "Bio" %><br />
   <%= f.text_area :bio %></div>

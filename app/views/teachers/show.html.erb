@@ -26,19 +26,19 @@
 <% if current_teacher.id != @teacher.id %>
 
 	<% if !current_teacher.subscribed_to?(@teacher.id) %>
-		<p><%= link_to "Subcribe to this teacher", "/sub/" + @teacher.id.to_s %></p>
+		<p><%= link_to "Subscribe to this teacher", "/confsub/" + @teacher.id.to_s %></p>
 	<% else %>
-		<p><%= link_to "Unsubcribe from this teacher", "/unsub/" + @teacher.id.to_s %></p>
+		<p><%= link_to "Unsubcribe from this teacher", "/confunsub/" + @teacher.id.to_s, :confirm => 'Are you sure?' %></p>
 	<% end %>
 
 	<% case current_teacher.colleague_status(@teacher.id) %>
 	<% when 0 %>
-		<p><%= link_to "Add as colleague", "/add/" + @teacher.id.to_s %></p>
+		<p><%= link_to "Add as colleague", "/confadd/" + @teacher.id.to_s %></p>
 	<% when 1 %>
 		<p>Colleague request sent</p>
 	<% when 2%>
-		<p><%= link_to "Accept colleague request", "/add/" + @teacher.id.to_s %></p>
+		<p><%= link_to "Accept colleague request", "/confadd/" + @teacher.id.to_s %></p>
 	<% when 3%>
-		<p><%= link_to "Remove colleague", "/remove/" + @teacher.id.to_s %></p>
+		<p><%= link_to "Remove colleague", "/confremove/" + @teacher.id.to_s, :confirm => 'Are you sure?' %></p>
 	<% end %>
 <% end %>

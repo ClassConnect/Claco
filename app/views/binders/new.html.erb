@@ -1,0 +1,14 @@
+<p>app/views/binders/new.html.erb</p>
+
+<%= form_for Binder.new, :url => binders_path do |f| %>
+
+  <div><%= f.label :title, "Title" %><br />
+  <%= f.text_field :title %></div>
+
+  <div><%= f.label :type, "Type" %><br />
+  <%= f.select(:type, options_for_select(0..2)) %></div>
+
+
+  <div><%= f.submit "Create Binder" %></div>
+
+<% end %>

@@ -3,7 +3,7 @@ class Binder
 
 	#File/Directory-specific Attributes
 	field :owner, :type => String
-	field :title, :type => String #File/directory name
+	field :title, :type => String#, :default => "/" #File/directory name
 	field :body, :type => String #Directory annotation
 	field :type, :type => Integer # 1 = Directory, 2 = Content/File
 	field :permissions, :type => Array # [shared_id, type, auth_level]
@@ -12,16 +12,16 @@ class Binder
 
 	#Parent
 	field :parent => Array #Possibly Replace with Binder.parents.last?
-	field :parents, :type => Array
+	field :parents, :type => Array #[# => [Title, id]]
 	field :parent_permissions, :type => Array #[type, folder_id, shared_id, auth_level]
 	field :parent_tags, :type => Array
 
 	#Version Control
-	field :versions, type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
+	field :versions, :type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
 	field :forked_from, :type => String
 	field :fork_hash, :type => String
 	field :fork_stamp, :type => String
-	field :last_update, :type => Time
+	field :last_update, :type => Time # Change to Integer if we want Unix time use and Time.now.to_i
 	field :lasted_updated_by, :type => String
 
 	#Counts

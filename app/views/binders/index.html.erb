@@ -1,0 +1,6 @@
+<h3>Binders#index</h3>
+<p>app/views/binders/index.html.erb</p>
+<% @binders.each do |binder| %>
+  <p>Binder: <%=link_to binder.title, binder %></p>
+<% end %>
+<%= link_to "Create new binder", new_binder_path %>

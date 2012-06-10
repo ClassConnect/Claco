@@ -2,7 +2,8 @@ class BindersController < ApplicationController
 	before_filter :authenticate_teacher!
 
 	def index
-		@binders = Binder.where(:owner => current_teacher.id.to_s)
+		#Change where to query for binders in the "root" directly
+		@binders = Binder.where("parent.id" => "0")
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Binders"
 	end
@@ -10,9 +11,9 @@ class BindersController < ApplicationController
 
 	def new
 
-		@binder = Binder.new
-
 		@binders = Binder.where(:owner => current_teacher.id)
+
+		@title = "Create a new binder"
 
 	end
 
@@ -21,28 +22,56 @@ class BindersController < ApplicationController
 
 	def create
 
-
-
 		@binder = Binder.new
 
-		@binder.title = params[:title].to_s[0..60]
+		@binder.owner = current_teacher.id
 
-		#Query for parent
-		@parent = Binder.where()
+		#Trim to 60 chars (old spec)
+		if params[:binder][:title].length < 1
+			redirect_to new_binder_path and return
+		end
 
-		#@permissions = verifypermissions(@parent)
+		@binder.title = params[:binder][:title].to_s[0..60]
+		
+		@parenthash = {}
+		@parentsarr = []
 
-		#@perlevel = determineperlevel(@parent.id.to_s, @permissions)
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {:id => params[:binder][:parent].to_s,
+				:title => ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {:id => params[:binder][:parent].to_s,
+				:title =>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+
+		@binder.parent = @parenthash
+
+		@binder.parents = @parentsarr
+
+		@binder.last_update = Time.now.to_i
+
+		@binder.last_updated_by = current_teacher.id.to_s
 
 		@binder.save
 
-		redirect_to binder_path(@binder)
+		redirect_to binders_path
 
 	end
 
 	def show
 
-		@children = Binder.where(:parent["id"] => params[:id])
+		@binder = Binder.find(params[:id])
+
+		@children = Binder.where("parent.id" => params[:id])
 
 	end
 

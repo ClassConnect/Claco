@@ -5,9 +5,8 @@
   <div><%= f.label :title, "Title" %><br />
   <%= f.text_field :title %></div>
 
-  <div><%= f.label :type, "Type" %><br />
-  <%= f.select(:type, options_for_select(0..2)) %></div>
-
+  <div><%= f.label :parent, "Parent" %><br />
+  <%= f.select(:parent, options_for_select([["Root", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
 
   <div><%= f.submit "Create Binder" %></div>
 

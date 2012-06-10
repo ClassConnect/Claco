@@ -1,5 +1,6 @@
 <h3>Home</h3>
 <p>app/views/home/index.html.erb</p>
 <% if signed_in? %>
-	<%= link_to teachers_path, teachers_path %>
+	<%= link_to teachers_path, teachers_path %><br />
+	<%= link_to binders_path, binders_path %>
 <% end %>

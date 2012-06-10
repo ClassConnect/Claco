@@ -5,13 +5,13 @@ class Binder
 	field :owner, :type => String
 	field :title, :type => String#, :default => "/" #File/directory name
 	field :body, :type => String #Directory annotation
-	field :type, :type => Integer # 1 = Directory, 2 = Content/File
+	field :type, :type => Integer # 1 = Directory, 2 = File
 	field :permissions, :type => Array # [shared_id, type, auth_level]
 	field :tags, :type => Array # [index, [title, owner, type]]
 	field :format, :type => Integer #Only used if type = 2
 
 	#Parent
-	field :parent => Array #Possibly Replace with Binder.parents.last?
+	field :parent, :type => Hash #Possibly Replace with Binder.parents.last?
 	field :parents, :type => Array #[# => [Title, id]]
 	field :parent_permissions, :type => Array #[type, folder_id, shared_id, auth_level]
 	field :parent_tags, :type => Array
@@ -21,8 +21,8 @@ class Binder
 	field :forked_from, :type => String
 	field :fork_hash, :type => String
 	field :fork_stamp, :type => String
-	field :last_update, :type => Time # Change to Integer if we want Unix time use and Time.now.to_i
-	field :lasted_updated_by, :type => String
+	field :last_update, :type => Integer
+	field :last_updated_by, :type => String
 
 	#Counts
 	field :files, :type => Integer

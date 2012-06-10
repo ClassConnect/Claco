@@ -1,6 +1,19 @@
-<h3>Binders#index</h3>
-<p>app/views/binders/index.html.erb</p>
+<h3>Binders#show</h3>
+<p>app/views/binders/show.html.erb</p>
+<p>Currently in: <%= @binder.title %></p>
+
+<p><% @binder.parents.each do |parent| %>
+
+	<% if parent["id"] == "0" %>
+		<%= link_to "Root", binders_path %> /
+	<% else %>
+		<%= link_to parent["title"], binder_path(parent["id"])  %> /
+	<% end %>
+<% end %><%= link_to @binder.title, binder_path(@binder) %></p>
+
 <% @children.each do |binder| %>
   <p>Binder: <%=link_to binder.title, binder %></p>
 <% end %>
+
+<%= link_to "Up one level", @binder.parent["id"].to_s == "0" ? binders_path : binder_path(@binder.parent["id"]) %>
 <%= link_to "Create new binder", new_binder_path %>

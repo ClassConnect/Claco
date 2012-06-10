@@ -3,25 +3,24 @@ class BindersController < ApplicationController
 
 	def index
 		#Change where to query for binders in the "root" directly
-		@binders = Binder.where("parent.id" => "0")
+		@binders = Binder.where(:owner => current_teacher.id, "parent.id" => "0")
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Binders"
 	end
 
+	def pubindex
+		@binders = Binder.where("permissions" => "2")
+	end
+
 
 	def new
-
 		@binders = Binder.where(:owner => current_teacher.id)
 
 		@title = "Create a new binder"
-
 	end
 
 	# Format is only used if Type is not folder
-
-
 	def create
-
 		@binder = Binder.new
 
 		@binder.owner = current_teacher.id
@@ -38,14 +37,14 @@ class BindersController < ApplicationController
 
 		if params[:binder][:parent].to_s == "0"
 
-			@parenthash = {:id => params[:binder][:parent].to_s,
+			@parenthash = {:id => params[:binder][:parent],
 				:title => ""}
 
 			@parentsarr = [@parenthash]
 
 		else
 
-			@parenthash = {:id => params[:binder][:parent].to_s,
+			@parenthash = {:id => params[:binder][:parent],
 				:title =>  Binder.find(params[:binder][:parent]).title}
 
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
@@ -71,8 +70,16 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		@title = "Viewing: #{@binder.title}"
+
 		@children = Binder.where("parent.id" => params[:id])
 
+	end
+
+	def edit
+		@title = "Edit binder"
+
+		@binder = Binder.find(params[:id])
 	end
 
 

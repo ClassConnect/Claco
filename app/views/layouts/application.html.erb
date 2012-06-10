@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Claco | <%= @title %></title>
-  <%= stylesheet_link_tag    "application", :media => "all" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
-
-      <header>
-        <%= render 'layouts/navigation' %>
-    </header>
-<%= yield %>
-
-</body>
+	<head>
+		<title>Claco | <%= @title %></title>
+		<%= stylesheet_link_tag    "application", :media => "all" %>
+		<%= javascript_include_tag "application" %>
+		<%= csrf_meta_tags %>
+	</head>
+	<body>
+		<header>
+			<%= render 'layouts/navigation' %>
+		</header>
+		<% if current_teacher %>
+		<%= current_teacher.inspect %>
+		<% end %>
+		<%= %> <!-- render 'shared/error_messages' -->
+		<%= yield %>
+		<% if Rails.env.development? %>
+		<div style="position:absolute; border:1px solid black; bottom:10px; right:10px;">
+			<%= debug(params) %>
+		</div>
+		<% end %>
+	</body>
 </html>

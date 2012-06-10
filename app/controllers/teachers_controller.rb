@@ -36,9 +36,13 @@ class TeachersController < ApplicationController
 	def editinfo
 		@title = "Edit your information"
 
+		if !current_teacher.info
+			current_teacher.info = Info.new
+		end
+
 		#@teacher = current_teacher
 
-		#f@info = @teacher.info
+		#@info = @teacher.info
 	end
 
 	#PUT /updateinfo
@@ -59,6 +63,10 @@ class TeachersController < ApplicationController
 #		@info.bio = params[:info][:bio]
 #		@info.website = params[:info][:website]
 #		@info.profile_picture = params[:info][:profile_picture]
+
+		if !current_teacher.info
+			current_teacher.info = Info.new
+		end
 
 		current_teacher.info.update_attributes(	:bio => params[:info][:bio],
 							:website => params[:info][:website],
@@ -129,6 +137,8 @@ class TeachersController < ApplicationController
 		redirect_to tags_path
 	end
 
+	# this function is no longer called:
+
 	#/sub/:id
 	#link to subscribe to :id
 	def sub
@@ -168,6 +178,8 @@ class TeachersController < ApplicationController
 		@relationship.save
 
 	end
+
+	# this function is no longer called:
 
 	#GET /unsub/:id
 	def unsub
@@ -234,6 +246,8 @@ class TeachersController < ApplicationController
 	#One will be 1 and the other must be 2 when a request has been made
 
 
+	# this function is no longer called:
+
 	#Will be changed to one-step process (remove the add method and change link to form)
 	#GET /add/:id
 	def add
@@ -288,6 +302,7 @@ class TeachersController < ApplicationController
 
 	end
 
+	# this function is no longer called:
 
 	#Will be changed to one-step process (remove the add method and change link to form)
 	#GET /remove/:id

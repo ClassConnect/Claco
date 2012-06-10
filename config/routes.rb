@@ -57,6 +57,7 @@ root :to => 'home#index'
 #Edit Info Form/Process
 get '/editinfo'       => "teachers#editinfo"
 put '/updateinfo'     => "teachers#updateinfo"
+post '/updateinfo'     => "teachers#updateinfo"
 
 #Profile Page
 get '/teachers/:id'   => 'teachers#show'

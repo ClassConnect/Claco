@@ -129,6 +129,8 @@ class TeachersController < ApplicationController
 		redirect_to tags_path
 	end
 
+	# this function is no longer called:
+
 	#/sub/:id
 	#link to subscribe to :id
 	def sub
@@ -168,6 +170,8 @@ class TeachersController < ApplicationController
 		@relationship.save
 
 	end
+
+	# this function is no longer called:
 
 	#GET /unsub/:id
 	def unsub
@@ -234,6 +238,8 @@ class TeachersController < ApplicationController
 	#One will be 1 and the other must be 2 when a request has been made
 
 
+	# this function is no longer called:
+
 	#Will be changed to one-step process (remove the add method and change link to form)
 	#GET /add/:id
 	def add
@@ -288,6 +294,7 @@ class TeachersController < ApplicationController
 
 	end
 
+	# this function is no longer called:
 
 	#Will be changed to one-step process (remove the add method and change link to form)
 	#GET /remove/:id

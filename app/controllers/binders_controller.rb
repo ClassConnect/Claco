@@ -31,7 +31,7 @@ class BindersController < ApplicationController
 		end
 
 		@binder.title = params[:binder][:title].to_s[0..60]
-		
+
 		@parenthash = {}
 		@parentsarr = []
 
@@ -69,6 +69,11 @@ class BindersController < ApplicationController
 	def show
 
 		@binder = Binder.find(params[:id])
+
+		# should not be possible to view/edit binders of others!
+		if current_teacher.id.to_s != @binder.owner.to_s
+			redirect_to binders_path
+		end
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -119,7 +124,7 @@ class BindersController < ApplicationController
 
 					child.parent["title"] = @title[0..60]
 					child.save
-				
+
 				end
 
 				#Update :parents field of children
@@ -139,7 +144,7 @@ class BindersController < ApplicationController
 			return true
 
 		else
-			
+
 			#Not the right permissions
 
 		end
@@ -163,7 +168,7 @@ class BindersController < ApplicationController
 		else
 
 			@binder.parent_permissions.each do |pper|
-				
+
 				if pper.type == 1
 
 					if pper.shared_id == @uid
@@ -202,7 +207,7 @@ class BindersController < ApplicationController
 
 				#Check if shared publicly
 				elsif pper.type == 3
-					
+
 					@publicauth = 1
 
 

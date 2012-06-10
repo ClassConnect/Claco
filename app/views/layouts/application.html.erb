@@ -15,10 +15,10 @@
 		<% end %> -->
 		<%= %> <!-- render 'shared/error_messages' -->
 		<%= yield %>
-		<!--<% if Rails.env.development? %>
+		<% if Rails.env.development? %>
 		<div style="position:absolute; border:1px solid black; bottom:10px; right:10px;">
 			<%= debug(params) %>
 		</div>
-		<% end %> -->
+		<% end %>
 	</body>
 </html>

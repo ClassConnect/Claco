@@ -14,6 +14,7 @@ class TeachersController < ApplicationController
 		@teacher = Teacher.find(params[:id])
 
 		@title = "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile"
+		#@title = "#{full_name(@teacher)}'s Profile"
 
 		#Create info for teacher if not yet created
 		if !@teacher.info

@@ -17,7 +17,7 @@ class Binder
 	field :parent_tags, :type => Array
 
 	#Version Control
-	field :versions, type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
+	field :versions, :type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
 	field :forked_from, :type => String
 	field :fork_hash, :type => String
 	field :fork_stamp, :type => String

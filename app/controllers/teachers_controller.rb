@@ -36,9 +36,13 @@ class TeachersController < ApplicationController
 	def editinfo
 		@title = "Edit your information"
 
+		if !current_teacher.info
+			current_teacher.info = Info.new
+		end
+
 		#@teacher = current_teacher
 
-		#f@info = @teacher.info
+		#@info = @teacher.info
 	end
 
 	#PUT /updateinfo
@@ -59,6 +63,10 @@ class TeachersController < ApplicationController
 #		@info.bio = params[:info][:bio]
 #		@info.website = params[:info][:website]
 #		@info.profile_picture = params[:info][:profile_picture]
+
+		if !current_teacher.info
+			current_teacher.info = Info.new
+		end
 
 		current_teacher.info.update_attributes(	:bio => params[:info][:bio],
 							:website => params[:info][:website],

@@ -84,6 +84,8 @@ get '/confremove/:id' => 'teachers#confremove'
 
 resources :teachers
 
+resources :binders
+
 
   # See how all your routes lay out with "rake routes"
 

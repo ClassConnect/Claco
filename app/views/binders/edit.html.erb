@@ -1,0 +1,17 @@
+<h3>Binders#edit</h3>
+<p>app/views/binders/edit.html.erb</p>
+
+<%= form_for Binder.find(params[:id]), :url => binder_path do |f| %>
+
+  <div><%= f.label :title, "Title" %><br />
+  <%= f.text_field :title %></div>
+<!--
+  <div><%= f.label :parent, "Parent" %><br />
+  <%= f.select(:parent, options_for_select([["Root", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
+-->
+  <div><%= f.label :body, "Body" %><br />
+  <%= f.text_area  :body %></div>
+
+  <div><%= f.submit "Edit Binder" %></div>
+
+<% end %>

@@ -1,0 +1,26 @@
+<h3>Binders#newcontent</h3>
+<p>app/views/binders/newcontent.html.erb</p>
+
+<%= form_for Binder.new, :url => binders_newcontent_path do |f| %>
+
+  <div><%= f.label :title, "Title" %><br />
+  <%= f.text_field :title %></div>
+
+  <div><%= f.label :parent, "Parent (to be replaced with a directory browser):" %><br />
+  <%= f.select(:parent, options_from_collection_for_select(@binders, :id, :title)) %></div>
+  <% #Do not allow content in "Root/home" %>
+
+  <%= f.fields_for :versions do |g| %>
+
+  	<div><%= g.label :data, "URL:" %><br />
+  	<%= g.text_field :data %></div>
+  
+  <% end %>
+
+
+  <div><%= f.label :body, "Body" %><br />
+  <%= f.text_area  :body %></div>
+
+  <div><%= f.submit "Create Binder" %></div>
+
+<% end %>

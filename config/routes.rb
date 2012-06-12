@@ -84,6 +84,10 @@ get '/confremove/:id' => 'teachers#confremove'
 
 resources :teachers
 
+#Adding Content
+get '/binders/newcontent' => 'binders#newcontent'
+post '/binders/newcontent' => 'binders#createcontent'
+
 resources :binders
 
 

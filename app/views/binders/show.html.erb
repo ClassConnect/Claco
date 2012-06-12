@@ -1,21 +1,41 @@
 <h3>Binders#show</h3>
 <p>app/views/binders/show.html.erb</p>
-<p>Currently in:<% @binder.parents.each do |parent| %>
 
+<p>Currently In:<% @binder.parents.each do |parent| %>
 	<% if parent["id"] == "0" %>
-		<%= link_to "Root", binders_path %> /
+		<%= link_to "Home", binders_path %> /
 	<% else %>
 		<%= link_to parent["title"], binder_path(parent["id"])  %> /
 	<% end %>
 <% end %><%= link_to @binder.title, binder_path(@binder) %></p>
 
-<div>Contents:<br />
-<% if @children.empty? %>
-	<p>Empty</p>
-<% end %>
-<% @children.each do |binder| %>
-  <%=link_to binder.title, binder %>
+<div><% if !@binder.body.blank? %>
+	Body: <%= @binder.body %>
+<br /><br />
 <% end %></div>
+
+<div>Contents:
+	<br />
+	<% if @children.empty? %>
+		Empty
+	<% end %>
+	<% @children.each do |binder| %>
+		<% if binder.type == 2 %>
+
+			<% if binder.format == 2 %>
+				<%= link_to binder.title, binder.versions.last.data, :target => "_blank" %>
+				(<%= link_to "Edit", edit_binder_path(binder) %>)
+			<% end %>
+
+		<% else %>
+	  		<%= link_to binder.title, binder %>
+	  	<% end %>
+	  		<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
+	  <br />
+	<% end %>
+</div>
 <br />
-<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %>
-<%= link_to "Create new binder", new_binder_path %>
+<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %> | 
+<%= link_to "Create new binder", new_binder_path %> | 
+<%= link_to "Edit this binder", edit_binder_path(@binder) %> |
+<%= link_to "Add content", binders_newcontent_path %>

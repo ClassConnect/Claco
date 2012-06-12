@@ -14,7 +14,7 @@ class BindersController < ApplicationController
 
 
 	def new
-		@binders = Binder.where(:owner => current_teacher.id)
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
 
 		@title = "Create a new binder"
 	end
@@ -51,6 +51,7 @@ class BindersController < ApplicationController
 
 		end
 
+		@binder.body = params[:binder][:body]
 
 		@binder.parent = @parenthash
 
@@ -59,6 +60,9 @@ class BindersController < ApplicationController
 		@binder.last_update = Time.now.to_i
 
 		@binder.last_updated_by = current_teacher.id.to_s
+
+		#Declare as folder
+		@binder.type = 1
 
 		@binder.save
 
@@ -80,6 +84,80 @@ class BindersController < ApplicationController
 		@title = "Edit binder"
 
 		@binder = Binder.find(params[:id])
+
+		@binders = Binder.where(:owner => current_teacher.id).reject {|x| x.id == params[:id]}#:id => params[:id])
+	end
+
+	def update
+
+		@binder = Binder.find(params[:id])
+
+		@binder.update_attributes(:title => params[:binder][:title],
+			:body => params[:binder][:body])
+
+		redirect_to binder_path(@binder)
+	end
+
+	def newcontent
+
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
+
+		@title = "Add new content"
+
+	end
+
+	def createcontent
+
+		@binder = Binder.new
+
+		@binder.owner = current_teacher.id
+
+		#Trim to 60 chars (old spec)
+		if params[:binder][:title].length < 1
+			redirect_to new_binder_path and return
+		end
+
+		@binder.title = params[:binder][:title].to_s[0..60]
+		
+		@parenthash = {}
+		@parentsarr = []
+
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title => ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title =>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+		@binder.body = params[:binder][:body]
+
+		@binder.parent = @parenthash
+
+		@binder.parents = @parentsarr
+
+		@binder.last_update = Time.now.to_i
+
+		@binder.last_updated_by = current_teacher.id.to_s
+
+		#Declare as content
+		@binder.type = 2
+		@binder.format = 2
+
+		@binder.versions << Version.new(:data => params[:binder][:versions][:data])
+
+		@binder.save
+
+		redirect_to binders_path(params[:binder][:parent])
+
 	end
 
 

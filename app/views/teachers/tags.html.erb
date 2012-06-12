@@ -1,5 +1,5 @@
 <p>app/views/teachers/tags.html.erb</p>
-<h1><%= "#{current_teacher.fname}'s Tags" %></h1>
+<h1><%= "#{current_teacher.full_name}'s Tags" %></h1>
 
 <%= form_for current_teacher.tag, :url => updatetags_path do |f| %>
 

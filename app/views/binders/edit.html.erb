@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <h3>Binders#edit</h3>
 <p>app/views/binders/edit.html.erb</p>
 
@@ -15,3 +16,20 @@
   <div><%= f.submit "Edit Binder" %></div>
 
 <% end %>
+=======
+<p>app/views/binders/edit.html.erb</p>
+
+<br />
+<br />
+
+<%= form_for @binder, :url => updatebinder_path do |f| %>
+
+	<!-- render 'shared/error_messages' -->
+
+	<div><%= f.label :title, "Title" %><br />
+	<%= f.text_field :title %></div>
+
+	<div><%= f.submit "Update" %></div>
+
+<% end %>
+>>>>>>> 8caeae3c0b7f63efd547cea0bdd40e7e85cef55b

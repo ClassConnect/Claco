@@ -31,7 +31,7 @@ class BindersController < ApplicationController
 		end
 
 		@binder.title = params[:binder][:title].to_s[0..60]
-		
+
 		@parenthash = {}
 		@parentsarr = []
 
@@ -53,13 +53,18 @@ class BindersController < ApplicationController
 
 		@binder.body = params[:binder][:body]
 
-		@binder.parent = @parenthash
+#		@binder.parent = @parenthash
 
-		@binder.parents = @parentsarr
+#		@binder.parents = @parentsarr
 
-		@binder.last_update = Time.now.to_i
+#		@binder.last_update = Time.now.to_i
 
-		@binder.last_updated_by = current_teacher.id.to_s
+#		@binder.last_updated_by = current_teacher.id.to_s
+
+		@binder.update_attributes(:parent => @parenthash,
+					:parents => @parentsarr,
+					:last_update => Time.now.to_i,
+					:last_updated_by => current_teacher.id.to_s)
 
 		#Declare as folder
 		@binder.type = 1
@@ -73,6 +78,11 @@ class BindersController < ApplicationController
 	def show
 
 		@binder = Binder.find(params[:id])
+
+		# should not be possible to view/edit binders of others!
+		if current_teacher.id.to_s != @binder.owner.to_s
+			redirect_to binders_path
+		end
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -160,6 +170,31 @@ class BindersController < ApplicationController
 
 	end
 
+	def update
+#		if !current_teacher.info
+#			current_teacher.info = Info.new
+#		end
+
+#		current_teacher.info.update_attributes(	:bio => params[:info][:bio],
+#							:website => params[:info][:website],
+#							:profile_picture => params[:info][:profile_picture])
+
+#		current_teacher.info.save
+
+#		redirect_to teacher_path(current_teacher)
+
+		@binder = Binder.find(params[:binder][:id])
+
+		@binder.update_attributes(:title => params[:binder][:title],
+					:last_update => Time.now.to_i,
+					:last_updated_by => current_teacher.id.to_s)
+
+		@binder.save
+
+		redirect_to binder_path
+
+	end
+
 
 #Fuck this shit for now
 =begin
@@ -197,7 +232,7 @@ class BindersController < ApplicationController
 
 					child.parent["title"] = @title[0..60]
 					child.save
-				
+
 				end
 
 				#Update :parents field of children
@@ -217,7 +252,7 @@ class BindersController < ApplicationController
 			return true
 
 		else
-			
+
 			#Not the right permissions
 
 		end
@@ -241,7 +276,7 @@ class BindersController < ApplicationController
 		else
 
 			@binder.parent_permissions.each do |pper|
-				
+
 				if pper.type == 1
 
 					if pper.shared_id == @uid
@@ -280,7 +315,7 @@ class BindersController < ApplicationController
 
 				#Check if shared publicly
 				elsif pper.type == 3
-					
+
 					@publicauth = 1
 
 

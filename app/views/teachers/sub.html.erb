@@ -1,5 +1,5 @@
 <p>app/views/teachers/sub.html.erb</p>
 <h1>Confirm Subscription</h1>
-<p>Are you sure you want to subscribe to <%= "#{@teacher.title} #{@teacher.lname}" %>?</p>
+<p>Are you sure you want to subscribe to <%= "#{@teacher.full_name}" %>?</p>
 
 <%= link_to "Yes", "/confsub/#{@teacher.id.to_s}" %> <%= link_to "No", teacher_path(@teacher) %>

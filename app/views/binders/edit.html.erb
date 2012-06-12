@@ -1,0 +1,15 @@
+<p>app/views/binders/edit.html.erb</p>
+
+<br />
+<br />
+
+<%= form_for @binder, :url => updatebinder_path do |f| %>
+
+	<!-- render 'shared/error_messages' -->
+
+	<div><%= f.label :title, "Title" %><br />
+	<%= f.text_field :title %></div>
+
+	<div><%= f.submit "Update" %></div>
+
+<% end %>

@@ -52,13 +52,18 @@ class BindersController < ApplicationController
 		end
 
 
-		@binder.parent = @parenthash
+#		@binder.parent = @parenthash
 
-		@binder.parents = @parentsarr
+#		@binder.parents = @parentsarr
 
-		@binder.last_update = Time.now.to_i
+#		@binder.last_update = Time.now.to_i
 
-		@binder.last_updated_by = current_teacher.id.to_s
+#		@binder.last_updated_by = current_teacher.id.to_s
+
+		@binder.update_attributes(:parent => @parenthash,
+					:parents => @parentsarr,
+					:last_update => Time.now.to_i,
+					:last_updated_by => current_teacher.id.to_s)
 
 		@binder.save
 
@@ -85,6 +90,31 @@ class BindersController < ApplicationController
 		@title = "Edit binder"
 
 		@binder = Binder.find(params[:id])
+	end
+
+	def update
+#		if !current_teacher.info
+#			current_teacher.info = Info.new
+#		end
+
+#		current_teacher.info.update_attributes(	:bio => params[:info][:bio],
+#							:website => params[:info][:website],
+#							:profile_picture => params[:info][:profile_picture])
+
+#		current_teacher.info.save
+
+#		redirect_to teacher_path(current_teacher)
+
+		@binder = Binder.find(params[:binder][:id])
+
+		@binder.update_attributes(:title => params[:binder][:title],
+					:last_update => Time.now.to_i,
+					:last_updated_by => current_teacher.id.to_s)
+
+		@binder.save
+
+		redirect_to binder_path
+
 	end
 
 

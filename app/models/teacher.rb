@@ -41,15 +41,37 @@ class Teacher
 	field :lname, :type => String
 	field :username, :type => String, :default => nil, :allow_nil => true, :unique => true
 
-	embeds_one :info, validate: false
+	embeds_one :info#, validate: false
 
-	embeds_one :tag, validate: false
+	embeds_one :tag#, validate: false
 
-	embeds_many :relationships, validate: false
+	embeds_many :relationships#, validate: false
 
 	## Token authenticatable
 	# field :authentication_token, :type => String
 
+	# Class Methods
+
+	# Mr. John Smith
+	def full_name
+		return title + " " + fname + " " + lname
+	end
+
+	# Mr. Smith
+	def formal_name
+		return title + " " + lname
+	end
+
+	# Relationship Class Method Wrappers
+
+	# this is not formal MVC style, but I wasn't able to successfully move this
+	# function down to the Relationship class
+	def relationship_by_teacher_id(teacher_id)
+		#self.relationships.by_teacher_id(params)
+		self.relationships.find_or_initialize_by(:user_id => teacher_id)
+	end
+
+	# unused
 	def subscribed_to?(id)
 		return self.relationships.find_or_initialize_by(:user_id => id).subscribed
 	end
@@ -63,22 +85,71 @@ end
 class Tag
 	include Mongoid::Document
 
-	field :grade_levels, :type => Array
-	field :subjects, :type => Array
-	field :standards, :type => Array
-	field :other, :type => Array
+	field :grade_levels, :type => Array, :default => [""]
+	field :subjects, :type => Array, :default => [""]
+	field :standards, :type => Array, :default => [""]
+	field :other, :type => Array, :default => [""]
 
 	embedded_in :teacher
+
+	# Class Methods
+
+	def update_tag_fields(params)
+		self.update_attributes(	:grade_levels => params[:tag][:grade_levels],
+					:subjects => params[:tag][:subjects].downcase.split.uniq,
+					:standards => params[:tag][:standards].downcase.split.uniq,
+					:other => params[:tag][:other].downcase.split.uniq)
+		self.save
+	end
+
 end
 
 class Relationship
 	include Mongoid::Document
+
+	#scope :find_by_id, find_or_initialize_by(:user_id => params[:id])
+	#scope :find_by_id, lambda { |teacher_id| find_or_initialize_by(":user_id => ?", teacher_id) }
+	#def self.find_by_id(teacher_id)
+	#	find_or_initialize_by(:user_id => teacher_id)
+	#end
+
+	#def self.find_by_id(teacher_id)
+	#def self.find_by_id(teacher_id)
+	#	return self.find_or_initialize_by(user_id: teacher_id)
+	#end
+
+	#scope :named, ->(name){ where(name: name) }
+	#scope :teacher_by_id, ->(teacher_id){ find_or_initialize_by(user_id: teacher_id) }
+
+	#scope :find_unsubscribed, where(subscribed: false)
 
 	field :user_id, :type => String, :unique => true
 	field :subscribed, :type => Boolean, :default => false
 	field :colleague_status, :type => Integer, :default => 0
 
 	embedded_in :teacher
+
+	# Class Methods
+
+#	def by_teacher_id(params)
+#		self.find_or_initialize_by(:user_id => params[:id])
+#	end
+
+	def subscribe
+		self.subscribed = true
+		self.save
+	end
+
+	def unsubscribe
+		self.subscribed = false
+		self.save
+	end
+
+	def set_colleague_status(newstatus)
+		self.colleague_status = newstatus
+		self.save
+	end
+
 end
 
 class Info
@@ -95,9 +166,18 @@ class Info
 	validates :profile_picture, 	:presence => true,
 					:format => { :with => image_regex }
 
-	field :bio, :type => String
-	field :website, :type => String
-	field :profile_picture, :type => String
+	field :bio, :type => String, :default => ""
+	field :website, :type => String, :default => ""
+	field :profile_picture, :type => String, :default => ""
 
 	embedded_in :teacher
+
+	# Class Methods
+
+	def update_info_fields(params)
+		self.update_attributes(	:bio => params[:info][:bio],
+					:website => params[:info][:website],
+					:profile_picture => params[:info][:profile_picture])
+		self.save
+	end
 end

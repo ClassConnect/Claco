@@ -2,7 +2,8 @@
 <p>app/views/teachers/show.html.erb</p>
 
 <% #Greeting %>
-<p><%= "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile" %></p>
+<!-- <p><%= "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile" %></p> -->
+<p><%= "#{ @teacher.full_name }" %>
 
 
 <% if !@teacher.info.bio.empty? %>
@@ -36,9 +37,9 @@
 		<p><%= link_to "Add as colleague", "/confadd/" + @teacher.id.to_s %></p>
 	<% when 1 %>
 		<p>Colleague request sent</p>
-	<% when 2%>
+	<% when 2 %>
 		<p><%= link_to "Accept colleague request", "/confadd/" + @teacher.id.to_s %></p>
-	<% when 3%>
+	<% when 3 %>
 		<p><%= link_to "Remove colleague", "/confremove/" + @teacher.id.to_s, :confirm => 'Are you sure?' %></p>
 	<% end %>
 <% end %>

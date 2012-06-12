@@ -59,6 +59,10 @@ get '/editinfo'       => "teachers#editinfo"
 put '/updateinfo'     => "teachers#updateinfo"
 post '/updateinfo'     => "teachers#updateinfo"
 
+get '/editbinder'	=> "binders#edit"
+put '/updatebinder'	=> "binders#update"
+post '/updatebinder'	=> "binders#update"
+
 #Profile Page
 get '/teachers/:id'   => 'teachers#show'
 
@@ -81,6 +85,9 @@ get '/confadd/:id'    => 'teachers#confadd'
 #Remove :id as colleague
 get '/remove/:id'     => 'teachers#remove'
 get '/confremove/:id' => 'teachers#confremove'
+
+#subscriptions
+get '/subs'	      => 'teachers#subs'
 
 resources :teachers
 

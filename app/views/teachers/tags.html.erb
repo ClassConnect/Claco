@@ -3,6 +3,9 @@
 
 <%= form_for current_teacher.tag, :url => updatetags_path do |f| %>
 
+	<!-- f.error_messages -->
+	<%= render 'shared/error_messages', object: f.object %>
+
 	<% if true %>
 	<% (0..19).each do |grade_level| %>
 	<%= check_box( "tag", "grade_levels", { :id => "tag_grade_levels", :name => "tag[grade_levels][]", :checked => check_box_value(grade_level) }  ) %>

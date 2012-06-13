@@ -43,8 +43,6 @@ class TeachersController < ApplicationController
 
 		#newinfo = params[:info]
 
-		#TODO: Add validation to make sure that the profile_picture is actually a link to picture,
-		#or add image upload form
 		#Make sure htmlcode is not allowed in @info.bio
 
 		if !current_teacher.info
@@ -53,7 +51,11 @@ class TeachersController < ApplicationController
 
 		current_teacher.info.update_info_fields(params);
 
-		redirect_to teacher_path(current_teacher)
+		if current_teacher.info.errors.empty?
+			redirect_to teacher_path(current_teacher)
+		else
+			render 'editinfo'
+		end
 
 	end
 

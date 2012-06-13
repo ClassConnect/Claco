@@ -2,7 +2,6 @@ class BindersController < ApplicationController
 	before_filter :authenticate_teacher!
 
 	def index
-		#Change where to query for binders in the "root" directly
 		@binders = Binder.where(:owner => current_teacher.id, "parent.id" => "0")
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Binders"
@@ -43,11 +42,12 @@ class BindersController < ApplicationController
 			@parenthash = {:id => params[:binder][:parent],
 				:title =>  Binder.find(params[:binder][:parent]).title}
 
+			#Grab
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
 
 		end
 
-		@binder.update_attributes(:title => params[:binder][:title].to_s[0..60]
+		@binder.update_attributes(:title => params[:binder][:title].to_s[0..60],
 					:parent => @parenthash,
 					:parents => @parentsarr,
 					:last_update => Time.now.to_i,
@@ -121,7 +121,7 @@ class BindersController < ApplicationController
 
 		end
 
-		@binder.update_attributes(	:title => params[:binder][:title][0..60]
+		@binder.update_attributes(:title => params[:binder][:title][0..60],
 					:parent => @parenthash,
 					:parents => @parentsarr,
 					:last_update => Time.now.to_i,

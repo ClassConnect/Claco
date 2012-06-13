@@ -85,7 +85,10 @@ end
 class Tag
 	include Mongoid::Document
 
-	field :grade_levels, :type => Array, :default => [""]
+	field :grade_levels, :type => Array, :default => [false, false, false, false, false,
+							false, false, false, false, false,
+							false, false, false, false, false,
+							false, false, false, false, false]
 	field :subjects, :type => Array, :default => [""]
 	field :standards, :type => Array, :default => [""]
 	field :other, :type => Array, :default => [""]
@@ -95,7 +98,19 @@ class Tag
 	# Class Methods
 
 	def update_tag_fields(params)
-		self.update_attributes(	:grade_levels => params[:tag][:grade_levels],
+
+		true_checkbox_array = Array.new(20, false)
+		zero_count = 0
+
+		(1..(params[:tag][:grade_levels].length-1)).each do |i|
+			if params[:tag][:grade_levels][i] == "0"
+				zero_count += 1
+			else
+				true_checkbox_array[zero_count] = true
+			end
+		end
+
+		self.update_attributes(	:grade_levels => true_checkbox_array,
 					:subjects => params[:tag][:subjects].downcase.split.uniq,
 					:standards => params[:tag][:standards].downcase.split.uniq,
 					:other => params[:tag][:other].downcase.split.uniq)

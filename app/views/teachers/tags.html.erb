@@ -3,29 +3,24 @@
 
 <%= form_for current_teacher.tag, :url => updatetags_path do |f| %>
 
-  <% (1..12).each do |g| %>
+	<% if true %>
+	<% (0..19).each do |grade_level| %>
+	<%= check_box( "tag", "grade_levels", { :id => "tag_grade_levels", :name => "tag[grade_levels][]", :checked => check_box_value(grade_level) }  ) %>
+	<%= f.label :grade_levels[grade_level], grade_level_title_by_index(grade_level) %><br />
+	<% end %>
+	<% end %>
 
-  <div><label ><%= "#{g.ordinalize} grade" %>
-  <input type="checkbox" "grade", "grade_#{g}" %></div>
+	<br />
 
+	<div><%= f.label :subjects, "Subject Tags" %><br />
+	<%= f.text_field :subjects, :value => current_teacher.tag.subjects.join(' ') %></div>
 
-  <!--
-    <div><%= label :grade_levels, "#{g.ordinalize} grade" %>
-    <%= check_box "#{:grade_levels}[#{g}]", :value => g.to_s %></div>
-  -->
-  <% end %>
+	<div><%= f.label :standards, "Standard Tags" %> <br />
+	<%= f.text_field :standards, :value => current_teacher.tag.standards.join(' ') %></div>
 
-  <br />
+	<div><%= f.label :other, "Other Tags" %> <br />
+	<%= f.text_field :other, :value => current_teacher.tag.other.join(' ') %></div>
 
-  <div><%= f.label :subjects, "Subject Tags" %><br />
-  <%= f.text_field :subjects, :value => current_teacher.tag.subjects.join(' ') %></div>
-
-  <div><%= f.label :standards, "Standard Tags" %> <br />
-  <%= f.text_field :standards, :value => current_teacher.tag.standards.join(' ') %></div>
-
-  <div><%= f.label :other, "Other Tags" %> <br />
-  <%= f.text_field :other, :value => current_teacher.tag.other.join(' ') %></div>
-
-  <div><%= f.submit "Update" %></div>
+	<div><%= f.submit "Update" %></div>
 
 <% end %>

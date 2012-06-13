@@ -10,9 +10,9 @@
 		<header>
 			<%= render 'layouts/navigation' %>
 		</header>
-		<!-- <% if current_teacher %>
+		<% if current_teacher %>
 		<%= current_teacher.inspect %>
-		<% end %> -->
+		<% end %>
 		<%= %> <!-- render 'shared/error_messages' -->
 		<%= yield %>
 		<% if Rails.env.development? %>

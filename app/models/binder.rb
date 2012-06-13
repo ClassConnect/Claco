@@ -41,7 +41,9 @@ end
 
 class Version
 	include Mongoid::Document
-
+	
+	
+	
 	field :uid, :type => String
 	field :timestamp, :type => Integer
 	field :comments_priv, :type => Array

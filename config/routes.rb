@@ -91,6 +91,10 @@ get '/subs'	      => 'teachers#subs'
 
 resources :teachers
 
+#Adding Content
+get '/binders/newcontent' => 'binders#newcontent'
+post '/binders/newcontent' => 'binders#createcontent'
+
 resources :binders
 
 

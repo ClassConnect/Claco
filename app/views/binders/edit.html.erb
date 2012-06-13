@@ -1,15 +1,14 @@
+<h3>Binders#edit</h3>
 <p>app/views/binders/edit.html.erb</p>
 
-<br />
-<br />
+<%= form_for Binder.find(params[:id]), :url => binder_path do |f| %>
 
-<%= form_for @binder, :url => updatebinder_path do |f| %>
+  <div><%= f.label :title, "Title" %><br />
+  <%= f.text_field :title %></div>
 
-	<!-- render 'shared/error_messages' -->
+  <div><%= f.label :body, "Body" %><br />
+  <%= f.text_area  :body %></div>
 
-	<div><%= f.label :title, "Title" %><br />
-	<%= f.text_field :title %></div>
-
-	<div><%= f.submit "Update" %></div>
+  <div><%= f.submit "Edit Binder" %></div>
 
 <% end %>

@@ -8,18 +8,16 @@ class BindersController < ApplicationController
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Binders"
 	end
 
-	def pubindex
-		@binders = Binder.where("permissions" => "2")
-	end
-
+#	def pubindex
+#		@binders = Binder.where("permissions" => "2")
+#	end
 
 	def new
-		@binders = Binder.where(:owner => current_teacher.id)
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
 
 		@title = "Create a new binder"
 	end
 
-	# Format is only used if Type is not folder
 	def create
 		@binder = Binder.new
 
@@ -29,8 +27,6 @@ class BindersController < ApplicationController
 		if params[:binder][:title].length < 1
 			redirect_to new_binder_path and return
 		end
-
-		@binder.title = params[:binder][:title].to_s[0..60]
 
 		@parenthash = {}
 		@parentsarr = []
@@ -51,19 +47,15 @@ class BindersController < ApplicationController
 
 		end
 
-
-#		@binder.parent = @parenthash
-
-#		@binder.parents = @parentsarr
-
-#		@binder.last_update = Time.now.to_i
-
-#		@binder.last_updated_by = current_teacher.id.to_s
-
-		@binder.update_attributes(:parent => @parenthash,
+		@binder.update_attributes(:title => params[:binder][:title].to_s[0..60]
+					:parent => @parenthash,
 					:parents => @parentsarr,
 					:last_update => Time.now.to_i,
-					:last_updated_by => current_teacher.id.to_s)
+					:last_updated_by => current_teacher.id.to_s,
+					:body => params[:binder][:body])
+
+		#Declare as folder
+		@binder.type = 1
 
 		@binder.save
 
@@ -75,10 +67,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		# should not be possible to view/edit binders of others!
-		if current_teacher.id.to_s != @binder.owner.to_s
-			redirect_to binders_path
-		end
+		#TODO: Verify permissions before rendering view
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -90,30 +79,83 @@ class BindersController < ApplicationController
 		@title = "Edit binder"
 
 		@binder = Binder.find(params[:id])
+
+		@binders = Binder.where(:owner => current_teacher.id).reject {|x| x.id == params[:id]}#:id => params[:id])
 	end
 
-	def update
-#		if !current_teacher.info
-#			current_teacher.info = Info.new
-#		end
+	def newcontent
 
-#		current_teacher.info.update_attributes(	:bio => params[:info][:bio],
-#							:website => params[:info][:website],
-#							:profile_picture => params[:info][:profile_picture])
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
 
-#		current_teacher.info.save
+		@title = "Add new content"
 
-#		redirect_to teacher_path(current_teacher)
+	end
 
-		@binder = Binder.find(params[:binder][:id])
+	def createcontent
 
-		@binder.update_attributes(:title => params[:binder][:title],
+		@binder = Binder.new
+
+		@binder.owner = current_teacher.id
+
+		#Trim to 60 chars (old spec)
+		if params[:binder][:title].length < 1
+			redirect_to new_binder_path and return
+		end
+		
+		@parenthash = {}
+		@parentsarr = []
+
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title => ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title =>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+		@binder.update_attributes(	:title => params[:binder][:title][0..60]
+					:parent => @parenthash,
+					:parents => @parentsarr,
 					:last_update => Time.now.to_i,
-					:last_updated_by => current_teacher.id.to_s)
+					:last_updated_by => current_teacher.id.to_s,
+					:body => params[:binder][:body])
+
+		#Declare as content
+		@binder.type = 2
+		@binder.format = 2
+
+		@binder.versions << Version.new(:data => params[:binder][:versions][:data])
 
 		@binder.save
 
-		redirect_to binder_path
+		redirect_to binders_path(params[:binder][:parent])
+
+	end
+
+	def update
+		@binder = Binder.find(params[:id])
+
+		@binder.update_attributes(:title => params[:binder][:title][0..60],
+					:last_update => Time.now.to_i,
+					:last_updated_by => current_teacher.id.to_s,
+					:body => params[:binder][:body])
+
+		@binder.save
+
+		#If not directory, apply versioning
+		if @binder.type != 1
+
+		end
+
+		redirect_to binder_path(@binder)
 
 	end
 

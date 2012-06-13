@@ -8,7 +8,7 @@
 
   <div><%= f.label :parent, "Parent (to be replaced with a directory browser):" %><br />
   <%= f.select(:parent, options_from_collection_for_select(@binders, :id, :title)) %></div>
-  <% #Do not allow content in "Root/home" %>
+  <% #Do not allow content in Home directory %>
 
   <%= f.fields_for :versions do |g| %>
 

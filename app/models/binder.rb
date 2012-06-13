@@ -18,6 +18,7 @@ class Binder
 	field :parent_permissions, :type => Array #[type, folder_id, shared_id, auth_level]
 	field :parent_tags, :type => Array
 
+	# Version control is only used if type != directory
 	#Version Control
 	#field :versions, :type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
 	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <h3>Binders#edit</h3>
 <p>app/views/binders/edit.html.erb</p>
 
@@ -6,30 +5,10 @@
 
   <div><%= f.label :title, "Title" %><br />
   <%= f.text_field :title %></div>
-<!--
-  <div><%= f.label :parent, "Parent" %><br />
-  <%= f.select(:parent, options_for_select([["Root", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
--->
+
   <div><%= f.label :body, "Body" %><br />
   <%= f.text_area  :body %></div>
 
   <div><%= f.submit "Edit Binder" %></div>
 
 <% end %>
-=======
-<p>app/views/binders/edit.html.erb</p>
-
-<br />
-<br />
-
-<%= form_for @binder, :url => updatebinder_path do |f| %>
-
-	<!-- render 'shared/error_messages' -->
-
-	<div><%= f.label :title, "Title" %><br />
-	<%= f.text_field :title %></div>
-
-	<div><%= f.submit "Update" %></div>
-
-<% end %>
->>>>>>> 8caeae3c0b7f63efd547cea0bdd40e7e85cef55b

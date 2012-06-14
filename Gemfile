@@ -25,7 +25,9 @@ gem 'mongoid', "~> 2.4"
 gem 'bson_ext', "~> 1.5"
 gem 'devise'
 
+gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
+
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

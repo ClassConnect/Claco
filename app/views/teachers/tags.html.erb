@@ -6,17 +6,31 @@
 	<!-- f.error_messages -->
 	<%= render 'shared/error_messages', object: f.object %>
 
-	<% if true %>
+	<table><tr><td>
 	<% (0..19).each do |grade_level| %>
-	<%= check_box( "tag", "grade_levels", { :id => "tag_grade_levels", :name => "tag[grade_levels][]", :checked => check_box_value(grade_level) }  ) %>
+	<%= check_box( "tag", "grade_levels", { :id => "tag_grade_levels",
+						:name => "tag[grade_levels][]",
+						:checked => grade_level_check_box_value(grade_level) },
+						grade_level_string_by_index(grade_level)  ) %>
 	<%= f.label :grade_levels[grade_level], grade_level_title_by_index(grade_level) %><br />
 	<% end %>
+	</td>
+	<td>
+	<% (0..11).each do |subject| %>
+	<%= check_box( "tag", "subjects",     { :id => "tag_subjects",
+						:name => "tag[subjects][]",
+						:checked => subject_check_box_value(subject) },
+						subject_string_by_index(subject) )%>
+	<%= f.label :subjects[subject], subject_title_by_index(subject) %><br />
 	<% end %>
+	</td></tr></table>
 
 	<br />
 
+	<% if false %>
 	<div><%= f.label :subjects, "Subject Tags" %><br />
 	<%= f.text_field :subjects, :value => current_teacher.tag.subjects.join(' ') %></div>
+	<% end %>
 
 	<div><%= f.label :standards, "Standard Tags" %> <br />
 	<%= f.text_field :standards, :value => current_teacher.tag.standards.join(' ') %></div>

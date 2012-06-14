@@ -89,13 +89,14 @@ class Tag
 	# PS, PK, K
 	# 1,2,3,4,5,6,7,8,9,10,11,12
 	# Prep, BS/BA, masters, PhD, Post Doc
-	field :grade_levels, :type => Array, :default => [false, false, false, false, false,
-							false, false, false, false, false,
-							false, false, false, false, false,
-							false, false, false, false, false]
-	field :subjects, :type => Array, :default => [""]
-	field :standards, :type => Array, :default => [""]
-	field :other, :type => Array, :default => [""]
+	#field :grade_levels, :type => Array, :default => [false, false, false, false, false,
+	#						false, false, false, false, false,
+	#						false, false, false, false, false,
+	#						false, false, false, false, false]
+	field :grade_levels, 	:type => Array, :default => [""]
+	field :subjects, 	:type => Array, :default => [""]
+	field :standards, 	:type => Array, :default => [""]
+	field :other, 		:type => Array, :default => [""]
 
 	embedded_in :teacher
 
@@ -105,8 +106,10 @@ class Tag
 	def update_tag_fields(params)
 
 		# array to be eventually passed into the :grade_levels field
-		true_checkbox_array = Array.new(20, false)
-		zero_count = 0
+		#true_checkbox_array = Array.new(20, false)
+		grade_levels_checkbox_array = Array.new
+		subjects_checkbox_array = Array.new
+		#zero_count = 0
 
 		# POST will return an array of "0" characters from the hidden fields, and
 		# if a box was checked, it will insert a "1" in the respective place.
@@ -118,15 +121,26 @@ class Tag
 		# and only the second one was checked
 		#
 		(1..(params[:tag][:grade_levels].length-1)).each do |i|
-			if params[:tag][:grade_levels][i] == "0"
-				zero_count += 1
-			else
-				true_checkbox_array[zero_count] = true
+			#if params[:tag][:grade_levels][i] == "0"
+			#	zero_count += 1
+			#else
+			#	true_checkbox_array[zero_count] = true
+			#end
+			if params[:tag][:grade_levels][i] != "0"
+				grade_levels_checkbox_array << params[:tag][:grade_levels][i]
 			end
 		end
 
-		self.update_attributes(	:grade_levels => true_checkbox_array,
-					:subjects => params[:tag][:subjects].downcase.split.uniq,
+		(1..(params[:tag][:subjects].length-1)).each do |i|
+			if params[:tag][:subjects][i] != "0"
+				subjects_checkbox_array << params[:tag][:subjects][i]
+			end
+		end
+
+
+		self.update_attributes(	:grade_levels => grade_levels_checkbox_array,
+					#:subjects => params[:tag][:subjects].downcase.split.uniq,
+					:subjects => subjects_checkbox_array,
 					:standards => params[:tag][:standards].downcase.split.uniq,
 					:other => params[:tag][:other].downcase.split.uniq)
 		self.save

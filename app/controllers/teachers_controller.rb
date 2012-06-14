@@ -43,7 +43,7 @@ class TeachersController < ApplicationController
 
 		#newinfo = params[:info]
 
-		#Make sure htmlcode is not allowed in @info.bio
+		#TODO Make sure htmlcode is not allowed in @info.bio
 
 		if !current_teacher.info
 			current_teacher.info = Info.new
@@ -52,8 +52,10 @@ class TeachersController < ApplicationController
 		current_teacher.info.update_info_fields(params);
 
 		if current_teacher.info.errors.empty?
+			# no errors, return to the main profile page
 			redirect_to teacher_path(current_teacher)
 		else
+			# remain on current page, display errors
 			render 'editinfo'
 		end
 

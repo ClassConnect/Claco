@@ -80,7 +80,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binders = Binder.where(:owner => current_teacher.id).reject {|x| x.id == params[:id]}#:id => params[:id])
+		#@binders = Binder.where(:owner => current_teacher.id).reject {|x| x.id == params[:id]}#:id => params[:id])
 	end
 
 	def newcontent
@@ -156,6 +156,69 @@ class BindersController < ApplicationController
 		end
 
 		redirect_to binder_path(@binder)
+
+	end
+
+	#Add new file
+	def newfile
+
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
+
+		@title = "Add new content"
+
+	end
+
+	def createfile
+
+		@binder = Binder.new
+
+		@binder.owner = current_teacher.id
+
+		#Trim to 60 chars (old spec)
+		#if params[:binder][:title].length < 1
+		#	redirect_to new_binder_path and return
+		#end
+		
+		@parenthash = {}
+		@parentsarr = []
+
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title => ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title =>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+		@binder.update_attributes(
+					:title => File.basename(params[:binder][:versions][:file].original_filename, File.extname(params[:binder][:versions][:file].original_filename)),
+					:parent => @parenthash,
+					:parents => @parentsarr,
+					:last_update => Time.now.to_i,
+					:last_updated_by => current_teacher.id.to_s,
+					:body => params[:binder][:body])
+
+		#Declare as file
+		@binder.type = 2
+		@binder.format = 1
+
+		@binder.versions << Version.new(:file => params[:binder][:versions][:file], :ext => File.extname(params[:binder][:versions][:file].original_filename))
+
+		#@binder.title = File.basename(params[:binder][:versions][:file].original_filename, File.extname(params[:binder][:versions][:file].original_filename))
+
+		@binder.save
+
+
+
+		redirect_to binders_path(params[:binder][:parent])
 
 	end
 

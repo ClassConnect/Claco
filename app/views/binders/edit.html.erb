@@ -1,10 +1,37 @@
 <h3>Binders#edit</h3>
 <p>app/views/binders/edit.html.erb</p>
 
-<%= form_for Binder.find(params[:id]), :url => binder_path do |f| %>
+<%= form_for @binder, :url => binder_path do |f| %>
 
   <div><%= f.label :title, "Title" %><br />
   <%= f.text_field :title %></div>
+
+  <% if @binder.type == 2 %>
+
+    <% if @binder.format == 1 %>
+
+      <%= f.fields_for @binder.versions.last do |g| %>
+
+        <div><%= g.label :file, "File:" %><br />
+        <%= g.file_field :file %></div>
+
+        <% end %>
+
+    <% end %>
+
+
+    <% if @binder.format == 2 %>
+
+      <%= f.fields_for @binder.versions.last do |g| %>
+
+        <div><%= g.label :data, "URL:" %><br />
+        <%= g.text_field :data %></div>
+      
+      <% end %>
+
+    <% end %>
+
+  <% end %>
 
   <div><%= f.label :body, "Body" %><br />
   <%= f.text_area  :body %></div>

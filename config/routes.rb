@@ -95,6 +95,10 @@ resources :teachers
 get '/binders/newcontent' => 'binders#newcontent'
 post '/binders/newcontent' => 'binders#createcontent'
 
+#Uploading File
+get '/binders/newfile' => 'binders#newfile'
+post '/binders/newfile' => 'binders#createfile'
+
 resources :binders
 
 

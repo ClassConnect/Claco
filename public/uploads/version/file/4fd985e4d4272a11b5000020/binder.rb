@@ -4,8 +4,6 @@
 class Binder
 	include Mongoid::Document
 
-	validates :title, :presence => true
-
 	#File/Directory-specific Attributes
 	field :owner, :type => String
 	field :title, :type => String#File/directory name
@@ -50,7 +48,7 @@ class Version
 	field :uid, :type => String #Owner of version
 	field :timestamp, :type => Integer
 	field :comments_priv, :type => Array
-	field :comments_pub, :type => Array
+	field :comments_pub, :type => Array 
 	field :size, :type => Integer
 	field :ext, :type => String
 	field :fork_total, :type => Integer

@@ -1,6 +1,3 @@
-#require 'app/uploaders/data'
-#require 'carrierwave/mongoid' 
-
 class Binder
 	include Mongoid::Document
 
@@ -10,7 +7,7 @@ class Binder
 	field :owner, :type => String
 	field :title, :type => String#File/directory name
 	field :body, :type => String #Directory annotation
-	field :type, :type => Integer # 1 = Directory, 2 = File
+	field :type, :type => Integer # 1 = Directory, 2 = File, 3 = Lesson
 	#field :permissions, :type => Array # [shared_id, type, auth_level]
 	embeds_one :permisson#, validate: false
 

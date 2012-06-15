@@ -71,20 +71,25 @@ get '/tags'           => "teachers#tags"
 put '/updatetags'     => "teachers#updatetags"
 
 #Subscribe to :id
-get '/sub/:id'        => 'teachers#sub'
-get '/confsub/:id'    => 'teachers#confsub'
+#get '/sub/:id'        => 'teachers#sub'
+put '/confsub/:id'    => 'teachers#confsub', :as => 'confsub'
+post '/confsub/:id'    => 'teachers#confsub', :as => 'confsub'
 
 #Unsubscribed to :id
-get '/unsub/:id'      => 'teachers#unsub'
-get 'confunsub/:id'   => 'teachers#confunsub'
+#get '/unsub/:id'      => 'teachers#unsub'
+put '/confunsub/:id'   => 'teachers#confunsub', :as => 'confunsub'
+post '/confunsub/:id'   => 'teachers#confunsub', :as => 'confunsub'
 
 #Add :id as colleague
-get '/add/:id'        => 'teachers#add'
-get '/confadd/:id'    => 'teachers#confadd'
+#get '/add/:id'        => 'teachers#add'
+put '/confadd/:id'    => 'teachers#confadd', :as => 'confadd'
+post '/confadd/:id'    => 'teachers#confadd', :as => 'confadd'
 
 #Remove :id as colleague
-get '/remove/:id'     => 'teachers#remove'
-get '/confremove/:id' => 'teachers#confremove'
+#get '/remove/:id'     => 'teachers#remove'
+put  '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
+post '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
+get  '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
 
 #subscriptions
 get '/subs'	      => 'teachers#subs'

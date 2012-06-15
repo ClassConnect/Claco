@@ -1,3 +1,19 @@
+# custom validation classes
+class InfoValidator < ActiveModel::Validator
+
+	#image_regex = [a-z\d\-.]+\.(jpg|jpeg|png|gif)
+	image_regex = /(.*?)\.(jpg|jpeg|png|gif)/
+
+	def validate(record)
+		if !record.profile_picture.blank?
+			unless record.profile_picture =~ /(.*?)\.(jpg|jpeg|png|gif)/
+				record.errors[:profile_picture] << "is an invalid file format"
+			end
+		end
+	end
+end
+
+# model classes
 class Teacher
 	include Mongoid::Document
 
@@ -71,7 +87,6 @@ class Teacher
 		self.relationships.find_or_initialize_by(:user_id => teacher_id)
 	end
 
-	# unused
 	def subscribed_to?(id)
 		return self.relationships.find_or_initialize_by(:user_id => id).subscribed
 	end
@@ -111,15 +126,7 @@ class Tag
 		subjects_checkbox_array = Array.new
 		#zero_count = 0
 
-		# POST will return an array of "0" characters from the hidden fields, and
-		# if a box was checked, it will insert a "1" in the respective place.
-		# the array POSTed in params[:tag][:grade_levels] is of variable length,
-		# so this iterates through all members, counting the zeroes in zero_count.
-		# if a "1" is discovered, this represents the "zero_count"th box being checked.
-		#
-		# for example, ["0","0","1","0"] would be returned from a set of three checkboxes,
-		# and only the second one was checked
-		#
+		# update grade_levels array
 		(1..(params[:tag][:grade_levels].length-1)).each do |i|
 			#if params[:tag][:grade_levels][i] == "0"
 			#	zero_count += 1
@@ -131,6 +138,7 @@ class Tag
 			end
 		end
 
+		# update subjects array
 		(1..(params[:tag][:subjects].length-1)).each do |i|
 			if params[:tag][:subjects][i] != "0"
 				subjects_checkbox_array << params[:tag][:subjects][i]
@@ -143,7 +151,7 @@ class Tag
 					:subjects => subjects_checkbox_array,
 					:standards => params[:tag][:standards].downcase.split.uniq,
 					:other => params[:tag][:other].downcase.split.uniq)
-		self.save
+		#self.save
 	end
 
 end
@@ -180,36 +188,33 @@ class Relationship
 #	end
 
 	def subscribe
-		self.subscribed = true
-		self.save
+		self.update_attributes(:subscribed => true)
+		#self.save
 	end
 
 	def unsubscribe
-		self.subscribed = false
-		self.save
+		self.update_attributes(:subscribed => false)
+		#self.save
 	end
 
 	def set_colleague_status(newstatus)
-		self.colleague_status = newstatus
-		self.save
+		self.update_attributes(:colleague_status => newstatus)
+		#self.save
 	end
 
 end
 
 class Info
 	include Mongoid::Document
-
-	#image_regex = [a-z\d\-.]+\.(jpg|jpeg|png|gif)
-	image_regex = /(.*?)\.(jpg|jpeg|png|gif)/
+	include ActiveModel::Validations
 
 	# none of these fields required when updating
 
-	#validates :bio, :presence => true
-	#validates :website, :presence => true
-	validates :profile_picture, 	:format => { :with => image_regex ,
-					:message => "field does not appear to be an image" }#,
-					#:presence => true
+	#validates :profile_picture, 	:format => { :with => image_regex ,
+	#				:message => "field does not appear to be an image" }#,
+	#				#:presence => true
 
+	validates_with InfoValidator
 
 	field :bio, :type => String, :default => ""
 	field :website, :type => String, :default => ""
@@ -223,6 +228,6 @@ class Info
 		self.update_attributes(:bio => params[:info][:bio],
 					:website => params[:info][:website],
 					:profile_picture => params[:info][:profile_picture])
-		self.save
+		#self.save
 	end
 end

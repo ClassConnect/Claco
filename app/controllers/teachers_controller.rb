@@ -15,6 +15,11 @@ class TeachersController < ApplicationController
 
 		@title = "#{ @teacher.full_name }'s Profile"
 
+		#@subscription = current_teacher.relationships.find_or_initialize_by(:user_id => @teacher.id)
+		#@colleague = current_teacher.relationships.find_or_initialize_by(:user_id => @teacher.id)
+
+		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
+
 		#Create info for teacher if not yet created
 		if !@teacher.info
 			@teacher.info = Info.new
@@ -115,6 +120,7 @@ class TeachersController < ApplicationController
 
 		@relationship.subscribe
 
+		redirect_to teacher_path(@teacher)
 	end
 
 	# this function is no longer called:
@@ -150,6 +156,8 @@ class TeachersController < ApplicationController
 		end
 
 		@relationship.unsubscribe
+
+		redirect_to teacher_path(@teacher)
 
 	end
 
@@ -232,6 +240,8 @@ class TeachersController < ApplicationController
 			@affected_relationship.set_colleague_status(3)
 		end
 
+		redirect_to teacher_path(@teacher)
+
 	end
 
 	# this function is no longer called:
@@ -262,7 +272,7 @@ class TeachersController < ApplicationController
 
 		@title = "Remove #{ @teacher.full_name } as a Colleague"
 
-		@relationship = @teacher.relationship_by_teacher_id(params[:id])
+		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
 
 		if @relationship.colleague_status == 3
 
@@ -272,9 +282,8 @@ class TeachersController < ApplicationController
 
 			@affected_relationship.set_colleague_status(0)
 
-		else
-			redirect_to teacher_path(@teacher)
 		end
+			redirect_to teacher_path(@teacher)
 
 	end
 

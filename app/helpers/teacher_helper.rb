@@ -2,6 +2,46 @@ module TeacherHelper
 #	def full_name(teacher)
 #		"#{teacher.fname teacher.lname}"
 #	end
+	def get_subscription_path
+		if !current_teacher.subscribed_to?(@teacher.id)
+			return confsub_path(@teacher)
+		else
+			return confunsub_path(@teacher)
+		end
+	end
+
+	def get_subscription_button(f)
+		if !current_teacher.subscribed_to?(@teacher.id)
+			#return "Subscribe to #{@teacher.full_name}"
+			f.submit "Subscribe to #{@teacher.full_name}", :confirm => 'Are you sure?'
+		else
+			#return "Unsubscribe from #{@teacher.full_name}"
+			f.submit "Unsubscribe from #{@teacher.full_name}", :confirm => 'Are you sure?'
+		end
+	end
+
+	def get_colleague_path
+		case current_teacher.colleague_status(@teacher.id)
+			when (0..2)
+				return confadd_path(@teacher.id.to_s)
+			when 3
+				return confremove_path(@teacher.id.to_s)
+		end
+	end
+
+	def get_colleague_button(f)
+		case current_teacher.colleague_status(@teacher.id)
+			when 0
+				f.submit "Add #{@teacher.full_name} as a colleague", :confirm => 'Are you sure?'
+			when 1
+				f.submit "Colleague request sent", :disabled => true
+			when 2
+				f.submit "Accept colleague request from #{@teacher.full_name}", :confirm => 'Are you sure?'
+			when 3
+				f.submit "Remove #{@teacher.full_name} from colleagues", :confirm => 'Are you sure?'
+		end
+
+	end
 
 	def grade_level_title_by_index(index)
 		case index

@@ -1,45 +1,28 @@
 <h1>Profile Page</h1>
 <p>app/views/teachers/show.html.erb</p>
 
-<% #Greeting %>
-<!-- <p><%= "#{@teacher.title} #{@teacher.fname} #{@teacher.lname}'s Profile" %></p> -->
-<p><%= "#{ @teacher.full_name }" %>
+<p><%= "#{ @teacher.full_name }" %></p>
 
+<p><%= "Bio: #{@teacher.info.bio}" if !@teacher.info.bio.empty? %></p>
 
-<% if !@teacher.info.bio.empty? %>
-<p>Bio:</p>
-	<p><%= @teacher.info.bio %></p>
-<% end %>
+<p><%= "Website: #{@teacher.info.website}" if !@teacher.info.website.empty? %></p>
 
-<% if !@teacher.info.website.empty? %>
-	<p>Website: <%= @teacher.info.website %></p>
-<% end %>
+<p><%= "Profile Picture: #{@teacher.info.profile_picture}" if !@teacher.info.profile_picture.empty? %></p>
 
-<% if !@teacher.info.profile_picture.empty? %>
-	<%= @teacher.info.profile_picture %>
-<% end %>
-
-
-<% if current_teacher.id == @teacher.id %>
-	<p><%= link_to "Edit Info", "/editinfo" %></p>
-<% end %>
+<%= link_to "Edit Info", "/editinfo" if current_teacher.id == @teacher.id %>
 
 <% if current_teacher.id != @teacher.id %>
 
-	<% if !current_teacher.subscribed_to?(@teacher.id) %>
-		<p><%= link_to "Subscribe to this teacher", "/confsub/" + @teacher.id.to_s %></p>
-	<% else %>
-		<p><%= link_to "Unsubcribe from this teacher", "/confunsub/" + @teacher.id.to_s, :confirm => 'Are you sure?' %></p>
+	<%= form_for @relationship, :url => get_subscription_path do |f| %>
+
+		<%= get_subscription_button(f) %>
+
 	<% end %>
 
-	<% case current_teacher.colleague_status(@teacher.id) %>
-	<% when 0 %>
-		<p><%= link_to "Add as colleague", "/confadd/" + @teacher.id.to_s %></p>
-	<% when 1 %>
-		<p>Colleague request sent</p>
-	<% when 2 %>
-		<p><%= link_to "Accept colleague request", "/confadd/" + @teacher.id.to_s %></p>
-	<% when 3 %>
-		<p><%= link_to "Remove colleague", "/confremove/" + @teacher.id.to_s, :confirm => 'Are you sure?' %></p>
+	<%= form_for @relationship, :url => get_colleague_path do |f| %>
+
+		<%= get_colleague_button(f) %>
+
 	<% end %>
+
 <% end %>

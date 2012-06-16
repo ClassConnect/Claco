@@ -2,6 +2,26 @@ module TeacherHelper
 #	def full_name(teacher)
 #		"#{teacher.fname teacher.lname}"
 #	end
+
+	def display_incoming_colleague_requests
+		if @colleague_requests.any?
+			#raw("<p>You have pending colleague requests!</p>")
+			@colleague_requests.each do |request|
+				#form_for request, :url => confadd_path(request.user_id) do |f|
+
+				#link_to "Accept colleague request from #{Teacher.find(request.user_id).full_name}", confadd_path(request.user_id)
+				#"#{Teacher.find(request.user_id).full_name}"
+				#request[:user_id]
+				#"#{@colleague_requests.count}"
+				#link_to "Accept colleague request from #{Teacher.find(@colleague_requests.user_id).full_name}", confadd_path(@colleague_requests.user_id)
+				#"#{request.user_id} "
+				#@colleague_requests.size
+				#"TEST"
+			end
+		end
+		#"DERP"
+	end
+
 	def get_subscription_path
 		if !current_teacher.subscribed_to?(@teacher.id)
 			return confsub_path(@teacher)
@@ -22,6 +42,7 @@ module TeacherHelper
 
 	def get_colleague_path
 		case current_teacher.colleague_status(@teacher.id)
+			# 2 returns an unused dummy URL
 			when (0..2)
 				return confadd_path(@teacher.id.to_s)
 			when 3

@@ -4,25 +4,41 @@
 <p><%= "#{ @teacher.full_name }" %></p>
 
 <p><%= "Bio: #{@teacher.info.bio}" if !@teacher.info.bio.empty? %></p>
-
 <p><%= "Website: #{@teacher.info.website}" if !@teacher.info.website.empty? %></p>
-
 <p><%= "Profile Picture: #{@teacher.info.profile_picture}" if !@teacher.info.profile_picture.empty? %></p>
 
 <%= link_to "Edit Info", "/editinfo" if current_teacher.id == @teacher.id %>
 
 <% if current_teacher.id != @teacher.id %>
-
-	<%= form_for @relationship, :url => get_subscription_path do |f| %>
-
+	<%= form_for @relationship, :url => get_subscription_path() do |f| %>
 		<%= get_subscription_button(f) %>
-
 	<% end %>
-
-	<%= form_for @relationship, :url => get_colleague_path do |f| %>
-
+	<%= form_for @relationship, :url => get_colleague_path() do |f| %>
 		<%= get_colleague_button(f) %>
-
 	<% end %>
-
+<% else %>
+	<% if @colleague_requests.any? %>
+		<p>You have pending colleague requests!</p>
+		<% @colleague_requests.each do |request| %>
+			<%= form_for request, :url => confadd_path(request.user_id) do |f| %>
+				<%= f.submit "Accept colleague request from #{Teacher.find(request.user_id).full_name}", :confirm => "Are you absofuckinlutely positve?" %>
+			<% end %>
+		<% end %>
+	<% end %>
+	<% if @colleagues.any? %>
+		<hr />
+		<p>You are colleagues with the following teachers:</p>
+		<% @colleagues.each do |colleague| %>
+			<% @colleague = Teacher.find(colleague.user_id) %>
+			<p><%= "#{@colleague.full_name}: "%><%= link_to @colleague.email, @colleague %></p>
+		<% end %>
+	<% end %>
+	<% if @subscriptions.any? %>
+		<hr />
+		<p>You are subscribed to the following teachers:</p>
+		<% @subscriptions.each do |subscription| %>
+			<% @sub_teacher = Teacher.find(subscription.user_id) %>
+			<p><%= "#{@sub_teacher.full_name}: "%><%= link_to @sub_teacher.email, @sub_teacher %></p>
+		<% end %>
+	<% end %>
 <% end %>

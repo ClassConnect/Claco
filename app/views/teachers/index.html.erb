@@ -1,5 +1,10 @@
 <h3>Teachers#index</h3>
 <p>app/views/teachers/index.html.erb</p>
+
+<p><b>You: <%=link_to current_teacher.email, current_teacher %></b></p>
+
 <% @teachers.each do |teacher| %>
-  <p>Teacher: <%=link_to teacher.email, teacher %></p>
+	<% if teacher.id != current_teacher.id %>
+		<p><%= "#{teacher.full_name}: "%><%= link_to teacher.email, teacher %></p>
+	<% end %>
 <% end %>

@@ -15,16 +15,16 @@ class TeachersController < ApplicationController
 
 		@title = "#{ @teacher.full_name }'s Profile"
 
-		#@subscription = current_teacher.relationships.find_or_initialize_by(:user_id => @teacher.id)
-		#@colleague = current_teacher.relationships.find_or_initialize_by(:user_id => @teacher.id)
-
 		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
-		#Create info for teacher if not yet created
-		if !@teacher.info
-			@teacher.info = Info.new
+		@colleague_requests = current_teacher.relationships.where(:colleague_status => 2).entries
 
-		end
+		@colleagues = current_teacher.relationships.where(:colleague_status => 3).entries
+
+		@subscriptions = current_teacher.relationships.where(:subscribed => true).entries
+
+		#Create info entry for teacher if not yet created
+		@teacher.info = Info.new if !@teacher.info
 
 	end
 
@@ -32,9 +32,7 @@ class TeachersController < ApplicationController
 	def editinfo
 		@title = "Edit your information"
 
-		if !current_teacher.info
-			current_teacher.info = Info.new
-		end
+		current_teacher.info = Info.new if !current_teacher.info
 	end
 
 	#PUT /updateinfo
@@ -50,9 +48,7 @@ class TeachersController < ApplicationController
 
 		#TODO Make sure htmlcode is not allowed in @info.bio
 
-		if !current_teacher.info
-			current_teacher.info = Info.new
-		end
+		current_teacher.info = Info.new if !current_teacher.info
 
 		current_teacher.info.update_info_fields(params);
 
@@ -70,11 +66,7 @@ class TeachersController < ApplicationController
 	def tags
 		@title = "Manage your subscribed tags"
 
-		if !current_teacher.tag
-			current_teacher.tag = Tag.new
-
-			current_teacher.tag.save
-		end
+		current_teacher.tag = Tag.new if !current_teacher.tag
 	end
 
 	#PUT /updatetags
@@ -118,7 +110,7 @@ class TeachersController < ApplicationController
 
 		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
 
-		@relationship.subscribe
+		@relationship.subscribe()
 
 		redirect_to teacher_path(@teacher)
 	end
@@ -151,11 +143,23 @@ class TeachersController < ApplicationController
 
 		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
 
-		if !@relationship.subscribed
-			redirect_to teacher_path(params[:id])
-		end
+		@affected_relationship = @teacher.relationship_by_teacher_id(current_teacher.id)
 
-		@relationship.unsubscribe
+		redirect_to teacher_path(params[:id]) if !@relationship.subscribed
+
+		if @relationship.colleague_status == 0
+			# both teachers are not colleagues
+			if @affected_relationship.subscribed == false
+				# not subscribed to current teacher and not colleagues, so delete
+				@affected_relationship.delete
+			end
+
+			# not subscribed and not colleagues, so delete
+			@relationship.delete
+		else
+			# some colleague action is pending, merely unsubscribe from the other teacher
+			@relationship.unsubscribe()
+		end
 
 		redirect_to teacher_path(@teacher)
 
@@ -218,6 +222,8 @@ class TeachersController < ApplicationController
 
 		@title = "Add #{ @teacher.full_name } as a Colleague"
 
+		#current_teacher.add_colleague(params)
+
 		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
 
 		if @relationship.colleague_status == 0 #Then the colleague_status for @teacher should also be 0
@@ -276,15 +282,35 @@ class TeachersController < ApplicationController
 
 		if @relationship.colleague_status == 3
 
-			@relationship.set_colleague_status(0)
+			#@relationship.set_colleague_status(0)
 
 			@affected_relationship = @teacher.relationship_by_teacher_id(current_teacher.id)
 
-			@affected_relationship.set_colleague_status(0)
+			#@affected_relationship.set_colleague_status(0)
 
+			if @relationship.subscribed == false# and @affected_relationship.subscribed == false
+				# we are not subscribed to the other teacher, so delete our relationship with them
+				@relationship.delete
+			else
+				# we are subscribed to them, so merely unset the colleague status
+				@relationship.set_colleague_status(0)
+			end
+
+			if @affected_relationship.subscribed == false
+				# the other teacher is not subscribed to us, so delete their relationship with us
+				@affected_relationship.delete
+			else
+				# they are subscribed to us, so merely unset the colleague status
+				@affected_relationship.set_colleague_status(0)
+			end
+#			@relationship.delete if !@relationship.subscribed else @relationship.set_colleague_status(0)
+
+#			@relationship.delete
+
+#			@affected_relationship.delete
 		end
-			redirect_to teacher_path(@teacher)
+
+		redirect_to teacher_path(@teacher)
 
 	end
-
 end

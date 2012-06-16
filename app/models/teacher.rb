@@ -87,6 +87,11 @@ class Teacher
 		self.relationships.find_or_initialize_by(:user_id => teacher_id)
 	end
 
+	def get_incoming_colleague_requests
+		self.relationships.where(:colleague_status => 2)
+		#self.relationships.find_by(colleague_status: 2)
+	end
+
 	def subscribed_to?(id)
 		return self.relationships.find_or_initialize_by(:user_id => id).subscribed
 	end
@@ -185,6 +190,51 @@ class Relationship
 
 #	def by_teacher_id(params)
 #		self.find_or_initialize_by(:user_id => params[:id])
+#	end
+
+#	def add_colleague(params)
+
+#		teacher = Teacher.find(params[:id])
+
+#		relationship = current_teacher.relationship_by_teacher_id(params[:id])
+
+#		if relationship.colleague_status == 0 #Then the colleague_status for @teacher should also be 0
+
+#			relationship.set_colleague_status(1)
+
+#			#affected_relationship =
+
+#			teacher.relationship_by_teacher_id(current_teacher.id).set_colleague_status(2)
+
+#			#@affected_relationship
+
+#		end
+
+#		#if adding colleage due to incoming request, create colleague relationshikp
+#		if relationship.colleague_status == 2
+
+#			relationship.set_colleague_status(3)
+
+#			#affected_relationship =
+
+#			teacher.relationship_by_teacher_id(current_teacher.id).set_colleague_status(3)
+
+#			#@affected_relationship.set_colleague_status(3)
+#		end
+#	end
+
+#	def remove_colleague(params)
+
+
+
+#	end
+
+#	def subscribe_to_teacher(params)
+
+#	end
+
+#	def unsubscribe_from_colleague(params)
+
 #	end
 
 	def subscribe

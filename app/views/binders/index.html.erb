@@ -6,6 +6,7 @@
 	<br />
 	<% @binders.each do |binder| %>
 	<%= link_to binder.title, binder %>
+  	(<%= link_to "Move", move_binder_path(binder) %>)
   	<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
   	<br />
 	<% end %>

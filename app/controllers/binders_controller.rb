@@ -52,12 +52,8 @@ class BindersController < ApplicationController
 					:parents => @parentsarr,
 					:last_update => Time.now.to_i,
 					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body])
-
-		#Declare as folder
-		@binder.type = 1
-
-		@binder.save
+					:body => params[:binder][:body],
+					:type => 1)
 
 		redirect_to binders_path
 
@@ -126,11 +122,9 @@ class BindersController < ApplicationController
 					:parents => @parentsarr,
 					:last_update => Time.now.to_i,
 					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body])
-
-		#Declare as content
-		@binder.type = 2
-		@binder.format = 2
+					:body => params[:binder][:body],
+					:type => 2,
+					:format => 2)
 
 		@binder.versions << Version.new(:data => params[:binder][:versions][:data])
 
@@ -140,6 +134,8 @@ class BindersController < ApplicationController
 
 	end
 
+	#IMPORTANT TODO: UPDATE CHILDRENS' :PARENTS ATTRIBUTES
+	#TODO: Version control, File/link update support
 	def update
 		@binder = Binder.find(params[:id])
 
@@ -148,7 +144,20 @@ class BindersController < ApplicationController
 					:last_updated_by => current_teacher.id.to_s,
 					:body => params[:binder][:body])
 
-		@binder.save
+		#@binder.save
+
+		@children = Binder.where("parents.id" => params[:id])
+
+		@index = @binder.parents.length
+
+		@children.each do |h|
+			
+			h.parent["title"] = params[:binder][:title][0..60] if h.parent["id"] == params[:id]
+			
+			h.parents[@index]["title"] = params[:binder][:title][0..60]
+			
+			h.save
+		end
 
 		#If not directory, apply versioning
 		if @binder.type != 1
@@ -204,11 +213,9 @@ class BindersController < ApplicationController
 					:parents => @parentsarr,
 					:last_update => Time.now.to_i,
 					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body])
-
-		#Declare as file
-		@binder.type = 2
-		@binder.format = 1
+					:body => params[:binder][:body],
+					:type => 2,
+					:format => 1)
 
 		@binder.versions << Version.new(:file => params[:binder][:versions][:file], :ext => File.extname(params[:binder][:versions][:file].original_filename))
 
@@ -222,7 +229,79 @@ class BindersController < ApplicationController
 
 	end
 
+	def move
 
+		@binder = Binder.find(params[:id])
+
+		@binders = Binder.where(:owner => current_teacher.id,
+			:type => 1).reject {|b| (b.id.to_s == params[:id] ||
+			b.id.to_s == @binder.parent["id"] || b.parents.any? {|c| c["id"] == params[:id]})}
+
+	end
+
+	#Process from moving
+	#TODO: Add sanity check, make sure no folder-in-self or folder-in-child situation
+	def moveitem
+
+		@binder = Binder.find(params[:id])
+
+		@parenthash = {}
+		@parentsarr = []
+
+
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title => ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title =>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+
+		#If directory, deal with the children
+		if @binder.type == 1 #Eventually will apply to type == 3 too
+
+			@index = @binder.parents.length
+
+			@children = Binder.where("parents.id" => params[:id])
+
+			@children.each do |h|
+				@current_parents = h.parents
+				@size = @current_parents.size
+				h.update_attributes(:parents => @parentsarr + @current_parents[@index..(@size - 1)])
+			end
+
+		end
+
+		@binder.update_attributes(:parent => @parenthash,
+			:parents => @parentsarr)
+
+		redirect_to binder_path(params[:binder][:parent])
+
+	end
+
+	#More validation needed
+	def destroy
+
+		@binder = Binder.find(params[:id])
+
+		@parent = @binder.parent["id"]
+
+		@binder.destroy
+
+		Binder.where("parents.id" => params[:id]).destroy
+
+		redirect_to binder_path(@parent)
+
+	end
 #Fuck this shit for now
 =begin
 	def updatetitle

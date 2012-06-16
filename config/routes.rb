@@ -59,10 +59,6 @@ get '/editinfo'       => "teachers#editinfo"
 put '/updateinfo'     => "teachers#updateinfo"
 post '/updateinfo'     => "teachers#updateinfo"
 
-get '/editbinder'	=> "binders#edit"
-put '/updatebinder'	=> "binders#update"
-post '/updatebinder'	=> "binders#update"
-
 #Profile Page
 get '/teachers/:id'   => 'teachers#show'
 
@@ -94,15 +90,19 @@ get  '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
 #subscriptions
 get '/subs'	      => 'teachers#subs'
 
-resources :teachers
+resources :teachers, :only => [:show, :index]
 
 #Adding Content
-get '/binders/newcontent' => 'binders#newcontent'
-post '/binders/newcontent' => 'binders#createcontent'
+get '/binders/newcontent'   => 'binders#newcontent'
+post '/binders/newcontent'  => 'binders#createcontent'
 
 #Uploading File
-get '/binders/newfile' => 'binders#newfile'
-post '/binders/newfile' => 'binders#createfile'
+get '/binders/newfile'      => 'binders#newfile'
+post '/binders/newfile'     => 'binders#createfile'
+
+#Moving a binder object (File, folder, content)
+get '/binders/:id/move'     => 'binders#move',      :as => 'move_binder'
+put '/binders/:id/move'     => 'binders#moveitem',  :as => 'move_binder'
 
 resources :binders
 

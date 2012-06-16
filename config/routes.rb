@@ -104,6 +104,10 @@ post '/binders/newfile'     => 'binders#createfile'
 get '/binders/:id/move'     => 'binders#move',      :as => 'move_binder'
 put '/binders/:id/move'     => 'binders#moveitem',  :as => 'move_binder'
 
+#Copying a binder object
+get '/binders/:id/copy'     => 'binders#copy',      :as => 'copy_binder'
+put '/binders/:id/copy'     => 'binders#copyitem',  :as => 'copy_binder'
+
 resources :binders
 
 

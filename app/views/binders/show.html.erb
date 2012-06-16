@@ -20,11 +20,11 @@
 		Empty
 	<% end %>
 	<% @children.each do |binder| %>
-		<% if binder.type == 2 %>
+		<% if binder.format == 1 %>
 
-			<%= link_to binder.title, binder.versions.last.file.url if binder.format == 1 %>
+			<%= link_to binder.title, binder.versions.last.file.url %>
 			
-			<%= link_to binder.title, binder.versions.last.data, :target => "_blank" if binder.format == 2 %>
+			<% #link_to binder.title, binder.versions.last.data, :target => "_blank" if binder.format == 2 %>
 
 			(<%= link_to "Edit", edit_binder_path(binder) %>)
 
@@ -32,6 +32,7 @@
 	  		<%= link_to binder.title, binder %>
 	  	<% end %>
 	  		(<%= link_to "Move", move_binder_path(binder) %>)
+	  		(<%= link_to "Copy", copy_binder_path(binder) %>)
 	  		(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
 	  		<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
 	  <br />

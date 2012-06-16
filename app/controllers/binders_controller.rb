@@ -18,10 +18,6 @@ class BindersController < ApplicationController
 	end
 
 	def create
-		@binder = Binder.new
-
-		@binder.owner = current_teacher.id
-
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
 			redirect_to new_binder_path and return
@@ -32,28 +28,31 @@ class BindersController < ApplicationController
 
 		if params[:binder][:parent].to_s == "0"
 
-			@parenthash = {:id => params[:binder][:parent],
-				:title => ""}
+			@parenthash = { :id 	=> params[:binder][:parent],
+							:title	=> ""}
 
 			@parentsarr = [@parenthash]
 
 		else
 
-			@parenthash = {:id => params[:binder][:parent],
-				:title =>  Binder.find(params[:binder][:parent]).title}
+			@parenthash = { :id 	=> params[:binder][:parent],
+							:title 	=> Binder.find(params[:binder][:parent]).title}
 
 			#Grab
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
 
 		end
 
-		@binder.update_attributes(:title => params[:binder][:title].to_s[0..60],
-					:parent => @parenthash,
-					:parents => @parentsarr,
-					:last_update => Time.now.to_i,
-					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body],
-					:type => 1)
+		Binder.new(	:owner 				=> current_teacher.id,
+					:title 				=> params[:binder][:title].to_s[0..60],
+					:parent 			=> @parenthash,
+					:parents 			=> @parentsarr,
+					:last_update 		=> Time.now.to_i,
+					:last_updated_by	=> current_teacher.id.to_s,
+					:body 				=> params[:binder][:body],
+					:type 				=> 1).save
+
+		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
 
@@ -64,6 +63,8 @@ class BindersController < ApplicationController
 		@binder = Binder.find(params[:id])
 
 		#TODO: Verify permissions before rendering view
+
+		redirect_to @binder.versions.last.data and return if @binder.format == 2
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -117,14 +118,14 @@ class BindersController < ApplicationController
 
 		end
 
-		@binder.update_attributes(:title => params[:binder][:title][0..60],
-					:parent => @parenthash,
-					:parents => @parentsarr,
-					:last_update => Time.now.to_i,
-					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body],
-					:type => 2,
-					:format => 2)
+		@binder.update_attributes(	:title 				=> params[:binder][:title][0..60],
+									:parent 			=> @parenthash,
+									:parents 			=> @parentsarr,
+									:last_update 		=> Time.now.to_i,
+									:last_updated_by	=> current_teacher.id.to_s,
+									:body 				=> params[:binder][:body],
+									:type 				=> 2,
+									:format 			=> 2)
 
 		@binder.versions << Version.new(:data => params[:binder][:versions][:data])
 
@@ -139,10 +140,10 @@ class BindersController < ApplicationController
 	def update
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(:title => params[:binder][:title][0..60],
-					:last_update => Time.now.to_i,
-					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body])
+		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
+									:last_update		=> Time.now.to_i,
+									:last_updated_by	=> current_teacher.id.to_s,
+									:body				=> params[:binder][:body])
 
 		#@binder.save
 
@@ -208,14 +209,14 @@ class BindersController < ApplicationController
 		end
 
 		@binder.update_attributes(
-					:title => File.basename(params[:binder][:versions][:file].original_filename, File.extname(params[:binder][:versions][:file].original_filename)),
-					:parent => @parenthash,
-					:parents => @parentsarr,
-					:last_update => Time.now.to_i,
-					:last_updated_by => current_teacher.id.to_s,
-					:body => params[:binder][:body],
-					:type => 2,
-					:format => 1)
+			:title				=> File.basename(params[:binder][:versions][:file].original_filename, File.extname(params[:binder][:versions][:file].original_filename)),
+			:parent				=> @parenthash,
+			:parents 			=> @parentsarr,
+			:last_update 		=> Time.now.to_i,
+			:last_updated_by	=> current_teacher.id.to_s,
+			:body 				=> params[:binder][:body],
+			:type 				=> 2,
+			:format 			=> 1)
 
 		@binder.versions << Version.new(:file => params[:binder][:versions][:file], :ext => File.extname(params[:binder][:versions][:file].original_filename))
 
@@ -225,7 +226,7 @@ class BindersController < ApplicationController
 
 
 
-		redirect_to binders_path(params[:binder][:parent])
+		redirect_to binder_path(params[:binder][:parent])
 
 	end
 
@@ -284,8 +285,107 @@ class BindersController < ApplicationController
 		@binder.update_attributes(:parent => @parenthash,
 			:parents => @parentsarr)
 
-		redirect_to binder_path(params[:binder][:parent])
+		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
+		redirect_to binders_path
+
+	end
+
+	def copy
+
+		@binder = Binder.find(params[:id])
+
+		@binders = Binder.where(:owner => current_teacher.id,
+			:type => 1).reject {|b| (b.id.to_s == params[:id] ||
+			b.id.to_s == @binder.parent["id"] ||
+			b.parents.any? {|c| c["id"] == params[:id]})}
+
+	end
+
+	def copyitem
+
+		@binder = Binder.find(params[:id])
+
+		@parenthash = {}
+		@parentsarr = []
+
+
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title => ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {:id => params[:binder][:parent],
+				:title =>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+		@new_parent = Binder.new(	:title 				=> @binder.title,
+									:body				=> @binder.body,
+									:type				=> @binder.type,
+									:parent 			=> @parenthash,
+									:parents			=> @parentsarr,
+									:owner				=> current_teacher.id,
+									:last_update 		=> Time.now.to_i,
+									:last_updated_by 	=> current_teacher.id)
+
+		@new_parent.format = @binder.format if @binder.type == 2
+
+
+		#TODO: Create new version instead of using @binder's last version
+		@new_parent.versions << @binder.versions.last if @binder.type != 1
+
+		@new_parent.save
+
+		@hash_index = {params[:id] => @new_parent.id.to_s}
+
+
+		#If directory, deal with the children
+		if @binder.type == 1 #Eventually will apply to type == 3 too
+
+			@index = @binder.parents.length
+
+			#Select old children, order by parents.length
+			@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
+
+			#Spawn new children, These children need to have updated parent ids
+			@children.each do |h|
+
+				@node_parent = {"id" 	=> @hash_index[h.parent["id"]],
+								"title" => h.parent["title"]}
+
+				@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
+
+				@new_node = Binder.new(	:title				=> h.title,
+										:body 				=> h.body,
+										:parent 			=> @node_parent,
+										:parents 			=> @node_parents,
+										:owner 				=> current_teacher.id,
+										:last_update 		=> Time.now.to_i,
+										:last_updated_by 	=> current_teacher.id,
+										:type				=> h.type)
+
+				@new_node.format = h.format if h.type != 1
+
+				#TODO: Create new version intead of ripping old one
+				@new_node.versions << h.versions.last if h.type != 1
+
+				@new_node.save
+
+				@hash_index[h.id.to_s] = @new_node.id.to_s
+			end
+
+		end
+
+		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+
+		redirect_to binders_path
 	end
 
 	#More validation needed
@@ -299,7 +399,9 @@ class BindersController < ApplicationController
 
 		Binder.where("parents.id" => params[:id]).destroy
 
-		redirect_to binder_path(@parent)
+		redirect_to binder_path(@parent) and return if @binder.parent["id"] != "0"
+
+		redirect_to binders_path
 
 	end
 #Fuck this shit for now

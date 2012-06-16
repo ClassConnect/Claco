@@ -12,7 +12,7 @@ class Binder
 	embeds_one :permisson#, validate: false
 
 	field :tags, :type => Array # [index, {title, owner, type}]
-	field :format, :type => Integer #Only used if type = 2, 1 = File, 2 = Content(link)
+	field :format, :type => Integer, :default => 0 #Only used if type = 2, 1 = File, 2 = Content(link)
 
 	#Parent
 	field :parent, :type => Hash

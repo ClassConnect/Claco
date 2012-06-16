@@ -1,0 +1,23 @@
+<p>app/views/teachers/editinfo.html.erb</p>
+
+<%= current_teacher.fname %>
+<br />
+<br />
+
+<%= form_for current_teacher.info, :url => updateinfo_path do |f| %>
+
+	<!-- render 'shared/error_messages' -->
+	<%= render 'shared/error_messages', object: f.object %>
+
+	<div><%= f.label :bio, "Bio" %><br />
+	<%= f.text_area :bio %></div>
+
+	<div><%= f.label :profile_picture, "Profile Picture (url)" %><br />
+	<%= f.text_field :profile_picture %></div>
+
+	<div><%= f.label :website, "Website" %> <br />
+	<%= f.text_field :website %></div>
+
+	<div><%= f.submit "Update" %></div>
+
+<% end %>

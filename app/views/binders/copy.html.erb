@@ -1,0 +1,19 @@
+<h3>Binders#copy</h3>
+<p>app/views/binders/copy.html.erb</p>
+
+<%= form_for @binder, :url => copy_binder_path do |f| %>
+
+  <div><%= f.label :parent,
+    "Copy #{@binder.title} From #{@binder.parent["id"] == "0" ? "Home" : @binder.parent["title"]} to:" %>
+    <br />
+  
+  <% if @binder.parent["id"] != "0" && @binder.type == 1 %>
+    <%= f.select(:parent,
+      options_for_select([["Home", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
+  <% else %>
+    <%= f.select(:parent, options_from_collection_for_select(@binders, :id, :title)) %></div>
+  <% end %>
+
+  <div><%= f.submit "Move Binder" %></div>
+
+<% end %>

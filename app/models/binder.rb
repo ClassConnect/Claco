@@ -23,17 +23,17 @@ class Binder
 	# Version control is only used if type != directory
 	#Version Control
 	#field :versions, :type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
+	#field :fork_hash, :type => String #Use Binder.id
 	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3
 	field :forked_from, :type => String
-	field :fork_hash, :type => String
-	field :fork_stamp, :type => String
+	field :fork_stamp, :type => Integer
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
 	#Counts
-	field :files, :type => Integer
-	field :folders, :type => Integer
-	field :total_size, :type => Integer
+	field :files, :type => Integer, :default => 0
+	field :folders, :type => Integer, :default => 0
+	field :total_size, :type => Integer, :default => 0
 
 	#Social
 	field :likes, :type => Integer
@@ -48,7 +48,7 @@ class Version
 	field :timestamp, :type => Integer
 	field :comments_priv, :type => Array
 	field :comments_pub, :type => Array
-	field :size, :type => Integer
+	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
 	field :fork_total, :type => Integer
 	field :data, :type => String #URL

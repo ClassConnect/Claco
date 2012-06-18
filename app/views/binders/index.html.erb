@@ -4,11 +4,14 @@
 
 <div>Contents:
 	<br />
+	<%= "Empty" if @binders.empty? %>
 	<% @binders.each do |binder| %>
 	<%= link_to binder.title, binder %>
   	(<%= link_to "Move", move_binder_path(binder) %>)
   	(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
   	<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
+  	<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
+  	(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
   	<br />
 	<% end %>
 </div>

@@ -1,7 +1,7 @@
 <h3>Binders#new</h3>
 <p>app/views/binders/new.html.erb</p>
 
-<%= form_for Binder.new, :url => binders_path do |f| %>
+<%= form_for @new_binder, :url => binders_path do |f| %>
 
 	<div><%= f.label :title, "Title" %><br />
 	<%= f.text_field :title %></div>
@@ -12,6 +12,39 @@
 
 	<div><%= f.label :body, "Body" %><br />
 	<%= f.text_area  :body %></div>
+
+	<%= f.fields_for :tag do |builder| %>
+
+		<table>
+			<tr>
+				<td valign="top">
+					<% (0..19).each do |grade_level| %>
+					<%= check_box( "tag", "grade_levels", { :id => "binder_tag_grade_levels",	#"binder[tag]",
+										:name => "binder[tag][grade_levels][]" },
+										grade_level_string_by_index(grade_level)  ) %>
+					<%= builder.label :grade_levels[grade_level], grade_level_title_by_index(grade_level) %><br />
+					<% end %>
+				</td>
+				<td valign="top">
+					<% (0..11).each do |subject| %>
+					<%= check_box( "tag", "subjects", { 	:id => "binder_tag_subjects",	# "binder[tag]",
+										:name => "binder[tag][subjects][]" },
+										subject_string_by_index(subject) ) %>
+					<%= builder.label :subjects[subject], subject_title_by_index(subject) %><br />
+					<% end %>
+				</td>
+			</tr>
+		</table>
+
+		<br />
+
+		<div><%= builder.label :standards, "Standard Tags" %><br />
+		<%= builder.text_field :standards, :value => "", :id => "binder_tag_standards", :name => "binder[tag][standards]" %></div>
+
+		<div><%= builder.label :other, "Other Tags" %><br />
+		<%= builder.text_field :other, :value => "", :id => "binder_tag_other", :name => "binder[tag][other]" %></div>
+
+	<% end %>
 
 	<div><%= f.submit "Create Binder" %></div>
 

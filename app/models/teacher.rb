@@ -138,16 +138,12 @@ class Tag
 			#else
 			#	true_checkbox_array[zero_count] = true
 			#end
-			if params[:tag][:grade_levels][i] != "0"
-				grade_levels_checkbox_array << params[:tag][:grade_levels][i]
-			end
+			grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_levels][i] != "0"
 		end
 
 		# update subjects array
 		(1..(params[:tag][:subjects].length-1)).each do |i|
-			if params[:tag][:subjects][i] != "0"
-				subjects_checkbox_array << params[:tag][:subjects][i]
-			end
+			subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
 		end
 
 

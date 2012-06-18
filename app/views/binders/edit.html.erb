@@ -3,39 +3,42 @@
 
 <%= form_for @binder, :url => binder_path do |f| %>
 
-  <div><%= f.label :title, "Title" %><br />
-  <%= f.text_field :title %></div>
+	<div><%= f.label :title, "Title" %><br />
+	<%= f.text_field :title %></div>
 
-  <% if @binder.type == 2 %>
+	<% if @binder.type == 2 %>
 
-    <% if @binder.format == 1 %>
+		<% if @binder.format == 1 %>
 
-      <%= f.fields_for @binder.versions.last do |g| %>
+		<%= f.fields_for @binder.versions.last do |g| %>
 
-        <div><%= g.label :file, "File:" %><br />
-        <%= g.file_field :file %></div>
+		<div><%= g.label :file, "File:" %><br />
+		<%= g.file_field :file %></div>
 
-        <% end %>
+		<% end %>
 
-    <% end %>
+	<% end %>
 
 
-    <% if @binder.format == 2 %>
+	<% if @binder.format == 2 %>
 
-      <%= f.fields_for @binder.versions.last do |g| %>
+		<%= f.fields_for @binder.versions.last do |g| %>
 
-        <div><%= g.label :data, "URL:" %><br />
-        <%= g.text_field :data %></div>
-      
-      <% end %>
+		<div><%= g.label :data, "URL:" %><br />
+		<%= g.text_field :data %></div>
 
-    <% end %>
+		<% end %>
 
-  <% end %>
+	<% end %>
 
-  <div><%= f.label :body, "Body" %><br />
-  <%= f.text_area  :body %></div>
+	<% end %>
 
-  <div><%= f.submit "Edit Binder" %></div>
+	<div><%= f.label :body, "Body" %><br />
+	<%= f.text_area  :body %></div>
+
+	<div><%= f.label :tags, "Tags" %><br />
+	<%= f.text_field :tags, :value => @binder.tags.join(' ') %></div>
+
+	<div><%= f.submit "Edit Binder" %></div>
 
 <% end %>

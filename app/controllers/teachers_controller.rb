@@ -6,6 +6,12 @@ class TeachersController < ApplicationController
 	def index
 		@title = "Teacher Listing"
 		@teachers = Teacher.all
+
+		# do not use!  much slower than C JSON parsing variant
+		#@parsed_json = ActiveSupport::JSON.decode(File.read("app/assets/json/test.json").to_s)
+
+		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!
+		@parsed_json = JSON.parse(File.read("app/assets/json/standards.json"))
 	end
 
 	#/teachers/:id
@@ -149,10 +155,9 @@ class TeachersController < ApplicationController
 
 		if @relationship.colleague_status == 0
 			# both teachers are not colleagues
-			if @affected_relationship.subscribed == false
-				# not subscribed to current teacher and not colleagues, so delete
-				@affected_relationship.delete
-			end
+
+			# not subscribed to current teacher and not colleagues, so delete
+			@affected_relationship.delete if @affected_relationship.subscribed == false
 
 			# not subscribed and not colleagues, so delete
 			@relationship.delete

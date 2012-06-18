@@ -4,7 +4,10 @@
 <p><b>You: <%=link_to current_teacher.email, current_teacher %></b></p>
 
 <% @teachers.each do |teacher| %>
-	<% if teacher.id != current_teacher.id %>
-		<p><%= "#{teacher.full_name}: "%><%= link_to teacher.email, teacher %></p>
+	<% if teacher.id != current_teacher.id  %>
+		<p><%= "#{teacher.full_name}: "%>
+		<%= link_to teacher.email, teacher %></p>
 	<% end %>
 <% end %>
+JSON file test:<br />
+<%= "#{@parsed_json.first.first}" %> <!-- "#{@parsed_json["firstName"]}" -->

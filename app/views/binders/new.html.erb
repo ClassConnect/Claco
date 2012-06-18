@@ -3,16 +3,16 @@
 
 <%= form_for Binder.new, :url => binders_path do |f| %>
 
-  <div><%= f.label :title, "Title" %><br />
-  <%= f.text_field :title %></div>
+	<div><%= f.label :title, "Title" %><br />
+	<%= f.text_field :title %></div>
 
-  <div><%= f.label :parent, "Parent (to be replaced with directory browser):" %><br />
-  <%= f.select(:parent,
-  	options_for_select([["Home", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
+	<div><%= f.label :parent, "Parent (to be replaced with directory browser):" %><br />
+	<%= f.select(:parent,
+	options_for_select([["Home", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
 
-  <div><%= f.label :body, "Body" %><br />
-  <%= f.text_area  :body %></div>
+	<div><%= f.label :body, "Body" %><br />
+	<%= f.text_area  :body %></div>
 
-  <div><%= f.submit "Create Binder" %></div>
+	<div><%= f.submit "Create Binder" %></div>
 
 <% end %>

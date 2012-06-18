@@ -3,11 +3,14 @@ module TeacherHelper
 #		"#{teacher.fname teacher.lname}"
 #	end
 
+	# function unused, doesn't work
 	def display_incoming_colleague_requests
 		if @colleague_requests.any?
-			#raw("<p>You have pending colleague requests!</p>")
+			raw("<p>You have pending colleague requests!</p>")
 			@colleague_requests.each do |request|
-				#form_for request, :url => confadd_path(request.user_id) do |f|
+				form_for request, :url => confadd_path(request.user_id) do |f|
+					f.submit "Accept colleague request from #{Teacher.find(request.user_id).full_name}", :confirm => "Are you absofuckinlutely positve?"
+				end
 
 				#link_to "Accept colleague request from #{Teacher.find(request.user_id).full_name}", confadd_path(request.user_id)
 				#"#{Teacher.find(request.user_id).full_name}"

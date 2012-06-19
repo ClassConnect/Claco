@@ -14,7 +14,7 @@ class BindersController < ApplicationController
 	end
 
 	#TODO: Implement size and file count
-
+	#Add Folder Function
 	def create
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
@@ -40,10 +40,10 @@ class BindersController < ApplicationController
 
 		end
 
-=begin
+
 		#Update parent counts
 		if @parentsarr.size > 1
-			pids = @parentsarr.map {|p| p["id"]}
+			pids = @parentsarr.map {|p| p["id"] || p[:id]}
 			
 			pids.each do |pid|
 
@@ -51,7 +51,7 @@ class BindersController < ApplicationController
 
 			end
 		end
-=end
+
 		Binder.new(	:owner				=> current_teacher.id,
 					:title				=> params[:binder][:title].to_s[0..60],
 					:parent				=> @parenthash,
@@ -100,6 +100,7 @@ class BindersController < ApplicationController
 
 	end
 
+	#Add links function
 	def createcontent
 
 		@binder = Binder.new
@@ -135,21 +136,22 @@ class BindersController < ApplicationController
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s,
 									:body				=> params[:binder][:body],
+									:files				=> 1,
 									:type				=> 2,
 									:format				=> 2)
 
 		@binder.versions << Version.new(:data => params[:binder][:versions][:data])
 
 		@binder.save
-=begin
-		pids = @parentsarr.map {|x| x["id"]}
+
+		pids = @parentsarr.map {|x| x["id"] || x[:id]}
 
 		pids.each do |id|
 
 			Binder.find(id).inc(:files, 1) if id != "0"
 
 		end
-=end
+
 		redirect_to binders_path(params[:binder][:parent])
 
 	end
@@ -197,6 +199,7 @@ class BindersController < ApplicationController
 
 	end
 
+	#Add file process
 	def createfile
 
 		@binder = Binder.new
@@ -238,8 +241,8 @@ class BindersController < ApplicationController
 										:size	=> params[:binder][:versions][:file].size)
 
 		@binder.save
-=begin
-		pids = @parentsarr.map {|x| x["id"]}
+
+		pids = @parentsarr.map {|x| x["id"] || x[:id]}
 
 		pids.each do |id|
 
@@ -249,7 +252,7 @@ class BindersController < ApplicationController
 											:total_size	=> parent.total_size + params[:binder][:versions][:file].size)
 			end
 		end
-=end
+
 		redirect_to binder_path(params[:binder][:parent])
 
 	end
@@ -265,7 +268,7 @@ class BindersController < ApplicationController
 
 	end
 
-	#Process from moving
+	#Process for moving any binders
 	#TODO: Add sanity check, make sure no folder-in-self or folder-in-child situation
 	def moveitem
 
@@ -291,11 +294,13 @@ class BindersController < ApplicationController
 		end
 
 		#OP = Original Parent
-		@op = Binder.find(@binder.parent["id"])
+		if @binder.parent["id"] != "0"
+			@op = Binder.find(@binder.parent["id"])
 
-		@op.update_attributes(	:files		=> @op.files - @binder.files,
-								:folders	=> @op.folders - @binder.folders,
-								:total_size	=> @op.total_size - @binder.total_size)
+			@op.update_attributes(	:files		=> @op.files - @binder.files,
+									:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
+									:total_size	=> @op.total_size - @binder.total_size)
+		end
 
 		@binder.update_attributes(	:parent		=> @parenthash,
 									:parents	=> @parentsarr)
@@ -316,11 +321,13 @@ class BindersController < ApplicationController
 
 		end
 
-		@np = Binder.find(params[:binder][:parent])
+		if params[:binder][:parent] != "0"
+			@np = Binder.find(params[:binder][:parent])
 
-		@np.update_attributes(	:files		=> @np.files + @binder.files,
-								:folders	=> @np.folders + @binder.folders,
-								:total_size	=> @np.total_size + @np.total_size)
+			@np.update_attributes(	:files		=> @np.files + @binder.files,
+									:folders	=> @np.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
+									:total_size	=> @np.total_size + @binder.total_size)
+		end
 
 		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
@@ -339,6 +346,7 @@ class BindersController < ApplicationController
 
 	end
 
+	#Copy Binders to new location
 	def copyitem
 
 		@binder = Binder.find(params[:id])
@@ -366,6 +374,9 @@ class BindersController < ApplicationController
 		@new_parent = Binder.new(	:title				=> @binder.title,
 									:body				=> @binder.body,
 									:type				=> @binder.type,
+									:files				=> @binder.files,
+									:folders			=> @binder.folders,
+									:total_size			=> @binder.total_size,
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:owner				=> current_teacher.id,
@@ -420,10 +431,11 @@ class BindersController < ApplicationController
 
 		end
 
-		@parent = Biinder.find(params[:binder][:parent])
+		@parent = Binder.find(params[:binder][:parent])
+
 
 		@parent.update_attributes(	:files		=> @parent.files + @new_parent.files,
-									:folders	=> @parent.folders + @new_parent.folders,
+									:folders	=> @parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
 									:total_size	=> @parent.total_size + @new_parent.total_size)
 
 		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
@@ -432,11 +444,29 @@ class BindersController < ApplicationController
 	end
 
 	#More validation needed
+	#TODO: Move "deleted" entries to a separate collection?
 	def destroy
 
 		@binder = Binder.find(params[:id])
 
 		@parent = @binder.parent["id"]
+
+		@pids = @binder.parents.collect {|x| x["id"] || x[:id]}
+
+		@pids.each do |id|
+
+			if id != "0"
+
+				@parent_binder = Binder.find(id)
+
+				@parent_binder.update_attributes(	:files		=> @parent_binder.files - @binder.files,
+													:folders	=> @parent_binder.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
+													:total_size	=> @parent_binder.total_size - @binder.total_size)
+	
+
+			end
+
+		end
 
 		@binder.destroy
 

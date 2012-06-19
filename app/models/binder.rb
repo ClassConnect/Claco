@@ -127,15 +127,15 @@ end
 class Tag
 	include Mongoid::Document
 
-	field :grade_levels, 		:type => Array, :default => [""]
-	field :subjects, 		:type => Array, :default => [""]
-	field :standards, 		:type => Array, :default => [""]
-	field :other, 			:type => Array, :default => [""]
+	field :grade_levels, 		:type => Array, :default => []
+	field :subjects, 		:type => Array, :default => []
+	field :standards, 		:type => Array, :default => []
+	field :other, 			:type => Array, :default => []
 
-	field :parent_grade_levels,	:type => Array, :default => [""]
-	field :parent_subjects,		:type => Array, :default => [""]
-	field :parent_standards,	:type => Array, :default => [""]
-	field :parent_other,		:type => Array, :default => [""]
+	field :parent_grade_levels,	:type => Array, :default => []
+	field :parent_subjects,		:type => Array, :default => []
+	field :parent_standards,	:type => Array, :default => []
+	field :parent_other,		:type => Array, :default => []
 
 	embedded_in :binder
 
@@ -173,6 +173,49 @@ class Tag
 		# THIS ROOT LEVEL IS INHERENTLY FLAWED, AND THEREFORE DANGEROUS!
 		if parent_binder.nil?
 			# is at root level, nothing to inherit
+			parent_grade_levels_tags = []
+			parent_subjects_tags = []
+			parent_standards_tags = []
+			parent_other_tags = []
+		else
+			# grab parent tags, merge into values to be inserted
+			# TODO: determine if the uniq method at the end of the assignments is necessary
+			parent_grade_levels_tags 	= (parent_binder.tag.grade_levels 	+ parent_binder.tag.parent_grade_levels).uniq
+			parent_subjects_tags 		= (parent_binder.tag.subjects 		+ parent_binder.tag.parent_subjects).uniq
+			parent_standards_tags 		= (parent_binder.tag.standards 		+ parent_binder.tag.parent_standards).uniq
+			parent_other_tags		= (parent_binder.tag.other 		+ parent_binder.tag.parent_other).uniq
+		end
+
+		# downcase.split.uniq will insert an empty string into the array in the db if there is no tag submitted for that field
+		# this empty string will propagate down to child nodes, who do not distinguish empty strings in parent data
+		# prevent insertion of empty strings into tags array
+		cleaned_standards_tags_array = Array.new
+		cleaned_other_tags_array = Array.new
+
+		cleaned_standards_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:standards].empty?
+		cleaned_other_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:other].empty?
+
+
+		self.update_attributes(	:grade_levels 		=> grade_levels_checkbox_array,
+					:subjects 		=> subjects_checkbox_array,
+					#:standards 		=> params[:binder][:tag][:standards].downcase.split.uniq,
+					#:other 		=> params[:binder][:tag][:other].downcase.split.uniq,
+					:standards		=> cleaned_standards_tags_array,
+					:other			=> cleaned_other_tags_array,
+					:parent_grade_levels 	=> parent_grade_levels_tags,
+					:parent_subjects 	=> parent_subjects_tags,
+					:parent_standards 	=> parent_standards_tags,
+					:parent_other 		=> parent_other_tags)
+
+	end
+
+	def set_binder_parent_tags(params,parent_binder)
+
+		# build parent values
+		# if parent_binder.id == "0"
+		# THIS ROOT LEVEL IS INHERENTLY FLAWED, AND THEREFORE DANGEROUS!
+		if parent_binder.nil?
+			# is at root level, nothing to inherit
 			parent_grade_levels_tags = [""]
 			parent_subjects_tags = [""]
 			parent_standards_tags = [""]
@@ -186,11 +229,7 @@ class Tag
 			parent_other_tags		= (parent_binder.tag.other 		+ parent_binder.tag.parent_other).uniq
 		end
 
-		self.update_attributes(	:grade_levels 		=> grade_levels_checkbox_array,
-					:subjects 		=> subjects_checkbox_array,
-					:standards 		=> params[:binder][:tag][:standards].downcase.split.uniq,
-					:other 			=> params[:binder][:tag][:other].downcase.split.uniq,
-					:parent_grade_levels 	=> parent_grade_levels_tags,
+		self.update_attributes(	:parent_grade_levels 	=> parent_grade_levels_tags,
 					:parent_subjects 	=> parent_subjects_tags,
 					:parent_standards 	=> parent_standards_tags,
 					:parent_other 		=> parent_other_tags)

@@ -124,10 +124,15 @@ class BindersController < ApplicationController
 		@binder.update_attributes(	:title			=> params[:binder][:title][0..60],
 						:last_update		=> Time.now.to_i,
 						:last_updated_by	=> current_teacher.id.to_s,
-						:body			=> params[:binder][:body],
-						:tags			=> params[:binder][:tags].downcase.split.uniq)
+						:body			=> params[:binder][:body])#,
+						#:tags			=> params[:binder][:tags].downcase.split.uniq)
 
 		#@binder.save
+		if @binder.parent["id"] == "0"
+			@binder.tag.set_binder_tags(params,nil)
+		else
+			@binder.tag.set_binder_tags(params,Binder.find(@binder.parent["id"]))
+		end
 
 		@children = Binder.where("parents.id" => params[:id])
 
@@ -138,6 +143,8 @@ class BindersController < ApplicationController
 			h.parent["title"] = params[:binder][:title][0..60] if h.parent["id"] == params[:id]
 
 			h.parents[@index]["title"] = params[:binder][:title][0..60]
+
+			h.tag.set_binder_parent_tags(params,Binder.find(h.parent["id"]))
 
 			h.save
 		end

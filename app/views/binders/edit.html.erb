@@ -36,8 +36,40 @@
 	<div><%= f.label :body, "Body" %><br />
 	<%= f.text_area  :body %></div>
 
-	<div><%= f.label :tags, "Tags" %><br />
-	<%= f.text_field :tags, :value => @binder.tags.join(' ') %></div>
+	<table>
+		<tr>
+			<td valign="top">
+				<% (0..19).each do |grade_level| %>
+				<%= check_box( "tag", "grade_levels", { :id => "binder_tag_grade_levels",	#"binder[tag]",
+									:name => "binder[tag][grade_levels][]" ,
+									:checked => binder_grade_level_check_box_value(grade_level) },
+									grade_level_string_by_index(grade_level)  ) %>
+				<%= f.label :grade_levels[grade_level], grade_level_title_by_index(grade_level) %><br />
+				<% end %>
+			</td>
+			<td valign="top">
+				<% (0..11).each do |subject| %>
+				<%= check_box( "tag", "subjects", { 	:id => "binder_tag_subjects",	# "binder[tag]",
+									:name => "binder[tag][subjects][]" ,
+									:checked => binder_subject_check_box_value(subject) },
+									subject_string_by_index(subject) ) %>
+				<%= f.label :subjects[subject], subject_title_by_index(subject) %><br />
+				<% end %>
+			</td>
+		</tr>
+	</table>
+
+	<br />
+
+	<%= f.fields_for :tag do |builder| %>
+
+		<div><%= builder.label :standards, "Standard Tags" %><br />
+		<%= builder.text_field :standards, :id => "binder_tag_standards", :name => "binder[tag][standards]", :value => @binder.tag.standards.join(' ') %></div>
+
+		<div><%= builder.label :other, "Other Tags" %><br />
+		<%= builder.text_field :other, :id => "binder_tag_other", :name => "binder[tag][other]", :value => @binder.tag.other.join(' ') %></div>
+
+	<% end %>
 
 	<div><%= f.submit "Edit Binder" %></div>
 

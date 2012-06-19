@@ -16,8 +16,8 @@
 									grade_level_string_by_index(grade_level)  ) %>
 				<%= f.label :grade_levels[grade_level], grade_level_title_by_index(grade_level) %><br />
 				<% end %>
-				</td>
-				<td valign="top">
+			</td>
+			<td valign="top">
 				<% (0..11).each do |subject| %>
 				<%= check_box( "tag", "subjects",     { :id => "tag_subjects",
 									:name => "tag[subjects][]",

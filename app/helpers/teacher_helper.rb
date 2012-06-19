@@ -187,7 +187,6 @@ module TeacherHelper
 		if current_teacher.tag.grade_levels.include? grade_level_string_by_index(index)
 			return true
 		end
-		return false
 	end
 
 	def subject_check_box_value(index)

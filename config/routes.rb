@@ -100,13 +100,22 @@ post '/binders/newcontent'  => 'binders#createcontent'
 get '/binders/newfile'      => 'binders#newfile'
 post '/binders/newfile'     => 'binders#createfile'
 
+#Add new version of file
+get '/binders/:id/update'   =>  'binders#newversion',     :as => 'new_binder_version'
+put '/binders/:id/update'  =>  'binders#createversion',  :as => 'create_binder_version'
+get '/binders/:id/versions' =>  'binders#versions',       :as => 'binder_versions'
+
 #Moving a binder object (File, folder, content)
-get '/binders/:id/move'     => 'binders#move',      :as => 'move_binder'
-put '/binders/:id/move'     => 'binders#moveitem',  :as => 'move_binder'
+get '/binders/:id/move'     => 'binders#move',            :as => 'move_binder'
+put '/binders/:id/move'     => 'binders#moveitem',        :as => 'move_binder'
 
 #Copying a binder object
-get '/binders/:id/copy'     => 'binders#copy',      :as => 'copy_binder'
-put '/binders/:id/copy'     => 'binders#copyitem',  :as => 'copy_binder'
+get '/binders/:id/copy'     => 'binders#copy',            :as => 'copy_binder'
+put '/binders/:id/copy'     => 'binders#copyitem',        :as => 'copy_binder'
+
+#Forking a binder object
+get '/binders/:id/fork'     => 'binders#fork',            :as => 'fork_binder'
+put '/binders/:id/fork'     => 'binders#forkitem',        :as => 'fork_binder'
 
 resources :binders
 

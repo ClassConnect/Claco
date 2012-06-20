@@ -27,6 +27,7 @@ class Binder
 	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3
 	field :forked_from, :type => String
 	field :fork_stamp, :type => Integer
+	field :fork_total, :type => Integer, :default => 0
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
@@ -50,7 +51,6 @@ class Version
 	field :comments_pub, :type => Array
 	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
-	field :fork_total, :type => Integer
 	field :data, :type => String #URL
 
 	mount_uploader :file, DataUploader

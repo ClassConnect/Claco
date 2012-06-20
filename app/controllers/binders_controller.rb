@@ -74,6 +74,7 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
+		#TODO: Create content dispostion headers and such
 		redirect_to @binder.versions.last.data and return if @binder.format == 2
 
 		redirect_to @binder.versions.last.file.url and return if @binder.format == 1
@@ -140,7 +141,8 @@ class BindersController < ApplicationController
 									:type				=> 2,
 									:format				=> 2)
 
-		@binder.versions << Version.new(:data => params[:binder][:versions][:data])
+		@binder.versions << Version.new(:data => params[:binder][:versions][:data],
+										:timestamp => Time.now.to_i)
 
 		@binder.save
 
@@ -178,11 +180,6 @@ class BindersController < ApplicationController
 			h.parents[@index]["title"] = params[:binder][:title][0..60]
 
 			h.save
-
-		end
-
-		#If not directory, apply versioning
-		if @binder.type != 1
 
 		end
 
@@ -236,9 +233,11 @@ class BindersController < ApplicationController
 			:type				=> 2,
 			:format				=> 1)
 
-		@binder.versions << Version.new(:file	=> params[:binder][:versions][:file],
-										:ext	=> File.extname(params[:binder][:versions][:file].original_filename),
-										:size	=> params[:binder][:versions][:file].size)
+		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
+										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
+										:size		=> params[:binder][:versions][:file].size,
+										:timestamp	=> Time.now.to_i,
+										:uid		=> current_teacher.id)
 
 		@binder.save
 
@@ -313,20 +312,26 @@ class BindersController < ApplicationController
 
 			@children = Binder.where("parents.id" => params[:id])
 
+			#Something is broken here....
 			@children.each do |h|
 				@current_parents = h.parents
 				@size = @current_parents.size
-				h.update_attributes(:parents => @parentsarr + @current_parents[@index..(@size - 1)])
+				h.update_attributes(:parents => @parentsarr + @current_parents[(@index - 1)..(@size - 1)])
 			end
 
 		end
 
-		if params[:binder][:parent] != "0"
-			@np = Binder.find(params[:binder][:parent])
 
-			@np.update_attributes(	:files		=> @np.files + @binder.files,
-									:folders	=> @np.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
-									:total_size	=> @np.total_size + @binder.total_size)
+		@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
+
+		@parents.each do |pid|
+			if pid != "0"
+				parent = Binder.find(pid)
+
+				parent.update_attributes(	:files		=> parent.files + @binder.files,
+											:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
+											:total_size	=> parent.total_size + @binder.total_size)
+			end
 		end
 
 		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
@@ -335,6 +340,8 @@ class BindersController < ApplicationController
 
 	end
 
+	#Copy will only be available to current user
+	#(Nearly the same functionality as fork without updating fork counts)
 	def copy
 
 		@binder = Binder.find(params[:id])
@@ -422,7 +429,20 @@ class BindersController < ApplicationController
 				@new_node.format = h.format if h.type != 1
 
 				#TODO: Create new version intead of ripping old one
-				@new_node.versions << h.versions.last if h.type != 1
+				@new_node.versions << Version.new(
+					:uid		=> h.versions.last.uid,
+					:timestamp	=> h.versions.last.timestamp,
+					:size		=> h.versions.last.size,
+					:ext		=> h.versions.last.ext,
+					:data		=> h.versions.last.data) if h.format == 2
+
+				@new_node.versions << Version.new(
+					:uid		=> h.versions.last.uid,
+					:timestamp	=> h.versions.last.timestamp,
+					:size		=> h.versions.last.size,
+					:ext		=> h.versions.last.ext,
+					:data		=> h.versions.last.data,
+					:file		=> h.versions.last.file) if h.format == 1
 
 				@new_node.save
 
@@ -431,16 +451,183 @@ class BindersController < ApplicationController
 
 		end
 
-		@parent = Binder.find(params[:binder][:parent])
+		@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
 
+		@parents.each do |pid|
+			if pid != "0"
+				parent = Binder.find(pid)
 
-		@parent.update_attributes(	:files		=> @parent.files + @new_parent.files,
-									:folders	=> @parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-									:total_size	=> @parent.total_size + @new_parent.total_size)
+				parent.update_attributes(	:files		=> parent.files + @new_parent.files,
+											:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
+											:total_size	=> parent.total_size + @new_parent.total_size)
+			end
+		end
 
 		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
+	end
+
+
+	def fork
+
+		@binder = Binder.find(params[:id])
+
+		redirect_to binder_path(params[:id]) and return if @binder.owner == current_teacher.id.to_s
+
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
+
+	end
+
+	#Copy Binders to new location
+	def forkitem
+
+		@binder = Binder.find(params[:id])
+
+		@parenthash = {}
+		@parentsarr = []
+
+
+		if params[:binder][:parent].to_s == "0"
+
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=> ""}
+
+			@parentsarr = [@parenthash]
+
+		else
+
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=>  Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+
+		end
+
+		@new_parent = Binder.new(	:title				=> @binder.title,
+									:body				=> @binder.body,
+									:type				=> @binder.type,
+									:files				=> @binder.files,
+									:folders			=> @binder.folders,
+									:total_size			=> @binder.total_size,
+									:parent				=> @parenthash,
+									:parents			=> @parentsarr,
+									:owner				=> current_teacher.id,
+									:last_update 		=> Time.now.to_i,
+									:last_updated_by 	=> current_teacher.id)
+
+		@new_parent.format = @binder.format if @binder.type == 2
+
+
+		#TODO: Create new version instead of using @binder's last version
+		@new_parent.versions << @binder.versions.last if @binder.type != 1
+
+		@new_parent.save
+
+		@hash_index = {params[:id] => @new_parent.id.to_s}
+
+
+		#If directory, deal with the children
+		if @binder.type == 1 #Eventually will apply to type == 3 too
+
+			@index = @binder.parents.length
+
+			#Select old children, order by parents.length
+			@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
+
+			#Spawn new children, These children need to have updated parent ids
+			@children.each do |h|
+
+				@node_parent = {"id"	=> @hash_index[h.parent["id"]],
+								"title"	=> h.parent["title"]}
+
+				@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
+
+				@new_node = Binder.new(	:title				=> h.title,
+										:body				=> h.body,
+										:parent				=> @node_parent,
+										:parents			=> @node_parents,
+										:owner				=> current_teacher.id,
+										:last_update 		=> h.last_update,
+										:last_updated_by 	=> current_teacher.id,
+										:type				=> h.type,
+										:forked_from		=> h.versions.last.id,
+										:fork_stamp			=> Time.now.to_i)
+
+				@new_node.format = h.format if h.type != 1
+
+				@new_node.versions << Version.new(
+					:uid		=> h.versions.last.uid,
+					:timestamp	=> h.versions.last.timestamp,
+					:size		=> h.versions.last.size,
+					:ext		=> h.versions.last.ext,
+					:data		=> h.versions.last.data) if h.type != 1 && h.format == 2
+
+				@new_node.versions << Version.new(
+					:uid		=> h.versions.last.uid,
+					:timestamp	=> h.versions.last.timestamp,
+					:size		=> h.versions.last.size,
+					:ext		=> h.versions.last.ext,
+					:data		=> h.versions.last.data,
+					:file		=> h.versions.last.file) if h.type != 1 && h.format == 1
+
+				@new_node.save
+
+				h.inc(:fork_total, 1)
+
+				@hash_index[h.id.to_s] = @new_node.id.to_s
+			end
+
+		end
+
+
+		@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+
+		@parents.each do |pid|
+			if pid != "0"
+				parent = Binder.find(pid)
+
+				parent.update_attributes(	:files		=> parent.files + @new_parent.files,
+											:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
+											:total_size	=> parent.total_size + @new_parent.total_size)
+			end
+		end
+
+		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+
+		redirect_to binders_path
+	end
+
+	def newversion
+		@binder = Binder.find(params[:id])
+
+		redirect_to binder_path(@binder) if @binder.type != 2
+	end
+
+	def createversion
+		@binder = Binder.find(params[:id])
+
+		if @binder.format == 1
+
+			@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
+											:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
+											:size		=> params[:binder][:versions][:file].size,
+											:timestamp	=> Time.now.to_i)
+
+		end
+
+		if @binder.format == 2
+
+			@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
+											:timestamp	=> Time.now.to_i)
+
+		end
+
+		redirect_to binder_path(@binder.parent["id"])
+	end
+
+	def versions
+		@binder = Binder.find(params[:id])
 	end
 
 	#More validation needed
@@ -461,8 +648,7 @@ class BindersController < ApplicationController
 
 				@parent_binder.update_attributes(	:files		=> @parent_binder.files - @binder.files,
 													:folders	=> @parent_binder.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-													:total_size	=> @parent_binder.total_size - @binder.total_size)
-	
+													:total_size	=> @parent_binder.total_size - @binder.total_size)	
 
 			end
 

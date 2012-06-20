@@ -1,0 +1,32 @@
+<h3>Binders#versions</h3>
+<p>app/views/binders/versions.html.erb</p>
+
+<p>Currently In:<% @binder.parents.each do |parent| %>
+	<% if parent["id"] == "0" %>
+		<%= link_to "Home", binders_path %> /
+	<% else %>
+		<%= link_to parent["title"], binder_path(parent["id"]) %> /
+	<% end %>
+<% end %><%= link_to @binder.title, binder_path(@binder) %></p>
+
+<div><% if !@binder.body.blank? %>
+	Body: <%= @binder.body %>
+<br /><br />
+<% end %></div>
+
+<div>Versions:
+	<br />
+	<% @binder.versions.each do |version| %>
+  		<%= link_to File.basename(version.file.url), version.file.url %>
+  		<%= "(#{version.size}) (#{version.timestamp}) (#{version.id})" %>
+	  <br />
+	<% end %>
+</div>
+<br />
+<% if false %>
+<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %> | 
+<%= link_to "Create new binder", new_binder_path %> | 
+<%= link_to "Edit this binder", edit_binder_path(@binder) %> |
+<%= link_to "Add content", binders_newcontent_path %> |
+<%= link_to "Add File", binders_newfile_path %>
+<% end %>

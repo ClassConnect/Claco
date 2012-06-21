@@ -13,30 +13,35 @@
 
 <% @retarray.uniq.each do |treenode| %>
 	<% treenode[2].times do %>
-		&nbsp;&nbsp;&nbsp;
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<% end %>
 	<% if treenode[3] == 1 %>
-		<%= link_to treenode[1], treenode[4].last.file.url %><br />
+		<%= #link_to treenode[1], treenode[4].last.file.url 
+		%>
+		<%= link_to File.basename(treenode[4].last.file.url), treenode[4].last.file.url %>
 	<% else %>
-		[<%= link_to treenode[1], show_binder_path(params[:id],treenode[0]) %>]<br />
+		[<%= link_to treenode[1], show_binder_path(params[:id],treenode[0]) %>]
 	<% end %>
 	<% if treenode[0] == @current_binder.id.to_s %>
+		<b>&lt;&lt;&lt;</b><br />
 		<% if @child_binders.empty? %>
 			<% (treenode[2]+1).times do %>
-				&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<% end %>
-			&lt;Empty&gt;<br />
+			<i>Empty</i><br />
 		<% else %>
 			<% @child_binders.each do |c_binder| %>
 				<% (treenode[2]+1).times do %>
-					&nbsp;&nbsp;&nbsp;
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<% end %>
 				<% if c_binder.format == 1 %>
-					<%= link_to c_binder.title, c_binder.versions.last.file.url %><br />
+					<%= link_to File.basename(c_binder.versions.last.file.url), c_binder.versions.last.file.url %><br />
 				<% else %>
 			  		[<%= link_to c_binder.title, show_binder_path(params[:id],c_binder.id) %>]<br />
 			  	<% end %>
 			<% end %>
 		<% end %>
+	<% else %>
+		<br />
 	<% end %>
 <% end %>

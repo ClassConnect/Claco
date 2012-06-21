@@ -44,11 +44,15 @@
 <% end %>
 
 <br />
-<br />
-
+<hr />
+<p><%= "#{ @teacher.full_name }'s binders:" %></p>
 <%= "[Home]" if @owned_root_binders.any? %>
 <br />
 <% @owned_root_binders.each do |root_binder| %>
 	&nbsp;&nbsp;&nbsp;[<%= link_to "#{root_binder.title}", "/teachers/#{params[:id]}/binder/#{root_binder.id}" %>]
 	<br />
 <% end %>
+<hr />
+<p>Feed:</p>
+
+

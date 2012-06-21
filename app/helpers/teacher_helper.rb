@@ -217,35 +217,20 @@ module TeacherHelper
 
 #  	@current_binder.parents[i]["id"].to_s == node.id.to_s
 
-	def print_children(index)#,retarray)
-		#retarray = "" if !retarray
+	def print_children(index)
 		for i in (0..(@binder_file_tree_array[index].length-1))
-			#if @current_binder.parents[index]["id"].to_s == @binder_file_tree_array[index][i].id.to_s
 
 			node = @binder_file_tree_array[index][i]
 
-			#if !@retarray.include?("#{title.to_s}")
 				@retarray << [	node.id.to_s,
 								node.title,
 								index,
 								node.format.to_i,
 								node.versions]
-			#end
 
 			if @binder_parent_id_array.include? @binder_file_tree_array[index][i].id.to_s
-				#retarray += "#{@binder_file_tree_array[index][i].title} "
-				#retarray += "i before: #{i} "
-				#(index+1).times do 
-				#	@retarray += ">"
-				#end
-				@retarray += print_children(index + 1)#,@retarray)
-				#retarray += "i after: #{i} "
-				#retarray += "NIGGERBALLS "
-			#els
-				#retarray += "#{@binder_file_tree_array[index][i].title} "
+				@retarray += print_children(index + 1)
 			end
-			#raw("shitfuck<br />")
-			
 		end
 		return @retarray.uniq#.sort! { |a,b| a[3] <=> b[3] }
 	end

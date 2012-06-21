@@ -16,17 +16,30 @@
 
 <div>Versions:
 	<br />
-	<% @binder.versions.each do |version| %>
-  		<%= link_to File.basename(version.file.url), version.file.url %>
-  		<%= "(#{version.size}) (#{version.timestamp}) (#{version.id})" %>
-	  <br />
+	<% if @binder.format == 1 %>
+		<% @binder.versions.each do |version| %>
+			<%= "(#{version.timestamp})" %>
+	  		<%= link_to File.basename(version.file.url), version.file.url %>
+	  		<%= "(#{version.size}) (#{version.id})" %>
+			<br />
+		<% end %>
+	<% elsif @binder.format == 2 %>
+		<% @binder.versions.each do |version| %>	
+			<%= "(#{version.timestamp})" %>
+			<%= link_to version.data, version.data %>
+	  		<%= "(#{version.id})" %>
+	  		<% if version == @binder.current_version %>
+				<br />
+	  			(Current Version)
+	  		<% else %>
+		  		<%= form_for version, :url => swap_binder_path(@binder) do |f|%>
+		  			<%= f.hidden_field :id %>
+		  			<%= f.submit "Use this version" %>
+		  		<% end %>
+	  		<% end %>
+			<hr />
+			<br />
+		<% end %>
 	<% end %>
+
 </div>
-<br />
-<% if false %>
-<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %> | 
-<%= link_to "Create new binder", new_binder_path %> | 
-<%= link_to "Edit this binder", edit_binder_path(@binder) %> |
-<%= link_to "Add content", binders_newcontent_path %> |
-<%= link_to "Add File", binders_newfile_path %>
-<% end %>

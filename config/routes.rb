@@ -102,8 +102,9 @@ post '/binders/newfile'     => 'binders#createfile'
 
 #Add new version of file
 get '/binders/:id/update'   =>  'binders#newversion',     :as => 'new_binder_version'
-put '/binders/:id/update'  =>  'binders#createversion',  :as => 'create_binder_version'
+put '/binders/:id/update'   =>  'binders#createversion',  :as => 'create_binder_version'
 get '/binders/:id/versions' =>  'binders#versions',       :as => 'binder_versions'
+put '/binders/:id/swap'     =>  'binders#swap',           :as => 'swap_binder'
 
 #Moving a binder object (File, folder, content)
 get '/binders/:id/move'     => 'binders#move',            :as => 'move_binder'

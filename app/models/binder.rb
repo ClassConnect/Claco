@@ -40,6 +40,16 @@ class Binder
 	field :likes, :type => Integer
 	field :comments, :type => Array
 
+	def current_version
+
+		self.versions.each do |v|
+			return v if v.active
+		end
+
+		return self.versions.sort_by {|v| v.timestamp}.last
+
+	end
+
 end
 
 class Version
@@ -52,6 +62,7 @@ class Version
 	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
 	field :data, :type => String #URL
+	field :active, :type => Boolean, :default => false
 
 	mount_uploader :file, DataUploader
 

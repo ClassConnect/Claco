@@ -75,9 +75,9 @@ class BindersController < ApplicationController
 		#TODO: Verify permissions before rendering view
 
 		#TODO: Create content dispostion headers and such
-		redirect_to @binder.versions.last.data and return if @binder.format == 2
+		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		redirect_to @binder.versions.last.file.url and return if @binder.format == 1
+		redirect_to @binder.current_version.file.url and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -628,6 +628,16 @@ class BindersController < ApplicationController
 
 	def versions
 		@binder = Binder.find(params[:id])
+	end
+
+	def swap
+		@binder = Binder.find(params[:id])
+
+		@binder.versions.each do |v|
+			v.update_attributes(:active => v.id.to_s == params[:version][:id])
+		end
+
+		redirect_to binder_path(@binder.parent["id"])
 	end
 
 	#More validation needed

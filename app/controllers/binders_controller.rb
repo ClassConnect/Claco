@@ -13,7 +13,6 @@ class BindersController < ApplicationController
 		@title = "Create a new binder"
 	end
 
-	#TODO: Implement size and file count
 	#Add Folder Function
 	def create
 		#Trim to 60 chars (old spec)
@@ -33,8 +32,8 @@ class BindersController < ApplicationController
 
 		else
 
-			@parenthash = {	:id 	=> params[:binder][:parent],
-							:title 	=> Binder.find(params[:binder][:parent]).title}
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=> Binder.find(params[:binder][:parent]).title}
 
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
 
@@ -158,7 +157,6 @@ class BindersController < ApplicationController
 
 	end
 
-	#TODO: Version control, File/link update support
 	def update
 		@binder = Binder.find(params[:id])
 
@@ -206,15 +204,15 @@ class BindersController < ApplicationController
 
 		if params[:binder][:parent].to_s == "0"
 
-			@parenthash = {	:id 	=> params[:binder][:parent],
-							:title 	=> ""}
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=> ""}
 
 			@parentsarr = [@parenthash]
 
 		else
 
-			@parenthash = {	:id 	=> params[:binder][:parent],
-							:title 	=>  Binder.find(params[:binder][:parent]).title}
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=>  Binder.find(params[:binder][:parent]).title}
 
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
 
@@ -387,14 +385,14 @@ class BindersController < ApplicationController
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:owner				=> current_teacher.id,
-									:last_update 		=> Time.now.to_i,
-									:last_updated_by 	=> current_teacher.id)
+									:last_update		=> Time.now.to_i,
+									:last_updated_by	=> current_teacher.id)
 
 		@new_parent.format = @binder.format if @binder.type == 2
 
 
 		#TODO: Create new version instead of using @binder's last version
-		@new_parent.versions << @binder.versions.last if @binder.type != 1
+		@new_parent.versions << @binder.current_version if @binder.type != 1
 
 		@new_parent.save
 
@@ -422,11 +420,13 @@ class BindersController < ApplicationController
 										:parent				=> @node_parent,
 										:parents			=> @node_parents,
 										:owner				=> current_teacher.id,
-										:last_update 		=> Time.now.to_i,
-										:last_updated_by 	=> current_teacher.id,
+										:last_update		=> Time.now.to_i,
+										:last_updated_by	=> current_teacher.id,
 										:type				=> h.type)
 
 				@new_node.format = h.format if h.type != 1
+
+				#TODO: Fork should also accept old versions
 
 				#TODO: Create new version intead of ripping old one
 				@new_node.versions << Version.new(
@@ -513,8 +513,8 @@ class BindersController < ApplicationController
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:owner				=> current_teacher.id,
-									:last_update 		=> Time.now.to_i,
-									:last_updated_by 	=> current_teacher.id)
+									:last_update		=> Time.now.to_i,
+									:last_updated_by	=> current_teacher.id)
 
 		@new_parent.format = @binder.format if @binder.type == 2
 
@@ -548,8 +548,8 @@ class BindersController < ApplicationController
 										:parent				=> @node_parent,
 										:parents			=> @node_parents,
 										:owner				=> current_teacher.id,
-										:last_update 		=> h.last_update,
-										:last_updated_by 	=> current_teacher.id,
+										:last_update		=> h.last_update,
+										:last_updated_by	=> current_teacher.id,
 										:type				=> h.type,
 										:forked_from		=> h.versions.last.id,
 										:fork_stamp			=> Time.now.to_i)
@@ -607,20 +607,22 @@ class BindersController < ApplicationController
 	def createversion
 		@binder = Binder.find(params[:id])
 
-		if @binder.format == 1
+		@binder.versions.each do |v|
+			v.update_attributes(:active => false)
+		end
 
+		if @binder.format == 1
 			@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
 											:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
 											:size		=> params[:binder][:versions][:file].size,
-											:timestamp	=> Time.now.to_i)
-
+											:timestamp	=> Time.now.to_i,
+											:active		=> true)
 		end
 
 		if @binder.format == 2
-
 			@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
-											:timestamp	=> Time.now.to_i)
-
+											:timestamp	=> Time.now.to_i,
+											:active		=> true)
 		end
 
 		redirect_to binder_path(@binder.parent["id"])
@@ -633,9 +635,7 @@ class BindersController < ApplicationController
 	def swap
 		@binder = Binder.find(params[:id])
 
-		@binder.versions.each do |v|
-			v.update_attributes(:active => v.id.to_s == params[:version][:id])
-		end
+		@binder.versions.each {|v| v.update_attributes(:active => v.id.to_s == params[:version][:id])}
 
 		redirect_to binder_path(@binder.parent["id"])
 	end

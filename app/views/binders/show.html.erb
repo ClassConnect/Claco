@@ -23,7 +23,7 @@
 		<% if binder.format == 1 %>
 
 			<%= link_to binder.title, binder.versions.last.file.url %>
-			
+
 			<% #link_to binder.title, binder.versions.last.data, :target => "_blank" if binder.format == 2 %>
 
 			(<%= link_to "Edit", edit_binder_path(binder) %>)
@@ -31,16 +31,16 @@
 		<% else %>
 	  		<%= link_to binder.title, binder %>
 	  	<% end %>
-	  		(<%= link_to "Move", move_binder_path(binder) %>)
-	  		(<%= link_to "Copy", copy_binder_path(binder) %>)
-	  		(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
-	  		<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
-	  <br />
+  		(<%= link_to "Move", move_binder_path(binder) %>)
+  		(<%= link_to "Copy", copy_binder_path(binder) %>)
+  		(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
+  		<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
+		<br />
 	<% end %>
 </div>
 <br />
-<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %> | 
-<%= link_to "Create new binder", new_binder_path %> | 
+<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %> |
+<%= link_to "Create new binder", new_binder_path %> |
 <%= link_to "Edit this binder", edit_binder_path(@binder) %> |
 <%= link_to "Add content", binders_newcontent_path %> |
 <%= link_to "Add File", binders_newfile_path %>

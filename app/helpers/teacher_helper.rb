@@ -196,7 +196,53 @@ module TeacherHelper
 		return false
 	end
 
-	def test_helper
-		true
+	# def print_children(parent_id,parent_height)
+		
+	# 	if !(@nodechildren = Binder.where("parent.id" => parent_id))
+	# 		FUCK
+	# 	end
+
+	# 	#if @nodechildren.any?
+	# 		@nodechildren.count.times do
+	# 			raw("Nigger")
+	# 		end
+	# 		#i = 0
+	# 		#@nodechildren
+	# 		#	i.to_s
+	# 			#{}"childnode.title"
+	# 			#<br />
+	# 		#end
+	# 	#end
+	# end
+
+#  	@current_binder.parents[i]["id"].to_s == node.id.to_s
+
+	def print_children(index)#,retarray)
+		#retarray = "" if !retarray
+		for i in (0..(@binder_file_tree_array[index].length-1))
+			#if @current_binder.parents[index]["id"].to_s == @binder_file_tree_array[index][i].id.to_s
+
+			node = @binder_file_tree_array[index][i]
+
+			#if !@retarray.include?("#{title.to_s}")
+				@retarray << [node.id.to_s,node.title,index]
+			#end
+
+			if @binder_parent_id_array.include? @binder_file_tree_array[index][i].id.to_s
+				#retarray += "#{@binder_file_tree_array[index][i].title} "
+				#retarray += "i before: #{i} "
+				#(index+1).times do 
+				#	@retarray += ">"
+				#end
+				@retarray += print_children(index + 1)#,@retarray)
+				#retarray += "i after: #{i} "
+				#retarray += "NIGGERBALLS "
+			#els
+				#retarray += "#{@binder_file_tree_array[index][i].title} "
+			end
+			#raw("shitfuck<br />")
+			
+		end
+		return @retarray.uniq
 	end
 end

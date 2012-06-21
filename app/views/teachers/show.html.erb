@@ -42,3 +42,13 @@
 		<% end %>
 	<% end %>
 <% end %>
+
+<br />
+<br />
+
+<%= "[Home]" if @owned_root_binders.any? %>
+<br />
+<% @owned_root_binders.each do |root_binder| %>
+	>&nbsp;&nbsp;<%= link_to "#{root_binder.title}", "/teachers/#{params[:id]}/binder/#{root_binder.id}" %>
+	<br />
+<% end %>

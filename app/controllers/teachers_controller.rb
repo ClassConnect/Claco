@@ -1,4 +1,4 @@
-class TeachersController < ApplicationController
+ class TeachersController < ApplicationController
 	before_filter :authenticate_teacher!
 
 	#/teachers
@@ -32,6 +32,9 @@ class TeachersController < ApplicationController
 		#Create info entry for teacher if not yet created
 		@teacher.info = Info.new if !@teacher.info
 
+		# fetch root level directories that are owned by the teacher
+		@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
+
 	end
 
 	#/editinfo
@@ -42,15 +45,15 @@ class TeachersController < ApplicationController
 	end
 
 	#PUT /updateinfo
-	def updateinfo
+	def updateinfow
 
 		#@teacher = current_teacher
 
 		#@info = @teacher.info
 
-		#@info = current_teacher.info
+		#@info = current_teacher.newinfo
 
-		#newinfo = params[:info]
+		#info = params[:info]
 
 		#TODO Make sure htmlcode is not allowed in @info.bio
 
@@ -297,7 +300,7 @@ class TeachersController < ApplicationController
 				# we are not subscribed to the other teacher, so delete our relationship with them
 				@relationship.delete
 			else
-				# we are subscribed to them, so merely unset the colleague status
+				# weScreenshot from 2012-06-20 13:53:32 are subscribed to them, so merely unset the colleague status
 				@relationship.set_colleague_status(0)
 			end
 
@@ -318,4 +321,34 @@ class TeachersController < ApplicationController
 		redirect_to teacher_path(@teacher)
 
 	end
+
+	def showbinder
+
+		#@text = "Success!"
+
+		@current_binder = Binder.find(params[:binder_id])
+		#@current_binder << Binder.where()
+
+		@child_binders = Binder.where("parent.id" => params[:binder_id])
+
+		@binder_file_tree_array = Array.new
+		@binder_parent_id_array = Array.new
+
+		@current_binder.parents.each do |nodeparent|
+			@binder_file_tree_array << Binder.where("parent.id" => nodeparent["id"], :owner => params[:id]).entries
+			@binder_parent_id_array << nodeparent["id"].to_s
+		end
+
+		
+		# if @child_binders.empty?
+		# 	@child_binders = Binder.new()
+		# end
+
+		@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
+
+		@retarray = Array.new
+
+	end
+
 end
+

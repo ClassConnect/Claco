@@ -108,6 +108,8 @@ put '/binders/:id/move'     => 'binders#moveitem',  :as => 'move_binder'
 get '/binders/:id/copy'     => 'binders#copy',      :as => 'copy_binder'
 put '/binders/:id/copy'     => 'binders#copyitem',  :as => 'copy_binder'
 
+get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
+
 resources :binders
 
 

@@ -75,13 +75,13 @@ class Binder
 
 		#new_binder = Binder.new(:owner 		=> current_teacher.id,
 		self.update_attributes(	:owner			=> teacher_id,	#current_teacher.id,
-					:title 			=> params[:binder][:title].to_s[0..60],
-					:parent 		=> @parenthash,
-					:parents 		=> @parentsarr,
+					:title 				=> params[:binder][:title].to_s[0..60],
+					:parent 			=> @parenthash,
+					:parents 			=> @parentsarr,
 					:last_update 		=> Time.now.to_i,
 					:last_updated_by	=> teacher_id,	#current_teacher.id.to_s,
-					:body 			=> params[:binder][:body],
-					:type 			=> 1)
+					:body 				=> params[:binder][:body],
+					:type 				=> 1)
 
 		self.tag = Tag.new
 
@@ -93,6 +93,10 @@ class Binder
 		#	parent_binder = Binder.find(params[:binder][:parent])
 		#end
 
+	end
+
+	def get_binder_children_by_id(parent_binder_id)
+		return Binders.where("parent.id" => parent_binder_id)
 	end
 
 end
@@ -128,9 +132,9 @@ class Tag
 	include Mongoid::Document
 
 	field :grade_levels, 		:type => Array, :default => []
-	field :subjects, 		:type => Array, :default => []
-	field :standards, 		:type => Array, :default => []
-	field :other, 			:type => Array, :default => []
+	field :subjects, 			:type => Array, :default => []
+	field :standards, 			:type => Array, :default => []
+	field :other, 				:type => Array, :default => []
 
 	field :parent_grade_levels,	:type => Array, :default => []
 	field :parent_subjects,		:type => Array, :default => []
@@ -195,17 +199,17 @@ class Tag
 		cleaned_standards_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:standards].empty?
 		cleaned_other_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:other].empty?
 
-
+		# this update query is partially duplicated below in order to make writes to the database atomic
 		self.update_attributes(	:grade_levels 		=> grade_levels_checkbox_array,
-					:subjects 		=> subjects_checkbox_array,
-					#:standards 		=> params[:binder][:tag][:standards].downcase.split.uniq,
-					#:other 		=> params[:binder][:tag][:other].downcase.split.uniq,
-					:standards		=> cleaned_standards_tags_array,
-					:other			=> cleaned_other_tags_array,
-					:parent_grade_levels 	=> parent_grade_levels_tags,
-					:parent_subjects 	=> parent_subjects_tags,
-					:parent_standards 	=> parent_standards_tags,
-					:parent_other 		=> parent_other_tags)
+								:subjects 		=> subjects_checkbox_array,
+								#:standards 		=> params[:binder][:tag][:standards].downcase.split.uniq,
+								#:other 		=> params[:binder][:tag][:other].downcase.split.uniq,
+								:standards		=> cleaned_standards_tags_array,
+								:other			=> cleaned_other_tags_array,
+								:parent_grade_levels 	=> parent_grade_levels_tags,
+								:parent_subjects 	=> parent_subjects_tags,
+								:parent_standards 	=> parent_standards_tags,
+								:parent_other 		=> parent_other_tags)
 
 	end
 
@@ -216,10 +220,10 @@ class Tag
 		# THIS ROOT LEVEL IS INHERENTLY FLAWED, AND THEREFORE DANGEROUS!
 		if parent_binder.nil?
 			# is at root level, nothing to inherit
-			parent_grade_levels_tags = [""]
-			parent_subjects_tags = [""]
-			parent_standards_tags = [""]
-			parent_other_tags = [""]
+			parent_grade_levels_tags = []
+			parent_subjects_tags = []
+			parent_standards_tags = []
+			parent_other_tags = []
 		else
 			# grab parent tags, merge into values to be inserted
 			# TODO: determine if the uniq method at the end of the assignments is necessary
@@ -230,9 +234,9 @@ class Tag
 		end
 
 		self.update_attributes(	:parent_grade_levels 	=> parent_grade_levels_tags,
-					:parent_subjects 	=> parent_subjects_tags,
-					:parent_standards 	=> parent_standards_tags,
-					:parent_other 		=> parent_other_tags)
+								:parent_subjects 	=> parent_subjects_tags,
+								:parent_standards 	=> parent_standards_tags,
+								:parent_other 		=> parent_other_tags)
 
 	end
 

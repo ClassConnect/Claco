@@ -1,0 +1,232 @@
+<h3>Teachers#showbinder</h3>
+<p>app/views/teachers/showbinder.html.erb</p>
+
+<hr />
+
+
+
+<%= #"#{params[:binder_id]}" 
+%>
+<%= #@child_binders.first.parents.length if @child_binders.any? 
+%>
+
+<% #if @child_binders.empty? %>
+	<!-- @child_binders = --> 
+<% #end %>
+<% #else %>
+
+<% if false %>
+
+	<% @current_binder.parents << {"id" => @current_binder.id, "title" => @current_binder.title} %>
+	<% @owned_root_binders.each do |root_binder| %>
+		[<%= link_to root_binder.title, show_binder_path(params[:id],root_binder.id) %>]
+		<br />
+		<% #if @child_binders.empty? %>
+			<!--&lt;Empty&gt;-->
+		<% #else %>
+			<% if root_binder.id.to_s == @current_binder.parents.second["id"].to_s #@child_binders.first.parents.second["id"] %>
+			<% #if @child_binders.first.parents.second %>
+				<% i = 0 %>
+				<% #@child_binders.first.parents.each do |path_member| %>
+				<% @current_binder.parents.each do |path_member| #(@current_binder.parents << {"id" => @current_binder.id, "title" => @current_binder.title}).each do |path_member| %>
+					<% if i > 1 %>
+						<% (2*(i-1)).times do %>
+							&nbsp;
+						<% end %>
+						[<%= link_to path_member["title"], show_binder_path(params[:id],path_member["id"]) %>]
+						<br />
+					<% end %>
+					<% i += 1 %>
+				<% end %>
+				<% child_height = (@current_binder.parents.length)#@child_binders.first.parents.length %>
+				<% if @child_binders.empty? %>
+					<% (2*(child_height-1)).times do %>
+						&nbsp;
+					<% end %>
+					&lt;Empty&gt;<br />
+				<% else %>
+					<% @child_binders.each do |child_binder| %>
+						<% (2*(child_height-1)).times do %>
+							&nbsp;
+						<% end %>
+						<% if child_binder.format == 1 %>
+							<%= link_to child_binder.title, child_binder.versions.last.file.url %>
+						<% else %>
+							<% #link_to child_binder.title, child_binder %>
+							<%= link_to child_binder.title, show_binder_path(params[:id],child_binder.id) %>
+						<% end %>
+						<br />
+					<% end %>
+				<% end %>
+			<% end %>
+		<% #end %>
+	<% end %>
+
+<% end %>
+
+<% print_children(0) %>
+
+<% @retarray.uniq.each do |treenode| %>
+	<% treenode[2].times do %>
+		&nbsp;&nbsp;&nbsp;
+	<% end %>
+	[<%= link_to treenode[1], show_binder_path(params[:id],treenode[0]) %>]<br />
+	<% if treenode[0] == @current_binder.id.to_s %>
+		<% if @child_binders.empty? %>
+			<% (treenode[2]+1).times do %>
+				&nbsp;&nbsp;&nbsp;
+			<% end %>
+			&lt;Empty&gt;<br />
+		<% else %>
+			<% @child_binders.each do |c_binder| %>
+				<% (treenode[2]+1).times do %>
+					&nbsp;&nbsp;&nbsp;
+				<% end %>
+				[<%= link_to c_binder.title, show_binder_path(params[:id],c_binder.id) %>]<br />
+			<% end %>
+		<% end %>
+	<% end %>
+<% end %>
+
+<% if false %>
+
+	<% if false %>
+
+		<% if false %>
+
+			<% i = 1 %>
+			<% @binder_file_tree_array.each do |heightarray| %>
+				<%= #heightarray.inspect 
+				%>
+				<% heightarray.each do |node| %>
+					<%= node.title %><br />
+					<% if @current_binder.parents[i]["id"].to_s == node.id.to_s %>
+						NEXT LEVEL<br />
+					<% end %>
+				<% end %>
+				<% i += 1 %>
+				(end)<br />
+			<% end %>
+
+		<% end %>
+
+		<br />
+		<br />
+		<hr />
+
+		<%= @binder_parent_id_array.inspect %>
+
+		<br /><br />
+
+		<%= @current_binder.inspect %><br /><br />
+
+		<%= @binder_file_tree_array.inspect %>
+		<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+
+		
+		<br />
+		<%= @binder_file_tree_array[0].length %>
+		<br />
+		<%= @retarray.inspect %>
+
+	<% end %>
+
+	<br /><br />
+
+	<br /><br />
+
+	<% if false %>
+
+		<br /><br />
+		<br /><br />
+		<hr />
+
+		<% @nodeheight = @current_binder.parents.length-1 %>
+		<%= @nodeheight %><br />
+		<% @owned_root_binders.each do |root_binder| %>
+			[<%= link_to root_binder.title, show_binder_path(params[:id],root_binder.id) %>]<br />
+			<% if root_binder.id.to_s == @current_binder.parents.second["id"].to_s %>
+				<% # this is the root folder from which to begin, start subtree construction 
+				i = 0 %>
+				<% @current_binder.parents.each do |path_member| %>
+					<% #if i>1 %>
+						<%= path_member["title"] %><br />
+						<% @localchildren = Binder.where("parent.id" => path_member["id"]) %>
+						<% @localchildren.each do |i| %>
+							--<%= i.title %><br />
+						<% end %>
+					<% #end %>
+					<% i += 1 %>
+				<% end %>
+			<% end %>
+		<% end %>
+
+
+		<br /><br />
+		<br /><br />
+		<hr />
+
+		FUCKED UP:
+
+		<% # interate through all root binders, should always be showing %>
+		<% @owned_root_binders.each do |root_binder| %>
+			[<%= link_to root_binder.title, show_binder_path(params[:id],root_binder.id) %>]<br />
+			<% if root_binder.id.to_s == @current_binder.parents.second["id"].to_s %>
+				<% # this is the root folder from which to begin, start subtree construction 
+				i = 0 %>
+				<% @current_binder.parents.each do |path_member| %>
+					<% if i>0 %>
+						<%= #link_to path_member["title"], show_binder_path(params[:id],path_member["id"]) 
+						%><!--<br />-->
+						<% cascaded_children = Binder.where("parent.id" => path_member["id"]) %>
+						<% cascaded_children.each do |c_child| %>
+							&nbsp;&nbsp;<%= c_child.title %><br />
+							<% if c_child.id.to_s == @current_binder.parent["id"].to_s %>
+								<% end_children = Binder.where("parent.id" => @current_binder.parent["id"]) %>
+								<% end_children.each do |e_child| %>
+									<%= "#{e_child.title}" %><br />
+								<% end %>
+							<% end %>
+						<% end %>
+						<!--<br />-->
+					<% end %>
+					<!--
+					<% #if i>0 %>
+						<% # iterates through every member of the path down to the current binder %>
+						<% #cascaded_children = Binder.where("parent.id" => path_member["id"]) #("parent.id" => path_member["id"]) %>
+						<% # performed all the way down to the current folder, inclusively %>
+						&gt;<%= #path_member["title"] 
+						%><%= #{}"(#{cascaded_children.count})" if cascaded_children.any? 
+						%><br />
+						<% #cascaded_children.each do |c_child| %>
+							&nbsp;&nbsp;<%= #c_child.title 
+							%><br />
+						<% #end %>
+					<% #end %>
+					-->
+					<% i += 1 %>
+				<% end %>
+			<% #else %>
+				
+			<% end %>
+		<% end %>
+
+
+					<% #if i > 1 %>
+						<!--<%= #link_to path_member["title"], show_binder_path(params[:id],path_member["id"]) 
+						%><br />-->
+						<% #@cascaded_children = Binder.where("parent.id" => path_member["id"]) %>
+						<% #if @cascaded_children.empty? %>
+							<!--&lt;Empty&gt;<br />-->
+						<% #else %>
+							<% #@cascaded_children.each do |c_child| %>
+								<!--[<%= #link_to c_child.title, show_binder_path(params[:id],c_child.id) 
+								%>]<br />-->
+							<% #end %>
+						<% #end %>
+					<% #end %>
+
+	<% end %>
+
+	<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<% end %>

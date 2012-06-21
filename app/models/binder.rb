@@ -58,7 +58,7 @@ class Binder
 		if params[:binder][:parent].to_s == "0"
 
 			@parenthash = { :id 	=> params[:binder][:parent],
-					:title	=> ""}
+							:title	=> ""}
 
 			@parentsarr = [@parenthash]
 
@@ -66,22 +66,22 @@ class Binder
 			new_binder_parent = Binder.find(params[:binder][:parent])
 
 			@parenthash = { :id 	=> params[:binder][:parent],
-					:title 	=> new_binder_parent.title}
+							:title 	=> new_binder_parent.title}
 
 			#Grab
 			@parentsarr = new_binder_parent.parents << @parenthash
 
 		end
 
-		#new_binder = Binder.new(:owner 		=> current_teacher.id,
-		self.update_attributes(	:owner			=> teacher_id,	#current_teacher.id,
-					:title 				=> params[:binder][:title].to_s[0..60],
-					:parent 			=> @parenthash,
-					:parents 			=> @parentsarr,
-					:last_update 		=> Time.now.to_i,
-					:last_updated_by	=> teacher_id,	#current_teacher.id.to_s,
-					:body 				=> params[:binder][:body],
-					:type 				=> 1)
+		#new_binder = Binder.new(:owner 			=> current_teacher.id,
+		self.update_attributes(	:owner				=> teacher_id,	#current_teacher.id,
+								:title 				=> params[:binder][:title].to_s[0..60],
+								:parent 			=> @parenthash,
+								:parents 			=> @parentsarr,
+								:last_update 		=> Time.now.to_i,
+								:last_updated_by	=> teacher_id,	#current_teacher.id.to_s,
+								:body 				=> params[:binder][:body],
+								:type 				=> 1)
 
 		self.tag = Tag.new
 
@@ -187,7 +187,7 @@ class Tag
 			parent_grade_levels_tags 	= (parent_binder.tag.grade_levels 	+ parent_binder.tag.parent_grade_levels).uniq
 			parent_subjects_tags 		= (parent_binder.tag.subjects 		+ parent_binder.tag.parent_subjects).uniq
 			parent_standards_tags 		= (parent_binder.tag.standards 		+ parent_binder.tag.parent_standards).uniq
-			parent_other_tags		= (parent_binder.tag.other 		+ parent_binder.tag.parent_other).uniq
+			parent_other_tags			= (parent_binder.tag.other 			+ parent_binder.tag.parent_other).uniq
 		end
 
 		# downcase.split.uniq will insert an empty string into the array in the db if there is no tag submitted for that field
@@ -200,16 +200,16 @@ class Tag
 		cleaned_other_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:other].empty?
 
 		# this update query is partially duplicated below in order to make writes to the database atomic
-		self.update_attributes(	:grade_levels 		=> grade_levels_checkbox_array,
-								:subjects 		=> subjects_checkbox_array,
-								#:standards 		=> params[:binder][:tag][:standards].downcase.split.uniq,
-								#:other 		=> params[:binder][:tag][:other].downcase.split.uniq,
-								:standards		=> cleaned_standards_tags_array,
-								:other			=> cleaned_other_tags_array,
+		self.update_attributes(	:grade_levels 			=> grade_levels_checkbox_array,
+								:subjects 				=> subjects_checkbox_array,
+								#:standards 			=> params[:binder][:tag][:standards].downcase.split.uniq,
+								#:other 				=> params[:binder][:tag][:other].downcase.split.uniq,
+								:standards				=> cleaned_standards_tags_array,
+								:other					=> cleaned_other_tags_array,
 								:parent_grade_levels 	=> parent_grade_levels_tags,
-								:parent_subjects 	=> parent_subjects_tags,
-								:parent_standards 	=> parent_standards_tags,
-								:parent_other 		=> parent_other_tags)
+								:parent_subjects 		=> parent_subjects_tags,
+								:parent_standards 		=> parent_standards_tags,
+								:parent_other 			=> parent_other_tags)
 
 	end
 
@@ -230,13 +230,13 @@ class Tag
 			parent_grade_levels_tags 	= (parent_binder.tag.grade_levels 	+ parent_binder.tag.parent_grade_levels).uniq
 			parent_subjects_tags 		= (parent_binder.tag.subjects 		+ parent_binder.tag.parent_subjects).uniq
 			parent_standards_tags 		= (parent_binder.tag.standards 		+ parent_binder.tag.parent_standards).uniq
-			parent_other_tags		= (parent_binder.tag.other 		+ parent_binder.tag.parent_other).uniq
+			parent_other_tags			= (parent_binder.tag.other 			+ parent_binder.tag.parent_other).uniq
 		end
 
 		self.update_attributes(	:parent_grade_levels 	=> parent_grade_levels_tags,
-								:parent_subjects 	=> parent_subjects_tags,
-								:parent_standards 	=> parent_standards_tags,
-								:parent_other 		=> parent_other_tags)
+								:parent_subjects 		=> parent_subjects_tags,
+								:parent_standards 		=> parent_standards_tags,
+								:parent_other 			=> parent_other_tags)
 
 	end
 

@@ -225,7 +225,11 @@ module TeacherHelper
 			node = @binder_file_tree_array[index][i]
 
 			#if !@retarray.include?("#{title.to_s}")
-				@retarray << [node.id.to_s,node.title,index]
+				@retarray << [	node.id.to_s,
+								node.title,
+								index,
+								node.format.to_i,
+								node.versions]
 			#end
 
 			if @binder_parent_id_array.include? @binder_file_tree_array[index][i].id.to_s
@@ -243,6 +247,6 @@ module TeacherHelper
 			#raw("shitfuck<br />")
 			
 		end
-		return @retarray.uniq
+		return @retarray.uniq#.sort! { |a,b| a[3] <=> b[3] }
 	end
 end

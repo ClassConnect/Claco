@@ -335,6 +335,7 @@
 		@binder_parent_id_array = Array.new
 
 		@current_binder.parents.each do |nodeparent|
+			# this is where versioning and permission logic should be inserted
 			@binder_file_tree_array << Binder.where("parent.id" => nodeparent["id"], :owner => params[:id]).entries
 			@binder_parent_id_array << nodeparent["id"].to_s
 		end
@@ -344,7 +345,7 @@
 		# 	@child_binders = Binder.new()
 		# end
 
-		@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
+		#@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
 
 		@retarray = Array.new
 

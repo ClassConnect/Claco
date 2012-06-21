@@ -2,7 +2,13 @@
 <p>app/views/teachers/showbinder.html.erb</p>
 
 <hr />
-
+<% if current_teacher.id.to_s == params[:id].to_s %>
+	<%= link_to "<< Back to my profile", teacher_path(params[:id]) %>
+<% else %>
+	<%= link_to "<< Back to #{@teacher.full_name}'s profile", teacher_path(params[:id]) %>
+<% end %>
+<br />
+<br />
 <% print_children(0) %>
 
 <% @retarray.uniq.each do |treenode| %>

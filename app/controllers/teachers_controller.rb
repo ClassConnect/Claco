@@ -325,6 +325,7 @@
 	def showbinder
 
 		#@text = "Success!"
+		@teacher = Teacher.find(params[:id])
 
 		@current_binder = Binder.find(params[:binder_id])
 		#@current_binder << Binder.where()

@@ -230,6 +230,7 @@ class Tag
 			self.node_tags = marshal_params_to_set(params,teacher_id).to_a
 			#self.debug_data << "NO PARENT FOUND"
 		else
+			# we cannot assume that the parents field has yet been written to
 			self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags)|arr_to_set(parent_binder.tag.parent_tags))).to_a	
 			#self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(self.parent_tags))).to_a
 			#self.debug_data << parent_binder.tag.node_tags.to_s
@@ -249,9 +250,11 @@ class Tag
 
 		if !parent_binder.nil?
 			self.parent_tags = (arr_to_set(parent_binder.tag.parent_tags) | arr_to_set(parent_binder.tag.node_tags)).to_a
+			self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags))).to_a
+		else
+			self.node_tags = marshal_params_to_set(params,teacher_id).to_a
 		end
 
-		self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags))).to_a
 
 		self.save
 
@@ -268,24 +271,79 @@ class Tag
 
 		# combine existing tags with new tags posted from form, and remove the parent tags immediately
 		# THIS IS A FUCKING SLOW OPERATION
-		tagset = (arr_to_set(self.node_tags)|marshal_params_to_set(params,teacher_id)).subtract(arr_to_set(self.parent_tags))
 
-		# divide the tagset by title.  sets with multiple instances will have duplicates
-		tagset.divide{ |i,j| i[:title]==j[:title] }.each do |subset|
-			# if there is a duplicate, we can assume the current user tried to duplicate an existing tag
-			if subset.size > 1
-				# find the duplicate within the subset (this can almost certainly be done more efficiently)
-				subset.each do |tag|
-					# delete the tag if the owner of the tag is the current teacher
-					subset.delete_if(tag[:owner].to_s==teacher_id.to_s)
-				end
-			end
-		end
 
-		# we can now assume all duplicate tags are removed
-		self.node_tags = tagset.flatten
+
+
+
+		# alteration_array = Array.new
+
+		# param_set = marshal_params_to_set(params,teacher_id)
+
+		# tagset = arr_to_set(self.node_tags)|param_set).subtract(arr_to_set(self.parent_tags)
+
+		# # divide the tagset by title.  sets with multiple instances will have duplicates
+		# tagset.divide{ |i,j| i["title"]==j["title"] }.each do |subset|
+		# 	# if there is a duplicate, we can assume the current user tried to duplicate an existing tag
+		# 	if subset.size > 1
+		# 		# find the duplicate within the subset (this can almost certainly be done more efficiently)
+		# 		subset.each do |tag|
+		# 			# delete the tag if the owner of the tag is the current teacher
+		# 			#subset.delete_if(tag["owner"].to_s==teacher_id.to_s)
+		# 			if tag["owner"].to_s==teacher_id.to_s
+		# 				subset.delete(tag)
+		# 				alteration_array << [ 0, tag ]
+		# 			end
+		# 		end
+		# 	else
+		# 		# length is 1, ensure that the owner of the tag isn't trying to remove it
+		# 		if (param_set & subset).empty?
+		# 			# the tag existed in the database before, but is now being removed by the user
+		# 			tagset.delete(subset)
+		# 			alteration_array << 
+
+					
+
+		# 		end
+		# 	end
+		# end
+
+		# # we can now assume all duplicate tags are removed
+		# self.node_tags = tagset.flatten.to_a
+
+		# self.save
+
+		alteration_array = Array.new
+
+		param_set = marshal_params_to_set(params,teacher_id)
+
+		# we only have the ability to alter tags that we have added in the past
+		existing_owned_tags = (self.node_tags|self.parent_tags).delete_if { |tag| tag["owner"]!= teacher_id.to_s }
+
+		# now retrieve the unique instances from these sets.  these will either be deleted or created
+		changed_tags = param_set^existing_owned_tags
+
+		self.node_tags = (arr_to_set(self.node_tags)^changed_tags).to_a
 
 		self.save
+
+		return changed_tags
+
+		# the steps below may not be necessary...
+
+		# deleted_tags = changed_tags&existing_owned_tags
+
+		# added_tags = existing_owned_tags.subtract(deleted_tags)
+
+		# deleted_tags.each do |deltag|
+		# 	alteration_array << [deltag,0]
+		# end
+
+		# added_tags.each do |addtag|
+		# 	alteration_array << [addtag,1]
+		# end
+
+
 
 		# u is the merged tagset
 		# u.each do |tagset|
@@ -295,6 +353,17 @@ class Tag
 		# enda
 
 	end
+
+	def update_parent_tags(changed_tag_set)
+
+		self.parent_tags = (arr_to_set(self.parent_tags)^changed_tag_set).to_a
+
+		self.save
+
+		#end
+
+	end
+
 
 	# this function takes in the posted params and returns a set
 	def marshal_params_to_set(params,teacher_id)

@@ -124,6 +124,9 @@ class BindersController < ApplicationController
 	#IMPORTANT TODO: UPDATE CHILDRENS' :PARENTS ATTRIBUTES
 	#TODO: Version control, File/link update support
 	def update
+
+		alteration_set = Set.new
+
 		@binder = Binder.find(params[:id])
 
 		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
@@ -133,12 +136,16 @@ class BindersController < ApplicationController
 									#:tags				=> params[:binder][:tags].downcase.split.uniq)
 
 		#@binder.save
-		if @binder.parent["id"] == "0"
-			@binder.tag.set_binder_tags(params,nil,current_teacher.id.to_s)
+		#if @binder.parent["id"] == "0"
+			# THIS OPERATION IS DEPRECATED
+			#@binder.tag.set_binder_tags(params,nil,current_teacher.id.to_s)
 
-		else
-			@binder.tag.set_binder_tags(params,Binder.find(@binder.parent["id"]),current_teacher.id.to_s)
-		end
+			alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
+
+		#else
+			# THIS OPERATION IS DEPRECATED
+			#@binder.tag.set_binder_tags(params,Binder.find(@binder.parent["id"]),current_teacher.id.to_s)
+		#end
 
 		@children = Binder.where("parents.id" => params[:id])
 
@@ -153,7 +160,10 @@ class BindersController < ApplicationController
 			# need to check that children don't duplicate parents!
 			#h.tag.set_binder_parent_tags(params,Binder.find(h.parent["id"])) 
 
-			h.tag.set_parent_tags(params,Binder.find(h.parent["id"]))
+			# THIS OPERATION IS DEPRECATED
+			#h.tag.set_parent_tags(params,Binder.find(h.parent["id"]))
+
+			h.tag.update_parent_tags(alteration_set)
 
 			#h.save
 		end

@@ -1,6 +1,11 @@
 <h3>Binders#new</h3>
 <p>app/views/binders/new.html.erb</p>
 
+<% 	# NOTE!  This form is inserting unused fields into the database.  
+	# grade_levels, subjects, standards, other, are all being created and filled with empty string arrays
+	# this should be fixed when this temporary form is replaced
+%>
+
 <%= form_for @new_binder, :url => binders_path do |f| %>
 
 	<div><%= f.label :title, "Title" %><br />

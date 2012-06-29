@@ -19,7 +19,9 @@ class BindersController < ApplicationController
 		@new_binder = Binder.new
 
 		# pre-build tag class for nested form builder
-		@new_binder.build_tag
+		#@new_binder.build_tag
+
+		@new_binder.tag = Tag.new
 	end
 
 	def create
@@ -88,15 +90,15 @@ class BindersController < ApplicationController
 
 		if params[:binder][:parent].to_s == "0"
 
-			@parenthash = {:id => params[:binder][:parent],
-				:title => ""}
+			@parenthash = { :id => params[:binder][:parent],
+							:title => ""}
 
 			@parentsarr = [@parenthash]
 
 		else
 
-			@parenthash = {:id => params[:binder][:parent],
-				:title =>  Binder.find(params[:binder][:parent]).title}
+			@parenthash = { :id => params[:binder][:parent],
+							:title =>  Binder.find(params[:binder][:parent]).title}
 
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
 
@@ -132,9 +134,10 @@ class BindersController < ApplicationController
 
 		#@binder.save
 		if @binder.parent["id"] == "0"
-			@binder.tag.set_binder_tags(params,nil)
+			@binder.tag.set_binder_tags(params,nil,current_teacher.id.to_s)
+
 		else
-			@binder.tag.set_binder_tags(params,Binder.find(@binder.parent["id"]))
+			@binder.tag.set_binder_tags(params,Binder.find(@binder.parent["id"]),current_teacher.id.to_s)
 		end
 
 		@children = Binder.where("parents.id" => params[:id])
@@ -147,9 +150,12 @@ class BindersController < ApplicationController
 
 			h.parents[@index]["title"] = params[:binder][:title][0..60]
 
-			h.tag.set_binder_parent_tags(params,Binder.find(h.parent["id"]))
+			# need to check that children don't duplicate parents!
+			#h.tag.set_binder_parent_tags(params,Binder.find(h.parent["id"])) 
 
-			h.save
+			h.tag.set_parent_tags(params,Binder.find(h.parent["id"]))
+
+			#h.save
 		end
 
 		#If not directory, apply versioning
@@ -193,8 +199,8 @@ class BindersController < ApplicationController
 
 		else
 
-			@parenthash = {:id => params[:binder][:parent],
-				:title =>  Binder.find(params[:binder][:parent]).title}
+			@parenthash = { :id => params[:binder][:parent],
+							:title =>  Binder.find(params[:binder][:parent]).title}
 
 			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
 
@@ -224,8 +230,8 @@ class BindersController < ApplicationController
 		@binder = Binder.find(params[:id])
 
 		@binders = Binder.where(:owner => current_teacher.id,
-			:type => 1).reject {|b| (b.id.to_s == params[:id] ||
-			b.id.to_s == @binder.parent["id"] || b.parents.any? {|c| c["id"] == params[:id]})}
+								:type => 1).reject {|b| (b.id.to_s == params[:id] ||
+								b.id.to_s == @binder.parent["id"] || b.parents.any? {|c| c["id"] == params[:id]})}
 
 	end
 

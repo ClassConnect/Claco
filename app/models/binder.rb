@@ -139,34 +139,6 @@ class Permission
 end
 
 
-# # tags inherited from node's parent
-# class Parent_Tag
-
-# 	field :tags, :type => Array, :default => []
-
-# 	embedded_in :binder
-
-# 	# Class Methods
-
-# 	# called when creating a new binder
-# 	def set_binder_tags(params,)
-
-
-
-# 	end
-
-# end
-
-# # tags locally assigned
-# class Node_Tag
-
-# 	field :tags, :type => Array, :default => []
-
-# 	embedded_in :binder
-
-# 	# Class Methods
-
-# end
 
 # Tag integer assignments:
 # 	 0: grade_level
@@ -176,19 +148,6 @@ end
 
 class Tag
 	include Mongoid::Document
-
-	# field :grade_levels, 		:type => Array, :default => []
-	# field :subjects, 			:type => Array, :default => []
-	# field :standards, 			:type => Array, :default => []
-	# field :other, 				:type => Array, :default => []
-
-	# field :parent_grade_levels,	:type => Array, :default => []
-	# field :parent_subjects,		:type => Array, :default => []
-	# field :parent_standards,	:type => Array, :default => []
-	# field :parent_other,		:type => Array, :default => []
-
-	# field :node_tags,			:type => Array,	:default => []
-	# field :parent_tags,			:type => Array, :default => []
 
 	field :parent_tags,			:type => Array,	:default => []
 	field :node_tags,			:type => Array,	:default => []
@@ -202,17 +161,11 @@ class Tag
 	# creates a union of parent_binder's parent and node tags
 	def set_parent_tags(params,parent_binder)
 
+		# ensure that this is not a top-level item
 		if !parent_binder.nil?
 
 			# the union of parent_tags and node_tags from the parent node is the new parent tag set
-
 			self.parent_tags = (arr_to_set(parent_binder.tag.parent_tags) | arr_to_set(parent_binder.tag.node_tags)).to_a
-
-			#self.debug_data << "parent binder node tags"
-			#self.debug_data << parent_binder.tag.node_tags.to_s
-			#self.debug_data << "parent binder parent tags"
-
-			#self.parent_tags = parent_binder.tag.parent_tags | parent_binder.tag.node_tags
 
 			self.save
 		end
@@ -224,22 +177,14 @@ class Tag
 
 		# takes in params from form, returns a single set containing all parameters
 
-		# self.node_tags should contain all members not contained within the parent_tags set
-		#self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(self.parent_tags))).to_a
+		# check that a parent binder exists
 		if !parent_binder
+			# no parent binder, so only need to feed params into node_tags
 			self.node_tags = marshal_params_to_set(params,teacher_id).to_a
-			#self.debug_data << "NO PARENT FOUND"
 		else
 			# we cannot assume that the parents field has yet been written to
 			self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags)|arr_to_set(parent_binder.tag.parent_tags))).to_a	
-			#self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(self.parent_tags))).to_a
-			#self.debug_data << parent_binder.tag.node_tags.to_s
-			#self.debug_data << "set of posted params:"
-			#self.debug_data << marshal_params_to_set(params,teacher_id).to_a
-			#self.debug_data << "set of this node's parent tags:"
-			#self.debug_data << arr_to_set(parent_binder.tag.node_tags).to_a
 		end
-
 
 		self.save
 
@@ -248,119 +193,51 @@ class Tag
 	# performs both the set_node_tags and set_parent_tags methods with a single save
 	def set_binder_tags(params,parent_binder,teacher_id)
 
+		# check for top-level item
 		if !parent_binder.nil?
+			# update both
 			self.parent_tags = (arr_to_set(parent_binder.tag.parent_tags) | arr_to_set(parent_binder.tag.node_tags)).to_a
 			self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags))).to_a
 		else
 			self.node_tags = marshal_params_to_set(params,teacher_id).to_a
 		end
 
-
 		self.save
 
 	end
 
+	# passed the param set, will determine which tags need to be changed, and returns a set of those changed tags
 	def update_node_tags(params,teacher_id)
 
-		#needs to maintain priority of who checked a box first, regardlgsess of submitted params
-		#old_tagset = Set.new
-		#new_tagset = Set.new
-
-		#old_tagset = arr_to_set(self.node_tags)
-		#new_tagset = marshal_params_to_set(params,teacher_id).subtract(arr_to_set(self.parent_tags))
-
-		# combine existing tags with new tags posted from form, and remove the parent tags immediately
-		# THIS IS A FUCKING SLOW OPERATION
-
-
-
-
-
-		# alteration_array = Array.new
-
-		# param_set = marshal_params_to_set(params,teacher_id)
-
-		# tagset = arr_to_set(self.node_tags)|param_set).subtract(arr_to_set(self.parent_tags)
-
-		# # divide the tagset by title.  sets with multiple instances will have duplicates
-		# tagset.divide{ |i,j| i["title"]==j["title"] }.each do |subset|
-		# 	# if there is a duplicate, we can assume the current user tried to duplicate an existing tag
-		# 	if subset.size > 1
-		# 		# find the duplicate within the subset (this can almost certainly be done more efficiently)
-		# 		subset.each do |tag|
-		# 			# delete the tag if the owner of the tag is the current teacher
-		# 			#subset.delete_if(tag["owner"].to_s==teacher_id.to_s)
-		# 			if tag["owner"].to_s==teacher_id.to_s
-		# 				subset.delete(tag)
-		# 				alteration_array << [ 0, tag ]
-		# 			end
-		# 		end
-		# 	else
-		# 		# length is 1, ensure that the owner of the tag isn't trying to remove it
-		# 		if (param_set & subset).empty?
-		# 			# the tag existed in the database before, but is now being removed by the user
-		# 			tagset.delete(subset)
-		# 			alteration_array << 
-
-					
-
-		# 		end
-		# 	end
-		# end
-
-		# # we can now assume all duplicate tags are removed
-		# self.node_tags = tagset.flatten.to_a
-
-		# self.save
-
-		alteration_array = Array.new
-
+		# collect the parameters into a set
 		param_set = marshal_params_to_set(params,teacher_id)
 
+		# collect relevant tags
 		# we only have the ability to alter tags that we have added in the past
 		existing_owned_tags = (self.node_tags|self.parent_tags).delete_if { |tag| tag["owner"]!= teacher_id.to_s }
 
-		# now retrieve the unique instances from these sets.  these will either be deleted or created
+		# now retrieve the unique instances from these sets
+		# a single instance of them means they were either just created, or just deleted
 		changed_tags = param_set^existing_owned_tags
 
+		# a set XOR with the changed tags will remove the duplicates, and leave the singletons
+		# this conveniently matches how we want the data to be altered
 		self.node_tags = (arr_to_set(self.node_tags)^changed_tags).to_a
 
 		self.save
 
 		return changed_tags
 
-		# the steps below may not be necessary...
-
-		# deleted_tags = changed_tags&existing_owned_tags
-
-		# added_tags = existing_owned_tags.subtract(deleted_tags)
-
-		# deleted_tags.each do |deltag|
-		# 	alteration_array << [deltag,0]
-		# end
-
-		# added_tags.each do |addtag|
-		# 	alteration_array << [addtag,1]
-		# end
-
-
-
-		# u is the merged tagset
-		# u.each do |tagset|
-		# 	if subset.size > 1
-		# 		subset.delete_if( owner is current user )
-		# 	end
-		# enda
-
 	end
 
+	# passed a set of changed tags, updates and saves
 	def update_parent_tags(changed_tag_set)
 
+		# a set XOR with the changed tags will remove the duplicates, and leave the singletons
+		# this conveniently matches how we want the data to be altered
 		self.parent_tags = (arr_to_set(self.parent_tags)^changed_tag_set).to_a
 
 		self.save
-
-		#end
 
 	end
 
@@ -368,82 +245,10 @@ class Tag
 	# this function takes in the posted params and returns a set
 	def marshal_params_to_set(params,teacher_id)
 
-		# the set we are going to stuff all the parameters into
-		# ret_set = Set.new
-
-		# ret_set.add( marshal_checkbox_params_to_set(params[:binder][:tag][:grade_levels],0,teacher_id) )
-
-		# ret_set.add( marshal_checkbox_params_to_set(params[:binder][:tag][:subjects],1,teacher_id) )
-
-		# ret_set.add( marshal_string_list_to_set(params[:binder][:tag][:standards],2,teacher_id) )
-
-		# ret_set.add( marshal_string_list_to_set(params[:binder][:tag][:other],3,teacher_id) )
-
-		# return ret_set
-
 		return 	marshal_checkbox_params_to_set(params[:binder][:tag][:grade_levels],0,teacher_id) |
 				marshal_checkbox_params_to_set(params[:binder][:tag][:subjects],1,teacher_id) |
 				marshal_string_list_to_set(params[:binder][:tag][:standards],2,teacher_id) |
 				marshal_string_list_to_set(params[:binder][:tag][:other],3,teacher_id)
-
-	# 	cleaned_standards_tags_array = Array.new
-	# 	cleaned_other_tags_array = Array.new
-
-	# 	cleaned_standards_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:standards].empty?
-	# 	cleaned_other_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:other].empty?
-
-	# # 	# decimate existing array
-	#  	self.node_tags = []
-
-	# 	# update grade_levels array
-	# 	(1..(params[:binder][:tag][:grade_levels].length-1)).each do |i|
-	# 	#(1..(params[:tag][:grade_levels].length-1)).each do |i|
-	# 		#if params[:tag][:grade_levels][i] == "0"
-	# 		#	zero_count += 1
-	# 		#else
-	# 		#	true_checkbox_array[zero_count] = true
-	# 		#end
-	# 		#grade_levels_checkbox_array << params[:binder][:tag][:grade_levels][i] if params[:binder][:tag][:grade_levels][i] != "0"
-	# 		#grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_level][i] != "0"
-
-	# 		if params[:binder][:tag][:grade_levels][i] != "0"
-	# 			# self.node_tags << { :owner => current_teacher.id, 
-	# 			# 					:type => 0,
-	# 			# 					:title => params[:binder][:tag][:grade_levels][i] }
-
-	# 			# build_tag_hash(owner,type,data,index)
-
-	# 			self.node_tags << build_tag_hash(teacher_id, 0, params,i)
-	# 		end
-	# 	end
-
-	# 	# update subjects array
-	# 	(1..(params[:binder][:tag][:subjects].length-1)).each do |i|
-	# 	#(1..(params[:tag][:subjects].length-1)).each do |i|
-	# 		#subjects_checkbox_array << params[:binder][:tag][:subjects][i] if params[:binder][:tag][:subjects][i] != "0"
-	# 		#subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
-		
-
-	# 		if params[:binder][:tag][:subjects][i] != "0"
-	# 			# self.node_tags << { :owner => current_teacher.id, 
-	# 			# 					:type => 1,
-	# 			# 					:title => params[:binder][:tag][:subjects][iself
-
-
-	# 			] }.node_tags << build_tag_hash(teacher_id, 1, params,i)
-	# 		end
-	# 	end
-
-	# 	cleaned_standards_tags_array.each do |standard|
-	# 		self.node_tags << build_tag_hash(teacher_id, 2, standard, -1)
-	# 	end
-
-	# 	cleaned_other_tags_array.each do |other|
-	# 		self.node_tags <<  build_tag_hash(teacher_id, 3, other, -1)
-	# 	end
-
-	# 	self.save
-	# 	#end
 
 	end
 
@@ -453,7 +258,6 @@ class Tag
 		ret_set = Set.new
 
 		cb_params.each do |cb|
-			#ret_set.add( { :title => cb.to_s, :type => type.to_i, :owner => owner.to_s } ) if cb.to_s != "0"
 			ret_set.add( { "title" => cb.to_s, "type" => type.to_i, "owner" => owner.to_s } ) if cb.to_s != "0"
 		end
 
@@ -488,242 +292,4 @@ class Tag
 
 	end
 
-	# this method must ensure that each tag is a singleton in their respective array
-
-	# def update_tags(params,parent_binder)
-
-	# 	# update parent tags as normal
-	# 	set_parent_tags(params,parent_binder)
-
-
-
-	# end+
-
-	# # this will be used for initialization as well as updating,
-	# # so must wipe out the existing array and rebuild it
-	# def set_parent_tags(params,parent_binder)
-
-	# 	# decimate existing array
-	# 	self.parent_tags = []
-
-	# 	# only add parent members if node is at a nonzero height
-	# 	if !parent_binder.nil?
-
-	# 		# bring down node and parent tags into the local node's parent tags, remove duplicates
-	# 		# THIS DOES NOT WORK, owner id's prevent uniqueness detection
-	# 		self.parent_tags = (parent_binder.tag.parent_tags + parent_binder.tag.node_tags).uniq
-
-	# 	end
-
-	# 	self.save
-
-	# 	#(1..(params[:binder][:tag][:grade_levels].length-1)).each do |i|
-	# 	# if parent_binder.nil?
-	# 	# 	# is at root level, nothing to inherit
-	# 	# 	parent_grade_levels_tags = []
-	# 	# 	parent_subjects_tags = []
-	# 	# 	parent_standards_tags = []
-	# 	# 	parent_other_tags = []
-	# 	# else
-	# 	# 	# grab parent tags, merge into values to be inserted
-	# 	# 	# TODO: determine if the uniq method at the end of the assignments is necessary
-	# 	# 	parent_grade_levels_tags 	= (parent_binder.tag.grade_levels 	+ parent_binder.tag.parent_grade_levels).uniq
-	# 	# 	parent_subjects_tags 		= (parent_binder.tag.subjects 		+ parent_binder.tag.parent_subjects).uniq
-	# 	# 	parent_standards_tags 		= (parent_binder.tag.standards 		+ parent_binder.tag.parent_standards).uniq
-	# 	# 	parent_other_tags			= (parent_binder.tag.other 			+ parent_binder.tag.parent_other).uniq
-	# 	# end
-
-
-	# 	#end
-
-	# end
-
-	# # this will be used for initialization as well as updating,
-	# # so must wipe out the existing array and rebuild it
-	# def set_node_tags(params,teacher_id)#,parent_binder)
-
-	#  	# marshal posted values
-	# 	cleaned_standards_tags_array = Array.new
-	# 	cleaned_other_tags_array = Array.new
-
-	# 	cleaned_standards_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:standards].empty?
-	# 	cleaned_other_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:other].empty?
-
-	# # 	# decimate existing array
-	#  	self.node_tags = []
-
-	# 	# update grade_levels array
-	# 	(1..(params[:binder][:tag][:grade_levels].length-1)).each do |i|
-	# 	#(1..(params[:tag][:grade_levels].length-1)).each do |i|
-	# 		#if params[:tag][:grade_levels][i] == "0"
-	# 		#	zero_count += 1
-	# 		#else
-	# 		#	true_checkbox_array[zero_count] = true
-	# 		#end
-	# 		#grade_levels_checkbox_array << params[:binder][:tag][:grade_levels][i] if params[:binder][:tag][:grade_levels][i] != "0"
-	# 		#grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_level][i] != "0"
-
-	# 		if params[:binder][:tag][:grade_levels][i] != "0"
-	# 			# self.node_tags << { :owner => current_teacher.id, 
-	# 			# 					:type => 0,
-	# 			# 					:title => params[:binder][:tag][:grade_levels][i] }
-
-	# 			# build_tag_hash(owner,type,data,index)
-
-	# 			self.node_tags << build_tag_hash(teacher_id, 0, params,i)
-	# 		end
-	# 	end
-
-	# 	# update subjects array
-	# 	(1..(params[:binder][:tag][:subjects].length-1)).each do |i|
-	# 	#(1..(params[:tag][:subjects].length-1)).each do |i|
-	# 		#subjects_checkbox_array << params[:binder][:tag][:subjects][i] if params[:binder][:tag][:subjects][i] != "0"
-	# 		#subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
-		
-
-	# 		if params[:binder][:tag][:subjects][i] != "0"
-	# 			# self.node_tags << { :owner => current_teacher.id, 
-	# 			# 					:type => 1
-
-	# 			# 					:title => params[:binder][:tag][:subjects][iself
-
-
-	# 			] }.node_tags << build_tag_hash(teacher_id, 1, params,i)
-	# 		end
-	# 	end
-
-	# 	cleaned_standards_tags_array.each do |standard|
-	# 		self.node_tags << build_tag_hash(teacher_id, 2, standard, -1)
-	# 	end
-
-	# 	cleaned_other_tags_array.each do |other|
-	# 		self.node_tags <<  build_tag_hash(teacher_id, 3, other, -1)
-	# 	end
-
-	# 	self.save
-	# 	#end
-	#  end
-
-
-	# end set_binder_tags(params,parent_binder)
-
-	# 	# array to be eventually passed into the :grade_levels field
-	# 	#true_checkbox_array = Array.new(20, false)
-	# 	grade_levels_checkbox_array = Array.new
-	# 	subjects_checkbox_array = Array.new
-	# 	#zero_count = 0
-
-	# 	# update grade_levels array
-	# 	(1..(params[:binder][:tag][:grade_levels].length-1)).each do |i|
-	# 	#(1..(params[:tag][:grade_levels].length-1)).each do |i|
-	# 		#if params[:tag][:grade_levels][i] == "0"
-	# 		#	zero_count += 1
-	# 		#else
-	# 		#	true_checkbox_array[zero_count] = true
-	# 		#end
-	# 		grade_levels_checkbox_array << params[:binder][:tag][:grade_levels][i] if params[:binder][:tag][:grade_levels][i] != "0"
-	# 		#grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_level][i] != "0"
-	# 	end
-
-	# 	# update subjects array
-	# 	(1..(params[:binder][:tag][:subjects].length-1)).each do |i|
-	# 	#(1..(params[:tag][:subjects].length-1)).each do |i|
-	# 		subjects_checkbox_array << params[:binder][:tag][:subjects][i] if params[:binder][:tag][:subjects][i] != "0"
-	# 		#subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
-	# 	end
-
-	# 	# build parent values
-	# 	# if parent_binder.id == "0"
-	# 	# THIS ROOT LEVEL IS INHERENTLY FLAWED, AND THEREFORE DANGEROUS!
-	# 	if parent_binder.nil?
-	# 		# is at root level, nothing to inherit
-	# 		parent_grade_levels_tags = []
-	# 		parent_subjects_tags = []
-	# 		parent_standards_tags = []
-	# 		parent_other_tags = []
-	# 	else
-	# 		# grab parent tags, merge into values to be inserted
-	# 		# TODO: determine if the uniq method at the end of the assignments is necessary
-	# 		parent_grade_levels_tags 	= (parent_binder.tag.grade_levels 	+ parent_binder.tag.parent_grade_levels).uniq
-	# 		parent_subjects_tags 		= (parent_binder.tag.subjects 		+ parent_binder.tag.parent_subjects).uniq
-	# 		parent_standards_tags 		= (parent_binder.tag.standards 		+ parent_binder.tag.parent_standards).uniq
-	# 		parent_other_tags			= (parent_binder.tag.other 			+ parent_binder.tag.parent_other).uniq
-	# 	end
-
-	# 	# downcase.split.uniq will insert an empty string into the array in the db if there is no tag submitted for that field
-	# 	# this empty string will propagate down to child nodes, who do not distinguish empty strings in parent data
-	# 	# prevent insertion of empty strings into tags array
-	# 	cleaned_standards_tags_array = Array.new
-	# 	cleaned_other_tags_array = Array.new
-
-	# 	cleaned_standards_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:standards].empty?
-	# 	cleaned_other_tags_array = params[:binder][:tag][:standards].downcase.split.uniq if params[:binder][:tag][:other].empty?
-
-	# 	# this update query is partially duplicated below in order to make writes to the database atomic
-	# 	self.update_attributes(	:grade_levels 			=> grade_levels_checkbox_array,
-	# 							:subjects 				=> subjects_checkbox_array,
-	# 							#:standards 			=> params[:binder][:tag][:standards].downcase.split.uniq,
-	# 							#:other 				=> params[:binder][:tag][:other].downcase.split.uniq,
-	# 							:standards				=> cleaned_standards_tags_array,
-	# 							:other					=> cleaned_other_tags_array,
-	# 							:parent_grade_levels 	=> parent_grade_levels_tags,
-	# 							:parent_subjects 		=> parent_subjects_tags,
-	# 							:parent_standards 		=> parent_standards_tags,
-	# 							:parent_other 			=> parent_other_tags)
-
-	# end
-
-	# def set_binder_parent_tags(params,parent_binder)
-
-	# 	# build parent values
-	# 	# if parent_binder.id == "0"
-	# 	# THIS ROOT LEVEL IS INHERENTLY FLAWED, AND THEREFORE DANGEROUS!
-	# 	if parent_binder.nil?
-	# 		# is at root level, nothing to inherit
-	# 		parent_grade_levels_tags = []
-	# 		parent_subjects_tags = []
-	# 		parent_standards_tags = []
-	# 		parent_other_tags = []
-	# 	else
-	# 		# grab parent tags, merge into values to be inserted
-	# 		# TODO: determine if the uniq method at the end of the assignments is necessary
-	# 		parent_grade_levels_tags 	= (parent_binder.tag.grade_levels 	+ parent_binder.tag.parent_grade_levels).uniq
-	# 		parent_subjects_tags 		= (parent_binder.tag.subjects 		+ parent_binder.tag.parent_subjects).uniq
-	# 		parent_standards_tags 		= (parent_binder.tag.standards 		+ parent_binder.tag.parent_standards).uniq
-	# 		parent_other_tags			= (parent_binder.tag.other 			+ parent_binder.tag.parent_other).uniq
-	# 	end
-
-	# 	self.update_attributes(	:parent_grade_levels 	=> parent_grade_levels_tags,
-	# 							:parent_subjects 		=> parent_subjects_tags,
-	# 							:parent_standards 		=> parent_standards_tags,
-	# 							:parent_other 			=> parent_other_tags)
-
-	# end
-
-	# takes in a teacher_id string, the integer type, 
-	# def build_tag_hash(owner,type,data,index)
-
-	# 	rethash = { :owner => owner, :type => type }
-
-	# 	if index > -1
-	# 		# passed a checkbox input
-	# 		if type == 0
-	# 			# grade levels tag
-	# 			rethash[:title] = data[:binder][:tag][:grade_levels][index]
-	# 		else
-	# 			# subjets tag
-	# 			rethash[:title] = data[:binder][:tag][:subjects][index]
-	# 		end
-	# 	else
-	# 		# passed string array input
-	# 		#if type == 2
-	# 			# standards tag
-	# 			rethash[:title] = data
-	# 		#else
-	# 			# other tag
-	# 		#end
-	# 	end
-
-	# 	return rethash
-	#end
 end

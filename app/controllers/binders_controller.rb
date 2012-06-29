@@ -135,17 +135,9 @@ class BindersController < ApplicationController
 									:body				=> params[:binder][:body])#,
 									#:tags				=> params[:binder][:tags].downcase.split.uniq)
 
-		#@binder.save
-		#if @binder.parent["id"] == "0"
-			# THIS OPERATION IS DEPRECATED
-			#@binder.tag.set_binder_tags(params,nil,current_teacher.id.to_s)
+		@binder.save
 
-			alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
-
-		#else
-			# THIS OPERATION IS DEPRECATED
-			#@binder.tag.set_binder_tags(params,Binder.find(@binder.parent["id"]),current_teacher.id.to_s)
-		#end
+		alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
 
 		@children = Binder.where("parents.id" => params[:id])
 
@@ -157,15 +149,8 @@ class BindersController < ApplicationController
 
 			h.parents[@index]["title"] = params[:binder][:title][0..60]
 
-			# need to check that children don't duplicate parents!
-			#h.tag.set_binder_parent_tags(params,Binder.find(h.parent["id"])) 
-
-			# THIS OPERATION IS DEPRECATED
-			#h.tag.set_parent_tags(params,Binder.find(h.parent["id"]))
-
 			h.tag.update_parent_tags(alteration_set)
 
-			#h.save
 		end
 
 		#If not directory, apply versioning

@@ -139,17 +139,23 @@ class BindersController < ApplicationController
 
 		alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
 
-		@children = Binder.where("parents.id" => params[:id])
+		# level-order traversal of tree yields updating in order, which allows
+		@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
 
 		@index = @binder.parents.length
 
 		@children.each do |h|
 
+			#child_parent = Binder.where("id" => h.parent.id)
+
 			h.parent["title"] = params[:binder][:title][0..60] if h.parent["id"] == params[:id]
 
 			h.parents[@index]["title"] = params[:binder][:title][0..60]
 
-			h.tag.update_parent_tags(alteration_set)
+			#h.tag.update_parent_tags(alteration_set)
+
+			# new function call
+			h.update_parent_tags()
 
 		end
 

@@ -109,6 +109,38 @@ class Binder
 		return Binders.where("parent.id" => parent_binder_id)
 	end
 
+	# re-inherits the parent tags
+	def update_parent_tags
+
+		#if self.parent["id"]=="0"
+		#	
+		#	self.tag
+#
+#		end
+		node_parent = Binder.find(self.parent["id"])
+
+#		self.tag.debug_data << node_parent.title.to_s
+#		self.tag.debug_data << node_parent.to_s
+
+		self.tag.parent_tags = (arr_to_set(node_parent.tag.parent_tags)|arr_to_set(node_parent.tag.node_tags)).to_a
+
+		self.save
+
+	end
+
+
+	def arr_to_set(array)
+
+		ret_set = Set.new
+
+		array.each do |a|
+			ret_set.add(a)
+		end
+
+		return ret_set
+
+	end
+
 end
 
 class Version
@@ -172,19 +204,19 @@ class Tag
 
 	end
 
-	# pulls in params, generates...
+	# only called when creating a new node.  this method does not need to handle conflicts involving updates and moves
 	def set_node_tags(params,parent_binder,teacher_id)
 
 		# takes in params from form, returns a single set containing all parameters
 
 		# check that a parent binder exists
-		if !parent_binder
+		#if !parent_binder
 			# no parent binder, so only need to feed params into node_tags
 			self.node_tags = marshal_params_to_set(params,teacher_id).to_a
-		else
+		#else
 			# we cannot assume that the parents field has yet been written to
-			self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags)|arr_to_set(parent_binder.tag.parent_tags))).to_a	
-		end
+		#	self.node_tags = (marshal_params_to_set(params,teacher_id).subtract(arr_to_set(parent_binder.tag.node_tags)|arr_to_set(parent_binder.tag.parent_tags))).to_a	
+		#end
 
 		self.save
 
@@ -230,16 +262,18 @@ class Tag
 
 	end
 
+	# THIS METHOD IS DEPRECATED
 	# passed a set of changed tags, updates and saves
-	def update_parent_tags(changed_tag_set)
+	# def update_parent_tags(changed_tag_set)
 
-		# a set XOR with the changed tags will remove the duplicates, and leave the singletons
-		# this conveniently matches how we want the data to be altered
-		self.parent_tags = (arr_to_set(self.parent_tags)^changed_tag_set).to_a
+	# 	# a set XOR with the changed tags will remove the duplicates, and leave the singletons
+	# 	# this conveniently matches how we want the data to be altered
+	# 	self.parent_tags = (arr_to_set(self.parent_tags)^changed_tag_set).to_a
 
-		self.save
+	# 	self.save
 
-	end
+	# end
+
 
 
 	# this function takes in the posted params and returns a set

@@ -350,11 +350,14 @@ class BindersController < ApplicationController
 
 		@new_parent.format = @binder.format if @binder.type == 2
 
-
 		#TODO: Create new version instead of using @binder's last version
 		@new_parent.versions << @binder.versions.last if @binder.type != 1
 
 		@new_parent.save
+
+		@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
+
+		@new_parent.update_parent_tags()
 
 		@hash_index = {params[:id] => @new_parent.id.to_s}
 
@@ -390,6 +393,10 @@ class BindersController < ApplicationController
 				@new_node.versions << h.versions.last if h.type != 1
 
 				@new_node.save
+
+				@new_node.tag = Tag.new(:node_tags => h.tag.node_tags)
+
+				@new_node.update_parent_tags()
 
 				@hash_index[h.id.to_s] = @new_node.id.to_s
 			end

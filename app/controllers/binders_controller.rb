@@ -135,26 +135,25 @@ class BindersController < ApplicationController
 									:body				=> params[:binder][:body])#,
 									#:tags				=> params[:binder][:tags].downcase.split.uniq)
 
+		@binder.tag.update_node_tags(params,current_teacher.id)
+
 		@binder.save
 
-		alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
+		#alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
 
-		# level-order traversal of tree yields updating in order, which allows
 		@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
 
 		@index = @binder.parents.length
 
 		@children.each do |h|
 
-			#child_parent = Binder.where("id" => h.parent.id)
-
 			h.parent["title"] = params[:binder][:title][0..60] if h.parent["id"] == params[:id]
 
 			h.parents[@index]["title"] = params[:binder][:title][0..60]
 
 			#h.tag.update_parent_tags(alteration_set)
+			#h.tag.update_parent_tags(@binder.id)
 
-			# new function call
 			h.update_parent_tags()
 
 		end
@@ -230,6 +229,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+
 		@binders = Binder.where(:owner => current_teacher.id,
 								:type => 1).reject {|b| (b.id.to_s == params[:id] ||
 								b.id.to_s == @binder.parent["id"] || b.parents.any? {|c| c["id"] == params[:id]})}
@@ -241,6 +241,10 @@ class BindersController < ApplicationController
 	def moveitem
 
 		@binder = Binder.find(params[:id])
+
+		@binder.tag.debug_data << "params[id]"
+		@binder.tag.debug_data << params[:id]
+		@binder.save
 
 		@parenthash = {}
 		@parentsarr = []
@@ -262,6 +266,15 @@ class BindersController < ApplicationController
 
 		end
 
+		@binder.update_attributes(	:parent => @parenthash,
+									:parents => @parentsarr)
+
+		#@binder.tag.debug_data << "parent hash"
+		#@binder.tag.debug_data << @parenthash
+		@binder.save
+
+		# must update the common ancestor of the children before 
+		@binder.update_parent_tags()
 
 		#If directory, deal with the children
 		if @binder.type == 1 #Eventually will apply to type == 3 too
@@ -271,15 +284,19 @@ class BindersController < ApplicationController
 			@children = Binder.where("parents.id" => params[:id])
 
 			@children.each do |h|
+
 				@current_parents = h.parents
+
 				@size = @current_parents.size
+
 				h.update_attributes(:parents => @parentsarr + @current_parents[@index..(@size - 1)])
+
+				h.update_parent_tags()
+
 			end
 
 		end
 
-		@binder.update_attributes(	:parent => @parenthash,
-									:parents => @parentsarr)
 
 		redirect_to binder_path(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 

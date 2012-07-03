@@ -106,28 +106,55 @@ class Binder
 
 	#TODO: change this to a scoped entity
 	def get_binder_children_by_id(parent_binder_id)
+
 		return Binders.where("parent.id" => parent_binder_id)
+
 	end
 
 	# re-inherits the parent tags
 	def update_parent_tags
 
-		#if self.parent["id"]=="0"
-		#	
-		#	self.tag
-#
-#		end
-		node_parent = Binder.find(self.parent["id"])
+		if self.parent[:id] == "0"
 
-#		self.tag.debug_data << node_parent.title.to_s
-#		self.tag.debug_data << node_parent.to_s
+			self.tag.parent_tags = []
 
-		self.tag.parent_tags = (arr_to_set(node_parent.tag.parent_tags)|arr_to_set(node_parent.tag.node_tags)).to_a
+		else
+
+			#self.tag.debug_data << "parent_id"
+
+			#self.tag.debug_data << self.parent[:id]
+
+			#self.save
+
+			node_parent = Binder.find(self.parent[:id])
+
+			self.tag.parent_tags = (arr_to_set(node_parent.tag.parent_tags)|arr_to_set(node_parent.tag.node_tags)).to_a
+
+		end
 
 		self.save
 
 	end
 
+	# updates parent, parents, and tags fields for all of the passed node's children
+	# this method is unused
+	# def amend_child_metadata(common_ancestor,params)
+
+	# 	children = Binder.where("parents.id" => common_ancestor.id).sort_by { |b| b.parents.length }
+
+	# 	index = common_ancestor.parents.length
+
+	# 	children.each.do |child|
+
+	# 		child.parent["title"] = params[:binder][:title][0..60] if h.parent["id"] == params[:id]
+
+	# 		child.parents[index]["title"] = params[:binder][:title][0..60]
+
+	# 		child.tag.update_parent_tags()
+
+	# 	end
+
+	# end
 
 	def arr_to_set(array)
 
@@ -261,6 +288,17 @@ class Tag
 		return changed_tags
 
 	end
+
+	# # re-inherits the parent tags
+	# def update_parent_tags(parent_id)
+
+	# 	node_parent = Binder.find(parent_id)
+
+	# 	self.parent_tags = (arr_to_set(node_parent.tag.parent_tags)|arr_to_set(node_parent.tag.node_tags)).to_a
+
+	# 	self.save
+
+	# end
 
 	# THIS METHOD IS DEPRECATED
 	# passed a set of changed tags, updates and saves

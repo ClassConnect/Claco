@@ -1,0 +1,50 @@
+<h3>Binders#permissions</h3>
+<p>app/views/binders/permissions.html.erb</p>
+
+
+<div>Inherited Permissions:<br />
+  <% if @binder.parent_permissions.blank? %>
+  None
+  <% else %>
+    <% @binder.parent_permissions.each do |pp| %>
+      Type: <%= pp["type"] %><br />
+      Shared with: <%= pp["shared_id"] %><br />
+      Authorization Level: <%= pp["auth_level"] %><br />
+      Inherited From: <%= pp["folder_id"] %><br /><br />
+    <% end %>
+  <% end %>
+  <br /><br />
+
+  Explicit Permissions:<br />
+  <% if @binder.permissions.blank? %>
+    None
+  <% else %>
+    <% @binder.permissions.each do |p| %>
+      Type: <%= p["type"] %><br />
+      Shared with: <%= p["shared_id"] %><br />
+      Authorization Level: <%= p["auth_level"] %><br />
+      <%= link_to "Delete this permission", destroy_binder_permission_path(@binder, @binder.permissions.index(p)), :method => :delete %><br /><br />
+    <% end %>
+  <% end %>
+  <br /><br />
+</div>
+
+
+
+<div>Add New Permission:<br /><br />
+<%= form_for @binder, :url => create_binder_permission_path do |f| %>
+
+  <%= label_tag :type, "Type:" %><br />
+  <%= select_tag :type, options_for_select([1, 3])  %><br />
+  <br />
+  <%= label_tag :shared_id, "Share with: (only used if Type = 1)" %><br />
+  <%= select_tag :shared_id, options_from_collection_for_select(@colleagues, :id, :full_name)  %><br />
+  <br />
+  <%= label_tag :auth_level, "Authorization Level (1 = R/W, 2 = RO)" %><br />
+  <%= select_tag :auth_level, options_for_select([1, 2])  %>
+  <br />
+  <br />
+  <%= f.submit "Add Permission" %>
+  <%= link_to "Back", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %>
+<% end %>
+</div>

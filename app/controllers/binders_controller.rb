@@ -8,9 +8,11 @@ class BindersController < ApplicationController
 	end
 
 	def new
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
 
 		@title = "Create a new binder"
+
+		@colleagues = Teacher.all.reject {|t| t == current_teacher}
 	end
 
 	#Add Folder Function
@@ -22,6 +24,7 @@ class BindersController < ApplicationController
 
 		@parenthash = {}
 		@parentsarr = []
+		@parentperarr = []
 
 		if params[:binder][:parent].to_s == "0"
 
@@ -32,32 +35,41 @@ class BindersController < ApplicationController
 
 		else
 
+			@parent = Binder.find(params[:binder][:parent])
+
 			@parenthash = {	:id		=> params[:binder][:parent],
 							:title	=> Binder.find(params[:binder][:parent]).title}
 
-			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+			@parentsarr = @parent.parents << @parenthash
+
+			@parentperarr = @parent.parent_permissions
+
+			@parent.permissions.each do |p|
+				p["folder_id"] = params[:binder][:parent]
+				@parentperarr << p
+			end
 
 		end
 
 
 		#Update parent counts
 		if @parentsarr.size > 1
-			pids = @parentsarr.map {|p| p["id"] || p[:id]}
+			pids = @parentsarr.collect {|p| p["id"] || p[:id]}
 			
-			pids.each do |pid|
-
-				Binder.find(pid).inc(:folders, 1) if pid != "0"
-
-			end
+			pids.each {|pid| Binder.find(pid).inc(:folders, 1) if pid != "0"}
 		end
 
 		Binder.new(	:owner				=> current_teacher.id,
 					:title				=> params[:binder][:title].to_s[0..60],
 					:parent				=> @parenthash,
 					:parents			=> @parentsarr,
+					:body				=> params[:binder][:body],
+					:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
+											:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
+											:auth_level => params[:auth_level]}] : []),
+					:parent_permissions	=> @parentperarr,
 					:last_update		=> Time.now.to_i,
 					:last_updated_by	=> current_teacher.id.to_s,
-					:body				=> params[:binder][:body],
 					:type				=> 1).save
 
 
@@ -71,18 +83,45 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id])
+
 		#TODO: Verify permissions before rendering view
 
 		#TODO: Create content dispostion headers and such
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		redirect_to @binder.current_version.file.url and return if @binder.format == 1
+		send_file @binder.current_version.file.path and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
 		@children = Binder.where("parent.id" => params[:id])
 
 	end
+
+
+	#TODO: When advanced routing is complete, replace show with nshow (and remove nshow)
+	#Specs: Needs to cross check all url variables with :id's properties
+	#Redirect/render something else if invalid
+	#
+	def nshow
+
+		@binder = Binder.find(params[:id])
+
+		#redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id])
+
+		#TODO: Verify permissions before rendering view
+
+		#TODO: Create content dispostion headers and such
+		redirect_to @binder.current_version.data and return if @binder.format == 2
+
+		send_file @binder.current_version.file.path and return if @binder.format == 1
+
+		@title = "Viewing: #{@binder.title}"
+
+		@children = Binder.where("parent.id" => params[:id])
+
+	end
+
 
 	def edit
 		@title = "Edit binder"
@@ -94,7 +133,7 @@ class BindersController < ApplicationController
 
 	def newcontent
 
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
 
 		@title = "Add new content"
 
@@ -107,11 +146,12 @@ class BindersController < ApplicationController
 
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
-			redirect_to new_binder_path and return
+			redirect_to new_binder_content_path and return
 		end
 		
 		@parenthash = {}
 		@parentsarr = []
+		@parentperarr = []
 
 		if params[:binder][:parent].to_s == "0"
 
@@ -121,11 +161,20 @@ class BindersController < ApplicationController
 			@parentsarr = [@parenthash]
 
 		else
+			
+			@parent = Binder.find(params[:binder][:parent])
 
 			@parenthash = {	:id		=> params[:binder][:parent],
 							:title	=> Binder.find(params[:binder][:parent]).title}
 
-			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+			@parentsarr = @parent.parents << @parenthash
+
+			@parentperarr = @parent.parent_permissions
+
+			@parent.permissions.each do |p|
+				p["folder_id"] = params[:binder][:parent]
+				@parentperarr << p
+			end
 
 		end
 
@@ -136,6 +185,12 @@ class BindersController < ApplicationController
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s,
 									:body				=> params[:binder][:body],
+									:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
+															:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
+															:auth_level => params[:auth_level]}] : []),
+#									:version			=> Version.new(	:data => params[:binder][:versions][:data],
+#																		:timestamp => Time.now.to_i),
+									:parent_permissions	=> @parentperarr,
 									:files				=> 1,
 									:type				=> 2,
 									:format				=> 2)
@@ -143,15 +198,11 @@ class BindersController < ApplicationController
 		@binder.versions << Version.new(:data => params[:binder][:versions][:data],
 										:timestamp => Time.now.to_i)
 
-		@binder.save
+		#@binder.save
 
-		pids = @parentsarr.map {|x| x["id"] || x[:id]}
+		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
-		pids.each do |id|
-
-			Binder.find(id).inc(:files, 1) if id != "0"
-
-		end
+		pids.each {|id| Binder.find(id).inc(:files, 1) if id != "0"}
 
 		redirect_to binders_path(params[:binder][:parent])
 
@@ -188,9 +239,9 @@ class BindersController < ApplicationController
 	#Add new file
 	def newfile
 
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
+		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
 
-		@title = "Add new content"
+		@title = "Add new files"
 
 	end
 
@@ -201,6 +252,7 @@ class BindersController < ApplicationController
 
 		@parenthash = {}
 		@parentsarr = []
+		@parentperarr = []
 
 		if params[:binder][:parent].to_s == "0"
 
@@ -211,10 +263,19 @@ class BindersController < ApplicationController
 
 		else
 
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=>  Binder.find(params[:binder][:parent]).title}
+			@parent = Binder.find(params[:binder][:parent])
 
-			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=> Binder.find(params[:binder][:parent]).title}
+
+			@parentsarr = @parent.parents << @parenthash
+
+			@parentperarr = @parent.parent_permissions
+
+			@parent.permissions.each do |p|
+				p["folder_id"] = params[:binder][:parent]
+				@parentperarr << p
+			end
 
 		end
 
@@ -227,6 +288,11 @@ class BindersController < ApplicationController
 			:last_updated_by	=> current_teacher.id.to_s,
 			:body				=> params[:binder][:body],
 			:total_size			=> params[:binder][:versions][:file].size,
+			:data				=> params[:binder][:versions][:file].path,
+			:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
+																:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
+																:auth_level	=> params[:auth_level]}] : []),
+			:parent_permissions	=> @parentperarr,
 			:files				=> 1,
 			:type				=> 2,
 			:format				=> 1)
@@ -235,11 +301,12 @@ class BindersController < ApplicationController
 										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
 										:size		=> params[:binder][:versions][:file].size,
 										:timestamp	=> Time.now.to_i,
-										:uid		=> current_teacher.id)
+										:owner		=> current_teacher.id)
+
 
 		@binder.save
 
-		pids = @parentsarr.map {|x| x["id"] || x[:id]}
+		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
 		pids.each do |id|
 
@@ -258,10 +325,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binders = Binder.where(:owner => current_teacher.id,
-								:type => 1).reject {|b| (b.id.to_s == params[:id] ||
-								b.id.to_s == @binder.parent["id"] ||
-								b.parents.any? {|c| c["id"] == params[:id]})}
+		@binders = Binder.where(:owner => current_teacher.id, #Query for possible new parents
+								:type => 1).reject {|b| (b.id.to_s == params[:id] || #Reject current Binder
+								b.id.to_s == @binder.parent["id"] || #Reject current parent
+								b.parents.first["id"] == "-1" || #Reject any trash binders
+								b.parents.any? {|c| c["id"] == params[:id]})} #Reject any child folders
 
 	end
 
@@ -302,11 +370,11 @@ class BindersController < ApplicationController
 		@binder.update_attributes(	:parent		=> @parenthash,
 									:parents	=> @parentsarr)
 
-
+		#@binder is the object being moved
 		#If directory, deal with the children
 		if @binder.type == 1 #Eventually will apply to type == 3 too
 
-			@index = @binder.parents.length
+			#@index = @binder.parents.index({@binder})
 
 			@children = Binder.where("parents.id" => params[:id])
 
@@ -314,7 +382,7 @@ class BindersController < ApplicationController
 			@children.each do |h|
 				@current_parents = h.parents
 				@size = @current_parents.size
-				h.update_attributes(:parents => @parentsarr + @current_parents[(@index - 1)..(@size - 1)])
+				h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
 			end
 
 		end
@@ -345,9 +413,9 @@ class BindersController < ApplicationController
 		@binder = Binder.find(params[:id])
 
 		@binders = Binder.where(:owner => current_teacher.id,
-			:type => 1).reject {|b| (b.id.to_s == params[:id] ||
-			b.id.to_s == @binder.parent["id"] ||
-			b.parents.any? {|c| c["id"] == params[:id]})}
+								:type => 1).reject {|b| (b.id.to_s == params[:id] ||
+														b.id.to_s == @binder.parent["id"] ||
+														b.parents.any? {|c| c["id"] == params[:id]})}
 
 	end
 
@@ -379,6 +447,7 @@ class BindersController < ApplicationController
 		@new_parent = Binder.new(	:title				=> @binder.title,
 									:body				=> @binder.body,
 									:type				=> @binder.type,
+									:format				=> @binder.type == 2 ? @binder.format : nil,
 									:files				=> @binder.files,
 									:folders			=> @binder.folders,
 									:total_size			=> @binder.total_size,
@@ -388,7 +457,7 @@ class BindersController < ApplicationController
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id)
 
-		@new_parent.format = @binder.format if @binder.type == 2
+		#@new_parent.format = @binder.format if @binder.type == 2
 
 
 		#TODO: Create new version instead of using @binder's last version
@@ -427,22 +496,13 @@ class BindersController < ApplicationController
 				@new_node.format = h.format if h.type != 1
 
 				#TODO: Fork should also accept old versions
-
-				#TODO: Create new version intead of ripping old one
 				@new_node.versions << Version.new(
-					:uid		=> h.versions.last.uid,
-					:timestamp	=> h.versions.last.timestamp,
-					:size		=> h.versions.last.size,
-					:ext		=> h.versions.last.ext,
-					:data		=> h.versions.last.data) if h.format == 2
-
-				@new_node.versions << Version.new(
-					:uid		=> h.versions.last.uid,
-					:timestamp	=> h.versions.last.timestamp,
-					:size		=> h.versions.last.size,
-					:ext		=> h.versions.last.ext,
-					:data		=> h.versions.last.data,
-					:file		=> h.versions.last.file) if h.format == 1
+					:owner		=> h.current_version.owner,
+					:timestamp	=> h.current_version.timestamp,
+					:size		=> h.current_version.size,
+					:ext		=> h.current_version.ext,
+					:data		=> h.current_version.data,
+					:file		=> h.format == 1 ? h.current_version.file : nil)
 
 				@new_node.save
 
@@ -514,13 +574,14 @@ class BindersController < ApplicationController
 									:parents			=> @parentsarr,
 									:owner				=> current_teacher.id,
 									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id)
+									:last_updated_by	=> current_teacher.id,
+									:format				=> @binder.type == 2 ? @binder.format : nil)
 
-		@new_parent.format = @binder.format if @binder.type == 2
+		#@new_parent.format = @binder.format if @binder.type == 2
 
 
 		#TODO: Create new version instead of using @binder's last version
-		@new_parent.versions << @binder.versions.last if @binder.type != 1
+		@new_parent.versions << @binder.current_version if @binder.type != 1
 
 		@new_parent.save
 
@@ -557,19 +618,12 @@ class BindersController < ApplicationController
 				@new_node.format = h.format if h.type != 1
 
 				@new_node.versions << Version.new(
-					:uid		=> h.versions.last.uid,
-					:timestamp	=> h.versions.last.timestamp,
-					:size		=> h.versions.last.size,
-					:ext		=> h.versions.last.ext,
-					:data		=> h.versions.last.data) if h.type != 1 && h.format == 2
-
-				@new_node.versions << Version.new(
-					:uid		=> h.versions.last.uid,
-					:timestamp	=> h.versions.last.timestamp,
-					:size		=> h.versions.last.size,
-					:ext		=> h.versions.last.ext,
-					:data		=> h.versions.last.data,
-					:file		=> h.versions.last.file) if h.type != 1 && h.format == 1
+					:owner		=> h.current_version.owner,
+					:timestamp	=> h.current_version.timestamp,
+					:size		=> h.current_version.size,
+					:ext		=> h.current_version.ext,
+					:data		=> h.current_version.data,
+					:file		=> h.format == 1 ? h.current_version.file : nil)
 
 				@new_node.save
 
@@ -607,19 +661,19 @@ class BindersController < ApplicationController
 	def createversion
 		@binder = Binder.find(params[:id])
 
-		@binder.versions.each do |v|
-			v.update_attributes(:active => false)
-		end
+		@binder.versions.each {|v| v.update_attributes(:active => false)}
 
 		if @binder.format == 1
+			#TODO: Need to update parents' size
+			@binder.update_attributes(:total_size => params[:binder][:versions][:file].size)
+
 			@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
 											:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
 											:size		=> params[:binder][:versions][:file].size,
 											:timestamp	=> Time.now.to_i,
 											:active		=> true)
-		end
-
-		if @binder.format == 2
+		#TODO: Use nil to merge the ifs
+		elsif @binder.format == 2
 			@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
 											:timestamp	=> Time.now.to_i,
 											:active		=> true)
@@ -630,6 +684,10 @@ class BindersController < ApplicationController
 
 	def versions
 		@binder = Binder.find(params[:id])
+
+		redirect_to binder_path(@binder.parent["id"]) and return if @binder.type == 1 && @binder.parent["id"] != "0"
+
+		redirect_to binders_path if @binder.type == 1
 	end
 
 	def swap
@@ -640,283 +698,112 @@ class BindersController < ApplicationController
 		redirect_to binder_path(@binder.parent["id"])
 	end
 
+	#Only owner can set permissions
+	def permissions
+		@binder = Binder.find(params[:id])
+
+		@title = "Permissions for #{@binder.title}"
+
+		#To be replaced with current_teacher.colleagues
+		@colleagues = Teacher.all.reject {|t| t == current_teacher}
+	end
+
+	def createpermission
+		@binder = Binder.find(params[:id])
+
+		@new = false
+
+		@binder.permissions.each {|p| @new = true if p["shared_id"] == params[:shared_id]}
+
+		@binder.parent_permissions.each {|pp| @new = true if pp["shared_id"] == params[:shared_id]} 
+
+		@binder.permissions << {:type => params[:type],
+								:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
+								:auth_level => params[:auth_level]} if !@new
+
+		@binder.save
+
+		@children = Binder.where("parents.id" => params[:id])
+
+		@children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
+																								:shared_id => params[:shared_id],
+																								:auth_level => params[:auth_level],
+																								:folder_id => params[:id]})} if !@new
+
+		redirect_to binder_permissions_path(params[:id])
+	end
+
+	def destroypermission
+		@binder = Binder.find(params[:id])
+
+		@binder.permissions.delete_at(params[:pid].to_i)
+
+		@binder.save
+
+		redirect_to binder_permissions_path(params[:id])
+	end
+
+	def trash
+		@binders = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
+
+		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
+	end
+
 	#More validation needed
 	#TODO: Move "deleted" entries to a separate collection?
 	def destroy
-
 		@binder = Binder.find(params[:id])
 
-		@parent = @binder.parent["id"]
+		@parenthash = {	:id		=> "-1",
+						:title	=> ""}
 
-		@pids = @binder.parents.collect {|x| x["id"] || x[:id]}
+		@parentsarr = [@parenthash]
 
-		@pids.each do |id|
+		#OP = Original Parent
+		if @binder.parent["id"] != "0"
+			@op = Binder.find(@binder.parent["id"])
 
-			if id != "0"
+			@op.update_attributes(	:files		=> @op.files - @binder.files,
+									:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
+									:total_size	=> @op.total_size - @binder.total_size)
+		end
 
-				@parent_binder = Binder.find(id)
+		@binder.update_attributes(	:parent		=> @parenthash,
+									:parents	=> @parentsarr)
 
-				@parent_binder.update_attributes(	:files		=> @parent_binder.files - @binder.files,
-													:folders	=> @parent_binder.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-													:total_size	=> @parent_binder.total_size - @binder.total_size)	
 
+		#If directory, deal with the children
+		if @binder.type == 1 #Eventually will apply to type == 3 too
+
+			#@index = @binder.parents.length
+
+			@children = Binder.where("parents.id" => params[:id])
+
+			@children.each do |h|
+				@current_parents = h.parents
+				@size = @current_parents.size
+				h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
 			end
 
 		end
 
-		@binder.destroy
 
-		#Destroy all children
-		Binder.where("parents.id" => params[:id]).destroy
+		@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
 
-		redirect_to binder_path(@parent) and return if @binder.parent["id"] != "0"
+		@parents.each do |pid|
+			if pid != "-1"
+				parent = Binder.find(pid)
+
+				parent.update_attributes(	:files		=> parent.files + @binder.files,
+											:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
+											:total_size	=> parent.total_size + @binder.total_size)
+			end
+		end
+
+		redirect_to binder_path(@op) and return if defined?(@op)
 
 		redirect_to binders_path
 
 	end
-#Fuck this shit for now
-=begin
-	def updatetitle
 
-		@title = params[:title]
-
-		if @title != ''
-			if @title.length > 60
-				#The title you entered is too long
-			end
-		else
-			#Forgot to enter title
-		end
-
-		@binder = Binder.find(params[:id])
-
-		@permissions = verifypermissions(@binder)
-		@perlevel = determineperlevel(params[:id], @permissions)
-
-		if @perlevel == 2
-
-			@binder.title = @title[0..60]
-
-			@binder.save
-
-
-			#If folder, update children
-			if @binder.type = 1
-
-				#Update :parent fields of direct children
-				@children = Binder.where(:parent["id"] => @binder.id)
-
-				@children.each do |child|
-
-					child.parent["title"] = @title[0..60]
-					child.save
-
-				end
-
-				#Update :parents field of children
-				@children = Binder.where()
-
-				@children.each do |child|
-
-					child.parents["title"] = @title[0..60]
-					child.save
-
-				end
-
-
-
-			end
-
-			return true
-
-		else
-
-			#Not the right permissions
-
-		end
-
-	end
-
-	def verifypermissions(bindobj)
-
-		@isowner = false
-		@localauth = 0
-		@folderloc = 0
-		@publicauth = 0
-
-		@binder = bindobj
-
-		@uid = current_teacher.id.to_s
-
-		#Check if current user is owner
-		if(@binder.owner == @uid)
-			@isowner = true
-		else
-
-			@binder.parent_permissions.each do |pper|
-
-				if pper.type == 1
-
-					if pper.shared_id == @uid
-
-						if pper.auth_level > @localauth
-
-							@localauth = pper.auth_level
-
-							@findex = @binder.parents.index(pper.folder_id)
-
-							@folderloc = @folderloc < @findex ? @findex : @folderloc
-
-						end
-
-
-					end
-
-
-				#Check if authorized
-				elsif pper.type == 2
-
-					if pper.shared_id.include?(params[:courses])
-
-						if pper.auth_level > @localauth
-
-							@localauth = pper.auth_level
-
-							@findex = @binder.parents.index(pper.folder_id)
-
-							@folderloc = @folderloc < @findex ? @findex : @folderloc
-
-						end
-
-					end
-
-
-				#Check if shared publicly
-				elsif pper.type == 3
-
-					@publicauth = 1
-
-
-					@findex = @binder.parents.index(pper.folder_id)
-
-					@folderloc = @folderloc < @findex ? @findex : @folderloc
-
-
-				end
-
-			# end @binder.parent_permissions.each do |pper|
-			end
-
-			#Check local permissions
-			@binder.permissions.each do |per|
-
-				if per.type == 1
-
-					if per.shared_id == @uid
-
-						if per.auth_level > @localauth
-
-							@localauth = per.auth_level
-
-							@findex = @binder.parents.length
-
-							@folderloc = @folderloc < @findex ? @findex : @folderloc
-
-						end
-
-					end
-
-				elsif per.type == 2
-
-					if per.shared_id.include?(params[:courses])
-
-						if per.auth_level > @localauth
-
-							@localauth = per.auth_level
-
-							@findex = @binder.parents.length
-
-							@folderloc = @folderloc < @findex ? @findex : @folderloc
-
-						end
-
-					end
-
-				elsif per.type == 3
-
-					@publicauth = 1
-
-					if per.auth_level > @localauth
-
-						@localauth = per.auth_level
-
-						@findex = @binder.parents.length
-
-						@folderloc = @folderloc < @findex ? @findex : @folderloc
-
-					end
-
-				end
-
-			end
-
-		end
-
-		@result = {"isowner" => @isowner, "localauth" => @localauth, "folderloc" => @folderloc, "publicauth" => @publicauth}
-
-		return @result
-
-	end
-
-
-	def determineperlevel(objid, perobj)
-
-		@level = 0
-
-		if perobj["isowner"] == 1
-			@level = 2 # Read/write
-		elsif perobj["localauth"] != 0
-
-			if perobj["localauth"] == 2
-				@level = 2 # Read/write
-			elsif perobj["localauth"] == 1
-				@level = 1 # Read only
-			end
-
-		elsif perobj["publicauth"] == 1
-			@level = 1
-		end
-
-
-		if objid == 0
-			@level = 2
-		end
-
-		return @level
-
-	end
-
-
-	def verifypublic
-
-		@binder = Binder.find(params[:id])
-
-		@binder.parent_permissions.each do |pper|
-
-			if pper.type == 3
-				return true
-			end
-		end
-
-		@binder.permissions.each do |per|
-
-			if per.type == 3
-				return true
-			end
-		end
-
-		return false
-
-	end
-=end
 end

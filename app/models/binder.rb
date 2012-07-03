@@ -15,37 +15,42 @@ class Binder
 	field :title, :type => String#File/directory name
 	field :body, :type => String #Directory annotation
 	field :type, :type => Integer # 1 = Directory, 2 = File, 3 = Lesson
-	#field :permissions, :type => Array # [shared_id, type, auth_level]
-	embeds_one :permisson#, validate: false
 
-	#field :tags, :type => Array#, :default => [""] # [index, {title, owner, type}]
 	field :format, :type => Integer, :default => 0 #Only used if type = 2, 1 = File, 2 = Content(link)
 
 	#Parent
 	field :parent, :type => Hash
 	field :parents, :type => Array #[# => {Title, id}]
-	field :parent_permissions, :type => Array #[type, folder_id, shared_id, auth_level]
-	#field :parent_tags, :type => Array
+
+	field :parent_tags, :type => Array
+	
+	#Permissions
+	field :permissions, :type => Array, :default => [] #[shared_id, type, auth_level]
+	field :parent_permissions, :type => Array, :default => [] #[type, folder_id, shared_id, auth_level]
+	#embeds_many :permissions#, validate: false
+	#embeds_many :parent_permissions
 
 	# Version control is only used if type != directory
 	#Version Control
 	#field :versions, :type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
+	#field :fork_hash, :type => String #Use Binder.id
 	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3
 
 	field :forked_from, :type => String
-	field :fork_hash, :type => String
-	field :fork_stamp, :type => String
+	field :fork_stamp, :type => Integer
+	field :fork_total, :type => Integer, :default => 0
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
 	#Counts
-	field :files, :type => Integer
-	field :folders, :type => Integer
-	field :total_size, :type => Integer
+	field :files, :type => Integer, :default => 0
+	field :folders, :type => Integer, :default => 0
+	field :total_size, :type => Integer, :default => 0
 
 	#Social
 	field :likes, :type => Integer
 	field :comments, :type => Array
+
 
 	# tag contains both local and parent tag data
 	embeds_one :tag
@@ -54,39 +59,44 @@ class Binder
 	# embeds_one :node_tag
 
 	# updates all data within the Tag class
-	def create_new_binder(params,teacher_id)
+	def create_binder_Tags(params,teacher_id)
 
-		@parenthash = {}
-		@parentsarr = []
+		# @parenthash = {}
+		# @parentsarr = []
 
-		new_binder_parent = Binder.find(params[:binder][:parent]) if params[:binder][:parent] != "0"
+		# new_binder_parent = Binder.find(params[:binder][:parent]) if params[:binder][:parent] != "0"
 
-		if params[:binder][:parent].to_s == "0"
+		# if params[:binder][:parent].to_s == "0"
 
-			@parenthash = { :id 	=> params[:binder][:parent],
-							:title	=> ""}
+		# 	@parenthash = { :id 	=> params[:binder][:parent],
+		# 					:title	=> ""}
 
-			@parentsarr = [@parenthash]
+		# 	@parentsarr = [@parenthash]
 
-		else
+		# else
 
-			@parenthash = { :id 	=> params[:binder][:parent],
-							:title 	=> new_binder_parent.title}
+		# 	@parenthash = { :id 	=> params[:binder][:parent],
+		# 					:title 	=> new_binder_parent.title}
 
-			#Grab
-			@parentsarr = new_binder_parent.parents << @parenthash
+		# 	#Grab
+		# 	@parentsarr = new_binder_parent.parents << @parenthash
 
-		end
+		# end
 
-		#new_binder = Binder.new(:owner 			=> current_teacher.id,
-		self.update_attributes(	:owner				=> teacher_id,	#current_teacher.id,
-								:title 				=> params[:binder][:title].to_s[0..60],
-								:parent 			=> @parenthash,
-								:parents 			=> @parentsarr,
-								:last_update 		=> Time.now.to_i,
-								:last_updated_by	=> teacher_id,	#current_teacher.id.to_s,
-								:body 				=> params[:binder][:body],
-								:type 				=> 1)
+		# #new_binder = Binder.new(:owner 			=> current_teacher.id,
+		# self.update_attributes(	:owner				=> teacher_id,	#current_teacher.id,
+		# 						:title 				=> params[:binder][:title].to_s[0..60],
+		# 						:parent 			=> @parenthash,
+		# 						:parents 			=> @parentsarr,
+		# 						:last_update 		=> Time.now.to_i,
+		# 						:last_updated_by	=> teacher_id,	#current_teacher.id.to_s,
+		# 						:body 				=> params[:binder][:body],
+		# 						:type 				=> 1)
+
+
+
+
+
 
 		self.tag = Tag.new
 
@@ -166,6 +176,55 @@ class Binder
 
 		return ret_set
 
+	def current_version
+		self.versions.each {|v| return v if v.active}
+
+		return self.versions.sort_by {|v| v.timestamp}.last
+	end
+
+	def is_owner?(id)
+		return self.owner == id.to_s
+	end
+
+	def get_access(id)
+		return 2 if self.is_owner?(id)
+
+		#Explicit permissions always take precedence
+		self.permissions.each do |p|
+
+			#Check what type of permission it is: 1 = person
+			return p.auth_level if p.shared_id == id && p.type == 1
+
+			#2 is reserved for classes
+
+			#3 = Public and always read-only
+			return 1 if p.type == 3
+
+			#4 is reserved for networks
+
+		end
+
+		self.parent_permissions.each do |p|
+
+			#Check what type of permission it is: 1 = person
+			return p.auth_level if p.shared_id == id && p.type == 1
+
+			#2 is reserved for classes
+
+			#3 = Public and always read-only
+			return 1 if p.type == 3
+
+		end
+
+		return 0
+
+	end
+
+	def root
+		return self.parents.second["title"] if self.parents.size > 1
+
+		return self.title
+
 	end
 
 end
@@ -173,30 +232,20 @@ end
 class Version
 	include Mongoid::Document
 
-	field :uid, :type => String #Owner of version
+	field :owner, :type => String #Owner of version
 	field :timestamp, :type => Integer
 	field :comments_priv, :type => Array
 	field :comments_pub, :type => Array
-	field :size, :type => Integer
+	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
-	field :fork_total, :type => Integer
-	field :data, :type => String #URL
+	field :data, :type => String #URL, path to file
+	field :active, :type => Boolean, :default => false
 
 	mount_uploader :file, DataUploader
 
 	embedded_in :binder
+
 end
-
-class Permission
-	include Mongoid::Document
-
-	field :shared_id, :type => String
-	field :type, :type => Integer
-	field :auth_level, :type => Integer
-
-	embedded_in :binder
-end
-
 
 
 # Tag integer assignments:

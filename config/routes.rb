@@ -51,6 +51,13 @@ Claco::Application.routes.draw do
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
 
+
+#Eventually we will need routes that give context, i.e.
+#get '/binders/:id'
+#Should be:
+
+get '/:username/binders/:greatest_parent/:title/:id' => 'binders#nshow', :as =>'show_binder'
+
 #Root to home
 root :to => 'home#index'
 
@@ -93,20 +100,40 @@ get '/subs'	      => 'teachers#subs'
 resources :teachers, :only => [:show, :index]
 
 #Adding Content
-get '/binders/newcontent'   => 'binders#newcontent'
-post '/binders/newcontent'  => 'binders#createcontent'
+get '/binders/newcontent'      => 'binders#newcontent',         :as => 'new_binder_content'
+post '/binders/newcontent'    => 'binders#createcontent'
 
 #Uploading File
-get '/binders/newfile'      => 'binders#newfile'
-post '/binders/newfile'     => 'binders#createfile'
+get '/binders/newfile'          => 'binders#newfile'
+post '/binders/newfile'         => 'binders#createfile'
+
+#Add new version of file
+get '/binders/:id/update'       =>  'binders#newversion',       :as => 'new_binder_version'
+put '/binders/:id/update'       =>  'binders#createversion',    :as => 'create_binder_version'
+get '/binders/:id/versions'     =>  'binders#versions',         :as => 'binder_versions'
+put '/binders/:id/swap'         =>  'binders#swap',             :as => 'swap_binder'
+
+#Handling permissions
+#Viewing current permissions w/ form at bottom for adding a new permission
+get '/binders/:id/permissions'          => 'binders#permissions',        :as => 'binder_permissions'
+put '/binders/:id/permissions'          => 'binders#createpermission',   :as => 'create_binder_permission'
+delete '/binders/:id/permissions/:pid'  => 'binders#destroypermission',  :as => 'destroy_binder_permission'
+get '/binders/:id/permissions/:pid'     => redirect("/binders/%{id}/permissions")
 
 #Moving a binder object (File, folder, content)
-get '/binders/:id/move'     => 'binders#move',      :as => 'move_binder'
-put '/binders/:id/move'     => 'binders#moveitem',  :as => 'move_binder'
+get '/binders/:id/move'     => 'binders#move',            :as => 'move_binder'
+put '/binders/:id/move'     => 'binders#moveitem',        :as => 'move_binder'
 
 #Copying a binder object
-get '/binders/:id/copy'     => 'binders#copy',      :as => 'copy_binder'
-put '/binders/:id/copy'     => 'binders#copyitem',  :as => 'copy_binder'
+get '/binders/:id/copy'     => 'binders#copy',            :as => 'copy_binder'
+put '/binders/:id/copy'     => 'binders#copyitem',        :as => 'copy_binder'
+
+#Forking a binder object
+get '/binders/:id/fork'     => 'binders#fork',            :as => 'fork_binder'
+put '/binders/:id/fork'     => 'binders#forkitem',        :as => 'fork_binder'
+
+#Trash folder
+get '/binders/trash'        => 'binders#trash',           :as => 'trash'
 
 resources :binders
 

@@ -1,0 +1,19 @@
+<h3>Binders#fork</h3>
+<p>app/views/binders/fork.html.erb</p>
+
+<%= form_for @binder, :url => fork_binder_path do |f| %>
+
+  <div><%= f.label :parent,
+    "Fork #{@binder.title} From #{@binder.parent["id"] == "0" ? "Home" : @binder.parent["title"]} to:" %>
+    <br />
+  
+  <% if @binder.parent["id"] != "0" && @binder.type == 1 %>
+    <%= f.select(:parent,
+      options_for_select([["Home", 0]]) + options_from_collection_for_select(@binders, :id, :title)) %></div>
+  <% else %>
+    <%= f.select(:parent, options_from_collection_for_select(@binders, :id, :title)) %></div>
+  <% end %>
+
+  <div><%= f.submit "Fork" %></div>
+
+<% end %>

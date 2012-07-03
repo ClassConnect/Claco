@@ -1,0 +1,24 @@
+<h3>Binders#newcontent</h3>
+<p>app/views/binders/newcontent.html.erb</p>
+
+<%= form_for @binder, :url => create_binder_version_path do |f| %>
+
+  	<%= f.fields_for :versions do |g| %>
+
+  	<% if @binder.format == 1 %>
+  		<div><%= g.label :file, "New Version of File:" %><br />
+  		<%= g.file_field :file %></div>
+  	<% end %>
+
+
+	<% if @binder.format == 2 %>
+  		<div><%= g.label :data, "URL:" %><br />
+  		<%= g.text_field :data %></div>
+	<% end %>
+
+
+  <% end %>
+
+  <div><%= f.submit "Add new version" %></div>
+
+<% end %>

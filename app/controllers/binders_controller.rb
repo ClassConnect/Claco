@@ -242,7 +242,7 @@ class BindersController < ApplicationController
 
 		@binder.tag.update_node_tags(params,current_teacher.id)
 
-		@binder.save
+		#@binder.save
 
 		#alteration_set = @binder.tag.update_node_tags(params,current_teacher.id.to_s)
 
@@ -417,7 +417,7 @@ class BindersController < ApplicationController
 
 		#@binder.tag.debug_data << "parent hash"
 		#@binder.tag.debug_data << @parenthash
-		@binder.save
+		#@binder.save
 
 		# must update the common ancestor of the children before 
 		@binder.update_parent_tags()

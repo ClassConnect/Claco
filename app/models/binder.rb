@@ -136,7 +136,7 @@ class Binder
 
 			#self.save
 
-			node_parent = Binder.find(self.parent[:id])
+			node_parent = Binder.find(self.parent[:id] || self.parent["id"])
 
 			self.tag.parent_tags = (arr_to_set(node_parent.tag.parent_tags)|arr_to_set(node_parent.tag.node_tags)).to_a
 
@@ -175,6 +175,7 @@ class Binder
 		end
 
 		return ret_set
+	end
 
 	def current_version
 		self.versions.each {|v| return v if v.active}

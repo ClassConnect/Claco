@@ -135,7 +135,8 @@ put '/binders/:id/fork'     => 'binders#forkitem',        :as => 'fork_binder'
 #Trash folder
 get '/binders/trash'        => 'binders#trash',           :as => 'trash'
 
-get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
+# rename route
+#get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
 
 resources :binders
 

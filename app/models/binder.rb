@@ -59,12 +59,12 @@ class Binder
 	# embeds_one :node_tag
 
 	# updates all data within the Tag class
-	def create_binder_Tags(params,teacher_id)
+	def create_binder_tags(params,teacher_id)
 
 		# @parenthash = {}
 		# @parentsarr = []
 
-		# new_binder_parent = Binder.find(params[:binder][:parent]) if params[:binder][:parent] != "0"
+		new_binder_parent = Binder.find(params[:binder][:parent]) if params[:binder][:parent] != "0"
 
 		# if params[:binder][:parent].to_s == "0"
 

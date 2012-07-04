@@ -87,6 +87,8 @@ class BindersController < ApplicationController
 					:type				=> 1)
 
 
+		#new_binder.tag = Tag.new
+
 		new_binder.save
 
 		new_binder.create_binder_tags(params,current_teacher.id)

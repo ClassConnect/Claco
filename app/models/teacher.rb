@@ -23,6 +23,8 @@ class Teacher
 	devise :database_authenticatable, :registerable,
 	 :recoverable, :rememberable, :trackable, :validatable
 
+	mount_uploader :avatar, AvatarUploader
+
 	## Database authenticatable
 	field :email,              :type => String, :null => false, :default => "", :unique => true
 	field :encrypted_password, :type => String, :null => false, :default => ""

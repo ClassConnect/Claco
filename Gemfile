@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+ source 'https://rubygems.org'
 
 gem 'rails', '3.2.3'
 
@@ -28,6 +28,7 @@ gem 'devise'
 gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 
+#gem 'mini-magick'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

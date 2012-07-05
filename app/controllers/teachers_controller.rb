@@ -45,7 +45,7 @@
 	end
 
 	#PUT /updateinfo
-	def updateinfow
+	def updateinfo
 
 		#@teacher = current_teacher
 

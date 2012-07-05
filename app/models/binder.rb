@@ -188,7 +188,11 @@ class Binder
 	end
 
 	def get_access(id)
+		#Owner will always have r/w access
 		return 2 if self.is_owner?(id)
+
+		#Only owner will be able to see trash folders
+		return 0 if self.parents.first["id"] == "-1"
 
 		#Explicit permissions always take precedence
 		self.permissions.each do |p|

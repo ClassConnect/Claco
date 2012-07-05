@@ -52,7 +52,7 @@ class BindersController < ApplicationController
 			@parent = Binder.find(params[:binder][:parent])
 
 			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> Binder.find(params[:binder][:parent]).title}
+							:title	=> @parent.title}
 
 			@parentsarr = @parent.parents << @parenthash
 
@@ -73,18 +73,18 @@ class BindersController < ApplicationController
 			pids.each {|pid| Binder.find(pid).inc(:folders, 1) if pid != "0"}
 		end
 
-		new_binder = Binder.new(	:owner				=> current_teacher.id,
-					:title				=> params[:binder][:title].to_s[0..60],
-					:parent				=> @parenthash,
-					:parents			=> @parentsarr,
-					:body				=> params[:binder][:body],
-					:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
-											:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
-											:auth_level => params[:auth_level]}] : []),
-					:parent_permissions	=> @parentperarr,
-					:last_update		=> Time.now.to_i,
-					:last_updated_by	=> current_teacher.id.to_s,
-					:type				=> 1)
+		new_binder = Binder.new(:owner				=> current_teacher.id,
+								:title				=> params[:binder][:title].to_s[0..60],
+								:parent				=> @parenthash,
+								:parents			=> @parentsarr,
+								:body				=> params[:binder][:body],
+								:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
+																					:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
+																					:auth_level	=> params[:auth_level]}] : []),
+								:parent_permissions	=> @parentperarr,
+								:last_update		=> Time.now.to_i,
+								:last_updated_by	=> current_teacher.id.to_s,
+								:type				=> 1)
 
 
 		#new_binder.tag = Tag.new
@@ -103,7 +103,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id])
+		redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id]) and return
 
 		#TODO: Verify permissions before rendering view
 
@@ -183,11 +183,11 @@ class BindersController < ApplicationController
 			@parentsarr = [@parenthash]
 
 		else
-			
+
 			@parent = Binder.find(params[:binder][:parent])
 
 			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> Binder.find(params[:binder][:parent]).title}
+							:title	=> @parent.title}
 
 			@parentsarr = @parent.parents << @parenthash
 
@@ -210,17 +210,20 @@ class BindersController < ApplicationController
 									:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
 															:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
 															:auth_level => params[:auth_level]}] : []),
-#									:version			=> Version.new(	:data => params[:binder][:versions][:data],
+#Not working						:version			=> Version.new(	:data => params[:binder][:versions][:data],
 #																		:timestamp => Time.now.to_i),
 									:parent_permissions	=> @parentperarr,
 									:files				=> 1,
 									:type				=> 2,
 									:format				=> 2)
 
-		@binder.versions << Version.new(:data => params[:binder][:versions][:data],
-										:timestamp => Time.now.to_i)
+		@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
+										:timestamp	=> Time.now.to_i,
+										:owner		=> current_teacher.id)
 
 		#@binder.save
+
+		@binder.create_binder_tags(params,current_teacher.id)
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
@@ -308,7 +311,7 @@ class BindersController < ApplicationController
 			@parent = Binder.find(params[:binder][:parent])
 
 			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> Binder.find(params[:binder][:parent]).title}
+							:title	=> @parent.title}
 
 			@parentsarr = @parent.parents << @parenthash
 
@@ -331,7 +334,6 @@ class BindersController < ApplicationController
 			:last_updated_by	=> current_teacher.id.to_s,
 			:body				=> params[:binder][:body],
 			:total_size			=> params[:binder][:versions][:file].size,
-			:data				=> params[:binder][:versions][:file].path,
 			:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
 																:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
 																:auth_level	=> params[:auth_level]}] : []),
@@ -342,12 +344,15 @@ class BindersController < ApplicationController
 
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
 										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
+										:data		=> params[:binder][:versions][:file].path,
 										:size		=> params[:binder][:versions][:file].size,
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)
 
+		@binder.create_binder_tags(params,current_teacher.id)
 
-		@binder.save
+		#@binder.save
+
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
@@ -370,9 +375,9 @@ class BindersController < ApplicationController
 
 		@binders = Binder.where(:owner => current_teacher.id, #Query for possible new parents
 								:type => 1).reject {|b| (b.id.to_s == params[:id] || #Reject current Binder
-								b.id.to_s == @binder.parent["id"] || #Reject current parent
-								b.parents.first["id"] == "-1" || #Reject any trash binders
-								b.parents.any? {|c| c["id"] == params[:id]})} #Reject any child folders
+														b.id.to_s == @binder.parent["id"] || #Reject current parent
+														b.parents.first["id"] == "-1" || #Reject any trash binders
+														b.parents.any? {|c| c["id"] == params[:id]})} #Reject any child folders
 
 	end
 
@@ -388,6 +393,7 @@ class BindersController < ApplicationController
 
 		@parenthash = {}
 		@parentsarr = []
+		@parentperarr = []
 
 		if params[:binder][:parent].to_s == "0"
 
@@ -398,10 +404,19 @@ class BindersController < ApplicationController
 
 		else
 
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> Binder.find(params[:binder][:parent]).title}
+			@parent = Binder.find(params[:binder][:parent])
 
-			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+			@parenthash = {	:id		=> params[:binder][:parent],
+							:title	=> @parent.title}
+
+			@parentsarr = @parent.parents << @parenthash
+
+			@parentperarr = @parent.parent_permissions
+
+			@parent.permissions.each do |p|
+				p["folder_id"] = params[:binder][:parent]
+				@parentperarr << p
+			end
 
 		end
 
@@ -414,12 +429,17 @@ class BindersController < ApplicationController
 									:total_size	=> @op.total_size - @binder.total_size)
 		end
 
-		@binder.update_attributes(	:parent		=> @parenthash,
-									:parents	=> @parentsarr)
+		#Save old permissions to remove childrens' inherited permissions
+		@ppers = @binder.parent_permissions
+
+		@binder.update_attributes(	:parent				=> @parenthash,
+									:parents			=> @parentsarr,
+									:parent_permissions	=> @parentperarr)
 
 		#@binder.tag.debug_data << "parent hash"
 		#@binder.tag.debug_data << @parenthash
 		#@binder.save
+
 
 		# must update the common ancestor of the children before 
 		@binder.update_parent_tags()
@@ -428,18 +448,20 @@ class BindersController < ApplicationController
 		#If directory, deal with the children
 		if @binder.type == 1 #Eventually will apply to type == 3 too
 
-			#@index = @binder.parents.index({@binder})
-
 			@children = Binder.where("parents.id" => params[:id])
 
-			#Something is broken here....
 			@children.each do |h|
 
 				@current_parents = h.parents
 
 				@size = @current_parents.size
 
-				h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
+				@npperarr = h.parent_permissions
+				
+				@ppers.each {|p| @npperarr.delete(p)}
+
+				h.update_attributes(:parents			=> @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)],
+									:parent_permissions	=> @npperarr + @parentperarr)
 
 				h.update_parent_tags()
 
@@ -485,6 +507,7 @@ class BindersController < ApplicationController
 
 		@parenthash = {}
 		@parentsarr = []
+		@parentperarr = []
 
 
 		if params[:binder][:parent].to_s == "0"
@@ -496,11 +519,19 @@ class BindersController < ApplicationController
 
 		else
 
+			@parent = Binder.find(params[:binder][:parent])
+
 			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=>  Binder.find(params[:binder][:parent]).title}
+							:title	=> @parent.title}
 
-			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+			@parentsarr = @parent.parents << @parenthash
 
+			@parentperarr = @parent.parent_permissions
+
+			@parent.permissions.each do |p|
+				p["folder_id"] = params[:binder][:parent]
+				@parentperarr << p
+			end
 		end
 
 		@new_parent = Binder.new(	:title				=> @binder.title,
@@ -527,6 +558,7 @@ class BindersController < ApplicationController
 
 		@new_parent.update_parent_tags()
 
+		#Hash table for oldid => newid lookups
 		@hash_index = {params[:id] => @new_parent.id.to_s}
 
 
@@ -729,21 +761,14 @@ class BindersController < ApplicationController
 
 		@binder.versions.each {|v| v.update_attributes(:active => false)}
 
-		if @binder.format == 1
-			#TODO: Need to update parents' size
-			@binder.update_attributes(:total_size => params[:binder][:versions][:file].size)
+		@binder.update_attributes(:total_size => params[:binder][:versions][:file].size) if @binder.format == 1
 
-			@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-											:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
-											:size		=> params[:binder][:versions][:file].size,
-											:timestamp	=> Time.now.to_i,
-											:active		=> true)
-		#TODO: Use nil to merge the ifs
-		elsif @binder.format == 2
-			@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
-											:timestamp	=> Time.now.to_i,
-											:active		=> true)
-		end
+		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
+										:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
+										:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
+										:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
+										:timestamp	=> Time.now.to_i,
+										:active		=> true)
 
 		redirect_to binder_path(@binder.parent["id"])
 	end
@@ -802,7 +827,18 @@ class BindersController < ApplicationController
 	def destroypermission
 		@binder = Binder.find(params[:id])
 
+		pper = @binder.permissions[params[:pid].to_i]
+
+		pper["folder_id"] = params[:id]
+
 		@binder.permissions.delete_at(params[:pid].to_i)
+
+		@children = Binder.where("parents.id" => params[:id])
+
+		@children.each do |c|
+			c.parent_permissions.delete(pper)
+			c.save
+		end
 
 		@binder.save
 

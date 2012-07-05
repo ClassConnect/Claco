@@ -1,9 +1,11 @@
-<h3>Binders#show</h3>
-<p>app/views/binders/show.html.erb</p>
+<h3>Binders#nshow</h3>
+<p>app/views/binders/nshow.html.erb</p>
 
 <p>Currently In:<% @binder.parents.each do |parent| %>
 	<% if parent["id"] == "0" %>
 		<%= link_to "Home", binders_path %> /
+	<% elsif parent["id"] == "-1" %>
+		<%= link_to "Trash", trash_path %> /
 	<% else %>
 		<%= link_to parent["title"], binder_path(parent["id"]) %> /
 	<% end %>

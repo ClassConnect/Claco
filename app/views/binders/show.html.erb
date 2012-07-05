@@ -34,7 +34,7 @@
   		<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
   		<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
   		(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
-	  <br />
+	 	<br />
 
 	<% end %>
 </div>

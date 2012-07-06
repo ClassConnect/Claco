@@ -420,13 +420,15 @@ class BindersController < ApplicationController
 
 		end
 
-		#OP = Original Parent
-		if @binder.parent["id"] != "0"
-			@op = Binder.find(@binder.parent["id"])
+		@ops = @binder.parents.collect {|x| x["id"] || x[:id]}
+		@ops.each do |opid|
+			if opid != "0"
+				op = Binder.find(opid)
 
-			@op.update_attributes(	:files		=> @op.files - @binder.files,
-									:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-									:total_size	=> @op.total_size - @binder.total_size)
+				op.update_attributes(	:files		=> op.files - @binder.files,
+										:folders	=> op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
+										:total_size	=> op.total_size - @binder.total_size)
+			end
 		end
 
 		#Save old permissions to remove childrens' inherited permissions
@@ -461,7 +463,7 @@ class BindersController < ApplicationController
 				@ppers.each {|p| @npperarr.delete(p)}
 
 				h.update_attributes(:parents			=> @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)],
-									:parent_permissions	=> @npperarr + @parentperarr)
+									:parent_permissions	=> @parentperarr + @npperarr)
 
 				h.update_parent_tags()
 
@@ -469,6 +471,7 @@ class BindersController < ApplicationController
 
 		end
 
+		#Update new parents' folder/file/size counts
 		@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
 
 		@parents.each do |pid|
@@ -532,7 +535,10 @@ class BindersController < ApplicationController
 				p["folder_id"] = params[:binder][:parent]
 				@parentperarr << p
 			end
+
 		end
+
+		@ppers = @binder.parent_permissions
 
 		@new_parent = Binder.new(	:title				=> @binder.title,
 									:body				=> @binder.body,
@@ -543,6 +549,7 @@ class BindersController < ApplicationController
 									:total_size			=> @binder.total_size,
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
+									:permissions		=> @binder.permissions,
 									:owner				=> current_teacher.id,
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id)
@@ -578,14 +585,26 @@ class BindersController < ApplicationController
 
 				@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
 
+				@old_permissions = h.parent_permissions
+
+				@ppers.each {|p| @old_permissions.delete(p)}
+
+				#Swap old folder ids with new folder ids
+				@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
+
 				@new_node = Binder.new(	:title				=> h.title,
 										:body				=> h.body,
 										:parent				=> @node_parent,
 										:parents			=> @node_parents,
+										:permissions		=> h.permissions,
+										:parent_permissions	=> @parentperarr + @old_permissions,
 										:owner				=> current_teacher.id,
 										:last_update		=> Time.now.to_i,
 										:last_updated_by	=> current_teacher.id,
-										:type				=> h.type)
+										:type				=> h.type,
+										:files				=> h.files,
+										:folders			=> h.folders,
+										:total_size			=> h.total_size)
 
 				@new_node.format = h.format if h.type != 1
 
@@ -596,7 +615,7 @@ class BindersController < ApplicationController
 					:size		=> h.current_version.size,
 					:ext		=> h.current_version.ext,
 					:data		=> h.current_version.data,
-					:file		=> h.format == 1 ? h.current_version.file : nil)
+					:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
 				@new_node.save
 
@@ -609,6 +628,7 @@ class BindersController < ApplicationController
 
 		end
 
+		#Update parents' folder/file/size counts
 		@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
 
 		@parents.each do |pid|

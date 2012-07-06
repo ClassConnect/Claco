@@ -214,7 +214,7 @@ class Info
 	validates_with InfoValidator
 
 	mount_uploader :avatar, AvatarUploader
-	
+
 	field :bio, :type => String, :default => ""
 	field :website, :type => String, :default => ""
 	field :profile_picture, :type => String, :default => ""
@@ -224,9 +224,20 @@ class Info
 	# Class Methods
 
 	def update_info_fields(params)
-		self.update_attributes(:bio => params[:info][:bio],
-					:website => params[:info][:website],
-					:profile_picture => params[:info][:profile_picture])
+
+
+		# COPYPASTA from binders_controller
+		# @binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
+		# 						:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
+		# 						:data		=> params[:binder][:versions][:file].path,
+		# 						:size		=> params[:binder][:versions][:file].size,
+		# 						:timestamp	=> Time.now.to_i,
+		# 						:owner		=> current_teacher.id)
+
+		self.update_attributes(	:bio => params[:info][:bio],
+								:avatar => params[:info][:avatar],
+								:website => params[:info][:website],
+								:profile_picture => params[:info][:profile_picture])
 		#self.save
 	end
 end

@@ -57,6 +57,7 @@
 
 		#TODO Make sure htmlcode is not allowed in @info.bio
 
+
 		current_teacher.info = Info.new if !current_teacher.info
 
 		current_teacher.info.update_info_fields(params);

@@ -23,8 +23,6 @@ class Teacher
 	devise :database_authenticatable, :registerable,
 	 :recoverable, :rememberable, :trackable, :validatable
 
-	mount_uploader :avatar, AvatarUploader
-
 	## Database authenticatable
 	field :email,              :type => String, :null => false, :default => "", :unique => true
 	field :encrypted_password, :type => String, :null => false, :default => ""
@@ -59,9 +57,9 @@ class Teacher
 	field :lname, :type => String
 	field :username, :type => String, :default => nil, :allow_nil => true, :unique => true
 
-	embeds_one :info#, validate: false
+	embeds_one :info #, validate: false
 
-	embeds_one :tag#, validate: false
+	embeds_one :tag #, validate: false
 
 	embeds_many :relationships#, validate: false
 
@@ -186,55 +184,6 @@ class Relationship
 
 	# Class Methods
 
-#	def by_teacher_id(params)
-#		self.find_or_initialize_by(:user_id => params[:id])
-#	end
-
-#	def add_colleague(params)
-
-#		teacher = Teacher.find(params[:id])
-
-#		relationship = current_teacher.relationship_by_teacher_id(params[:id])
-
-#		if relationship.colleague_status == 0 #Then the colleague_status for @teacher should also be 0
-
-#			relationship.set_colleague_status(1)
-
-#			#affected_relationship =
-
-#			teacher.relationship_by_teacher_id(current_teacher.id).set_colleague_status(2)
-
-#			#@affected_relationship
-
-#		end
-
-#		#if adding colleage due to incoming request, create colleague relationshikp
-#		if relationship.colleague_status == 2
-
-#			relationship.set_colleague_status(3)
-
-#			#affected_relationship =
-
-#			teacher.relationship_by_teacher_id(current_teacher.id).set_colleague_status(3)
-
-#			#@affected_relationship.set_colleague_status(3)
-#		end
-#	end
-
-#	def remove_colleague(params)
-
-
-
-#	end
-
-#	def subscribe_to_teacher(params)
-
-#	end
-
-#	def unsubscribe_from_colleague(params)
-
-#	end
-
 	def subscribe
 		self.update_attributes(:subscribed => true)
 		#self.save
@@ -264,6 +213,8 @@ class Info
 
 	validates_with InfoValidator
 
+	mount_uploader :avatar, AvatarUploader
+	
 	field :bio, :type => String, :default => ""
 	field :website, :type => String, :default => ""
 	field :profile_picture, :type => String, :default => ""

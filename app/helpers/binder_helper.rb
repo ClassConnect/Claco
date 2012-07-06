@@ -3,25 +3,25 @@ module BinderHelper
 	#	current_teacher.tag.grade_levels[index]
 	#end
 
-	def binder_check_box_value(index,type)
-		#if @binder.tag.grade_levels.include? grade_level_string_by_index(index)
+	# def binder_check_box_value(index,type)
+	# 	#if @binder.tag.grade_levels.include? grade_level_string_by_index(index)
 
-		# we don't need to unpack the arrays into sets in order to search for values, although this may help performance
-		if(type==0)
-			if (@binder.tag.node_tags|@binder.tag.parent_tags).map { |tag| ( tag["title"] if tag["type"]==type ) }.include? grade_level_string_by_index(index)
-				return true
-			end
-		else
-			if (@binder.tag.node_tags|@binder.tag.parent_tags).map { |tag| ( tag["title"] if tag["type"]==type ) }.include? subject_string_by_index(index)
-				return true
-			end
-		end
-		return false
-		#if @binder.nil?
-		#	return true
-		#end
-		#return false
-	end
+	# 	# we don't need to unpack the arrays into sets in order to search for values, although this may help performance
+	# 	if(type==0)
+	# 		if (@binder.tag.node_tags|@binder.tag.parent_tags).map { |tag| ( tag["title"] if tag["type"]==type ) }.include? grade_level_string_by_index(index)
+	# 			return true
+	# 		end
+	# 	else
+	# 		if (@binder.tag.node_tags|@binder.tag.parent_tags).map { |tag| ( tag["title"] if tag["type"]==type ) }.include? subject_string_by_index(index)
+	# 			return true
+	# 		end
+	# 	end
+	# 	return false
+	# 	#if @binder.nil?
+	# 	#	return true
+	# 	#end
+	# 	#return false
+	# end
 
 	# def binder_subject_check_box_value(index)
 	# 	#if @binder.tag.subjects.include? subject_string_by_index(index)
@@ -33,17 +33,17 @@ module BinderHelper
 	# 	return false
 	# end
 
-	def binder_string_value(type)
+	# def binder_string_value(type)
 
-		ret_array = Array.new
+	# 	ret_array = Array.new
 
-		(@binder.tag.node_tags|@binder.tag.parent_tags).each do |tag| #{ |tag| (tag["title"] if tag["type"]==2) }
-			ret_array << tag["title"] if tag["type"]==type
-		end
+	# 	(@binder.tag.node_tags|@binder.tag.parent_tags).each do |tag| #{ |tag| (tag["title"] if tag["type"]==2) }
+	# 		ret_array << tag["title"] if tag["type"]==type
+	# 	end
 
-		return ret_array.join(' ')
+	# 	return ret_array.join(' ')
 
-	end
+	# end
 
 	# def binder_other_string_value
 

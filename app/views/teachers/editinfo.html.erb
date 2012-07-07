@@ -9,11 +9,13 @@
 	<!-- render 'shared/error_messages' -->
 	<%= render 'shared/error_messages', object: f.object %>
 
+	<%= get_teacher_avatar(current_teacher,{:height => 200, :border => 1}) %>
+
+  	<div><%= f.label :avatar, "Profile Picture:" %><br />
+  	<%= f.file_field :avatar %></div>
+
 	<div><%= f.label :bio, "Bio" %><br />
 	<%= f.text_area :bio %></div>
-
-	<div><%= f.label :profile_picture, "Profile Picture (url)" %><br />
-	<%= f.text_field :profile_picture %></div>
 
 	<div><%= f.label :website, "Website" %> <br />
 	<%= f.text_field :website %></div>

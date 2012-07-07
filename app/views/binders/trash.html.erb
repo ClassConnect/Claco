@@ -6,7 +6,7 @@
 	<br />
 	<%= "Empty" if @binders.empty? %>
 	<% @binders.each do |binder| %>
-	<%= link_to binder.title, binder %>
+	  <%= link_to binder.title, named_binder_route(binder) %>
   	(<%= link_to "Move", move_binder_path(binder) %>)
     (<%= link_to "Copy", copy_binder_path(binder) %>)
   	(<%= link_to "Permissions", binder_permissions_path(binder) %>)

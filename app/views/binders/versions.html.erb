@@ -20,7 +20,7 @@
 		<% @binder.versions.each do |version| %>
 			<%= "(#{version.timestamp})" %>
 	  		<%= link_to File.basename(version.file.url), version.file.url %>
-	  		<%= "(#{version.size}) (#{version.id})" %>
+	  		<%= "(#{version.size}b) (#{version.id})" %>
 			<br />
 		<% end %>
 	<% elsif @binder.format == 2 %>

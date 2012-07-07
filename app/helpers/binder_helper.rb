@@ -3,6 +3,27 @@ module BinderHelper
 	#	current_teacher.tag.grade_levels[index]
 	#end
 
+	#Forgiving function that returns the correct route even if only given binder id
+	#Accepts the following arguments in order of preference:
+	#Binder id, root, title, owner(username)
+	#Only Binder object
+	#Only Binder id
+	def named_binder_route(binder, action = "show", root = nil, title = nil, owner = nil)
+
+		return "/#{owner}/portfolio/#{root}/#{title}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
+
+		return "/#{owner}/portfolio/#{root}/#{title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
+
+		return "/#{binder.handle}/portfolio/#{binder.title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
+
+		return "/#{binder.handle}/portfolio/#{binder.root}/#{binder.title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+
+		return named_binder_route(Binder.find(binder), action) if binder.class == String
+
+		return "/500.html"
+
+	end
+
 	def binder_check_box_value(index,type)
 		#if @binder.tag.grade_levels.include? grade_level_string_by_index(index)
 

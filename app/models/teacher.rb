@@ -1,17 +1,17 @@
 # custom validation classes
-class InfoValidator < ActiveModel::Validator
+# class InfoValidator < ActiveModel::Validator
 
-	#image_regex = [a-z\d\-.]+\.(jpg|jpeg|png|gif)
-	image_regex = /(.*?)\.(jpg|jpeg|png|gif)/
+# 	#image_regex = [a-z\d\-.]+\.(jpg|jpeg|png|gif)
+# 	image_regex = /(.*?)\.(jpg|jpeg|png|gif)/
 
-	def validate(record)
-		if !record.profile_picture.blank?
-			unless record.profile_picture =~ /(.*?)\.(jpg|jpeg|png|gif)/
-				record.errors[:profile_picture] << "is an invalid file format"
-			end
-		end
-	end
-end
+# 	def validate(record)
+# 		if !record.profile_picture.blank?
+# 			unless record.profile_picture =~ /(.*?)\.(jpg|jpeg|png|gif)/
+# 				record.errors[:profile_picture] << "is an invalid file format"
+# 			end
+# 		end
+# 	end
+# end
 
 # model classes
 class Teacher
@@ -57,9 +57,9 @@ class Teacher
 	field :lname, :type => String
 	field :username, :type => String, :default => nil, :allow_nil => true, :unique => true
 
-	embeds_one :info #, validate: false
+	embeds_one :info#, autobuild: true #, validate: false
 
-	embeds_one :tag #, validate: false
+	embeds_one :tag#, autobuild: true #, validate: false
 
 	embeds_many :relationships#, validate: false
 
@@ -114,46 +114,46 @@ class Tag
 	#						false, false, false, false, false,
 	#						false, false, false, false, false]
 	field :grade_levels, 	:type => Array, :default => [""]
-	field :subjects, 	:type => Array, :default => [""]
-	field :standards, 	:type => Array, :default => [""]
-	field :other, 		:type => Array, :default => [""]
+	field :subjects, 		:type => Array, :default => [""]
+	field :standards, 		:type => Array, :default => [""]
+	field :other, 			:type => Array, :default => [""]
 
 	embedded_in :teacher
 
 	# Class Methods
 
 	# updates all data within the Tag class
-	def update_tag_fields(params)
+	# def update_tag_fields(params)
 
-		# array to be eventually passed into the :grade_levels field
-		#true_checkbox_array = Array.new(20, false)
-		grade_levels_checkbox_array = Array.new
-		subjects_checkbox_array = Array.new
-		#zero_count = 0
+	# 	# array to be eventually passed into the :grade_levels field
+	# 	#true_checkbox_array = Array.new(20, false)
+	# 	grade_levels_checkbox_array = Array.new
+	# 	subjects_checkbox_array = Array.new
+	# 	#zero_count = 0
 
-		# update grade_levels array
-		(1..(params[:tag][:grade_levels].length-1)).each do |i|
-			#if params[:tag][:grade_levels][i] == "0"
-			#	zero_count += 1
-			#else
-			#	true_checkbox_array[zero_count] = true
-			#end
-			grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_levels][i] != "0"
-		end
+	# 	# update grade_levels array
+	# 	(1..(params[:tag][:grade_levels].length-1)).each do |i|
+	# 		#if params[:tag][:grade_levels][i] == "0"
+	# 		#	zero_count += 1
+	# 		#else
+	# 		#	true_checkbox_array[zero_count] = true
+	# 		#end
+	# 		grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_levels][i] != "0"
+	# 	end
 
-		# update subjects array
-		(1..(params[:tag][:subjects].length-1)).each do |i|
-			subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
-		end
+	# 	# update subjects array
+	# 	(1..(params[:tag][:subjects].length-1)).each do |i|
+	# 		subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
+	# 	end
 
 
-		self.update_attributes(	:grade_levels => grade_levels_checkbox_array,
-					#:subjects => params[:tag][:subjects].downcase.split.uniq,
-					:subjects => subjects_checkbox_array,
-					:standards => params[:tag][:standards].downcase.split.uniq,
-					:other => params[:tag][:other].downcase.split.uniq)
-		#self.save
-	end
+	# 	self.update_attributes(	:grade_levels => grade_levels_checkbox_array,
+	# 							#:subjects => params[:tag][:subjects].downcase.split.uniq,
+	# 							:subjects => subjects_checkbox_array,
+	# 							:standards => params[:tag][:standards].downcase.split.uniq,
+	# 							:other => params[:tag][:other].downcase.split.uniq)
+	# 	#self.save
+	# end
 
 end
 
@@ -204,6 +204,12 @@ end
 class Info
 	include Mongoid::Document
 	include ActiveModel::Validations
+	include CarrierWave::MiniMagick
+
+	#require 'carrierwave/processing/mini_magick'
+
+  #require 'mini_magick'
+	#require
 
 	# none of these fields required when updating
 
@@ -211,13 +217,21 @@ class Info
 	#				:message => "field does not appear to be an image" }#,
 	#				#:presence => true
 
-	validates_with InfoValidator
+	#validates_with InfoValidator
 
 	mount_uploader :avatar, AvatarUploader
 
-	field :bio, :type => String, :default => ""
-	field :website, :type => String, :default => ""
-	field :profile_picture, :type => String, :default => ""
+	field :size, 				:type => Integer, :default => 0
+	field :ext, 				:type => String, :default => ""
+	field :data, 				:type => String, :default => "" #URL, path to file
+	field :avatar_width,		:type => Integer, :default => 0
+	field :avatar_height,		:type => Integer, :default => 0
+
+	field :bio, 				:type => String, :default => ""
+	field :website, 			:type => String, :default => ""
+	#field :profile_picture, 	:type => String, :default => ""
+
+	#field :debug_data,			:type => Array, :default => []
 
 	embedded_in :teacher
 
@@ -225,19 +239,19 @@ class Info
 
 	def update_info_fields(params)
 
+		#self.debug_data = []
+		#.save
 
-		# COPYPASTA from binders_controller
-		# @binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-		# 						:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
-		# 						:data		=> params[:binder][:versions][:file].path,
-		# 						:size		=> params[:binder][:versions][:file].size,
-		# 						:timestamp	=> Time.now.to_i,
-		# 						:owner		=> current_teacher.id)
+		avatar = MiniMagick::Image.open(params[:info][:avatar].path)
 
-		self.update_attributes(	:bio => params[:info][:bio],
-								:avatar => params[:info][:avatar],
-								:website => params[:info][:website],
-								:profile_picture => params[:info][:profile_picture])
-		#self.save
+		self.update_attributes(	:bio 				=> params[:info][:bio],
+								:avatar 			=> params[:info][:avatar],
+								:size 				=> params[:info][:avatar].size,
+								:ext 				=> File.extname(params[:info][:avatar].original_filename),
+								:data 				=> params[:info][:avatar].path,
+								:avatar_width		=> avatar[:width],
+								:avatar_height		=> avatar[:height],
+								:website 			=> params[:info][:website])
+
 	end
 end

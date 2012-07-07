@@ -2,12 +2,38 @@
 <p>app/views/teachers/index.html.erb</p>
 
 <p><b>You: <%=link_to current_teacher.email, current_teacher %></b></p>
-
-<% @teachers.each do |teacher| %>
-	<% if teacher.id != current_teacher.id  %>
-		<p><%= "#{teacher.full_name}: "%>
-		<%= link_to teacher.email, teacher %></p>
-	<% end %>
+<br />
+<br />
+<% if @teachers.size > 1 %>
+<p>Other teachers:</p>
+	<table>
+		<tr>
+			<td colspan = "2">
+				<hr />
+			</td>
+		</tr>
+		<% @teachers.each do |teacher| %>
+		<% if teacher.id != current_teacher.id  %>
+		<tr>
+			<td>
+				<%= get_teacher_avatar(teacher,{:height => 60, :border => 1}) %>
+			</td>
+			<td>
+				<p><%= "#{teacher.full_name}: "%>
+				<%= link_to teacher.email, teacher %></p>
+			</td>
+		</tr>
+		<tr>
+			<td colspan = "2">
+				<hr />
+			</td>
+		</tr>
+		<% end %>
+		<% end %>
+	</table>
 <% end %>
-JSON file test:<br />
-<%= "#{@parsed_json.first.first}" %> <!-- "#{@parsed_json["firstName"]}" -->
+
+<% if false %> 
+	JSON file test:<br />
+	<%= "#{@parsed_json.first.first}" %> <!-- "#{@parsed_json["firstName"]}" -->
+<% end %>

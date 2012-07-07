@@ -25,12 +25,14 @@
 
 		@colleague_requests = current_teacher.relationships.where(:colleague_status => 2).entries
 
-		@colleagues = current_teacher.relationships.where(:colleague_status => 3).entries
+		#@colleagues = current_teacher.relationships.where(:colleague_status => 3).entries
+		@colleagues = (current_teacher.relationships.where(:colleague_status => 3).entries).map { |c| Teacher.find(c["user_id"]) }
 
-		@subscriptions = current_teacher.relationships.where(:subscribed => true).entries
+		#@subscriptions = current_teacher.relationships.where(:subscribed => true).entries
+		@subscriptions = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| Teacher.find(r["user_id"]) } 
 
 		#Create info entry for teacher if not yet created
-		@teacher.info = Info.new if !@teacher.info
+		#@teacher.info = Info.new if !@teacher.info
 
 		# fetch root level directories that are owned by the teacher
 		@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries

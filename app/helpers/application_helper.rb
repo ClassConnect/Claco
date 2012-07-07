@@ -236,5 +236,18 @@ module ApplicationHelper
 		return @retarray.uniq
 	end
 
+	# passed a teacher object, and a hash of the image options
+	# returns an image tag with the inserted options
+	def get_teacher_avatar(teacher,options)
+
+		if teacher.info.nil? || teacher.info.avatar.size==0
+			return "<no profile picture>"
+		elsif options.empty?
+			return image_tag( "#{teacher.info.avatar}" )
+		else
+			return image_tag( "#{teacher.info.avatar}", options )
+		end
+
+	end
 
 end

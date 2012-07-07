@@ -22,13 +22,14 @@ end
 gem 'jquery-rails'
 
 gem 'mongoid', "~> 2.4"
+#gem "mongoid", "~> 3.0.0.rc"
 gem 'bson_ext', "~> 1.5"
 gem 'devise'
 
 gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 
-#gem 'mini-magick'
+gem 'mini_magick'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

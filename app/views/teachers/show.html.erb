@@ -2,10 +2,13 @@
 <p>app/views/teachers/show.html.erb</p>
 
 <p><%= "#{ @teacher.full_name }" %></p>
-<p><%=  !@teacher.info.avatar.path.to_s.empty? ? image_tag(@teacher.info.avatar.to_s, :width => "200") : "<no profile picture>" %></p>
+<p><%=  #!@teacher.info.avatar.path.to_s.empty? ? image_tag(@teacher.info.avatar, :width => "200") : "<no profile picture>" 
+%></p>
+<p><%= get_teacher_avatar(@teacher,{:width => 200, :border => 1}) %></p>
+<% if !@teacher.info.nil? %>
 <p><%= "Bio: #{@teacher.info.bio}" if !@teacher.info.bio.empty? %></p>
 <p><%= "Website: #{@teacher.info.website}" if !@teacher.info.website.empty? %></p>
-<p><%= "Profile Picture: #{@teacher.info.profile_picture}" if !@teacher.info.profile_picture.empty? %></p>
+<% end %>
 
 <%= link_to "Edit Info", "/editinfo" if current_teacher.id == @teacher.id %>
 
@@ -28,31 +31,80 @@
 	<% if @colleagues.any? %>
 		<hr />
 		<p>You are colleagues with the following teachers:</p>
-		<% @colleagues.each do |colleague| %>
-			<% @colleague = Teacher.find(colleague.user_id) %>
-			<p><%= "#{@colleague.full_name}: "%><%= link_to @colleague.email, @colleague %></p>
-		<% end %>
+		<table>
+			<tr>
+				<td colspan = "2">
+					<hr />
+				</td>
+			</tr>
+			<% @colleagues.each do |colleague| %>
+			<tr>
+				<td>
+					<%= get_teacher_avatar(colleague, {:height => 60, :border => 1}) %>
+				</td>
+				<td>
+					<p>
+						<%= "#{colleague.full_name} " %>
+						<%= link_to colleague.email, colleague %>
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan = "2">
+					<hr />
+				</td>
+			</tr>
+			<% end %>
+			</tr>
+		</table>
 	<% end %>
+	<br />
 	<% if @subscriptions.any? %>
 		<hr />
 		<p>You are subscribed to the following teachers:</p>
-		<% @subscriptions.each do |subscription| %>
-			<% @sub_teacher = Teacher.find(subscription.user_id) %>
-			<p><%= "#{@sub_teacher.full_name}: "%><%= link_to @sub_teacher.email, @sub_teacher %></p>
-		<% end %>
+		<table>
+			<tr>
+				<td colspan = "2">
+					<hr />
+				</td>
+			</tr>
+			<% @subscriptions.each do |subscription| %>
+			<tr>
+				<td>
+					<%= get_teacher_avatar(subscription, {:height => 60, :border => 1}) %>
+				</td>
+				<td>
+					<p>
+						<%= "#{subscription.full_name}: " %>
+						<%= link_to subscription.email, subscription %>
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan = "2">
+					<hr />
+				</td>
+			</tr>
+			<% end %>
+		</table>
 	<% end %>
 <% end %>
+<% if @owned_root_binders.any? %>
 
 <br />
 <hr />
-<p><%= "#{ @teacher.full_name }'s binders:" %></p>
-<%= "[Home]" if @owned_root_binders.any? %>
-<br />
-<% @owned_root_binders.each do |root_binder| %>
-	&nbsp;&nbsp;&nbsp;[<%= link_to "#{root_binder.title}", "/teachers/#{params[:id]}/binder/#{root_binder.id}" %>]
+	<p><%= "#{ @teacher.full_name }'s binders:" %></p>
+	<p>[Home]</p>
 	<br />
+	<% @owned_root_binders.each do |root_binder| %>
+		&nbsp;&nbsp;&nbsp;[<%= link_to "#{root_binder.title}", "/teachers/#{params[:id]}/binder/#{root_binder.id}" %>]
+		<br />
+	<% end %>
 <% end %>
-<hr />
-<p>Feed:</p>
+
+<% if false %>
+	<hr />
+	<p>Feed:</p>
+<% end %>
 
 

@@ -12,6 +12,9 @@ class Binder
 
 	#File/Directory-specific Attributes
 	field :owner, :type => String
+	field :username, :type => String
+	field :fname, :type => String
+	field :lname, :type => String
 	field :title, :type => String#File/directory name
 	field :body, :type => String #Directory annotation
 	field :type, :type => Integer # 1 = Directory, 2 = File, 3 = Lesson
@@ -34,7 +37,6 @@ class Binder
 
 	field :forked_from, :type => String
 	field :fork_stamp, :type => Integer
-	field :fork_total, :type => Integer, :default => 0
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
@@ -42,6 +44,7 @@ class Binder
 	field :files, :type => Integer, :default => 0
 	field :folders, :type => Integer, :default => 0
 	field :total_size, :type => Integer, :default => 0
+	field :fork_total, :type => Integer, :default => 0
 
 	#Social
 	field :likes, :type => Integer
@@ -133,7 +136,7 @@ class Binder
 	end
 
 	def handle
-		return Teacher.find(owner).username || owner
+		return username || owner
 	end
 
 	def get_access(id)

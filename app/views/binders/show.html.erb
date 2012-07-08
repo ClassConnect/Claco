@@ -29,7 +29,7 @@
 		<%= link_to "(Versions)", binder_versions_path(binder) if binder.type == 2 %>
   		(<%= link_to "Move", named_binder_route(binder, "move") %>)
   		(<%= link_to "Copy", named_binder_route(binder, "copy") %>)
-  		(<%= link_to "Permissions", binder_permissions_path(binder) %>)
+  		(<%= link_to "Permissions", named_binder_route(binder, "permissions") %>)
   		(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
   		<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
   		<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
@@ -42,5 +42,5 @@
 <%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %> |
 <%= link_to "Create new binder", new_binder_path %> |
 <%= link_to "Edit this binder", edit_binder_path(@binder) %> |
-<%= link_to "Add content", binders_newcontent_path %> |
-<%= link_to "Add File", binders_newfile_path %>
+<%= link_to "Add content", new_binder_content_path %> |
+<%= link_to "Add File", new_binder_file_path %>

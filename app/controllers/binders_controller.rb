@@ -65,6 +65,9 @@ class BindersController < ApplicationController
 		end
 
 		new_binder = Binder.new(:owner				=> current_teacher.id,
+								:fname				=> current_teacher.fname,
+								:lname				=> current_teacher.lname,
+								:username			=> current_teacher.username,
 								:title				=> params[:binder][:title].to_s[0..60],
 								:parent				=> @parenthash,
 								:parents			=> @parentsarr,
@@ -192,6 +195,9 @@ class BindersController < ApplicationController
 
 		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
 									:owner				=> current_teacher.id,
+									:username			=> current_teacher.username,
+									:fname				=> current_teacher.fname,
+									:lname				=> current_teacher.lname,
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:last_update		=> Time.now.to_i,
@@ -301,6 +307,8 @@ class BindersController < ApplicationController
 			:title				=> File.basename(	params[:binder][:versions][:file].original_filename,
 													File.extname(params[:binder][:versions][:file].original_filename)),
 			:owner				=> current_teacher.id,
+			:fname				=> current_teacher.fname,
+			:lname				=> current_teacher.lname,
 			:parent				=> @parenthash,
 			:parents			=> @parentsarr,
 			:last_update		=> Time.now.to_i,
@@ -797,6 +805,8 @@ class BindersController < ApplicationController
 	def permissions
 		@binder = Binder.find(params[:id])
 
+		redirect_to "/404.html" and return if current_teacher.id != @binder.owner
+
 		@title = "Permissions for #{@binder.title}"
 
 		#To be replaced with current_teacher.colleagues
@@ -825,7 +835,7 @@ class BindersController < ApplicationController
 																								:auth_level => params[:auth_level],
 																								:folder_id => params[:id]})} if !@new
 
-		redirect_to binder_permissions_path(params[:id])
+		redirect_to named_binder_route(@binder, "permissions")
 	end
 
 	def destroypermission
@@ -846,11 +856,13 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		redirect_to binder_permissions_path(params[:id])
+		redirect_to named_binder_route(@binder, "permissions")
 	end
 
 	def trash
 		@binders = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
+
+		redirect_to "/404.html" and return if params[:username] != current_teacher.username
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
 	end
@@ -912,11 +924,6 @@ class BindersController < ApplicationController
 	end
 
 
-
-
-
-
-
 	#HELPERS:
 
 	#Because named_binder_route can accept an id or object, so can this check
@@ -931,15 +938,15 @@ class BindersController < ApplicationController
 	#Binder id, action, root, title, owner(username)
 	#Only Binder object
 	#Only Binder id
-	def named_binder_route(binder, action = "show", root = nil, title = nil, owner = nil)
+	def named_binder_route(binder, action = "show", root = nil, title = nil, username = nil)
 
-		return "/#{owner}/portfolio/#{root}/#{title}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
+		return "/#{username}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
 
-		return "/#{owner}/portfolio/#{root}/#{title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
+		return "/#{username}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
 
-		return "/#{binder.handle}/portfolio/#{binder.title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
+		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
 
-		return "/#{binder.handle}/portfolio/#{binder.root}/#{binder.title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
 
 		return named_binder_route(Binder.find(binder), action) if binder.class == String
 

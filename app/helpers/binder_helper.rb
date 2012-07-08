@@ -10,13 +10,13 @@ module BinderHelper
 	#Only Binder id
 	def named_binder_route(binder, action = "show", root = nil, title = nil, owner = nil)
 
-		return "/#{owner}/portfolio/#{root}/#{title}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
+		return "/#{owner}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
 
-		return "/#{owner}/portfolio/#{root}/#{title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
+		return "/#{owner}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
 
-		return "/#{binder.handle}/portfolio/#{binder.title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
+		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
 
-		return "/#{binder.handle}/portfolio/#{binder.root}/#{binder.title}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
 
 		return named_binder_route(Binder.find(binder), action) if binder.class == String
 

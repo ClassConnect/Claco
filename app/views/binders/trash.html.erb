@@ -7,8 +7,8 @@
 	<%= "Empty" if @binders.empty? %>
 	<% @binders.each do |binder| %>
 	  <%= link_to binder.title, named_binder_route(binder) %>
-  	(<%= link_to "Move", move_binder_path(binder) %>)
-    (<%= link_to "Copy", copy_binder_path(binder) %>)
+  	(<%= link_to "Move", named_binder_route(binder, "move") %>)
+    (<%= link_to "Copy", named_binder_route(binder, "copy") %>)
   	(<%= link_to "Permissions", binder_permissions_path(binder) %>)
   	(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
   	<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>

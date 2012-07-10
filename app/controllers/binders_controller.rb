@@ -27,6 +27,7 @@ class BindersController < ApplicationController
 			redirect_to new_binder_path and return
 		end
 
+		#TODO: Write helper functions to populate the three arrays/hashes and use in all three create functions
 		@parenthash = {}
 		@parentsarr = []
 		@parentperarr = []
@@ -89,31 +90,7 @@ class BindersController < ApplicationController
 		redirect_to binders_path
 
 	end
-=begin
-	def show
 
-		@binder = Binder.find(params[:id])
-
-		redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id]) and return
-
-		#TODO: Verify permissions before rendering view
-
-		#TODO: Create content dispostion headers and such
-		redirect_to @binder.current_version.data and return if @binder.format == 2
-
-		send_file @binder.current_version.file.path and return if @binder.format == 1
-
-		@title = "Viewing: #{@binder.title}"
-
-		@children = Binder.where("parent.id" => params[:id])
-
-	end
-=end
-
-	#TODO: When advanced routing is complete, replace show with nshow (and remove nshow)
-	#Specs: Needs to cross check all url variables with :id's properties
-	#Redirect/render something else if invalid
-	#
 	def show
 
 		@binder = Binder.find(params[:id])
@@ -124,7 +101,6 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		#TODO: Create content dispostion headers and such
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
 		send_file @binder.current_version.file.path and return if @binder.format == 1
@@ -132,6 +108,9 @@ class BindersController < ApplicationController
 		@title = "Viewing: #{@binder.title}"
 
 		@children = Binder.where("parent.id" => params[:id])
+		
+		rescue BSON::InvalidObjectId
+			redirect_to "/404.html" and return
 
 	end
 
@@ -225,7 +204,7 @@ class BindersController < ApplicationController
 
 		pids.each {|id| Binder.find(id).inc(:files, 1) if id != "0"}
 
-		redirect_to binders_path(params[:binder][:parent])
+		redirect_to named_binder_route(params[:binder][:parent])
 
 	end
 
@@ -255,7 +234,9 @@ class BindersController < ApplicationController
 
 		end
 
-		redirect_to named_binder_route(@binder)
+		redirect_to named_binder_route(@binder.parent["id"]) and return if @binder.parent["id"] != "0"
+
+		redirect_to binders_path
 
 	end
 
@@ -652,11 +633,19 @@ class BindersController < ApplicationController
 
 		else
 
+			@parent = Binder.find(params[:binder][:parent])
+
 			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=>  Binder.find(params[:binder][:parent]).title}
+							:title	=> @parent.title}
 
-			@parentsarr = Binder.find(params[:binder][:parent]).parents << @parenthash
+			@parentsarr = @parent.parents << @parenthash
 
+			@parentperarr = @parent.parent_permissions
+
+			@parent.permissions.each do |p|
+				p["folder_id"] = params[:binder][:parent]
+				@parentperarr << p
+			end
 		end
 
 		@new_parent = Binder.new(	:title				=> @binder.title,
@@ -742,7 +731,7 @@ class BindersController < ApplicationController
 			end
 		end
 
-		redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
 	end
@@ -766,7 +755,7 @@ class BindersController < ApplicationController
 										:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
 										:timestamp	=> Time.now.to_i,
 										:active		=> true)
-		if @binder.format == 1
+		if @binder.format == 1 && @old_size != params[:binder][:versions][:file].size
 
 			@binder.update_attributes(:total_size => params[:binder][:versions][:file].size)
 
@@ -776,13 +765,15 @@ class BindersController < ApplicationController
 				if pid != "0"
 					parent = Binder.find(pid)
 
+					@parent = parent if pid == @binder.parent["id"]
+
 					parent.update_attributes(:total_size	=> parent.total_size - @old_size + @binder.total_size)
 				end
 			end
 
 		end
 
-		redirect_to named_binder_route(@binder.parent["id"])
+		redirect_to named_binder_route(@parent || @binder.parent["id"])
 	end
 
 	def versions
@@ -805,7 +796,7 @@ class BindersController < ApplicationController
 	def permissions
 		@binder = Binder.find(params[:id])
 
-		redirect_to "/404.html" and return if current_teacher.id != @binder.owner
+		redirect_to "/404.html" and return if current_teacher.id.to_s != @binder.owner
 
 		@title = "Permissions for #{@binder.title}"
 
@@ -892,8 +883,6 @@ class BindersController < ApplicationController
 		#If directory, deal with the children
 		if @binder.type == 1 #Eventually will apply to type == 3 too
 
-			#@index = @binder.parents.length
-
 			@children = Binder.where("parents.id" => params[:id])
 
 			@children.each do |h|
@@ -924,6 +913,7 @@ class BindersController < ApplicationController
 	end
 
 
+
 	#HELPERS:
 
 	#Because named_binder_route can accept an id or object, so can this check
@@ -933,26 +923,17 @@ class BindersController < ApplicationController
 
 	end
 
-	#Forgiving function that returns the correct route even if only given binder id
-	#Accepts the following arguments in order of preference:
-	#Binder id, action, root, title, owner(username)
-	#Only Binder object
-	#Only Binder id
-	def named_binder_route(binder, action = "show", root = nil, title = nil, username = nil)
+	#Function that returns routing given a binder object and action
+	#Only works for routes in the format of: /username/portfolio(/root)/title/id/action(s)
+	#Binder objects preferred over ids
+	def named_binder_route(binder, action = "show")
 
-		return "/#{username}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
-
-		return "/#{username}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
-
-		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
-
-		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+		return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
 
 		return named_binder_route(Binder.find(binder), action) if binder.class == String
 
 		return "/500.html"
 
 	end
-
 
 end

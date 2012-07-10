@@ -1,13 +1,15 @@
-<h3>Binders#versions</h3>
-<p>app/views/binders/versions.html.erb</p>
+<h3>Binders#<%= params[:action] %></h3>
+<p>app/views/binders/<%= params[:action] %>.html.erb</p>
 
 <p>Currently In:<% @binder.parents.each do |parent| %>
 	<% if parent["id"] == "0" %>
 		<%= link_to "Home", binders_path %> /
+	<% elsif parent["id"] == "-1" %>
+		<%= link_to "Trash", trash_path %> /
 	<% else %>
-		<%= link_to parent["title"], binder_path(parent["id"]) %> /
+		<%= link_to parent["title"], named_binder_route(parent["id"]) %> /
 	<% end %>
-<% end %><%= link_to @binder.title, binder_path(@binder) %></p>
+<% end %><%= link_to @binder.title, named_binder_route(@binder) %></p>
 
 <div><% if !@binder.body.blank? %>
 	Body: <%= @binder.body %>
@@ -32,7 +34,7 @@
 				<br />
 	  			(Current Version)
 	  		<% else %>
-		  		<%= form_for version, :url => swap_binder_path(@binder) do |f|%>
+		  		<%= form_for version, :url => named_binder_route(@binder, "swap") do |f|%>
 		  			<%= f.hidden_field :id %>
 		  			<%= f.submit "Use this version" %>
 		  		<% end %>
@@ -41,5 +43,5 @@
 			<br />
 		<% end %>
 	<% end %>
-	<%= link_to "Add new version", new_binder_version_path(@binder) %>
+	<%= link_to "Add new version", named_binder_route(@binder, "update") %>
 </div>

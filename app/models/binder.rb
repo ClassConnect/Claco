@@ -50,6 +50,9 @@ class Binder
 	field :likes, :type => Integer
 	field :comments, :type => Array
 
+	#Scoping
+	#scope :children, where("parent.id" => :id)
+
 	# tag contains both local and parent tag data
 	embeds_one :tag
 
@@ -123,6 +126,10 @@ class Binder
 		end
 
 		return ret_set
+	end
+
+	def children
+		return Binder.where("parent.id" => self.id)
 	end
 
 	def current_version

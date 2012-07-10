@@ -1,6 +1,6 @@
-<h3>Binders#trash</h3>
-<p>app/views/binders/trash.html.erb</p>
-<p>Currently In: <%= link_to "Trash", binders_path %> </p>
+<h3>Binders#<%= params[:action] %></h3>
+<p>app/views/binders/<%= params[:action] %>.html.erb</p>
+<p>Currently In: <%= link_to "Trash", trash_path %> </p>
 
 <div>Contents:
 	<br />
@@ -9,8 +9,7 @@
 	  <%= link_to binder.title, named_binder_route(binder) %>
   	(<%= link_to "Move", named_binder_route(binder, "move") %>)
     (<%= link_to "Copy", named_binder_route(binder, "copy") %>)
-  	(<%= link_to "Permissions", binder_permissions_path(binder) %>)
-  	(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
+  	(<%= link_to "Permissions", named_binder_route(binder, "permissions") %>)
   	<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
   	<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
   	(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)

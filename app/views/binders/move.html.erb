@@ -1,5 +1,5 @@
-<h3>Binders#move</h3>
-<p>app/views/binders/move.html.erb</p>
+<h3>Binders#<%= params[:action] %></h3>
+<p>app/views/binders/<%= params[:action] %>.html.erb</p>
 
 <%= form_for @binder, :url => move_binder_path do |f| %>
 

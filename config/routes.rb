@@ -40,92 +40,68 @@ Claco::Application.routes.draw do
 	#subscriptions
 	get '/subs'											=> 'teachers#subs'
 
+
+	get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
+
 	resources :teachers, :only => [:show, :index]
 
-	#Adding Content
-	get '/:username/portfolio/newcontent'				=> 'binders#newcontent',         :as => 'new_binder_content'
-	post '/:username/portfolio/newcontent'				=> 'binders#createcontent'
-
-	#Uploading File
-	get '/:username/binders/newfile'					=> 'binders#newfile',			:as => 'new_binder_file'
-	post '/:username/binders/newfile'					=> 'binders#createfile'
-
-	#Add new version of file
-	get '/binders/:id/update'							=>  'binders#newversion',       :as => 'new_binder_version'
-	put '/binders/:id/update'							=>  'binders#createversion',    :as => 'create_binder_version'
-	get '/binders/:id/versions'							=>  'binders#versions',         :as => 'binder_versions'
-	put '/binders/:id/swap'								=>  'binders#swap',             :as => 'swap_binder'
-
-	#Handling permissions
-	#Viewing current permissions w/ form at bottom for adding a new permission
-	#get '/binders/:id/permissions'						=> 'binders#permissions',        :as => 'binder_permissions'
-	#put '/binders/:id/permissions'						=> 'binders#createpermission',   :as => 'create_binder_permission'
-	#delete '/binders/:id/permissions/:pid'				=> 'binders#destroypermission',  :as => 'destroy_binder_permission'
-	#get '/binders/:id/permissions/:pid'					=> redirect("/binders/%{id}/permissions")
-
-	#Moving a binder object (File, folder, content)
-	#get '/binders/:id/move'								=> 'binders#move',            :as => 'move_binder'
-	#put '/binders/:id/move'								=> 'binders#moveitem',        :as => 'move_binder'
-
-	#Copying a binder object
-	#get '/binders/:id/copy'								=> 'binders#copy',            :as => 'copy_binder'
-	#put '/binders/:id/copy'								=> 'binders#copyitem',        :as => 'copy_binder'
-
-	#Forking a binder object
-	get '/binders/:id/fork'											=> 'binders#fork',            :as => 'fork_binder'
-	put '/binders/:id/fork'											=> 'binders#forkitem',        :as => 'fork_binder'
+	##################
+	# BINDER ROUTING #
+	##################
 
 	#Trash folder
-	get '/:username/trash'											=> 'binders#trash',           :as => 'trash'
+	get		'/:username/trash'												=> 'binders#trash',			:as => 'trash'
 
-	#Shorter routing must precede longer routing in order to prevent conflicts
-
-	get '/:username/portfolio'											=> 'binders#index',			:as => 'binders'
+	#Binder Index
+	get		'/:username/portfolio'											=> 'binders#index',			:as => 'binders'
 
 	#New
-	get '/:username/portfolio/new'										=> 'binders#new',			:as => 'new_binder'
-	post '/:username/portfolio'											=> 'binders#create',		:as => 'binders'
+	get		'/:username/portfolio/new'										=> 'binders#new',			:as => 'new_binder'
+	post	'/:username/portfolio'											=> 'binders#create'
+	
+	#Adding Content
+	get		'/:username/portfolio/newcontent'								=> 'binders#newcontent',	:as => 'new_binder_content'
+	post	'/:username/portfolio/newcontent'								=> 'binders#createcontent'
+
+	#Uploading File
+	get		'/:username/portfolio/newfile'									=> 'binders#newfile',		:as => 'new_binder_file'
+	post	'/:username/portfolio/newfile'									=> 'binders#createfile'
+	
+	################################################
+	# Paths handled by named_binder_route function #
+	################################################
 
 	#Show
-	get '/:username/portfolio/:title/:id'								=> 'binders#show',			:as =>'show_binder'
+	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show'
+	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy'
+
+	#Edit
+	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit'
+	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
 
 	#Move
-	get '/:username/portfolio/:title/:id/move'							=> 'binders#move',			:as => 'move_binder'
-	put '/:username/portfolio/:title/:id/move'							=> 'binders#moveitem'
+	get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move'
+	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem'
 
 	#Copy
-	get '/:username/portfolio/:title/:id/copy'							=> 'binders#copy'
-	put '/:username/portfolio/:title/:id/copy'							=> 'binders#copyitem'
+	get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy'
+	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem'
+
+	#Fork (Clip)
+	get		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#fork'
+	put		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#forkitem'
+
+	#Versioning
+	get		'/:username/portfolio(/:root)/:title/:id/versions'				=> 'binders#versions'
+	get		'/:username/portfolio(/:root)/:title/:id/swap'					=> 'binders#swap'
+	get		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#newversion'
+	put		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#createversion'
 
 	#Permissions
-	get '/:username/portfolio/:title/:id/permissions'					=> 'binders#permissions'
-	put '/:username/portfolio/:title/:id/permissions'					=> 'binders#createpermission'
-	delete '/:username/portfolio/:title/:id/permissions/:pid'			=> 'binders#destroypermission',  :as => 'destroy_binder_permission'
-	get '/:username/portfolio/:title/:id/permissions/:pid'				=> redirect("%{username}/portfolio/%{title}/%{id}/permissions")
-
-	#Longer equivalants
-	#Show
-	get '/:username/portfolio/:root/:title/:id'							=> 'binders#show', :as =>'show_binder'
-
-	#Move
-	get '/:username/portfolio/:root/:title/:id/move'					=> 'binders#move'
-	put '/:username/portfolio/:root/:title/:id/move'					=> 'binders#moveitem'
-
-	#Copy
-	get '/:username/portfolio/:root/:title/:id/copy'					=> 'binders#copy'
-	put '/:username/portfolio/:root/:title/:id/copy'					=> 'binders#copyitem'
-
-	#Permissions
-	get '/:username/portfolio/:root/:title/:id/permissions'				=> 'binders#permissions'
-	put '/:username/portfolio/:root/:title/:id/permissions'				=> 'binders#createpermission'
-	delete '/:username/portfolio/:root/:title/:id/permissions/:pid'		=> 'binders#destroypermission',  :as => 'destroy_binder_permission'
-	get '/:username/portfolio/:root/:title/:id/permissions/:pid'		=> redirect("%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
-
-	# rename route
-	#get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
-
-	#resources :binders
-
+	get		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#permissions'
+	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission'
+	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission'
+	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
 
 
 end

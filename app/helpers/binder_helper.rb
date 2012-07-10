@@ -3,20 +3,12 @@ module BinderHelper
 	#	current_teacher.tag.grade_levels[index]
 	#end
 
-	#Forgiving function that returns the correct route even if only given binder id
-	#Accepts the following arguments in order of preference:
-	#Binder id, root, title, owner(username)
-	#Only Binder object
-	#Only Binder id
-	def named_binder_route(binder, action = "show", root = nil, title = nil, owner = nil)
+	#Function that returns routing given a binder object and action
+	#Only works for routes in the format of: /username/portfolio(/root)/title/id/action(s)
+	#Binder objects preferred over ids
+	def named_binder_route(binder, action = "show")
 
-		return "/#{owner}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder}#{action == "show" ? String.new : "/#{action}"}" if binder.class == String && defined?(root) && defined?(title) && defined?(id)
-
-		return "/#{owner}/portfolio/#{CGI.escape(root)}/#{CGI.escape(title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && defined?(root) && defined?(title) && defined?(id)
-
-		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder && binder.parents.length == 1
-
-		return "/#{binder.handle}/portfolio/#{CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+		return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
 
 		return named_binder_route(Binder.find(binder), action) if binder.class == String
 

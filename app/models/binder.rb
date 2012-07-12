@@ -50,8 +50,7 @@ class Binder
 	field :likes, :type => Integer
 	field :comments, :type => Array
 
-	#Scoping
-	#scope :children, where("parent.id" => :id)
+	#TODO: Add indexing functions that allow binders to be put in a user-defined order via dragon drop
 
 	# tag contains both local and parent tag data
 	embeds_one :tag
@@ -128,8 +127,12 @@ class Binder
 		return ret_set
 	end
 
+	def parent_ids
+		return parents.collect {|x| x["id"] || x[:id]}
+	end
+
 	def children
-		return Binder.where("parent.id" => self.id)
+		return Binder.where("parent.id" => self.id.to_s)
 	end
 
 	def current_version
@@ -188,7 +191,6 @@ class Binder
 		return parents.second["title"] if parents.size > 1
 
 		return title
-
 	end
 
 end

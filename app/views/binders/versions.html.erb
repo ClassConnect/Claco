@@ -1,15 +1,4 @@
-<h3>Binders#<%= params[:action] %></h3>
-<p>app/views/binders/<%= params[:action] %>.html.erb</p>
-
-<p>Currently In:<% @binder.parents.each do |parent| %>
-	<% if parent["id"] == "0" %>
-		<%= link_to "Home", binders_path %> /
-	<% elsif parent["id"] == "-1" %>
-		<%= link_to "Trash", trash_path %> /
-	<% else %>
-		<%= link_to parent["title"], named_binder_route(parent["id"]) %> /
-	<% end %>
-<% end %><%= link_to @binder.title, named_binder_route(@binder) %></p>
+<%= render 'layouts/breadcrumbs' %>
 
 <div><% if !@binder.body.blank? %>
 	Body: <%= @binder.body %>

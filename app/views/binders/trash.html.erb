@@ -2,19 +2,7 @@
 <p>app/views/binders/<%= params[:action] %>.html.erb</p>
 <p>Currently In: <%= link_to "Trash", trash_path %> </p>
 
-<div>Contents:
-	<br />
-	<%= "Empty" if @binders.empty? %>
-	<% @binders.each do |binder| %>
-	  <%= link_to binder.title, named_binder_route(binder) %>
-  	(<%= link_to "Move", named_binder_route(binder, "move") %>)
-    (<%= link_to "Copy", named_binder_route(binder, "copy") %>)
-  	(<%= link_to "Permissions", named_binder_route(binder, "permissions") %>)
-  	<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
-  	<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
-  	(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
-  	<br />
-	<% end %>
-</div>
+<%= render 'layouts/show' %>
+
 <br />
 <%= link_to "Home", binders_path %>

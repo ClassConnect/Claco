@@ -2,55 +2,49 @@ Claco::Application.routes.draw do
 	devise_for :teachers
 
 	#Root to home
-	root :to											=> 'home#index'
+	root	:to																=> 'home#index'
+	get		'/homebase'														=> 'home#index'
 
 	#Edit Info Form/Process
-	get '/editinfo'										=> "teachers#editinfo"
-	put '/updateinfo'									=> "teachers#updateinfo"
-	post '/updateinfo'									=> "teachers#updateinfo"
+	get		'/editinfo'														=> "teachers#editinfo"
+	put		'/updateinfo'													=> "teachers#updateinfo"
+	post	'/updateinfo'													=> "teachers#updateinfo"
 
 	#Profile Page
-	get '/teachers/:id'									=> 'teachers#show'
+	get		'/teachers/:id'													=> 'teachers#show'
 
 	#Edit Tags Form/Process
-	get '/tags'											=> "teachers#tags"
-	put '/updatetags'									=> "teachers#updatetags"
+	get		'/tags'															=> "teachers#tags"
+	put		'/updatetags'													=> "teachers#updatetags"
 
 	#Subscribe to :id
-	#get '/sub/:id'										=> 'teachers#sub'
-	put '/confsub/:id'									=> 'teachers#confsub', :as => 'confsub'
-	post '/confsub/:id'									=> 'teachers#confsub', :as => 'confsub'
+	put		'/confsub/:id'													=> 'teachers#confsub',		:as => 'confsub'
+	post	'/confsub/:id'													=> 'teachers#confsub',		:as => 'confsub'
 
 	#Unsubscribed to :id
-	#get '/unsub/:id'									=> 'teachers#unsub'
-	put '/confunsub/:id'								=> 'teachers#confunsub', :as => 'confunsub'
-	post '/confunsub/:id'								=> 'teachers#confunsub', :as => 'confunsub'
+	put		'/confunsub/:id'												=> 'teachers#confunsub',	:as => 'confunsub'
+	post	'/confunsub/:id'												=> 'teachers#confunsub',	:as => 'confunsub'
 
 	#Add :id as colleague
-	#get '/add/:id'										=> 'teachers#add'
-	put '/confadd/:id'									=> 'teachers#confadd', :as => 'confadd'
-	post '/confadd/:id'									=> 'teachers#confadd', :as => 'confadd'
+	put		'/confadd/:id'													=> 'teachers#confadd',		:as => 'confadd'
+	post	'/confadd/:id'													=> 'teachers#confadd',		:as => 'confadd'
 
 	#Remove :id as colleague
-	#get '/remove/:id'									=> 'teachers#remove'
-	put  '/confremove/:id'								=> 'teachers#confremove', :as => 'confremove'
-	post '/confremove/:id'								=> 'teachers#confremove', :as => 'confremove'
-	get  '/confremove/:id'								=> 'teachers#confremove', :as => 'confremove'
+	put		'/confremove/:id'												=> 'teachers#confremove',	:as => 'confremove'
+	post	'/confremove/:id'												=> 'teachers#confremove',	:as => 'confremove'
+	get		'/confremove/:id'												=> 'teachers#confremove',	:as => 'confremove'
 
 	#subscriptions
-	get '/subs'											=> 'teachers#subs'
+	get		'/subs'															=> 'teachers#subs'
 
 
-	get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
+	get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',	:as => 'show_binder'
 
 	resources :teachers, :only => [:show, :index]
 
 	##################
 	# BINDER ROUTING #
 	##################
-
-	#Trash folder
-	get		'/:username/trash'												=> 'binders#trash',			:as => 'trash'
 
 	#Binder Index
 	get		'/:username/portfolio'											=> 'binders#index',			:as => 'binders'
@@ -66,14 +60,13 @@ Claco::Application.routes.draw do
 	#Uploading File
 	get		'/:username/portfolio/newfile'									=> 'binders#newfile',		:as => 'new_binder_file'
 	post	'/:username/portfolio/newfile'									=> 'binders#createfile'
-	
+
+	#Trash folder
+	get		'/:username/trash'												=> 'binders#trash',			:as => 'trash'
+
 	################################################
 	# Paths handled by named_binder_route function #
 	################################################
-
-	#Show
-	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show'
-	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy'
 
 	#Edit
 	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit'
@@ -103,5 +96,8 @@ Claco::Application.routes.draw do
 	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission'
 	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
 
+	#Show
+	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show'
+	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy'
 
 end

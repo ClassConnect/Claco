@@ -1,10 +1,12 @@
 class BindersController < ApplicationController
-	before_filter :authenticate_teacher!
+	before_filter :authenticate_teacher!, :except => [:show, :index]
 
 	def index
-		@binders = Binder.where(:owner => current_teacher.id, "parent.id" => "0")
+		@owner = Teacher.where(:username => params[:username]).first || Teacher.find(params[:username])
 
-		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Binders"
+		@children = Binder.where(:owner => @owner.id, "parent.id" => "0")
+
+		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
 	end
 
 	def new
@@ -17,48 +19,29 @@ class BindersController < ApplicationController
 		@new_binder.tag = Tag.new
 
 		@colleagues = Teacher.all.reject {|t| t == current_teacher}
-
 	end
 
 	#Add Folder Function
 	def create
+
+		#Must be logged in to write
+
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
 			redirect_to new_binder_path and return
 		end
 
-		#TODO: Write helper functions to populate the three arrays/hashes and use in all three create functions
-		@parenthash = {}
-		@parentsarr = []
-		@parentperarr = []
+		@inherited = inherit_from params[:binder][:parent]
 
-		if params[:binder][:parent].to_s == "0"
+		@parenthash = @inherited[:parenthash]
+		@parentsarr = @inherited[:parentsarr]
+		@parentperarr = @inherited[:parentperarr]
 
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> ""}
+		@parent = @inherited[:parent]
 
-			@parentsarr = [@parenthash]
+		redirect_to "/403.html" and return if @parent.get_access(current_teacher.id) != 1
 
-		else
-
-			@parent = Binder.find(params[:binder][:parent])
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> @parent.title}
-
-			@parentsarr = @parent.parents << @parenthash
-
-			@parentperarr = @parent.parent_permissions
-
-			@parent.permissions.each do |p|
-				p["folder_id"] = params[:binder][:parent]
-				@parentperarr << p
-			end
-
-		end
-
-
-		#Update parent counts
+		#Update parents' folder counts
 		if @parentsarr.size > 1
 			pids = @parentsarr.collect {|p| p["id"] || p[:id]}
 			
@@ -85,7 +68,7 @@ class BindersController < ApplicationController
 
 		new_binder.create_binder_tags(params,current_teacher.id)
 
-		redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
 
@@ -95,7 +78,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
+
 		redirect_to "/404.html" and return if !binder_routing_ok?(@binder, params[:action])
+
+		redirect_to "/403.html" and return if @access == 0
 
 		#redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id])
 
@@ -107,7 +94,7 @@ class BindersController < ApplicationController
 
 		@title = "Viewing: #{@binder.title}"
 
-		@children = Binder.where("parent.id" => params[:id])
+		@children = teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children
 		
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -142,35 +129,11 @@ class BindersController < ApplicationController
 			redirect_to new_binder_content_path and return
 		end
 
-		@parenthash = {}
-		@parentsarr = []
-		@parentperarr = []
+		@inherited = inherit_from params[:binder][:parent]
 
-		if params[:binder][:parent].to_s == "0"
-
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> ""}
-
-			@parentsarr = [@parenthash]
-
-		else
-
-			@parent = Binder.find(params[:binder][:parent])
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> @parent.title}
-
-			@parentsarr = @parent.parents << @parenthash
-
-			@parentperarr = @parent.parent_permissions
-
-			@parent.permissions.each do |p|
-				p["folder_id"] = params[:binder][:parent]
-				@parentperarr << p
-			end
-
-		end
+		@parenthash = @inherited[:parenthash]
+		@parentsarr = @inherited[:parentsarr]
+		@parentperarr = @inherited[:parentperarr]
 
 		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
 									:owner				=> current_teacher.id,
@@ -185,8 +148,6 @@ class BindersController < ApplicationController
 									:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
 															:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
 															:auth_level => params[:auth_level]}] : []),
-#Not working						:version			=> Version.new(	:data => params[:binder][:versions][:data],
-#																		:timestamp => Time.now.to_i),
 									:parent_permissions	=> @parentperarr,
 									:files				=> 1,
 									:type				=> 2,
@@ -195,8 +156,6 @@ class BindersController < ApplicationController
 		@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)
-
-		#@binder.save
 
 		@binder.create_binder_tags(params,current_teacher.id)
 
@@ -219,7 +178,7 @@ class BindersController < ApplicationController
 
 		@binder.tag.update_node_tags(params,current_teacher.id)
 
-		@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
+		@children = @binder.children.sort_by {|binder| binder.parents.length}
 
 		@index = @binder.parents.length
 
@@ -254,34 +213,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.new
 
-		@parenthash = {}
-		@parentsarr = []
-		@parentperarr = []
+		@inherited = inherit_from params[:binder][:parent]
 
-		if params[:binder][:parent].to_s == "0"
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> ""}
-
-			@parentsarr = [@parenthash]
-
-		else
-
-			@parent = Binder.find(params[:binder][:parent])
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> @parent.title}
-
-			@parentsarr = @parent.parents << @parenthash
-
-			@parentperarr = @parent.parent_permissions
-
-			@parent.permissions.each do |p|
-				p["folder_id"] = params[:binder][:parent]
-				@parentperarr << p
-			end
-
-		end
+		@parenthash = @inherited[:parenthash]
+		@parentsarr = @inherited[:parentsarr]
+		@parentperarr = @inherited[:parentperarr]
 
 
 		@binder.update_attributes(
@@ -348,34 +284,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@parenthash = {}
-		@parentsarr = []
-		@parentperarr = []
+		@inherited = inherit_from params[:binder][:parent]
 
-		if params[:binder][:parent].to_s == "0"
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> ""}
-
-			@parentsarr = [@parenthash]
-
-		else
-
-			@parent = Binder.find(params[:binder][:parent])
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> @parent.title}
-
-			@parentsarr = @parent.parents << @parenthash
-
-			@parentperarr = @parent.parent_permissions
-
-			@parent.permissions.each do |p|
-				p["folder_id"] = params[:binder][:parent]
-				@parentperarr << p
-			end
-
-		end
+		@parenthash = @inherited[:parenthash]
+		@parentsarr = @inherited[:parentsarr]
+		@parentperarr = @inherited[:parentperarr]
 
 		@ops = @binder.parents.collect {|x| x["id"] || x[:id]}
 		@ops.each do |opid|
@@ -403,7 +316,7 @@ class BindersController < ApplicationController
 		#If directory, deal with the children
 		if @binder.type == 1 #Eventually will apply to type == 3 too
 
-			@children = Binder.where("parents.id" => params[:id])
+			@children = @binder.children
 
 			@children.each do |h|
 
@@ -536,7 +449,7 @@ class BindersController < ApplicationController
 			@index = @binder.parents.length
 
 			#Select old children, order by parents.length
-			@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
+			@children = @binder.children.sort_by {|binder| binder.parents.length}
 
 			#Spawn new children, These children need to have updated parent ids
 			@children.each do |h|
@@ -680,7 +593,7 @@ class BindersController < ApplicationController
 			@index = @binder.parents.length
 
 			#Select old children, order by parents.length
-			@children = Binder.where("parents.id" => params[:id]).sort_by {|binder| binder.parents.length}
+			@children = @binder.children.sort_by {|binder| binder.parents.length}
 
 			#Spawn new children, These children need to have updated parent ids
 			@children.each do |h|
@@ -796,7 +709,7 @@ class BindersController < ApplicationController
 	def permissions
 		@binder = Binder.find(params[:id])
 
-		redirect_to "/404.html" and return if current_teacher.id.to_s != @binder.owner
+		redirect_to "/403.html" and return if current_teacher.id.to_s != @binder.owner
 
 		@title = "Permissions for #{@binder.title}"
 
@@ -819,9 +732,7 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		@children = Binder.where("parents.id" => params[:id])
-
-		@children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
+		@binder.children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
 																								:shared_id => params[:shared_id],
 																								:auth_level => params[:auth_level],
 																								:folder_id => params[:id]})} if !@new
@@ -838,9 +749,7 @@ class BindersController < ApplicationController
 
 		@binder.permissions.delete_at(params[:pid].to_i)
 
-		@children = Binder.where("parents.id" => params[:id])
-
-		@children.each do |c|
+		@binder.children.each do |c|
 			c.parent_permissions.delete(pper)
 			c.save
 		end
@@ -851,9 +760,9 @@ class BindersController < ApplicationController
 	end
 
 	def trash
-		@binders = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
+		@children = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
 
-		redirect_to "/404.html" and return if params[:username] != current_teacher.username
+		redirect_to "/403.html" and return if params[:username] != current_teacher.username
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
 	end
@@ -883,9 +792,7 @@ class BindersController < ApplicationController
 		#If directory, deal with the children
 		if @binder.type == 1 #Eventually will apply to type == 3 too
 
-			@children = Binder.where("parents.id" => params[:id])
-
-			@children.each do |h|
+			@binder.children.each do |h|
 				@current_parents = h.parents
 				@size = @current_parents.size
 				h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
@@ -915,6 +822,42 @@ class BindersController < ApplicationController
 
 
 	#HELPERS:
+
+	def inherit_from parentid
+
+		parenthash = {}
+		parentsarr = []
+		parentperarr = []
+
+		if parentid.to_s == "0"
+
+			parenthash = {	:id		=> parentid,
+							:title	=> ""}
+
+			parentsarr = [parenthash]
+
+		else
+
+			parent = Binder.find(parentid)
+
+			parenthash = {	:id		=> parentid,
+							:title	=> parent.title}
+
+			parentsarr = parent.parents << parenthash
+
+			parentperarr = parent.parent_permissions
+
+			parent.permissions.each do |p|
+				p["folder_id"] = parentid
+				parentperarr << p
+			end
+
+		end
+
+		return {:parenthash => parenthash, :parentsarr => parentsarr, :parentperarr => parentperarr, :parent => parent}
+
+	end
+
 
 	#Because named_binder_route can accept an id or object, so can this check
 	def binder_routing_ok?(binder, action)

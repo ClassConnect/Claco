@@ -377,35 +377,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@parenthash = {}
-		@parentsarr = []
-		@parentperarr = []
+		@inherited = inherit_from params[:binder][:parent]
 
-
-		if params[:binder][:parent].to_s == "0"
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> ""}
-
-			@parentsarr = [@parenthash]
-
-		else
-
-			@parent = Binder.find(params[:binder][:parent])
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> @parent.title}
-
-			@parentsarr = @parent.parents << @parenthash
-
-			@parentperarr = @parent.parent_permissions
-
-			@parent.permissions.each do |p|
-				p["folder_id"] = params[:binder][:parent]
-				@parentperarr << p
-			end
-
-		end
+		@parenthash = @inherited[:parenthash]
+		@parentsarr = @inherited[:parentsarr]
+		@parentperarr = @inherited[:parentperarr]
 
 		@ppers = @binder.parent_permissions
 
@@ -533,33 +509,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@parenthash = {}
-		@parentsarr = []
+		@inherited = inherit_from params[:binder][:parent]
 
-
-		if params[:binder][:parent].to_s == "0"
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> ""}
-
-			@parentsarr = [@parenthash]
-
-		else
-
-			@parent = Binder.find(params[:binder][:parent])
-
-			@parenthash = {	:id		=> params[:binder][:parent],
-							:title	=> @parent.title}
-
-			@parentsarr = @parent.parents << @parenthash
-
-			@parentperarr = @parent.parent_permissions
-
-			@parent.permissions.each do |p|
-				p["folder_id"] = params[:binder][:parent]
-				@parentperarr << p
-			end
-		end
+		@parenthash = @inherited[:parenthash]
+		@parentsarr = @inherited[:parentsarr]
+		@parentperarr = @inherited[:parentperarr]
 
 		@new_parent = Binder.new(	:title				=> @binder.title,
 									:body				=> @binder.body,

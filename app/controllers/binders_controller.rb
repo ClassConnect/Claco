@@ -39,7 +39,8 @@ class BindersController < ApplicationController
 
 		@parent = @inherited[:parent]
 
-		redirect_to "/403.html" and return if @parent.get_access(current_teacher.id) != 1
+		# doesn't work
+		#redirect_to "/403.html" and return if @parent.get_access(current_teacher.id) != 1
 
 		#Update parents' folder counts
 		if @parentsarr.size > 1

@@ -1,7 +1,7 @@
 <h3>Binders#copy</h3>
 <p>app/views/binders/copy.html.erb</p>
 
-<%= form_for @binder, :url => copy_binder_path do |f| %>
+<%= form_for @binder, :url => named_binder_route(@binder, "copy") do |f| %>
 
   <div><%= f.label :parent,
     "Copy #{@binder.title} From #{@binder.parent["id"] == "0" ? "Home" : @binder.parent["title"]} to:" %>

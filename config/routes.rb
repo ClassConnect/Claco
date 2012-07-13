@@ -68,19 +68,15 @@ Claco::Application.routes.draw do
 	# Paths handled by named_binder_route function #
 	################################################
 
-	#Edit
-	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit'
-	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
-
 	#Move
-	get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move'
+	get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move'#,	:as => 'move_binder_path'
 	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem'
 
 	#Copy
 	get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy'
 	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem'
 
-	#Fork (Clip)
+	#Fork (Snap)
 	get		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#fork'
 	put		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#forkitem'
 
@@ -95,6 +91,10 @@ Claco::Application.routes.draw do
 	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission'
 	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission'
 	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
+
+	#Edit
+	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit'
+	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
 
 	#Show
 	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show'

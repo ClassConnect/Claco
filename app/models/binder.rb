@@ -29,6 +29,8 @@ class Binder
 	field :permissions, :type => Array, :default => [] #[shared_id, type, auth_level]
 	field :parent_permissions, :type => Array, :default => [] #[type, folder_id, shared_id, auth_level]
 
+	# an index of -1 indicates that this node still needs to be serviced to determine placement in the binder
+	field :order_index, :type => Integer, :default => -1
 
 	# Version control is only used if type != directory
 	#Version Control

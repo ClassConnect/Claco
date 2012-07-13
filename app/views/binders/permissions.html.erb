@@ -29,10 +29,10 @@
   <br /><br />
 </div>
 
-
-
 <div>Add New Permission:<br /><br />
 <%= form_for @binder, :url => named_binder_route(@binder, "permissions") do |f| %>
+
+  <p><%= "#{named_binder_route(@binder, "permissions")}" %></p> 
 
   <%= label_tag :type, "Type:" %><br />
   <%= select_tag :type, options_for_select([1, 3])  %><br />

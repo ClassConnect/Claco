@@ -8,11 +8,37 @@ module BinderHelper
 	#Binder objects preferred over ids
 	def named_binder_route(binder, action = "show")
 
-		return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+		# return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? 
+		# 										String.new : 
+		# 										"/" + CGI.escape(binder.root)
+		# 									}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? 
+		# 																					String.new : 
+		# 																					"/#{action}"
+		# 																				}" if binder.class == Binder
 
-		return named_binder_route(Binder.find(binder), action) if binder.class == String
+		if binder.class == Binder
+			retstr = "/#{binder.handle}/portfolio"
 
-		return "/500.html"
+			if binder.parents.length != 1 
+				retstr += "/#{CGI.escape(binder.root)}" 
+			end
+
+			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+
+			if action != "show" 
+				retstr += "/#{action}" 
+			end
+
+			return retstr
+		elsif binder.class == String 
+			return named_binder_route(Binder.find(binder), action)
+		else
+			return "/500.html"
+		end
+
+		#return named_binder_route(Binder.find(binder), action) if binder.class == String
+
+		#return "/500.html"
 
 	end
 

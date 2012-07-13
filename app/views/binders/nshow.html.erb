@@ -7,9 +7,9 @@
 	<% elsif parent["id"] == "-1" %>
 		<%= link_to "Trash", trash_path %> /
 	<% else %>
-		<%= link_to parent["title"], binder_path(parent["id"]) %> /
+		<%= link_to parent["title"], named_binder_route(parent["id"]) %> /
 	<% end %>
-<% end %><%= link_to @binder.title, binder_path(@binder) %></p>
+<% end %><%= link_to @binder.title, named_binder_route(@binder) %></p>
 
 <div><% if !@binder.body.blank? %>
 	Body: <%= @binder.body %>

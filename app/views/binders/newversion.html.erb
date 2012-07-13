@@ -1,7 +1,7 @@
-<h3>Binders#newcontent</h3>
-<p>app/views/binders/newcontent.html.erb</p>
+<h3>Binders#<%= params[:action] %></h3>
+<p>app/views/binders/<%= params[:action] %>.html.erb</p>
 
-<%= form_for @binder, :url => create_binder_version_path do |f| %>
+<%= form_for @binder, :url => named_binder_route(@binder, "update") do |f| %>
 
   	<%= f.fields_for :versions do |g| %>
 

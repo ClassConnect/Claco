@@ -12,6 +12,9 @@ class Binder
 
 	#File/Directory-specific Attributes
 	field :owner, :type => String
+	field :username, :type => String
+	field :fname, :type => String
+	field :lname, :type => String
 	field :title, :type => String#File/directory name
 	field :body, :type => String #Directory annotation
 	field :type, :type => Integer # 1 = Directory, 2 = File, 3 = Lesson
@@ -21,24 +24,19 @@ class Binder
 	#Parent
 	field :parent, :type => Hash
 	field :parents, :type => Array #[# => {Title, id}]
-
-	field :parent_tags, :type => Array
 	
 	#Permissions
 	field :permissions, :type => Array, :default => [] #[shared_id, type, auth_level]
 	field :parent_permissions, :type => Array, :default => [] #[type, folder_id, shared_id, auth_level]
-	#embeds_many :permissions#, validate: false
-	#embeds_many :parent_permissions
+
 
 	# Version control is only used if type != directory
 	#Version Control
-	#field :versions, :type => Array # Array(# => [id, uid, timestamp, comments_priv, comments_pub, size, ext, fork_total, recs])
 	#field :fork_hash, :type => String #Use Binder.id
 	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3
 
 	field :forked_from, :type => String
 	field :fork_stamp, :type => Integer
-	field :fork_total, :type => Integer, :default => 0
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
@@ -46,71 +44,27 @@ class Binder
 	field :files, :type => Integer, :default => 0
 	field :folders, :type => Integer, :default => 0
 	field :total_size, :type => Integer, :default => 0
+	field :fork_total, :type => Integer, :default => 0
 
 	#Social
 	field :likes, :type => Integer
 	field :comments, :type => Array
 
+	#TODO: Add indexing functions that allow binders to be put in a user-defined order via dragon drop
 
 	# tag contains both local and parent tag data
 	embeds_one :tag
 
-	# embeds_one :parent_tag
-	# embeds_one :node_tag
-
 	# updates all data within the Tag class
 	def create_binder_tags(params,teacher_id)
 
-		# @parenthash = {}
-		# @parentsarr = []
-
 		new_binder_parent = Binder.find(params[:binder][:parent]) if params[:binder][:parent] != "0"
 
-		# if params[:binder][:parent].to_s == "0"
-
-		# 	@parenthash = { :id 	=> params[:binder][:parent],
-		# 					:title	=> ""}
-
-		# 	@parentsarr = [@parenthash]
-
-		# else
-
-		# 	@parenthash = { :id 	=> params[:binder][:parent],
-		# 					:title 	=> new_binder_parent.title}
-
-		# 	#Grab
-		# 	@parentsarr = new_binder_parent.parents << @parenthash
-
-		# end
-
-		# #new_binder = Binder.new(:owner 			=> current_teacher.id,
-		# self.update_attributes(	:owner				=> teacher_id,	#current_teacher.id,
-		# 						:title 				=> params[:binder][:title].to_s[0..60],
-		# 						:parent 			=> @parenthash,
-		# 						:parents 			=> @parentsarr,
-		# 						:last_update 		=> Time.now.to_i,
-		# 						:last_updated_by	=> teacher_id,	#current_teacher.id.to_s,
-		# 						:body 				=> params[:binder][:body],
-		# 						:type 				=> 1)
-
-
-
-
-
-
 		self.tag = Tag.new
-
-		#self.tag.set_binder_tags(params,new_binder_parent)
 
 		self.tag.set_parent_tags(params,new_binder_parent) if params[:binder][:parent] != "0"
 
 		self.tag.set_node_tags(params,new_binder_parent,teacher_id)
-
-		#if params[:binder][:parent] == "0"
-		#
-		#else
-		#	parent_binder = Binder.find(params[:binder][:parent])
-		#end
 
 	end
 
@@ -130,12 +84,6 @@ class Binder
 
 		else
 
-			#self.tag.debug_data << "parent_id"
-
-			#self.tag.debug_data << self.parent[:id]
-
-			#self.save
-
 			node_parent = Binder.find(self.parent[:id] || self.parent["id"])
 
 			self.tag.parent_tags = (arr_to_set(node_parent.tag.parent_tags)|arr_to_set(node_parent.tag.node_tags)).to_a
@@ -145,6 +93,8 @@ class Binder
 		self.save
 
 	end
+
+
 
 	# updates parent, parents, and tags fields for all of the passed node's children
 	# this method is unused
@@ -177,25 +127,37 @@ class Binder
 		return ret_set
 	end
 
-	def current_version
-		self.versions.each {|v| return v if v.active}
-
-		return self.versions.sort_by {|v| v.timestamp}.last
+	def parent_ids
+		return parents.collect {|x| x["id"] || x[:id]}
 	end
 
-	def is_owner?(id)
-		return self.owner == id.to_s
+	def children
+		return Binder.where("parent.id" => self.id.to_s)
+	end
+
+	def current_version
+		versions.each {|v| return v if v.active}
+
+		return versions.sort_by {|v| v.timestamp}.last
+	end
+
+	def owner?(id)
+		return owner == id.to_s
+	end
+
+	def handle
+		return username || owner
 	end
 
 	def get_access(id)
 		#Owner will always have r/w access
-		return 2 if self.is_owner?(id)
+		return 2 if owner?(id)
 
 		#Only owner will be able to see trash folders
-		return 0 if self.parents.first["id"] == "-1"
+		return 0 if parents.first["id"] == "-1"
 
 		#Explicit permissions always take precedence
-		self.permissions.each do |p|
+		permissions.each do |p|
 
 			#Check what type of permission it is: 1 = person
 			return p.auth_level if p.shared_id == id && p.type == 1
@@ -209,7 +171,7 @@ class Binder
 
 		end
 
-		self.parent_permissions.each do |p|
+		parent_permissions.each do |p|
 
 			#Check what type of permission it is: 1 = person
 			return p.auth_level if p.shared_id == id && p.type == 1
@@ -226,10 +188,9 @@ class Binder
 	end
 
 	def root
-		return self.parents.second["title"] if self.parents.size > 1
+		return parents.second["title"] if parents.size > 1
 
-		return self.title
-
+		return title
 	end
 
 end

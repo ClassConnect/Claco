@@ -1,149 +1,103 @@
 Claco::Application.routes.draw do
-  devise_for :teachers
+	devise_for :teachers
 
-  # The priority is based upon order of creation:
-  # first created -> highest priority.
+	#Root to home
+	root	:to																=> 'home#index'
+	get		'/homebase'														=> 'home#index'
 
-  # Sample of regular route:
-  #   match 'products/:id' => 'catalog#view'
-  # Keep in mind you can assign values other than :controller and :action
+	#Edit Info Form/Process
+	get		'/editinfo'														=> "teachers#editinfo"
+	put		'/updateinfo'													=> "teachers#updateinfo"
+	post	'/updateinfo'													=> "teachers#updateinfo"
 
-  # Sample of named route:
-  #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
-  # This route can be invoked with purchase_url(:id => product.id)
+	#Profile Page
+	get		'/teachers/:id'													=> 'teachers#show'
 
-  # Sample resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
+	#Edit Tags Form/Process
+	get		'/tags'															=> "teachers#tags"
+	put		'/updatetags'													=> "teachers#updatetags"
 
-  # Sample resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
+	#Subscribe to :id
+	put		'/confsub/:id'													=> 'teachers#confsub',		:as => 'confsub'
+	post	'/confsub/:id'													=> 'teachers#confsub',		:as => 'confsub'
 
-  # Sample resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
+	#Unsubscribed to :id
+	put		'/confunsub/:id'												=> 'teachers#confunsub',	:as => 'confunsub'
+	post	'/confunsub/:id'												=> 'teachers#confunsub',	:as => 'confunsub'
 
-  # Sample resource route with more complex sub-resources
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', :on => :collection
-  #     end
-  #   end
+	#Add :id as colleague
+	put		'/confadd/:id'													=> 'teachers#confadd',		:as => 'confadd'
+	post	'/confadd/:id'													=> 'teachers#confadd',		:as => 'confadd'
 
-  # Sample resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
+	#Remove :id as colleague
+	put		'/confremove/:id'												=> 'teachers#confremove',	:as => 'confremove'
+	post	'/confremove/:id'												=> 'teachers#confremove',	:as => 'confremove'
+	get		'/confremove/:id'												=> 'teachers#confremove',	:as => 'confremove'
 
-  # You can have the root of your site routed with "root"
-  # just remember to delete public/index.html.
+	#subscriptions
+	get		'/subs'															=> 'teachers#subs'
 
 
-#Eventually we will need routes that give context, i.e.
-#get '/binders/:id'
-#Should be:
+	get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',	:as => 'show_binder'
 
-get '/:username/binders/:greatest_parent/:title/:id' => 'binders#nshow', :as =>'show_binder'
+	resources :teachers, :only => [:show, :index]
 
-#Root to home
-root :to => 'home#index'
+	##################
+	# BINDER ROUTING #
+	##################
 
-#Edit Info Form/Process
-get '/editinfo'       => "teachers#editinfo"
-put '/updateinfo'     => "teachers#updateinfo"
-post '/updateinfo'     => "teachers#updateinfo"
+	#Binder Index
+	get		'/:username/portfolio'											=> 'binders#index',			:as => 'binders'
 
-#Profile Page
-get '/teachers/:id'   => 'teachers#show'
+	#New
+	get		'/:username/portfolio/new'										=> 'binders#new',			:as => 'new_binder'
+	post	'/:username/portfolio'											=> 'binders#create'
+	
+	#Adding Content
+	get		'/:username/portfolio/newcontent'								=> 'binders#newcontent',	:as => 'new_binder_content'
+	post	'/:username/portfolio/newcontent'								=> 'binders#createcontent'
 
-#Edit Tags Form/Process
-get '/tags'           => "teachers#tags"
-put '/updatetags'     => "teachers#updatetags"
+	#Uploading File
+	get		'/:username/portfolio/newfile'									=> 'binders#newfile',		:as => 'new_binder_file'
+	post	'/:username/portfolio/newfile'									=> 'binders#createfile'
 
-#Subscribe to :id
-#get '/sub/:id'        => 'teachers#sub'
-put '/confsub/:id'    => 'teachers#confsub', :as => 'confsub'
-post '/confsub/:id'    => 'teachers#confsub', :as => 'confsub'
+	#Trash folder
+	get		'/:username/trash'												=> 'binders#trash',			:as => 'trash'
 
-#Unsubscribed to :id
-#get '/unsub/:id'      => 'teachers#unsub'
-put '/confunsub/:id'   => 'teachers#confunsub', :as => 'confunsub'
-post '/confunsub/:id'   => 'teachers#confunsub', :as => 'confunsub'
+	################################################
+	# Paths handled by named_binder_route function #
+	################################################
 
-#Add :id as colleague
-#get '/add/:id'        => 'teachers#add'
-put '/confadd/:id'    => 'teachers#confadd', :as => 'confadd'
-post '/confadd/:id'    => 'teachers#confadd', :as => 'confadd'
+	#Edit
+	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit'
+	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
 
-#Remove :id as colleague
-#get '/remove/:id'     => 'teachers#remove'
-put  '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
-post '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
-get  '/confremove/:id' => 'teachers#confremove', :as => 'confremove'
+	#Move
+	get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move'
+	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem'
 
-#subscriptions
-get '/subs'	      => 'teachers#subs'
+	#Copy
+	get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy'
+	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem'
 
-resources :teachers, :only => [:show, :index]
+	#Fork (Clip)
+	get		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#fork'
+	put		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#forkitem'
 
-#Adding Content
-get '/binders/newcontent'      => 'binders#newcontent',         :as => 'new_binder_content'
-post '/binders/newcontent'    => 'binders#createcontent'
+	#Versioning
+	get		'/:username/portfolio(/:root)/:title/:id/versions'				=> 'binders#versions'
+	get		'/:username/portfolio(/:root)/:title/:id/swap'					=> 'binders#swap'
+	get		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#newversion'
+	put		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#createversion'
 
-#Uploading File
-get '/binders/newfile'          => 'binders#newfile'
-post '/binders/newfile'         => 'binders#createfile'
+	#Permissions
+	get		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#permissions'
+	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission'
+	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission'
+	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
 
-#Add new version of file
-get '/binders/:id/update'       =>  'binders#newversion',       :as => 'new_binder_version'
-put '/binders/:id/update'       =>  'binders#createversion',    :as => 'create_binder_version'
-get '/binders/:id/versions'     =>  'binders#versions',         :as => 'binder_versions'
-put '/binders/:id/swap'         =>  'binders#swap',             :as => 'swap_binder'
+	#Show
+	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show'
+	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy'
 
-#Handling permissions
-#Viewing current permissions w/ form at bottom for adding a new permission
-get '/binders/:id/permissions'          => 'binders#permissions',        :as => 'binder_permissions'
-put '/binders/:id/permissions'          => 'binders#createpermission',   :as => 'create_binder_permission'
-delete '/binders/:id/permissions/:pid'  => 'binders#destroypermission',  :as => 'destroy_binder_permission'
-get '/binders/:id/permissions/:pid'     => redirect("/binders/%{id}/permissions")
-
-#Moving a binder object (File, folder, content)
-get '/binders/:id/move'     => 'binders#move',            :as => 'move_binder'
-put '/binders/:id/move'     => 'binders#moveitem',        :as => 'move_binder'
-
-#Copying a binder object
-get '/binders/:id/copy'     => 'binders#copy',            :as => 'copy_binder'
-put '/binders/:id/copy'     => 'binders#copyitem',        :as => 'copy_binder'
-
-#Forking a binder object
-get '/binders/:id/fork'     => 'binders#fork',            :as => 'fork_binder'
-put '/binders/:id/fork'     => 'binders#forkitem',        :as => 'fork_binder'
-
-#Trash folder
-get '/binders/trash'        => 'binders#trash',           :as => 'trash'
-
-# rename route
-#get '/teachers/:id/binder/:binder_id' => 'teachers#showbinder', :as => 'show_binder'
-
-resources :binders
-
-
-  # See how all your routes lay out with "rake routes"
-
-  # This is a legacy wild controller route that's not recommended for RESTful applications.
-  # Note: This route will make all actions in every controller accessible via GET requests.
-  # match ':controller(/:action(/:id))(.:format)'
 end

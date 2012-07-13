@@ -1,22 +1,8 @@
-<h3>Binders#index</h3>
-<p>app/views/binders/index.html.erb</p>
-<p>Currently In: <%= link_to "Home", binders_path %> </p>
+<h3>Binders#<%= params[:action] %></h3>
+<p>app/views/binders/<%= params[:action] %>.html.erb</p>
+<p>Currently In: <%= link_to "Home", binders_path(@owner.username || @owner.id) %> </p>
 
-<div>Contents:
-	<br />
-	<%= "Empty" if @binders.empty? %>
-	<% @binders.each do |binder| %>
-	<%= link_to binder.title, binder %>
-  	(<%= link_to "Move", move_binder_path(binder) %>)
-    (<%= link_to "Copy", copy_binder_path(binder) %>)
-  	(<%= link_to "Permissions", binder_permissions_path(binder) %>)
-  	(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
-  	<%= !binder.body.blank? ? ("(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")")) : "" %>
-  	<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
-  	(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
-  	<br />
-	<% end %>
-</div>
-<br />
+<%= render 'layouts/show' %>
+
 <%= link_to "Create new binder", new_binder_path %><br /><br />
-<%= link_to "Trash", trash_path %>
+<%= link_to "Trash", trash_path(params[:username]) %>

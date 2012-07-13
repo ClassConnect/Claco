@@ -1,22 +1,10 @@
 <h3>Binders#edit</h3>
 <p>app/views/binders/edit.html.erb</p>
 
-<%= form_for @binder, :url => binder_path do |f| %>
+<%= form_for @binder, :url => named_binder_route(@binder) do |f| %>
 
 	<div><%= f.label :title, "Title" %><br />
 	<%= f.text_field :title %></div>
-
-  <% if @binder.format == 2 && @binder.type == 2 %>
-
-    <%= f.fields_for @binder.versions.last do |g| %>
-
-      <div><%= g.label :data, "URL:" %><br />
-      <%= g.text_field :data %></div>
-    
-    <% end %>
-
-
-	<% end %>
 
 	<div><%= f.label :body, "Body" %><br />
 	<%= f.text_area  :body %></div>

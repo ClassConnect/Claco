@@ -70,12 +70,12 @@ class Teacher
 
 	# Mr. John Smith
 	def full_name
-		return title + " " + fname + " " + lname
+		return "#{title} #{fname} #{lname}"
 	end
 
 	# Mr. Smith
 	def formal_name
-		return title + " " + lname
+		return "#{title} #{lname}"
 	end
 
 	# Relationship Class Method Wrappers

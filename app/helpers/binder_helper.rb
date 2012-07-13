@@ -3,6 +3,19 @@ module BinderHelper
 	#	current_teacher.tag.grade_levels[index]
 	#end
 
+	#Function that returns routing given a binder object and action
+	#Only works for routes in the format of: /username/portfolio(/root)/title/id/action(s)
+	#Binder objects preferred over ids
+	def named_binder_route(binder, action = "show")
+
+		return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+
+		return named_binder_route(Binder.find(binder), action) if binder.class == String
+
+		return "/500.html"
+
+	end
+
 	# def binder_check_box_value(index,type)
 	# 	#if @binder.tag.grade_levels.include? grade_level_string_by_index(index)
 

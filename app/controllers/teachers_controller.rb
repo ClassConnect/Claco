@@ -89,30 +89,6 @@
 		redirect_to tags_path
 	end
 
-	# this function is no longer called:
-
-	#/sub/:id
-#	#link to subscribe to :id
-#	def sub
-
-#		#Prevent subscription to self
-#		if params[:id] == current_teacher.id.to_s
-#			redirect_to teacher_path(current_teacher) and return
-#		end
-
-#		@teacher = Teacher.find(params[:id])
-
-#		#@relationship = current_teacher.relationships.find_or_initialize_by(:user_id => params[:id])
-#		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
-
-#		if @relationship.subscribed
-#			redirect_to teacher_path(params[:id]) and return
-#		end
-
-#		@title = "Subscribe to #{ @teacher.full_name }"
-
-#	end
-
 	#GET /confsub/:id <- To be changed to PUT/POST
 	def confsub
 
@@ -126,27 +102,6 @@
 
 		redirect_to teacher_path(@teacher)
 	end
-
-	# this function is no longer called:
-
-	#GET /unsub/:id
-#	def unsub
-
-#		@teacher = Teacher.find(params[:id])
-
-#		if @teacher == current_teacher
-#			redirect_to teacher_path(current_teacher) and return
-#		end
-
-#		@title = "Subscribe to #{ @teacher.full_name }"
-
-#		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
-
-#		if !@relationship.subscribed
-#			redirect_to teacher_path(params[:id]) and return
-#		end
-
-#	end
 
 	#GET /confunsub/:id
 	def confunsub
@@ -206,25 +161,6 @@
 	#One will be 1 and the other must be 2 when a request has been made
 
 
-	# this function is no longer called:
-
-	#Will be changed to one-step process (remove the add method and change link to form)
-	#GET /add/:id
-#	def add
-
-#		#Teacher to be added
-#		@teacher = Teacher.find(params[:id])
-
-#		@title = "Add #{ @teacher.full_name } as a Colleague"
-
-#		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
-
-#		if @relationship.colleague_status == 3
-#			redirect_to teacher_path(@teacher)
-#		end
-
-#	end
-
 	#GET /confadd/:id <= To be changed to PUT/POST
 	def confadd
 
@@ -260,26 +196,6 @@
 		redirect_to teacher_path(@teacher)
 
 	end
-
-	# this function is no longer called:
-
-	#Will be changed to one-step process (remove the add method and change link to form)
-	#GET /remove/:id
-#	def remove
-
-#		#Teacher to be removed
-#		@teacher = Teacher.find(params[:id])
-
-#		@title = "Remove #{ @teacher.full_name } as a Colleague"
-
-#		relationship = @teacher.relationship_by_teacher_id(current_teacher.id)
-
-
-#		if !@relationship.colleague_status == 3
-#			redirect_to teacher_path(@teacher)
-#		end
-
-#	end
 
 	#GET /confremove/:id <= To be changed to PUT/POST
 	def confremove
@@ -352,6 +268,7 @@
 		#@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
 
 		@retarray = Array.new
+
 
 	end
 

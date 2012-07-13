@@ -1,5 +1,5 @@
-<h3>Binders#permissions</h3>
-<p>app/views/binders/permissions.html.erb</p>
+<h3>Binders#<%= params[:action] %></h3>
+<p>app/views/binders/<%= params[:action] %>.html.erb</p>
 
 
 <div>Inherited Permissions:<br />
@@ -23,7 +23,7 @@
       Type: <%= p["type"] %><br />
       Shared with: <%= p["shared_id"] %><br />
       Authorization Level: <%= p["auth_level"] %><br />
-      <%= link_to "Delete this permission", destroy_binder_permission_path(@binder, @binder.permissions.index(p)), :method => :delete %><br /><br />
+      <%= link_to "Delete this permission", named_binder_route(@binder, "permissions/#{@binder.permissions.index(p)}"), :method => :delete %><br /><br />
     <% end %>
   <% end %>
   <br /><br />
@@ -32,7 +32,7 @@
 
 
 <div>Add New Permission:<br /><br />
-<%= form_for @binder, :url => create_binder_permission_path do |f| %>
+<%= form_for @binder, :url => named_binder_route(@binder, "permissions") do |f| %>
 
   <%= label_tag :type, "Type:" %><br />
   <%= select_tag :type, options_for_select([1, 3])  %><br />
@@ -45,6 +45,6 @@
   <br />
   <br />
   <%= f.submit "Add Permission" %>
-  <%= link_to "Back", @binder.parent["id"] == "0" ? binders_path : binder_path(@binder.parent["id"]) %>
+  <%= link_to "Back", @binder.parent["id"] == "0" ? binders_path : named_binder_route(@binder.parent["id"]) %>
 <% end %>
 </div>

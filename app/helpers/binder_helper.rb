@@ -8,13 +8,7 @@ module BinderHelper
 	#Binder objects preferred over ids
 	def named_binder_route(binder, action = "show")
 
-		# return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? 
-		# 										String.new : 
-		# 										"/" + CGI.escape(binder.root)
-		# 									}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? 
-		# 																					String.new : 
-		# 																					"/#{action}"
-		# 																				}" if binder.class == Binder
+		# return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
 
 		if binder.class == Binder
 			retstr = "/#{binder.handle}/portfolio"

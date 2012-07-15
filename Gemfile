@@ -19,6 +19,15 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+# group :development do
+#   gem 'linecache19'#, '0.5.13'
+#   gem 'ruby-debug-base19'#, '0.11.26'
+#   gem 'ruby-debug19', :require => 'ruby-debug'
+# end
+
+# command to properly install debugger
+#gem install ruby-debug19 -- --with-ruby-include=$rvm_path/src/ruby-1.9.2-head/
+
 gem 'jquery-rails'
 
 gem 'mongoid', "~> 2.4"
@@ -30,6 +39,10 @@ gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 
 gem 'mini_magick'
+
+gem 'log4r', '1.1.9'
+
+# gem 'ruby-debug19', :require => 'ruby-debug'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

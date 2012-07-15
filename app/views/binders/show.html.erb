@@ -8,3 +8,25 @@
 <%= link_to "Edit this binder", named_binder_route(@binder, "edit") %> |
 <%= link_to "Add content", new_binder_content_path %> |
 <%= link_to "Add File", new_binder_file_path %>
+<br /><br />
+
+<%= #{}"#{@binder.siblings(@binder.id)}" 
+%>
+<%= #'Binder.where("parent.id" == @binder.id).count' 
+%>
+<br />
+<%= #Binder.where("parent.id" => @binder.id.to_s).count 
+%>
+<br />
+<%= #Binder.where("parent.id" => @binder.id.to_s).entries 
+%>
+<br />
+<%= #{}"binder.id: #{@binder.id}" 
+%>
+<br />
+<%= #{}"binder.parent.id: #{@binder.parent["id"]}" 
+%>
+<br />
+<%= #{}"params[:id]: #{params[:id]}" 
+%>
+<br />

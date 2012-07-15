@@ -13,6 +13,7 @@
 		Empty
 	<% end %>
 	<% @children.each do |binder| %>
+		[<%= binder.order_index %>]
 		<%= link_to binder.title, named_binder_route(binder) %>
 		<%= link_to "(Update)", named_binder_route(binder, "update") if binder.type == 2 %>
 		<%= link_to "(Versions)", named_binder_route(binder, "versions") if binder.type == 2 %>

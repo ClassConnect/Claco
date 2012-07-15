@@ -45,6 +45,7 @@ class Binder
 	#Counts
 	field :files, :type => Integer, :default => 0
 	field :folders, :type => Integer, :default => 0
+	field :children, :type => Integer, :default => 0
 	field :total_size, :type => Integer, :default => 0
 	field :fork_total, :type => Integer, :default => 0
 
@@ -52,10 +53,56 @@ class Binder
 	field :likes, :type => Integer
 	field :comments, :type => Array
 
+	field :debug_data, :type => Array, :default => []
+
 	#TODO: Add indexing functions that allow binders to be put in a user-defined order via dragon drop
 
 	# tag contains both local and parent tag data
 	embeds_one :tag
+
+	# passed the index to sift above
+	# decrement all binders with an index >= that index
+	def sift_children(index)
+
+		Binder.where("parent.id" => self.id).reject { |b| b.order_index < index }.each do |c|
+
+			c.update_attributes( :order_index => c.order_index - 1)
+			c.save
+
+		end
+
+	end
+
+	# passed the index to sift above
+	# decrement all binders with an index >= that index
+	def sift_siblings()
+
+		logger.debug "#{Binder.where("parent.id" => self.parent["id"].to_s).to_a.inspect}"#.reject { |b| b.order_index < self.order_index }}"
+		
+		logger.debug "self parent id: #{self.parent["id"]}"
+		logger.debug "self order index: #{self.order_index}"
+
+		Binder.where("parent.id" => self.parent["id"].to_s).each do |c|
+			logger.debug "#{c.title}, #{c.order_index}"
+		end
+
+		Binder.where("parent.id" => self.parent["id"].to_s).reject { |b| b.order_index.to_i < self.order_index.to_i }.each do |c|
+
+			logger.debug "before: #{c.inspect}"
+
+			c.update_attributes( :order_index => c.order_index - 1)
+			c.save
+
+			logger.debug " after: #{c.inspect}"
+
+		end
+	end
+
+
+
+	def siblings(id)
+		return Binder.where(parent["id"] => id).count
+	end
 
 	# updates all data within the Tag class
 	def create_binder_tags(params,teacher_id)

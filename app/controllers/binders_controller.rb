@@ -4,9 +4,15 @@ class BindersController < ApplicationController
 	def index
 		@owner = Teacher.where(:username => params[:username]).first || Teacher.find(params[:username])
 
-		@children = Binder.where(:owner => @owner.id, "parent.id" => "0")
+		@children = Binder.where(:owner => @owner.id, "parent.id" => "0").sort_by { |binder| binder.order_index }
 
 		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
+
+		# logger.debug 'bitchtits'
+		# logger.info 'fuckdick'
+		# logger.fatal 'loggertest2'
+		#RAILS_DEFAULT_LOGGER.error("\n test \n")
+
 	end
 
 	def new
@@ -26,18 +32,27 @@ class BindersController < ApplicationController
 
 		#Must be logged in to write
 
+		#debugger
+
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
 			redirect_to new_binder_path and return
 		end
 
-		@inherited = inherit_from params[:binder][:parent]
+		@inherited = inherit_from(params[:binder][:parent])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
 
 		@parent = @inherited[:parent]
+
+		#Rails.logger "Inspected parent: #{Binder.find(params[:binder][:parent]).inspect}"
+
+		# logger.fatal 'loggertest'
+		#RAILS_DEFAULT_LOGGER.error("\n test \n")
+
+		@parent_child_count = @inherited[:parent_child_count]
 
 		# doesn't work
 		#redirect_to "/403.html" and return if @parent.get_access(current_teacher.id) != 1
@@ -46,7 +61,14 @@ class BindersController < ApplicationController
 		if @parentsarr.size > 1
 			pids = @parentsarr.collect {|p| p["id"] || p[:id]}
 			
-			pids.each {|pid| Binder.find(pid).inc(:folders, 1) if pid != "0"}
+			pids.each do |pid| 
+				if pid != "0"
+					Binder.find(pid).inc(:folders, 1)
+				end
+				#Binder.find(pid).inc(:folders, 1) if pid != "0"
+			end
+
+			Binder.find(pids.last).inc(:children,1) if pids.last != "0"
 		end
 
 		new_binder = Binder.new(:owner				=> current_teacher.id,
@@ -56,10 +78,12 @@ class BindersController < ApplicationController
 								:title				=> params[:binder][:title].to_s[0..60],
 								:parent				=> @parenthash,
 								:parents			=> @parentsarr,
+								#:children 			=> 
 								:body				=> params[:binder][:body],
 								:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
 																					:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
 																					:auth_level	=> params[:auth_level]}] : []),
+								:order_index		=> @parent_child_count,
 								:parent_permissions	=> @parentperarr,
 								:last_update		=> Time.now.to_i,
 								:last_updated_by	=> current_teacher.id.to_s,
@@ -69,7 +93,9 @@ class BindersController < ApplicationController
 
 		new_binder.create_binder_tags(params,current_teacher.id)
 
-		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
+		# this line breaks creation of new leaf binders
+		#redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
+		#redirect_to named_binder_route(params[:binder][:parent]) if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
 
@@ -77,7 +103,10 @@ class BindersController < ApplicationController
 
 	def show
 
-		@binder = Binder.find(params[:id])
+		# example sort:
+		# @children = @binder.children.sort_by {|binder| binder.parents.length}
+
+		@binder = Binder.find(params[:id])#.sort_by { |binder| binder.order_index }
 
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
@@ -130,11 +159,13 @@ class BindersController < ApplicationController
 			redirect_to new_binder_content_path and return
 		end
 
-		@inherited = inherit_from params[:binder][:parent]
+		@inherited = inherit_from(params[:binder][:parent])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
+
+		@parent_child_count = @inherited[:parent_child_count]
 
 		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
 									:owner				=> current_teacher.id,
@@ -149,6 +180,7 @@ class BindersController < ApplicationController
 									:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
 															:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
 															:auth_level => params[:auth_level]}] : []),
+									:order_index		=> @parent_child_count,
 									:parent_permissions	=> @parentperarr,
 									:files				=> 1,
 									:type				=> 2,
@@ -162,7 +194,9 @@ class BindersController < ApplicationController
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
-		pids.each {|id| Binder.find(id).inc(:files, 1) if id != "0"}
+		pids.each {|pid| Binder.find(id).inc(:files, 1) if id != "0"}
+
+		Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
 		redirect_to named_binder_route(params[:binder][:parent])
 
@@ -200,7 +234,7 @@ class BindersController < ApplicationController
 
 	end
 
-	#Add new file
+	#Add new file9
 	def newfile
 
 		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
@@ -214,12 +248,13 @@ class BindersController < ApplicationController
 
 		@binder = Binder.new
 
-		@inherited = inherit_from params[:binder][:parent]
+		@inherited = inherit_from(params[:binder][:parent])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
 
+		@parent_child_count = @inherited[:parent_child_count]
 
 		@binder.update_attributes(
 			:title				=> File.basename(	params[:binder][:versions][:file].original_filename,
@@ -236,6 +271,7 @@ class BindersController < ApplicationController
 			:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
 																:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
 																:auth_level	=> params[:auth_level]}] : []),
+			:order_index 		=> @parent_child_count,
 			:parent_permissions	=> @parentperarr,
 			:files				=> 1,
 			:type				=> 2,
@@ -261,10 +297,12 @@ class BindersController < ApplicationController
 			end
 		end
 
+		Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+
 		redirect_to named_binder_route(params[:binder][:parent])
 
 	end
-
+ 
 	def move
 
 		@binder = Binder.find(params[:id])
@@ -285,11 +323,17 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from params[:binder][:parent]
+		#logger.debug "FUCKYOU NIGGER"
+
+		@binder.sift_siblings()
+
+		@inherited = inherit_from(params[:binder][:parent])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
+
+		@parent_child_count = @inherited[:parent_child_count]
 
 		@ops = @binder.parents.collect {|x| x["id"] || x[:id]}
 		@ops.each do |opid|
@@ -301,13 +345,17 @@ class BindersController < ApplicationController
 										:total_size	=> op.total_size - @binder.total_size)
 			end
 		end
+ 
+		#Binder.find(op.last).inc(:children,-1)
 
 		#Save old permissions to remove childrens' inherited permissions
 		@ppers = @binder.parent_permissions
 
 		@binder.update_attributes(	:parent				=> @parenthash,
 									:parents			=> @parentsarr,
-									:parent_permissions	=> @parentperarr)
+									:parent_permissions	=> @parentperarr,
+									# might be +1, as update has not yet occured for the parent
+									:order_index		=> @parent_child_count)
 
 
 		# must update the common ancestor of the children before 
@@ -378,11 +426,13 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from params[:binder][:parent]
+		@inherited = inherit_from(params[:binder][:parent])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
+
+		@parent_child_count = @inherited[:parent_child_count]
 
 		@ppers = @binder.parent_permissions
 
@@ -393,6 +443,7 @@ class BindersController < ApplicationController
 									:files				=> @binder.files,
 									:folders			=> @binder.folders,
 									:total_size			=> @binder.total_size,
+									:order_index		=> @parent_child_count,
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:permissions		=> @binder.permissions,
@@ -510,11 +561,13 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from params[:binder][:parent]
+		@inherited = inherit_from(params[:binder][:parent])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
+
+		@parent_child_count = @inherited[:parent_child_count]
 
 		@new_parent = Binder.new(	:title				=> @binder.title,
 									:body				=> @binder.body,
@@ -522,6 +575,7 @@ class BindersController < ApplicationController
 									:files				=> @binder.files,
 									:folders			=> @binder.folders,
 									:total_size			=> @binder.total_size,
+									:order_index		=> @parent_child_count,
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:owner				=> current_teacher.id,
@@ -726,6 +780,8 @@ class BindersController < ApplicationController
 	def destroy
 		@binder = Binder.find(params[:id])
 
+		@binder.sift_siblings()
+
 		@parenthash = {	:id		=> "-1",
 						:title	=> ""}
 
@@ -778,11 +834,22 @@ class BindersController < ApplicationController
 
 	#HELPERS:
 
-	def inherit_from parentid
+	def inherit_from(parentid)
 
 		parenthash = {}
 		parentsarr = []
 		parentperarr = []
+
+		#parent = Binder.find(parentid) if parentid != "0"
+
+		# Binder.where("parent.id" == parentid).entries.to_a.each do |parent|
+		# 	#parent.to_a.each do |f|
+		# 	#	logger.debug "#{f}"
+		# 	#end
+		# 	logger.debug "#{ parent.inspect.to_s }"#.inspect.to_a)}"
+		# end
+
+		#logger.debug "#{Binder.where("parent.id" == "0").entries.to_a}"
 
 		if parentid.to_s == "0"
 
@@ -791,9 +858,16 @@ class BindersController < ApplicationController
 
 			parentsarr = [parenthash]
 
+			#parent_child_count = Binder.where("parent.id" == "0").count
+
 		else
 
 			parent = Binder.find(parentid)
+
+
+			#parent.debug_data << parentid
+			#parent.debug_data << Binder.where("parent.id" == parentid).count
+			#arent.save
 
 			parenthash = {	:id		=> parentid,
 							:title	=> parent.title}
@@ -807,9 +881,17 @@ class BindersController < ApplicationController
 				parentperarr << p
 			end
 
+			#parent_child_count = Binder.where("parent.id" == parentid.to_s).count
+
+			#parent_child_count = Binder.where("parent.id" == parentid).count #parent.files + parent.folders
+
 		end
 
-		return {:parenthash => parenthash, :parentsarr => parentsarr, :parentperarr => parentperarr, :parent => parent}
+		return {:parenthash => parenthash, 
+				:parentsarr => parentsarr,
+				:parentperarr => parentperarr, 
+				:parent => parent, 
+				:parent_child_count => Binder.where("parent.id" => parentid.to_s).count }
 
 	end
 
@@ -826,11 +908,31 @@ class BindersController < ApplicationController
 	#Binder objects preferred over ids
 	def named_binder_route(binder, action = "show")
 
-		return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+		if binder.class == Binder
+			retstr = "/#{binder.handle}/portfolio"
 
-		return named_binder_route(Binder.find(binder), action) if binder.class == String
+			if binder.parents.length != 1 
+				retstr += "/#{CGI.escape(binder.root)}" 
+			end
 
-		return "/500.html"
+			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+
+			if action != "show" 
+				retstr += "/#{action}" 
+			end
+
+			return retstr
+		elsif binder.class == String 
+			return named_binder_route(Binder.find(binder), action)
+		else
+			return "/500.html"
+		end
+
+		#return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
+
+		#return named_binder_route(Binder.find(binder), action) if binder.class == String
+
+		#return "/500.html"
 
 	end
 

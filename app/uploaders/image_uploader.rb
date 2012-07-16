@@ -1,10 +1,10 @@
 # encoding: utf-8
 
-class DataUploader < CarrierWave::Uploader::Base
+class ImageUploader < CarrierWave::Uploader::Base
 
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
-  #include CarrierWave::MiniMagick
+  # include CarrierWave::MiniMagick
 
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
   # include Sprockets::Helpers::RailsHelper
@@ -35,16 +35,16 @@ class DataUploader < CarrierWave::Uploader::Base
   #   # do something
   # end
 
-  # Create different components of your uploaded files:
+  # Create different versions of your uploaded files:
   # component :thumb do
   #   process :scale => [50, 50]
   # end
 
   # Add a white list of extensions which are allowed to be uploaded.
   # For images you might use something like this:
-  # def extension_white_list
-  #   %w(jpg jpeg gif png)
-  # end
+  def extension_white_list
+    %w(jpg jpeg gif png)
+  end
 
   # Override the filename of the uploaded files:
   # Avoid using model.id or component_name here, see uploader/store.rb for details.

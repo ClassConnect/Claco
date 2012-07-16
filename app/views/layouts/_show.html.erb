@@ -24,7 +24,7 @@
 		<%= link_to "(Delete)", named_binder_route(binder), :method => :delete %>
 		<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
 		<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
-		(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
+		(<%= binder.type == 1 ? binder.total_size : binder.components.last.size %>b)
 		<br />
 	<% end %>
 </div>

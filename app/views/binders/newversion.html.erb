@@ -3,7 +3,7 @@
 
 <%= form_for @binder, :url => named_binder_route(@binder, "update") do |f| %>
 
-  	<%= f.fields_for :versions do |g| %>
+  	<%= f.fields_for :components do |g| %>
 
   	<% if @binder.format == 1 %>
   		<div><%= g.label :file, "New Version of File:" %><br />

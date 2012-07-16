@@ -8,11 +8,6 @@ class BindersController < ApplicationController
 
 		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
 
-		# logger.debug 'bitchtits'
-		# logger.info 'fuckdick'
-		# logger.fatal 'loggertest2'
-		#RAILS_DEFAULT_LOGGER.error("\n test \n")
-
 	end
 
 	def new
@@ -32,8 +27,6 @@ class BindersController < ApplicationController
 
 		#Must be logged in to write
 
-		#debugger
-
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
 			redirect_to new_binder_path and return
@@ -46,11 +39,6 @@ class BindersController < ApplicationController
 		@parentperarr = @inherited[:parentperarr]
 
 		@parent = @inherited[:parent]
-
-		#Rails.logger "Inspected parent: #{Binder.find(params[:binder][:parent]).inspect}"
-
-		# logger.fatal 'loggertest'
-		#RAILS_DEFAULT_LOGGER.error("\n test \n")
 
 		@parent_child_count = @inherited[:parent_child_count]
 
@@ -118,9 +106,9 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		redirect_to @binder.current_version.data and return if @binder.format == 2
+		redirect_to @binder.current_component.data and return if @binder.format == 2
 
-		send_file @binder.current_version.file.path and return if @binder.format == 1
+		send_file @binder.current_component.file.path and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -186,7 +174,7 @@ class BindersController < ApplicationController
 									:type				=> 2,
 									:format				=> 2)
 
-		@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
+		@binder.components << Component.new(:data		=> params[:binder][:components][:data],
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)
 
@@ -194,7 +182,7 @@ class BindersController < ApplicationController
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
-		pids.each {|pid| Binder.find(id).inc(:files, 1) if id != "0"}
+		pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
 
 		Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
@@ -257,8 +245,8 @@ class BindersController < ApplicationController
 		@parent_child_count = @inherited[:parent_child_count]
 
 		@binder.update_attributes(
-			:title				=> File.basename(	params[:binder][:versions][:file].original_filename,
-													File.extname(params[:binder][:versions][:file].original_filename)),
+			:title				=> File.basename(	params[:binder][:components][:file].original_filename,
+													File.extname(params[:binder][:components][:file].original_filename)),
 			:owner				=> current_teacher.id,
 			:fname				=> current_teacher.fname,
 			:lname				=> current_teacher.lname,
@@ -267,7 +255,7 @@ class BindersController < ApplicationController
 			:last_update		=> Time.now.to_i,
 			:last_updated_by	=> current_teacher.id.to_s,
 			:body				=> params[:binder][:body],
-			:total_size			=> params[:binder][:versions][:file].size,
+			:total_size			=> params[:binder][:components][:file].size,
 			:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
 																:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
 																:auth_level	=> params[:auth_level]}] : []),
@@ -277,10 +265,10 @@ class BindersController < ApplicationController
 			:type				=> 2,
 			:format				=> 1)
 
-		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
-										:data		=> params[:binder][:versions][:file].path,
-										:size		=> params[:binder][:versions][:file].size,
+		@binder.components << Component.new(:file		=> params[:binder][:components][:file],
+										:ext		=> File.extname(params[:binder][:components][:file].original_filename),
+										:data		=> params[:binder][:components][:file].path,
+										:size		=> params[:binder][:components][:file].size,
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)
 
@@ -293,7 +281,7 @@ class BindersController < ApplicationController
 			if id != "0"
 				parent = Binder.find(id)
 				parent.update_attributes(	:files		=> parent.files + 1,
-											:total_size	=> parent.total_size + params[:binder][:versions][:file].size)
+											:total_size	=> parent.total_size + params[:binder][:components][:file].size)
 			end
 		end
 
@@ -354,7 +342,6 @@ class BindersController < ApplicationController
 		@binder.update_attributes(	:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:parent_permissions	=> @parentperarr,
-									# might be +1, as update has not yet occured for the parent
 									:order_index		=> @parent_child_count)
 
 
@@ -454,12 +441,12 @@ class BindersController < ApplicationController
 
 		#@new_parent.format = @binder.format if @binder.type == 2
 
-		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-											:timestamp	=> @binder.current_version.timestamp,
-											:size		=> @binder.current_version.size,
-											:ext		=> @binder.current_version.ext,
-											:data		=> @binder.current_version.data,
-											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
+		@new_parent.components << Component.new(:owner		=> @binder.current_component.owner,
+											:timestamp	=> @binder.current_component.timestamp,
+											:size		=> @binder.current_component.size,
+											:ext		=> @binder.current_component.ext,
+											:data		=> @binder.current_component.data,
+											:file		=> @binder.format == 1 ? @binder.current_component.file : nil) if @binder.type == 2
 
 		@new_parent.save
 
@@ -509,12 +496,12 @@ class BindersController < ApplicationController
 										:folders			=> h.folders,
 										:total_size			=> h.total_size)
 
-				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-													:timestamp	=> h.current_version.timestamp,
-													:size		=> h.current_version.size,
-													:ext		=> h.current_version.ext,
-													:data		=> h.current_version.data,
-													:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+				@new_node.components << Component.new(	:owner		=> h.current_component.owner,
+													:timestamp	=> h.current_component.timestamp,
+													:size		=> h.current_component.size,
+													:ext		=> h.current_component.ext,
+													:data		=> h.current_component.data,
+													:file		=> h.format == 1 ? h.current_component.file : nil) if h.type == 2
 
 				@new_node.save
 
@@ -584,12 +571,12 @@ class BindersController < ApplicationController
 									:format				=> @binder.type == 2 ? @binder.format : nil)
 
 
-		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-											:timestamp	=> @binder.current_version.timestamp,
-											:size		=> @binder.current_version.size,
-											:ext		=> @binder.current_version.ext,
-											:data		=> @binder.current_version.data,
-											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
+		@new_parent.components << Component.new(:owner		=> @binder.current_component.owner,
+											:timestamp	=> @binder.current_component.timestamp,
+											:size		=> @binder.current_component.size,
+											:ext		=> @binder.current_component.ext,
+											:data		=> @binder.current_component.data,
+											:file		=> @binder.format == 1 ? @binder.current_component.file : nil) if @binder.type == 2
 
 		@new_parent.save
 
@@ -621,15 +608,15 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id,
 										:type				=> h.type,
 										:format				=> (h.type != 1 ? h.format : nil),
-										:forked_from		=> h.versions.last.id,
+										:forked_from		=> h.components.last.id,
 										:fork_stamp			=> Time.now.to_i)
 
-				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-													:timestamp	=> h.current_version.timestamp,
-													:size		=> h.current_version.size,
-													:ext		=> h.current_version.ext,
-													:data		=> h.current_version.data,
-													:file		=> h.format == 1 ? h.current_version.file : nil)
+				@new_node.components << Component.new(	:owner		=> h.current_component.owner,
+													:timestamp	=> h.current_component.timestamp,
+													:size		=> h.current_component.size,
+													:ext		=> h.current_component.ext,
+													:data		=> h.current_component.data,
+													:file		=> h.format == 1 ? h.current_component.file : nil)
 
 				@new_node.save
 
@@ -669,17 +656,17 @@ class BindersController < ApplicationController
 
 		@old_size = @binder.total_size
 
-		@binder.versions.each {|v| v.update_attributes(:active => false)}
+		@binder.components.each {|v| v.update_attributes(:active => false)}
 
-		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-										:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
-										:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
-										:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
+		@binder.components << Component.new(:file		=> params[:binder][:components][:file],
+										:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:components][:file].original_filename) : nil),
+										:size		=> (@binder.format == 1 ? params[:binder][:components][:file].size : nil),
+										:data		=> (@binder.format == 1 ? params[:binder][:components][:file].path : params[:binder][:components][:data]),
 										:timestamp	=> Time.now.to_i,
 										:active		=> true)
-		if @binder.format == 1 && @old_size != params[:binder][:versions][:file].size
+		if @binder.format == 1 && @old_size != params[:binder][:components][:file].size
 
-			@binder.update_attributes(:total_size => params[:binder][:versions][:file].size)
+			@binder.update_attributes(:total_size => params[:binder][:components][:file].size)
 
 			@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
 
@@ -709,7 +696,7 @@ class BindersController < ApplicationController
 	def swap
 		@binder = Binder.find(params[:id])
 
-		@binder.versions.each {|v| v.update_attributes(:active => v.id.to_s == params[:version][:id])}
+		@binder.components.each {|v| v.update_attributes(:active => v.id.to_s == params[:component][:id])}
 
 		redirect_to named_binder_route(@binder.parent["id"])
 	end
@@ -840,17 +827,6 @@ class BindersController < ApplicationController
 		parentsarr = []
 		parentperarr = []
 
-		#parent = Binder.find(parentid) if parentid != "0"
-
-		# Binder.where("parent.id" == parentid).entries.to_a.each do |parent|
-		# 	#parent.to_a.each do |f|
-		# 	#	logger.debug "#{f}"
-		# 	#end
-		# 	logger.debug "#{ parent.inspect.to_s }"#.inspect.to_a)}"
-		# end
-
-		#logger.debug "#{Binder.where("parent.id" == "0").entries.to_a}"
-
 		if parentid.to_s == "0"
 
 			parenthash = {	:id		=> parentid,
@@ -858,16 +834,9 @@ class BindersController < ApplicationController
 
 			parentsarr = [parenthash]
 
-			#parent_child_count = Binder.where("parent.id" == "0").count
-
 		else
 
 			parent = Binder.find(parentid)
-
-
-			#parent.debug_data << parentid
-			#parent.debug_data << Binder.where("parent.id" == parentid).count
-			#arent.save
 
 			parenthash = {	:id		=> parentid,
 							:title	=> parent.title}
@@ -880,10 +849,6 @@ class BindersController < ApplicationController
 				p["folder_id"] = parentid
 				parentperarr << p
 			end
-
-			#parent_child_count = Binder.where("parent.id" == parentid.to_s).count
-
-			#parent_child_count = Binder.where("parent.id" == parentid).count #parent.files + parent.folders
 
 		end
 

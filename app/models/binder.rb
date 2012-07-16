@@ -35,7 +35,7 @@ class Binder
 	# Version control is only used if type != directory
 	#Version Control
 	#field :fork_hash, :type => String #Use Binder.id
-	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3
+	embeds_many :components#, validate: false #Components are only used if type = 2 or 3
 
 	field :forked_from, :type => String
 	field :fork_stamp, :type => Integer
@@ -62,42 +62,79 @@ class Binder
 
 	# passed the index to sift above
 	# decrement all binders with an index >= that index
-	def sift_children(index)
+	# def sift_children(index)
 
-		Binder.where("parent.id" => self.id).reject { |b| b.order_index < index }.each do |c|
+	# 	Binder.where("parent.id" => self.id).reject { |b| b.order_index < index }.each do |c|
 
-			c.update_attributes( :order_index => c.order_index - 1)
-			c.save
+	# 		c.update_attributes( :order_index => c.order_index - 1)
+	# 		c.save
 
-		end
+	# 	end
 
-	end
+	# end
 
 	# passed the index to sift above
 	# decrement all binders with an index >= that index
 	def sift_siblings()
 
-		logger.debug "#{Binder.where("parent.id" => self.parent["id"].to_s).to_a.inspect}"#.reject { |b| b.order_index < self.order_index }}"
+		#logger.debug "#{Binder.where("parent.id" => self.parent["id"].to_s).to_a.inspect}"#.reject { |b| b.order_index < self.order_index }}"
 		
-		logger.debug "self parent id: #{self.parent["id"]}"
-		logger.debug "self order index: #{self.order_index}"
+		#logger.debug "self parent id: #{self.parent["id"]}"
+		#logger.debug "self order index: #{self.order_index}"
 
-		Binder.where("parent.id" => self.parent["id"].to_s).each do |c|
-			logger.debug "#{c.title}, #{c.order_index}"
-		end
+		#Binder.where("parent.id" => self.parent["id"].to_s).each do |c|
+		#	logger.debug "#{c.title}, #{c.order_index}"
+		#end
 
-		Binder.where("parent.id" => self.parent["id"].to_s).reject { |b| b.order_index.to_i < self.order_index.to_i }.each do |c|
+		Binder.where("parent.id" => self.parent["id"].to_s).reject { |b| b.order_index.to_i <= self.order_index.to_i }.each do |c|
 
-			logger.debug "before: #{c.inspect}"
+			#logger.debug "before: #{c.inspect}"
 
 			c.update_attributes( :order_index => c.order_index - 1)
-			c.save
+			#c.save
 
-			logger.debug " after: #{c.inspect}"
+			#logger.debug " after: #{c.inspect}"
 
 		end
 	end
 
+	# passed the index the current binder is to be moved to
+	# moves the binder to the specified index within the same parent binder
+	def move_to_index(index)
+
+		# decrement all indices above the binder's own index
+		Binder.where("parent.id" => self.parent["id"].to_s).reject { |b| b.order_index.to_i <= self.order_index.to_i }.each do |c|
+
+			c.update_attributes( :order_index => c.order_index-1 )
+
+		end
+
+		# check for non-
+		if index == self.order_index
+			logger.debug "Attempted a move to the same index"
+			return
+		elsif index < self.order_index
+			# binder is being moved to a lower index, increment inbetween indices
+			Binder.where("parent.id" => self.parent["id"].to_s).reject { |b| b.order_index.to_i < index.to_i ||
+																			 b.order_index.to_i > self.order_index }.each do |c|
+
+					c.update_attributes( :order_index => c.order_index+1)
+
+			end
+		else
+			# binder is being moved to a higher index, decrement inbetween indices
+			Binder.where("parent.id" => self.parent["id"].to_s).reject { |b| b.order_index.to_i > index.to_i ||
+																			 b.order_index.to_i < self.order_index }.each do |c|
+
+					c.update_attributes( :order_index => c.order_index-1)
+
+			end
+		end
+
+		# finally, set the index of the node being moved
+		self.update_attributes( :order_index => index )
+
+	end
 
 
 	def siblings(id)
@@ -184,10 +221,10 @@ class Binder
 		return Binder.where("parent.id" => self.id.to_s)
 	end
 
-	def current_version
-		versions.each {|v| return v if v.active}
+	def current_component
+		components.each {|v| return v if v.active}
 
-		return versions.sort_by {|v| v.timestamp}.last
+		return components.sort_by {|v| v.timestamp}.last
 	end
 
 	def owner?(id)
@@ -244,7 +281,7 @@ class Binder
 
 end
 
-class Version
+class Component
 	include Mongoid::Document
 
 	field :owner, :type => String #Owner of version

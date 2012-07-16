@@ -24,15 +24,15 @@
 	<% @children.each do |binder| %>
   		<%= link_to binder.title, binder %>
 		<%= link_to "(Edit)", edit_binder_path(binder) if binder.type == 2 %>
-		<%= link_to "(Update)", new_binder_version_path(binder) if binder.type == 2 %>
-		<%= link_to "(Versions)", binder_versions_path(binder) if binder.type == 2 %>
+		<%= link_to "(Update)", new_binder_component_path(binder) if binder.type == 2 %>
+		<%= link_to "(Versions)", binder_components_path(binder) if binder.type == 2 %>
   		(<%= link_to "Move", move_binder_path(binder) %>)
   		(<%= link_to "Copy", copy_binder_path(binder) %>)
   		(<%= link_to "Permissions", binder_permissions_path(binder) %>)
   		(<%= link_to "Delete", binder_path(binder), :method => :delete %>)
   		<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
   		<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
-  		(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
+  		(<%= binder.type == 1 ? binder.total_size : binder.components.last.size %>b)
 	  <br />
 	<% end %>
 </div>

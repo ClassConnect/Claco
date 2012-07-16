@@ -8,22 +8,22 @@
 <div>Versions:
 	<br />
 	<% if @binder.format == 1 %>
-		<% @binder.versions.each do |version| %>
-			<%= "(#{version.timestamp})" %>
-	  		<%= link_to File.basename(version.file.url), version.file.url %>
-	  		<%= "(#{version.size}b) (#{version.id})" %>
+		<% @binder.components.each do |component| %>
+			<%= "(#{component.timestamp})" %>
+	  		<%= link_to File.basename(component.file.url), component.file.url %>
+	  		<%= "(#{component.size}b) (#{component.id})" %>
 			<br />
 		<% end %>
 	<% elsif @binder.format == 2 %>
-		<% @binder.versions.each do |version| %>	
-			<%= "(#{version.timestamp})" %>
-			<%= link_to version.data, version.data %>
-	  		<%= "(#{version.id})" %>
-	  		<% if version == @binder.current_version %>
+		<% @binder.components.each do |component| %>	
+			<%= "(#{component.timestamp})" %>
+			<%= link_to component.data, component.data %>
+	  		<%= "(#{component.id})" %>
+	  		<% if component == @binder.current_component %>
 				<br />
-	  			(Current Version)
+	  			(Current Component)
 	  		<% else %>
-		  		<%= form_for version, :url => named_binder_route(@binder, "swap") do |f|%>
+		  		<%= form_for component, :url => named_binder_route(@binder, "swap") do |f|%>
 		  			<%= f.hidden_field :id %>
 		  			<%= f.submit "Use this version" %>
 		  		<% end %>

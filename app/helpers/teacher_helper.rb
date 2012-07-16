@@ -226,7 +226,7 @@ module TeacherHelper
 # 								node.title,
 # 								index,
 # 								node.format.to_i,
-# 								node.versions]
+# 								node.components]
 
 # 			if @binder_parent_id_array.include? @binder_file_tree_array[index][i].id.to_s
 # 				@retarray += print_children(index + 1)

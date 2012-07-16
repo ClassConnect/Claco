@@ -7,7 +7,7 @@
   <%= f.select(:parent, options_from_collection_for_select(@binders, :id, :title)) %></div>
   <% #Do not allow files in Home directory %>
 
-  <%= f.fields_for :versions do |g| %>
+  <%= f.fields_for :components do |g| %>
 
   	<div><%= g.label :file, "File:" %><br />
   	<%= g.file_field :file %></div>

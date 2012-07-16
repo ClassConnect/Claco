@@ -66,7 +66,7 @@ module Claco
     # Enable the asset pipeline
     config.assets.enabled = true
 
-    # Version of your assets, change this if you want to expire all your assets
+    # Component of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
 
     # assign log4r's logger as rails' logger.

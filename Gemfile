@@ -42,6 +42,9 @@ gem 'mini_magick'
 
 gem 'log4r', '1.1.9'
 
+# elastic search
+gem 'tire'
+
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
 # To use ActiveModel has_secure_password

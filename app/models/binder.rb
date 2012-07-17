@@ -293,6 +293,9 @@ class Component
 	field :data, :type => String #URL, path to file
 	field :active, :type => Boolean, :default => false
 
+	field :file_hash, :type => String
+	field :croc_uuid, :type => String
+
 	mount_uploader :file, DataUploader
 
 	embedded_in :binder

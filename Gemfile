@@ -42,6 +42,8 @@ gem 'mini_magick'
 
 gem 'log4r', '1.1.9'
 
+gem 'rest-client'
+
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
 # To use ActiveModel has_secure_password

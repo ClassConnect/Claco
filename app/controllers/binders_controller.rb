@@ -1,5 +1,33 @@
 class BindersController < ApplicationController
+
 	before_filter :authenticate_teacher!, :except => [:show, :index]
+
+	# Crocodoc's API's base URL
+	CROC_API_URL = "https://crocodoc.com/api/v2"
+	CROC_API_TOKEN = "3QsGvCVcSyYuN9HM2edPh4ZD"
+
+	PATH_UPLOAD	   = "/document/upload"
+	PATH_THUMBNAIL = "/download/thumbnail"	
+
+	CROC_API_OPTIONS = {
+		# Your API token
+		:token => "3QsGvCVcSyYuN9HM2edPh4ZD",
+
+		# When uploading in async mode, a response is returned before conversion begins.
+		:async => false,
+
+		# Documents uploaded as private can only be accessed by owners or via sessions.
+		:private => false,
+
+		# When downloading, should the document include annotations?
+		:annotated => false,
+
+		# Can users mark up the document? (Affects both #share and #get_session)
+		:editable => true,
+
+		# Whether or not a session user can download the document.
+		:downloadable => true
+	}
 
 	def index
 		@owner = Teacher.where(:username => params[:username]).first || Teacher.find(params[:username])
@@ -66,7 +94,6 @@ class BindersController < ApplicationController
 								:title				=> params[:binder][:title].to_s[0..60],
 								:parent				=> @parenthash,
 								:parents			=> @parentsarr,
-								#:children 			=> 
 								:body				=> params[:binder][:body],
 								:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
 																					:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
@@ -222,7 +249,7 @@ class BindersController < ApplicationController
 
 	end
 
-	#Add new file9
+	#Add new file
 	def newfile
 
 		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
@@ -243,6 +270,10 @@ class BindersController < ApplicationController
 		@parentperarr = @inherited[:parentperarr]
 
 		@parent_child_count = @inherited[:parent_child_count]
+
+		#@filedata = 6
+
+		@newfile = File.open(params[:binder][:components][:file].path,"rb")
 
 		@binder.update_attributes(
 			:title				=> File.basename(	params[:binder][:components][:file].original_filename,
@@ -265,14 +296,43 @@ class BindersController < ApplicationController
 			:type				=> 2,
 			:format				=> 1)
 
-		@binder.components << Component.new(:file		=> params[:binder][:components][:file],
-										:ext		=> File.extname(params[:binder][:components][:file].original_filename),
-										:data		=> params[:binder][:components][:file].path,
-										:size		=> params[:binder][:components][:file].size,
-										:timestamp	=> Time.now.to_i,
-										:owner		=> current_teacher.id)
+		# upload document to crocodoc after sending to s3
+		#@filedata = crocodoc_upload(File.open(params[:binder][:components][:file].path.to_s,"rb"))
+		#@filedata = RestClient.post(File.open(params[:binder][:components][:file].path.to_s,"rb"),options)
+
+		#logger.debug "file path: #{params[:binder][:components][:file].path}"
+		#logger.debug "file: #{@newfile}"
+
+		#@filedata = RestClient.post(CROC_API_URL + PATH_UPLOAD,{ :token => "3QsGvCVcSyYuN9HM2edPh4ZD", 
+		#														 :file => File.open(params[:binder][:components][:file].path,"rb") })
+
+		#@filedata = RestClient.post("https://crocodoc.com/api/v2/document/upload",{ :token => "3QsGvCVcSyYuN9HM2edPh4ZD", 
+		#														 :file => File.open(params[:binder][:components][:file].path,"rb") })
+
+		#@filedata = RestClient.post("https://crocodoc.com/api/v2/document/upload", :token => CROC_API_TOKEN, :file => params[:binder][:components][:file].path.to_s) #File.open(params[:binder][:components][:file].path,"rb"))
+
+		#logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :file => File.read(params[:binder][:components][:file].path.to_s) ){ |response, request, result| response }
+		#logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :file => File.read(params[:binder][:components][:file].tempfile) ){ |response, request, result| response }
+
+		#@filedata = Crocodoc.upload(@newfile)
+
+		#logger.debug "#{@filedata[:uuid]}"
+
+		logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :url => params[:binder][:components][:file].to_s){ |response, request, result| response }
+
+		@binder.components << (@newcomponent = Component.new(:file		=> params[:binder][:components][:file],
+															:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:components][:file].path).to_s),
+															:ext		=> File.extname(params[:binder][:components][:file].original_filename),
+															:data		=> params[:binder][:components][:file].path,
+															:size		=> params[:binder][:components][:file].size,
+															:timestamp	=> Time.now.to_i,
+															:owner		=> current_teacher.id))
+
+		@binder.save
 
 		@binder.create_binder_tags(params,current_teacher.id)
+ 
+		#logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :url => @newcomponent["file"].to_s){ |response, request, result| response }
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
@@ -442,6 +502,7 @@ class BindersController < ApplicationController
 		#@new_parent.format = @binder.format if @binder.type == 2
 
 		@new_parent.components << Component.new(:owner		=> @binder.current_component.owner,
+											:file_hash	=> @binder.current_component.file_hash,
 											:timestamp	=> @binder.current_component.timestamp,
 											:size		=> @binder.current_component.size,
 											:ext		=> @binder.current_component.ext,
@@ -497,11 +558,12 @@ class BindersController < ApplicationController
 										:total_size			=> h.total_size)
 
 				@new_node.components << Component.new(	:owner		=> h.current_component.owner,
-													:timestamp	=> h.current_component.timestamp,
-													:size		=> h.current_component.size,
-													:ext		=> h.current_component.ext,
-													:data		=> h.current_component.data,
-													:file		=> h.format == 1 ? h.current_component.file : nil) if h.type == 2
+														:file_hash	=> h.current_component.file_hash,
+														:timestamp	=> h.current_component.timestamp,
+														:size		=> h.current_component.size,
+														:ext		=> h.current_component.ext,
+														:data		=> h.current_component.data,
+														:file		=> h.format == 1 ? h.current_component.file : nil) if h.type == 2
 
 				@new_node.save
 
@@ -572,11 +634,12 @@ class BindersController < ApplicationController
 
 
 		@new_parent.components << Component.new(:owner		=> @binder.current_component.owner,
-											:timestamp	=> @binder.current_component.timestamp,
-											:size		=> @binder.current_component.size,
-											:ext		=> @binder.current_component.ext,
-											:data		=> @binder.current_component.data,
-											:file		=> @binder.format == 1 ? @binder.current_component.file : nil) if @binder.type == 2
+												:file_hash	=> @binder.current_component.file_hash,
+												:timestamp	=> @binder.current_component.timestamp,
+												:size		=> @binder.current_component.size,
+												:ext		=> @binder.current_component.ext,
+												:data		=> @binder.current_component.data,
+												:file		=> @binder.format == 1 ? @binder.current_component.file : nil) if @binder.type == 2
 
 		@new_parent.save
 
@@ -612,11 +675,12 @@ class BindersController < ApplicationController
 										:fork_stamp			=> Time.now.to_i)
 
 				@new_node.components << Component.new(	:owner		=> h.current_component.owner,
-													:timestamp	=> h.current_component.timestamp,
-													:size		=> h.current_component.size,
-													:ext		=> h.current_component.ext,
-													:data		=> h.current_component.data,
-													:file		=> h.format == 1 ? h.current_component.file : nil)
+														:file_hash	=> h.current_component.file_hash,
+														:timestamp	=> h.current_component.timestamp,
+														:size		=> h.current_component.size,
+														:ext		=> h.current_component.ext,
+														:data		=> h.current_component.data,
+														:file		=> h.format == 1 ? h.current_component.file : nil)
 
 				@new_node.save
 
@@ -659,11 +723,12 @@ class BindersController < ApplicationController
 		@binder.components.each {|v| v.update_attributes(:active => false)}
 
 		@binder.components << Component.new(:file		=> params[:binder][:components][:file],
-										:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:components][:file].original_filename) : nil),
-										:size		=> (@binder.format == 1 ? params[:binder][:components][:file].size : nil),
-										:data		=> (@binder.format == 1 ? params[:binder][:components][:file].path : params[:binder][:components][:data]),
-										:timestamp	=> Time.now.to_i,
-										:active		=> true)
+											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:components][:file].path).to_s),
+											:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:components][:file].original_filename) : nil),
+											:size		=> (@binder.format == 1 ? params[:binder][:components][:file].size : nil),
+											:data		=> (@binder.format == 1 ? params[:binder][:components][:file].path : params[:binder][:components][:data]),
+											:timestamp	=> Time.now.to_i,
+											:active		=> true)
 		if @binder.format == 1 && @old_size != params[:binder][:components][:file].size
 
 			@binder.update_attributes(:total_size => params[:binder][:components][:file].size)
@@ -819,7 +884,113 @@ class BindersController < ApplicationController
 
 
 
-	#HELPERS:
+	#############################
+	# 							#
+	# 	 CONTROLLER HELPERS: 	#
+	# 							#
+	#############################
+
+	#module Crocodoc
+	#	extend self
+
+		# passed opened file and options - TODO: add ability to send file directly from URL
+		# returns uuid of file
+		def crocodoc_upload(url_or_file,options = {})
+
+			# require 'rest-client'
+			# require 'json'
+
+		    if url_or_file.is_a? String
+	      		options.merge! :url => url_or_file
+		    else
+	      		options.merge! :file => url_or_file
+		    end
+
+			_shake_and_stir_params(options, :url, :file, :title, :async, :private, :token)
+
+			_request(PATH_UPLOAD, (options[:file] ? :post : :get), options)
+
+			# # don't return until a thumbnail can be obtained
+			# return filedata
+
+			#return _request(PATH_UPLOAD, (options[:file] ? :post : :get), CROC_API_OPTIONS)[:uuid]
+
+		end
+
+		 # passed uuid of file
+		 # returns fullsize thumbnail
+		def crocodoc_thumbnail(uuid)
+
+			# timeout after ten seconds
+			timeout = 1000
+
+			while RestClient.get("#{CROC_API_URL + PATH_THUMBNAIL + '?' + URI.encode_www_form(options)}"){|response, request, result| response.code } == 500 #"{\"error\": \"internal error\"}"
+				#puts "waiting..."
+				sleep 0.1
+				timeout -= 1
+				if timeout==0
+					return false
+				end
+			end
+
+			# only request thumbnail once file can be accessed
+			RestClient.get("#{CROC_API_URL + PATH_THUMBNAIL + '?' + URI.encode_www_form(options)}")
+
+		end
+
+		# "Upload and convert a file. This method will try to convert a file that has
+		#  been referenced by a URL or has been uploaded via a POST request."
+		def upload(url_or_file, options = {})
+			if url_or_file.is_a? String
+			  	options.merge! :url => url_or_file
+			else
+			  	options.merge! :file => url_or_file
+			end
+			_shake_and_stir_params(options, :url, :file, :title, :async, :private, :token)
+
+			_request("/document/upload", (options[:file] ? :post : :get), options)
+		end
+
+
+		# core of crocodoc api wrapper:
+		def _request(path, method, options)
+			response_body = _request_raw(path, method, options)
+
+			if response_body == false
+				false
+			elsif response_body == "true"
+				# JSON.parse has a problem with parsing the string "true"...
+				true
+			else
+				JSON.parse(response_body, :symbolize_names => true)
+			end
+		end
+
+		def _request_raw(path, method, options)
+			response = case method
+			when :get
+				RestClient.get(CROC_API_URL + path, :params => options)
+			when :post
+				#logger.debug "#{ RestClient.post(CROC_API_URL + path, options){ |response, request, result| response } }"
+				RestClient.post(CROC_API_URL + path, options)
+			else
+				raise ArgumentError, "method must be :get or :post"
+			end
+
+			response.code == 200 ? response.to_str : false
+		end
+
+		def _shake_and_stir_params(params, *whitelist)
+			# Mix and stir the two params hashes together.
+			params.replace CROC_API_OPTIONS.merge(params)
+
+			# Shake out the unwanted params.
+			params.keys.each do |key|
+		  		params.delete(key) unless whitelist.include? key
+			end
+		end
+
+	#end
 
 	def inherit_from(parentid)
 

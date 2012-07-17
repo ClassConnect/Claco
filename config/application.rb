@@ -8,10 +8,34 @@ require "active_resource/railtie"
 require "sprockets/railtie"
 require "rails/test_unit/railtie"
 
+
+require 'digest/md5'
+
+
 require 'log4r'
 require 'log4r/yamlconfigurator'
 require 'log4r/outputter/datefileoutputter'
 include Log4r
+
+# API_OPTIONS = {
+#     # Your API token
+#     :token => "3QsGvCVcSyYuN9HM2edPh4ZD",
+
+#     # When uploading in async mode, a response is returned before conversion begins.
+#     :async => false,
+
+#     # Documents uploaded as private can only be accessed by owners or via sessions.
+#     :private => false,
+
+#     # When downloading, should the document include annotations?
+#     :annotated => false,
+
+#     # Can users mark up the document? (Affects both #share and #get_session)
+#     :editable => true,
+
+#     # Whether or not a session user can download the document.
+#     :downloadable => true
+# }
 
 Bundler.require(:default, Rails.env) if defined?(Bundler)
 
@@ -80,3 +104,4 @@ module Claco
     #Mongoid.logger.level = Logger::DEBUG
   end
 end
+

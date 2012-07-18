@@ -7,9 +7,6 @@
 		@title = "Teacher Listing"
 		@teachers = Teacher.all
 
-		# do not use!  much slower than C JSON parsing variant
-		#@parsed_json = ActiveSupport::JSON.decode(File.read("app/assets/json/test.json").to_s)
-
 		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!
 		@parsed_json = JSON.parse(File.read("app/assets/json/standards.json"))
 	end

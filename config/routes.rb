@@ -100,4 +100,7 @@ Claco::Application.routes.draw do
 	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show'
 	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy'
 
+	#Temporary crocodoc view
+	get		'/:username/portfolio(/:root)/:title/:id/croc'					=> 'binders#showcroc'
+
 end

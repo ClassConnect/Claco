@@ -11,20 +11,24 @@
 	<br />
 	<% if @children.empty? %>
 		Empty
-	<% end %>
-	<% @children.each do |binder| %>
-		[<%= binder.order_index %>]
-		<%= link_to binder.title, named_binder_route(binder) %>
-		<%= link_to "(Update)", named_binder_route(binder, "update") if binder.type == 2 %>
-		<%= link_to "(Versions)", named_binder_route(binder, "versions") if binder.type == 2 %>
-		<%= link_to "(Edit)", named_binder_route(binder, "edit") %>
-		<%= link_to "(Move)", named_binder_route(binder, "move") %>
-		<%= link_to "(Copy)", named_binder_route(binder, "copy") %>
-		<%= link_to "(Permissions)", named_binder_route(binder, "permissions") %>
-		<%= link_to "(Delete)", named_binder_route(binder), :method => :delete %>
-		<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
-		<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
-		(<%= binder.type == 1 ? binder.total_size : binder.components.last.size %>b)
-		<br />
+	<% else %>
+		<% @children.each do |binder| %>
+			[<%= binder.order_index %>]
+			<%= link_to binder.title, named_binder_route(binder) %>
+			<% if !binder.components.last.nil? %>
+				<%= link_to "(Croc)", named_binder_route(binder)+'/croc' if !binder.components.last.croc_uuid.nil? %>
+			<% end %>
+				<%= link_to "(Update)", named_binder_route(binder, "update") if binder.type == 2 %>
+				<%= link_to "(Versions)", named_binder_route(binder, "versions") if binder.type == 2 %>
+				<%= link_to "(Edit)", named_binder_route(binder, "edit") %>
+				<%= link_to "(Move)", named_binder_route(binder, "move") %>
+				<%= link_to "(Copy)", named_binder_route(binder, "copy") %>
+				<%= link_to "(Permissions)", named_binder_route(binder, "permissions") %>
+				<%= link_to "(Delete)", named_binder_route(binder), :method => :delete %>
+				<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
+				<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
+				(<%= binder.type == 1 ? binder.total_size : binder.components.last.size %>b)
+			<br />
+		<% end %>
 	<% end %>
 </div>

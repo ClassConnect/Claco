@@ -1,0 +1,21 @@
+<%= render 'layouts/breadcrumbs' %>
+
+
+<% if false %>
+	Url: <%= @binder.components.last.file.url %>
+	<br /><br />
+	Current path: <%= @binder.components.last.file.current_path %>
+	<br /><br />
+	Uuid: <%= @uuid.inspect %>
+	<br /><br />
+	Session: <%= @session.inspect %>
+	<br /><br />
+	Status: <%= @status %>
+	<br /><br />
+<% end %>
+Croc Url: <%= @croc_url %>
+<br /><br />
+
+<iframe id="crocFrame" style="width: 800px; height: 600px;" src=<%= @croc_url %> ></iframe>
+
+

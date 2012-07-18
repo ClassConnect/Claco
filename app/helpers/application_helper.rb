@@ -227,7 +227,7 @@ module ApplicationHelper
 								node.title,
 								index,
 								node.format.to_i,
-								node.components]
+								node.versions]
 
 			if @binder_parent_id_array.include? @binder_file_tree_array[index][i].id.to_s
 				@retarray += print_children(index + 1)

@@ -137,9 +137,9 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		redirect_to @binder.current_component.data and return if @binder.format == 2
+		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		send_file @binder.current_component.file.path and return if @binder.format == 1
+		send_file @binder.current_version.file.path and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -154,13 +154,13 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		#@uuid = @binder.components.last.croc_uuid
+		#@uuid = @binder.versions.last.croc_uuid
 
-		#@session = crocodoc_sessiongen(@binder.components.last.croc_uuid)["session"]
+		#@session = crocodoc_sessiongen(@binder.versions.last.croc_uuid)["session"]
 
 		#@status = crocodoc_docstatus(@uuid)
 
-		@croc_url = "https://crocodoc.com/view/" + crocodoc_sessiongen(@binder.components.last.croc_uuid)["session"]
+		@croc_url = "https://crocodoc.com/view/" + crocodoc_sessiongen(@binder.versions.last.croc_uuid)["session"]
 
 	end
 
@@ -219,7 +219,7 @@ class BindersController < ApplicationController
 									:type				=> 2,
 									:format				=> 2)
 
-		@binder.components << Component.new(:data		=> params[:binder][:components][:data],
+		@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)
 
@@ -291,10 +291,10 @@ class BindersController < ApplicationController
 
 		#@filedata = 6
 
-		#@newfile = File.open(params[:binder][:components][:file].path,"rb")
+		#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
-		@binder.update_attributes(	:title				=> File.basename(	params[:binder][:components][:file].original_filename,
-																			File.extname(params[:binder][:components][:file].original_filename)),
+		@binder.update_attributes(	:title				=> File.basename(	params[:binder][:versions][:file].original_filename,
+																			File.extname(params[:binder][:versions][:file].original_filename)),
 									:owner				=> current_teacher.id,
 									:fname				=> current_teacher.fname,
 									:lname				=> current_teacher.lname,
@@ -303,7 +303,7 @@ class BindersController < ApplicationController
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s,
 									:body				=> params[:binder][:body],
-									:total_size			=> params[:binder][:components][:file].size,
+									:total_size			=> params[:binder][:versions][:file].size,
 									:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
 																						:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
 																						:auth_level	=> params[:auth_level]}] : []),
@@ -315,40 +315,40 @@ class BindersController < ApplicationController
 
 
 		# send file to crocodoc if the format is supported
-		# if crocodoc_valid_format(File.extname(params[:binder][:components][:file].original_filename))
-		# 	filedata = crocodoc_upload(params[:binder][:components][:file])
+		# if crocodoc_valid_format(File.extname(params[:binder][:versions][:file].original_filename))
+		# 	filedata = crocodoc_upload(params[:binder][:versions][:file])
 				
 		# 	filedata = filedata["uuid"] if !filedata.nil?
 		# end
 
-		logger.debug DataUploader.new(params[:binder][:components][:file]).current_path
-		#temp.file = params[:binder][:components][:file]
+		logger.debug DataUploader.new(params[:binder][:versions][:file]).current_path
+		#temp.file = params[:binder][:versions][:file]
 
-		@binder.components << Component.new(:file		=> params[:binder][:components][:file],
-											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:components][:file].path).to_s),
-											:ext		=> File.extname(params[:binder][:components][:file].original_filename),
-											:data		=> params[:binder][:components][:file].path,
-											:size		=> params[:binder][:components][:file].size,
+		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
+											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
+											:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
+											:data		=> params[:binder][:versions][:file].path,
+											:size		=> params[:binder][:versions][:file].size,
 											:timestamp	=> Time.now.to_i,
 											:owner		=> current_teacher.id)#,
 											#:croc_uuid => filedata)
 
 		@binder.save
 
-		logger.debug @binder.components.last.file.url
-		logger.debug @binder.components.last.file.current_path
-		#logger.debug params[:binder][:components][:file].current_path
+		logger.debug @binder.versions.last.file.url
+		logger.debug @binder.versions.last.file.current_path
+		#logger.debug params[:binder][:versions][:file].current_path
 
 		# send file to crocodoc if the format is supported
-		if crocodoc_valid_format(@binder.components.last.ext)
-			filedata = crocodoc_upload(@binder.components.last.file.current_path)
+		if crocodoc_valid_format(@binder.versions.last.ext)
+			filedata = crocodoc_upload(@binder.versions.last.file.current_path)
 				
 			filedata = filedata["uuid"] if !filedata.nil?
 		end
 
 
 
-		@binder.components.last.update_attributes(:croc_uuid => filedata)
+		@binder.versions.last.update_attributes(:croc_uuid => filedata)
 
 
 
@@ -357,7 +357,7 @@ class BindersController < ApplicationController
 
 		@binder.create_binder_tags(params,current_teacher.id)
  
-		#logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :url => @newcomponent["file"].to_s){ |response, request, result| response }
+		#logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :url => @newversion["file"].to_s){ |response, request, result| response }
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
@@ -366,7 +366,7 @@ class BindersController < ApplicationController
 			if id != "0"
 				parent = Binder.find(id)
 				parent.update_attributes(	:files		=> parent.files + 1,
-											:total_size	=> parent.total_size + params[:binder][:components][:file].size)
+											:total_size	=> parent.total_size + params[:binder][:versions][:file].size)
 			end
 		end
 
@@ -526,14 +526,14 @@ class BindersController < ApplicationController
 
 		#@new_parent.format = @binder.format if @binder.type == 2
 
-		@new_parent.components << Component.new(:owner		=> @binder.current_component.owner,
-											:file_hash	=> @binder.current_component.file_hash,
-											:timestamp	=> @binder.current_component.timestamp,
-											:size		=> @binder.current_component.size,
-											:ext		=> @binder.current_component.ext,
-											:data		=> @binder.current_component.data,
-											:croc_uuid 	=> @binder.current_component.croc_uuid,
-											:file		=> @binder.format == 1 ? @binder.current_component.file : nil) if @binder.type == 2
+		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
+											:file_hash	=> @binder.current_version.file_hash,
+											:timestamp	=> @binder.current_version.timestamp,
+											:size		=> @binder.current_version.size,
+											:ext		=> @binder.current_version.ext,
+											:data		=> @binder.current_version.data,
+											:croc_uuid 	=> @binder.current_version.croc_uuid,
+											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
 
 
 #TODO: copy related images?
@@ -586,14 +586,14 @@ class BindersController < ApplicationController
 										:folders			=> h.folders,
 										:total_size			=> h.total_size)
 
-				@new_node.components << Component.new(	:owner		=> h.current_component.owner,
-														:file_hash	=> h.current_component.file_hash,
-														:timestamp	=> h.current_component.timestamp,
-														:size		=> h.current_component.size,
-														:ext		=> h.current_component.ext,
-														:data		=> h.current_component.data,
-														:croc_uuid	=> h.current_component.croc_uuid,
-														:file		=> h.format == 1 ? h.current_component.file : nil) if h.type == 2
+				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+														:file_hash	=> h.current_version.file_hash,
+														:timestamp	=> h.current_version.timestamp,
+														:size		=> h.current_version.size,
+														:ext		=> h.current_version.ext,
+														:data		=> h.current_version.data,
+														:croc_uuid	=> h.current_version.croc_uuid,
+														:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
 #TODO: copy related images?
 
@@ -665,14 +665,14 @@ class BindersController < ApplicationController
 									:format				=> @binder.type == 2 ? @binder.format : nil)
 
 
-		@new_parent.components << Component.new(:owner		=> @binder.current_component.owner,
-												:file_hash	=> @binder.current_component.file_hash,
-												:timestamp	=> @binder.current_component.timestamp,
-												:size		=> @binder.current_component.size,
-												:ext		=> @binder.current_component.ext,
-												:data		=> @binder.current_component.data,
-												:croc_uuid	=> @binder.current_component.croc_uuid,
-												:file		=> @binder.format == 1 ? @binder.current_component.file : nil) if @binder.type == 2
+		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
+												:file_hash	=> @binder.current_version.file_hash,
+												:timestamp	=> @binder.current_version.timestamp,
+												:size		=> @binder.current_version.size,
+												:ext		=> @binder.current_version.ext,
+												:data		=> @binder.current_version.data,
+												:croc_uuid	=> @binder.current_version.croc_uuid,
+												:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
 
 		@new_parent.save
 
@@ -704,17 +704,17 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id,
 										:type				=> h.type,
 										:format				=> (h.type != 1 ? h.format : nil),
-										:forked_from		=> h.components.last.id,
+										:forked_from		=> h.versions.last.id,
 										:fork_stamp			=> Time.now.to_i)
 
-				@new_node.components << Component.new(	:owner		=> h.current_component.owner,
-														:file_hash	=> h.current_component.file_hash,
-														:timestamp	=> h.current_component.timestamp,
-														:size		=> h.current_component.size,
-														:ext		=> h.current_component.ext,
-														:data		=> h.current_component.data,
-														:croc_uuid	=> h.current_component.croc_uuid,
-														:file		=> h.format == 1 ? h.current_component.file : nil)
+				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+														:file_hash	=> h.current_version.file_hash,
+														:timestamp	=> h.current_version.timestamp,
+														:size		=> h.current_version.size,
+														:ext		=> h.current_version.ext,
+														:data		=> h.current_version.data,
+														:croc_uuid	=> h.current_version.croc_uuid,
+														:file		=> h.format == 1 ? h.current_version.file : nil)
 
 				@new_node.save
 
@@ -754,26 +754,26 @@ class BindersController < ApplicationController
 
 		@old_size = @binder.total_size
 
-		@binder.components.each {|v| v.update_attributes(:active => false)}
+		@binder.versions.each {|v| v.update_attributes(:active => false)}
 
 		# send file to crocodoc if the format is supported
-		if crocodoc_valid_format(File.extname(params[:binder][:components][:file].original_filename))
-			filedata = crocodoc_upload(params[:binder][:components][:file])
+		if crocodoc_valid_format(File.extname(params[:binder][:versions][:file].original_filename))
+			filedata = crocodoc_upload(params[:binder][:versions][:file])
 				
 			filedata = filedata["uuid"] if !filedata.nil?
 		end
 
-		@binder.components << Component.new(:file		=> params[:binder][:components][:file],
-											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:components][:file].path).to_s),
-											:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:components][:file].original_filename) : nil),
-											:size		=> (@binder.format == 1 ? params[:binder][:components][:file].size : nil),
+		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
+											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
+											:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
+											:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
 											:croc_uuid	=> (@binder.format == 1 ? filedata : nil),
-											:data		=> (@binder.format == 1 ? params[:binder][:components][:file].path : params[:binder][:components][:data]),
+											:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
 											:timestamp	=> Time.now.to_i,
 											:active		=> true)
-		if @binder.format == 1 && @old_size != params[:binder][:components][:file].size
+		if @binder.format == 1 && @old_size != params[:binder][:versions][:file].size
 
-			@binder.update_attributes(:total_size => params[:binder][:components][:file].size)
+			@binder.update_attributes(:total_size => params[:binder][:versions][:file].size)
 
 			@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
 
@@ -803,7 +803,7 @@ class BindersController < ApplicationController
 	def swap
 		@binder = Binder.find(params[:id])
 
-		@binder.components.each {|v| v.update_attributes(:active => v.id.to_s == params[:component][:id])}
+		@binder.versions.each {|v| v.update_attributes(:active => v.id.to_s == params[:version][:id])}
 
 		redirect_to named_binder_route(@binder.parent["id"])
 	end

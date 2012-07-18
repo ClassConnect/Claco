@@ -1122,7 +1122,7 @@
         },
         {
           "title": "SL.5.5",
-          "body": " Include multimedia components (e.g., graphics, sound) and visual displays in presentations when appropriate to enhance the development of main ideas or themes."
+          "body": " Include multimedia versions (e.g., graphics, sound) and visual displays in presentations when appropriate to enhance the development of main ideas or themes."
         },
         {
           "title": "SL.5.6",
@@ -1302,7 +1302,7 @@
         },
         {
           "title": "SL.6.5",
-          "body": ". Include multimedia components (e.g., graphics, images, music, sound) and visual displays in presentations to clarify information."
+          "body": ". Include multimedia versions (e.g., graphics, images, music, sound) and visual displays in presentations to clarify information."
         },
         {
           "title": "SL.6.6",
@@ -1482,7 +1482,7 @@
         },
         {
           "title": "SL.7.5",
-          "body": " Include multimedia components and visual displays in presentations to clarify claims and findings and emphasize salient points."
+          "body": " Include multimedia versions and visual displays in presentations to clarify claims and findings and emphasize salient points."
         },
         {
           "title": "SL.7.6",
@@ -2534,7 +2534,7 @@
         },
         {
           "title": "K.G.5",
-          "body": " Model shapes in the world by building shapes from components (e.g., sticks and clay balls) and drawing shapes."
+          "body": " Model shapes in the world by building shapes from versions (e.g., sticks and clay balls) and drawing shapes."
         },
         {
           "title": "K.G.6",
@@ -3536,7 +3536,7 @@
         },
         {
           "title": "N-VM.2",
-          "body": " (+) Find the components of a vector by subtracting the coordinates of an initial point from the coordinates of a terminal point."
+          "body": " (+) Find the versions of a vector by subtracting the coordinates of an initial point from the coordinates of a terminal point."
         },
         {
           "title": "N-VM.3",
@@ -3544,11 +3544,11 @@
         },
         {
           "title": "N-VM.4",
-          "body": " (+) Add and subtract vectors.      <ul>          <li>Add vectors end-to-end, component-wise, and by the parallelogram rule. Understand that the magnitude of a sum of two vectors is typically not the sum of the magnitudes.</li>          <li>Given two vectors in magnitude and direction form, determine the magnitude and direction of their sum.</li>          <li>Understand vector subtraction <b><i>v</i></b> &ndash; <b><i>w</i></b> as <b><i>v</i></b> + (&ndash;<b><i>w</i></b>), where &ndash;<b><i>w</i></b> is the additive inverse of <b><i>w</i></b>, with the same magnitude as <b><i>w</i></b> and pointing in the opposite direction. Represent vector subtraction graphically by connecting the tips in the appropriate order, and perform vector subtraction component-wise.</li>      </ul>      "
+          "body": " (+) Add and subtract vectors.      <ul>          <li>Add vectors end-to-end, version-wise, and by the parallelogram rule. Understand that the magnitude of a sum of two vectors is typically not the sum of the magnitudes.</li>          <li>Given two vectors in magnitude and direction form, determine the magnitude and direction of their sum.</li>          <li>Understand vector subtraction <b><i>v</i></b> &ndash; <b><i>w</i></b> as <b><i>v</i></b> + (&ndash;<b><i>w</i></b>), where &ndash;<b><i>w</i></b> is the additive inverse of <b><i>w</i></b>, with the same magnitude as <b><i>w</i></b> and pointing in the opposite direction. Represent vector subtraction graphically by connecting the tips in the appropriate order, and perform vector subtraction version-wise.</li>      </ul>      "
         },
         {
           "title": "N-VM.5",
-          "body": " (+) Multiply a vector by a scalar.      <ul>          <li>Represent scalar multiplication graphically by scaling vectors and possibly reversing their direction; perform scalar multiplication component-wise, e.g., as <i>c</i>(<i>v</i><sub><i>x</i></sub>, <i>v</i><sub><i>y</i></sub>) = (<i>cv</i><sub><i>x</i></sub>, <i>cv</i><sub><i>y</i></sub>).</li>          <li>Compute the magnitude of a scalar multiple <i>c</i><b><i>v</i></b> using ||<i>c</i><b><i>v</i></b>|| = |<i>c</i>|<b><i>v</i></b>. Compute the direction of <i>c</i><b><i>v</i></b> knowing that when |<i>c</i>|<b><i>v</i></b> &ne; 0, the direction of <i>c</i><b><i>v</i></b> is either along <b><i>v</i></b> (for <i>c</i> &gt; 0) or against <b><i>v</i></b> (for <i>c</i> &lt; 0).</li>      </ul>      "
+          "body": " (+) Multiply a vector by a scalar.      <ul>          <li>Represent scalar multiplication graphically by scaling vectors and possibly reversing their direction; perform scalar multiplication version-wise, e.g., as <i>c</i>(<i>v</i><sub><i>x</i></sub>, <i>v</i><sub><i>y</i></sub>) = (<i>cv</i><sub><i>x</i></sub>, <i>cv</i><sub><i>y</i></sub>).</li>          <li>Compute the magnitude of a scalar multiple <i>c</i><b><i>v</i></b> using ||<i>c</i><b><i>v</i></b>|| = |<i>c</i>|<b><i>v</i></b>. Compute the direction of <i>c</i><b><i>v</i></b> knowing that when |<i>c</i>|<b><i>v</i></b> &ne; 0, the direction of <i>c</i><b><i>v</i></b> is either along <b><i>v</i></b> (for <i>c</i> &gt; 0) or against <b><i>v</i></b> (for <i>c</i> &lt; 0).</li>      </ul>      "
         },
         {
           "title": "N-VM.6",

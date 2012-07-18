@@ -35,7 +35,7 @@ class Binder
 	# Version control is only used if type != directory
 	#Version Control
 	#field :fork_hash, :type => String #Use Binder.id
-	embeds_many :components#, validate: false #Components are only used if type = 2 or 3
+	embeds_many :versions#, validate: false #Versions are only used if type = 2 or 3
 
 	field :forked_from, :type => String
 	field :fork_stamp, :type => Integer
@@ -59,6 +59,8 @@ class Binder
 
 	# tag contains both local and parent tag data
 	embeds_one :tag
+
+	embeds_one :imageset
 
 	# passed the index to sift above
 	# decrement all binders with an index >= that index
@@ -221,10 +223,10 @@ class Binder
 		return Binder.where("parent.id" => self.id.to_s)
 	end
 
-	def current_component
-		components.each {|v| return v if v.active}
+	def current_version
+		versions.each {|v| return v if v.active}
 
-		return components.sort_by {|v| v.timestamp}.last
+		return versions.sort_by {|v| v.timestamp}.last
 	end
 
 	def owner?(id)
@@ -281,7 +283,7 @@ class Binder
 
 end
 
-class Image
+class Imageset
 	include Mongoid::Document
 
 	field :title,		:type => String
@@ -299,10 +301,12 @@ class Image
 	mount_uploader :thumbnail_lg, ImageUploader
 	mount_uploader :thumbnail_sm, ImageUploader
 
+	embedded_in :binder
+
 end
 
 
-class Component
+class Version
 	include Mongoid::Document
 
 	field :owner, :type => String #Owner of version

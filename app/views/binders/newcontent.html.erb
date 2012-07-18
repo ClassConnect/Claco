@@ -10,7 +10,7 @@
   <%= f.select(:parent, options_from_collection_for_select(@binders, :id, :title)) %></div>
   <% #Do not allow content in Home directory %>
 
-  <%= f.fields_for :components do |g| %>
+  <%= f.fields_for :versions do |g| %>
 
   	<div><%= g.label :data, "URL:" %><br />
   	<%= g.text_field :data %></div>

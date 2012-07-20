@@ -283,27 +283,6 @@ class Binder
 
 end
 
-class Imageset
-	include Mongoid::Document
-
-	field :title,		:type => String
-	field :filename,	:type => String
-	field :filetype,	:type => String
-	field :class,		:type => Integer
-	field :dimensions,	:type => Hash, 	:default => {:width => -1, :height => -1}
-
-	field :image_hash,	:type => String
-
-	# file id from which the image was generated, should not be self-referential
-	field :parent_file,	:type => String
-
-	mount_uploader :fullimage, ImageUploader
-	mount_uploader :thumbnail_lg, ImageUploader
-	mount_uploader :thumbnail_sm, ImageUploader
-
-	embedded_in :binder
-
-end
 
 
 class Version
@@ -320,11 +299,46 @@ class Version
 
 	field :file_hash, :type => String
 	field :croc_uuid, :type => String
-	field :image_id, :type => String
 
 	mount_uploader :file, DataUploader
 
+	# file image data
+
+	field :imgtitle,	:type => String
+	field :imgfilename,	:type => String
+	field :imgfiletype,	:type => String
+	field :imgclass,	:type => Integer
+	field :imgdims,		:type => Hash, 	:default => {:width => -1, :height => -1}
+
+	field :imghash,		:type => String
+
+	mount_uploader :imgfile, 		ImageUploader
+	mount_uploader :imgthumb_lg, 	ImageUploader
+	mount_uploader :imgthumb_sm, 	ImageUploader
+
 	embedded_in :binder
+
+	# class Imageset
+	# 	include Mongoid::Document
+
+	# 	field :title,		:type => String
+	# 	field :filename,	:type => String
+	# 	field :filetype,	:type => String
+	# 	field :class,		:type => Integer
+	# 	field :dimensions,	:type => Hash, 	:default => {:width => -1, :height => -1}
+
+	# 	field :image_hash,	:type => String
+
+	# 	# file id from which the image was generated, should not be self-referential
+	# 	field :parent_file,	:type => String
+
+	# 	mount_uploader :fullimage, 		ImageUploader
+	# 	mount_uploader :thumbnail_lg, 	ImageUploader
+	# 	mount_uploader :thumbnail_sm, 	ImageUploader
+
+	# 	embedded_in :version
+
+	# end
 
 end
 

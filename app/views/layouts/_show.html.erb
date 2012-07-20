@@ -14,6 +14,7 @@
 	<% else %>
 		<% @children.each do |binder| %>
 			[<%= binder.order_index %>]
+			<%= get_binder_image(binder,{:height => 60, :border => 1}) %>
 			<%= link_to binder.title, named_binder_route(binder) %>
 			<% if !binder.versions.last.nil? %>
 				<%= link_to "(Croc)", named_binder_route(binder)+'/croc' if !binder.versions.last.croc_uuid.nil? %>
@@ -29,7 +30,7 @@
 				<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
 			<% if !binder.versions.last.nil? %>
 				(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
-			<% end %>
+			<% end %>	
 			<br />
 		<% end %>
 	<% end %>

@@ -39,10 +39,14 @@ gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 
 gem 'mini_magick'
+gem 'rmagick'
 
 gem 'log4r', '1.1.9'
 
 gem 'rest-client'
+
+#gem 'rest-open-uri'
+#gem 'open-uri'
 
 # elastic search
 gem 'tire'

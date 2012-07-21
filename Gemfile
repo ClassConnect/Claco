@@ -45,6 +45,8 @@ gem 'log4r', '1.1.9'
 
 gem 'rest-client'
 
+gem 'delayed_job_mongoid'
+
 #gem 'rest-open-uri'
 #gem 'open-uri'
 

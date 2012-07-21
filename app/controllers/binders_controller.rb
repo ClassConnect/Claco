@@ -429,6 +429,7 @@ class BindersController < ApplicationController
 													#:imgfile => open(Url.get_url2png_url(croc_url)))
 													#:imgfile => open( Crocodoc.get_thumbnail(filedata) ))
 													:remote_imgfile_url => Crocodoc.get_thumbnail(filedata) )
+			
 
 			#@binder.save
 

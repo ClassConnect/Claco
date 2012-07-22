@@ -243,12 +243,25 @@ class BindersController < ApplicationController
 
 		# do not need to check for http, carrierwave handles this
 
+		# target = find(id).versions.last
+
+		#@binder.save
+
+		stathash = @binder.versions.last.imgstatus
+		stathash[:imgfile][:retrieved] = true
+
+		# target.update_attributes( 	:remote_imgfile_url => url,										
+		# 							:imgstatus => stathash)
+
+
 		if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 			# is a youtube URL
-			@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_youtube_url(params[:binder][:versions][:data]))
+			@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_youtube_url(params[:binder][:versions][:data]),										
+													:imgstatus => stathash)
 		else
 			# generic URL, grab Url2png
-			@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_url2png_url(params[:binder][:versions][:data]))
+			@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_url2png_url(params[:binder][:versions][:data]),										
+													:imgstatus => stathash)
 		end
 
 
@@ -378,10 +391,10 @@ class BindersController < ApplicationController
 		# this may work:
 		# RestClient.post '/data', :myfile => File.new("/path/to/image.jpg", 'rb')
 
-		logger.debug DataUploader.new(params[:binder][:versions][:file]).current_path
+		#logger.debug DataUploader.new(params[:binder][:versions][:file]).current_path
 		#temp.file = params[:binder][:versions][:file]
  
-		logger.debug(params[:binder][:versions][:file].class)
+		#logger.debug(params[:binder][:versions][:file].class)
 
 
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
@@ -395,10 +408,10 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		logger.debug(@binder.versions.last.file.class)
+		#logger.debug(@binder.versions.last.file.class)
 
-		logger.debug @binder.versions.last.file.url
-		logger.debug "current path: #{@binder.versions.last.file.current_path}"
+		#logger.debug @binder.versions.last.file.url
+		#logger.debug "current path: #{@binder.versions.last.file.current_path}"
 		#logger.debug params[:binder][:versions][:file].current_path
 
 		# send file to crocodoc if the format is supported
@@ -417,19 +430,29 @@ class BindersController < ApplicationController
 
 			#@binder.versions.last.imgfile.store! open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
 
-			croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(filedata)["session"]
+			#croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(filedata)["session"]
 
 			#Rails.logger.debug "croc png: #{Url.get_url2png_url(croc_url)}"
 			#sleep 3
 
-			sleep 6
+			#sleep 6
 
-			@binder.versions.last.update_attributes(:croc_uuid => filedata, 
+
+			Rails.logger.debug "about to retrieve the crocodoc thumbnail"
+
+			@binder.versions.last.update_attributes(:croc_uuid => filedata)#, 
+													#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata) )
+
+
 													#:remote_imgfile_url => Url.get_url2png_url(croc_url))
 													#:imgfile => open(Url.get_url2png_url(croc_url)))
 													#:imgfile => open( Crocodoc.get_thumbnail(filedata) ))
-													:remote_imgfile_url => Crocodoc.get_thumbnail(filedata) )
-			
+
+			Rails.logger.debug Crocodoc.get_thumbnail_url(filedata)
+
+			#@binder.get_thumbnail(Crocodoc.get_thumbnail(filedata))#update_attributes(:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
+
+			Binder.delay.get_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 
 			#@binder.save
 
@@ -1063,7 +1086,12 @@ class BindersController < ApplicationController
 
 	end
 
+	def catcherr
 
+		# why in fuck's sake is the server trying to fetch a directory?
+		raise 'Bad Fetch'
+
+	end
 
 	#############################
 	# 							#
@@ -1155,7 +1183,7 @@ class BindersController < ApplicationController
 
 		 # passed uuid of file
 		 # returns fullsize thumbnail
-		def get_thumbnail(uuid,options = {})
+		def get_thumbnail_url(uuid,options = {})
 
 			options = CROC_API_OPTIONS.merge(options).merge({:uuid => uuid})
 

@@ -103,4 +103,6 @@ Claco::Application.routes.draw do
 	#Temporary crocodoc view
 	get		'/:username/portfolio(/:root)/:title/:id/croc'					=> 'binders#showcroc'
 
+	get		'/assets'														=> 'binders#catcherr'
+
 end

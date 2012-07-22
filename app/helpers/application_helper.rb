@@ -250,11 +250,19 @@ module ApplicationHelper
 
 	def get_binder_image(binder,options = {})
 
-		if binder.versions.last.nil? || binder.versions.last.imgfile.nil?
+
+		if binder.versions.nil?
+			return "<no image>"
+		elsif binder.versions.last.nil?
+			return "<no image>"
+		elsif binder.versions.last.imgfile.nil?
 			return "<no image>"
 		else
 			return image_tag( "#{binder.versions.last.imgfile}", options )
 		end
+
+
+		#Rails.logger.debug "Imgfile: #{binder.versions.last.imgfile.to_s}"
 
 	end
 

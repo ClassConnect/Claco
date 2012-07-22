@@ -281,6 +281,70 @@ class Binder
 		return title
 	end
 
+	# Delayed Job Methods
+
+	def self.get_thumbnail(id,url)
+
+		Rails.logger.debug "Got to the self call"
+
+		#find(id).versions.last.get_thumbnail(url)
+		#find(id).get_thumbnail(url)
+
+		sleep 8
+
+		target = find(id).versions.last
+
+		stathash = target.imgstatus
+		stathash['imgfile']['retrieved'] = true
+
+		target.update_attributes( 	:remote_imgfile_url => url,										
+									:imgstatus => stathash)
+
+		# binder = find(id).versions.last#.update_attributes( :imghash => "shitcock")
+
+		#find(id).versions.last.update_attributes( :imghash => "shitcock")
+
+
+		#statushash = binder.versions.last.imgfilestatus
+		#statushash['retrieved'] = true
+
+		#binder.versions.last.imgfilestatus['retrieved'] = true
+		#binder.versions.last.imgfilestatus.retrieved = true
+		#binder.versions.last.imgfilestatus = statushash
+		#binder.versions.last.imghash = 'fuckballs'
+		#binder.remote_imgfile_url = url
+
+		#binder.imghash = 'shitballs'
+		#binder.save
+
+		# binder.update_attributes( :imghash => "shitcock")
+		# 							#:remote_imgfile_url => url )
+		# #binder.versions.last.save
+
+
+		# binder.update_attributes( :remote_imgfile_url => url)#,
+		# 							#:imgstatus[:imgfile][:retrieved] => true )
+
+
+		# stathash = binder.imgstatus
+		# stathash['imgfile']['retrieved'] = true
+		# binder.imgstatus = stathash
+		# binder.save
+
+
+	end
+
+	# def get_thumbnail(url)
+
+	# 	Rails.logger.debug "Got here! url:#{url}"
+
+	# 	sleep 8
+
+	# 	versions.last.update_attribute(:remote_imgfile_url => url)
+	# end
+
+	#handle_asynchronously :get_thumbnail#, :run_at => Proc.new { 10.seconds.from_now }
+
 end
 
 
@@ -308,9 +372,17 @@ class Version
 	field :imgfilename,	:type => String
 	field :imgfiletype,	:type => String
 	field :imgclass,	:type => Integer
-	field :imgdims,		:type => Hash, 	:default => {:width => -1, :height => -1}
+	field :imgdims,		:type => Hash, 	:default => { :width => -1, :height => -1 }
 
 	field :imghash,		:type => String
+
+	field :imgstatus, 	:type => Hash, 	:default => { 	:imgfile => 	{ :retrieved => false },
+													 	:imgthumb_lg => { :retrieved => false },
+														:imgthumb_sm => { :retrieved => false } }
+
+	# field :imgfilestatus, 		:type => Hash, :default => { :retrieved => false }
+	# field :imgthumb_lgstatus, 	:type => Hash, :default => { :retrieved => false }
+	# field :imgthumb_smstatus, 	:type => Hash, :default => { :retrieved => false }
 
 	mount_uploader :imgfile, 		ImageUploader
 	mount_uploader :imgthumb_lg, 	ImageUploader
@@ -339,6 +411,7 @@ class Version
 	# 	embedded_in :version
 
 	# end
+
 
 end
 

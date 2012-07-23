@@ -154,6 +154,8 @@ class BindersController < ApplicationController
 	#Add links function
 	def createcontent
 
+		#TODO: if the URL is to a document, ask if they want to upload it as a document instead
+
 		# TODO: check for URL validity
 		# use structure presented below
 
@@ -182,6 +184,16 @@ class BindersController < ApplicationController
 
 		# uri.to_s
 		# #=> "http://foo.com/posts?id=30&limit=5#time=1305298413"
+
+		respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
+
+		# the RestClient object will catch most of the error codes before getting to here
+		if ![200,301,302].include? respcode
+			raise "Invalud URL! Response code: #{respcode}" and return
+		end
+
+
+		#Rails.logger.debug RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_s
 
 		@binder = Binder.new
 
@@ -254,16 +266,18 @@ class BindersController < ApplicationController
 		# 							:imgstatus => stathash)
 
 
+
 		if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 			# is a youtube URL
-			@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_youtube_url(params[:binder][:versions][:data]),										
-													:imgstatus => stathash)
+			#@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_youtube_url(params[:binder][:versions][:data]),										
+			#										:imgstatus => stathash)
+			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:binder][:versions][:data]))
 		else
 			# generic URL, grab Url2png
-			@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_url2png_url(params[:binder][:versions][:data]),										
-													:imgstatus => stathash)
+			#@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_url2png_url(params[:binder][:versions][:data]),										
+			#										:imgstatus => stathash)
+			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:binder][:versions][:data]))
 		end
-
 
 
 
@@ -413,90 +427,115 @@ class BindersController < ApplicationController
 		#logger.debug @binder.versions.last.file.url
 		#logger.debug "current path: #{@binder.versions.last.file.current_path}"
 		#logger.debug params[:binder][:versions][:file].current_path
+		if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.versions.last.ext
+			# send file to crocodoc if the format is supported
+			if Crocodoc.check_format_validity(@binder.versions.last.ext)
+				filedata = Crocodoc.upload("#{@binder.versions.last.file.current_path}")
+					
+				filedata = filedata["uuid"] if !filedata.nil?
 
-		# send file to crocodoc if the format is supported
-		if Crocodoc.check_format_validity(@binder.versions.last.ext)
-			filedata = Crocodoc.upload("#{@binder.versions.last.file.current_path}")
+				#OPENSSL::SSL::VERIFY_PEER = OPENSSL::SSL::VERIFY_NONE
+
+				#sleep 10
+
+				#Rails.logger.debug "filedata: #{filedata}"
+				#Rails.logger.debug "croc url: [#{ Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }) }]"
+				#Rails.logger.debug "response: #{ RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })){ |response, request, result| response } }"
+
+				#@binder.versions.last.imgfile.store! open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
+
+				#croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(filedata)["session"]
+
+				#Rails.logger.debug "croc png: #{Url.get_url2png_url(croc_url)}"
+				#sleep 3
+
+				#sleep 6
+
+
+				#Rails.logger.debug "about to retrieve the crocodoc thumbnail"
+
+				@binder.versions.last.update_attributes(:croc_uuid => filedata)#, 
+														#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata) )
+
+
+														#:remote_imgfile_url => Url.get_url2png_url(croc_url))
+														#:imgfile => open(Url.get_url2png_url(croc_url)))
+														#:imgfile => open( Crocodoc.get_thumbnail(filedata) ))
+
+				#Rails.logger.debug Crocodoc.get_thumbnail_url(filedata)
+
+				#@binder.get_thumbnail(Crocodoc.get_thumbnail(filedata))#update_attributes(:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
+
+				# url = Crocodoc.get_thumbnail_url(filedata)
+
+				# Rails.logger.debug "before:"
+				# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
+
+				Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
+
+				# sleep 8
+
+				# Rails.logger.debug "after:"
+				# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
+
+
+				#@binder.save
+
+				# file = Tempfile.new
+				# file.binmode
+				# open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })) { |data| file.write data.read }
+
+				# @binder.versions.last.update_attributes(:croc_uuid => filedata,
+				# 										:imgfile => file)
+
 				
-			filedata = filedata["uuid"] if !filedata.nil?
 
-			#OPENSSL::SSL::VERIFY_PEER = OPENSSL::SSL::VERIFY_NONE
+				# http = Net::HTTP.new('awebsite', 443)
+				# http.use_ssl = true
+				# http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+				# http.start() { |http|
+				#    req = Net::HTTP::Get.new("image.jpg")
+				#    req.basic_auth login, password
+				#    response = http.request(req)
+				#    attachment = Attachment.new(:uploaded_data => response.body)
+				#    attachement.save
+				# }
 
-			#sleep 10
+				# File.open( "temp.png",'wb' ) do |f|
+				# 	f << RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
+				# end
+				# 	#f << Crocodoc.thumbnail(filedata[:uuid], :size => "300x300")
+				# 	#f << RestClient.get("#{API_URL + PATH_THUMBNAIL + '?' + params}")
+				# 	f << RestClient.get(Crocodoc.get_thumbnail(filedata))
+				# end
 
-			#Rails.logger.debug "filedata: #{filedata}"
-			#Rails.logger.debug "croc url: [#{ Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }) }]"
-			#Rails.logger.debug "response: #{ RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })){ |response, request, result| response } }"
+				# OPENSSL::SSL:VERIFY_NONE
+				#Rails.logger.debug "thumbnail response:"
+				#Rails.logger.debug logger.debug RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })){ |response, request, result| response }
 
-			#@binder.versions.last.imgfile.store! open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
+				#@binder.versions.last.update_attributes(:croc_uuid => filedata,
+														#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
+														#:imgfile => File.open( 'temp.png' ) { |f| f << RestClient.get(Crocodoc.get_thumbnail(filedata)) } )
+														#:imgfile => open(Crocodoc.get_thumbnail(filedata)) { |f| f.read } )
+				#										:remote_imgfile_url => Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
 
-			#croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(filedata)["session"]
+				#tf.close!
 
-			#Rails.logger.debug "croc png: #{Url.get_url2png_url(croc_url)}"
-			#sleep 3
+				#OPENSSL::SSL::VERIFY_PEER = OPENSSL::SSL::VERIFY_PEER
+			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.versions.last.ext
+				# for now, image will be added as file AND as imgfile
+				stathash = @binder.versions.last.imgstatus#[:imgfile][:retrieved]
+				stathash[:imgfile][:retrieved] = true
 
-			#sleep 6
-
-
-			Rails.logger.debug "about to retrieve the crocodoc thumbnail"
-
-			@binder.versions.last.update_attributes(:croc_uuid => filedata)#, 
-													#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata) )
-
-
-													#:remote_imgfile_url => Url.get_url2png_url(croc_url))
-													#:imgfile => open(Url.get_url2png_url(croc_url)))
-													#:imgfile => open( Crocodoc.get_thumbnail(filedata) ))
-
-			Rails.logger.debug Crocodoc.get_thumbnail_url(filedata)
-
-			#@binder.get_thumbnail(Crocodoc.get_thumbnail(filedata))#update_attributes(:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
-
-			Binder.delay.get_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-
-			#@binder.save
-
-			# file = Tempfile.new
-			# file.binmode
-			# open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })) { |data| file.write data.read }
-
-			# @binder.versions.last.update_attributes(:croc_uuid => filedata,
-			# 										:imgfile => file)
-
+				@binder.versions.last.update_attributes( :imgfile => params[:binder][:versions][:file],
+															:imgstatus => stathash)
 			
+			end
+		else
+			stathash = @binder.versions.last.imgstatus
+			stathash[:imageable] = false
 
-			# http = Net::HTTP.new('awebsite', 443)
-			# http.use_ssl = true
-			# http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-			# http.start() { |http|
-			#    req = Net::HTTP::Get.new("image.jpg")
-			#    req.basic_auth login, password
-			#    response = http.request(req)
-			#    attachment = Attachment.new(:uploaded_data => response.body)
-			#    attachement.save
-			# }
-
-			# File.open( "temp.png",'wb' ) do |f|
-			# 	f << RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
-			# end
-			# 	#f << Crocodoc.thumbnail(filedata[:uuid], :size => "300x300")
-			# 	#f << RestClient.get("#{API_URL + PATH_THUMBNAIL + '?' + params}")
-			# 	f << RestClient.get(Crocodoc.get_thumbnail(filedata))
-			# end
-
-			# OPENSSL::SSL:VERIFY_NONE
-			#Rails.logger.debug "thumbnail response:"
-			#Rails.logger.debug logger.debug RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })){ |response, request, result| response }
-
-			#@binder.versions.last.update_attributes(:croc_uuid => filedata,
-													#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
-													#:imgfile => File.open( 'temp.png' ) { |f| f << RestClient.get(Crocodoc.get_thumbnail(filedata)) } )
-													#:imgfile => open(Crocodoc.get_thumbnail(filedata)) { |f| f.read } )
-			#										:remote_imgfile_url => Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
-
-			#tf.close!
-
-			#OPENSSL::SSL::VERIFY_PEER = OPENSSL::SSL::VERIFY_PEER
+			@binder.versions.last.update_attributes(	:imgstatus => stathash )
 		end
 
 
@@ -1185,7 +1224,7 @@ class BindersController < ApplicationController
 		 # returns fullsize thumbnail
 		def get_thumbnail_url(uuid,options = {})
 
-			options = CROC_API_OPTIONS.merge(options).merge({:uuid => uuid})
+			options = CROC_API_OPTIONS.merge(options).merge({:uuid => uuid, :size => '300x300'})
 
 			# # timeout 
 			# timeout = 30

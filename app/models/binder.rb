@@ -283,14 +283,26 @@ class Binder
 
 	# Delayed Job Methods
 
-	def self.get_thumbnail(id,url)
+	def self.get_croc_thumbnail(id,url)
 
-		Rails.logger.debug "Got to the self call"
+		#Rails.logger.debug "Got to the self call"
 
 		#find(id).versions.last.get_thumbnail(url)
 		#find(id).get_thumbnail(url)
 
-		sleep 8
+
+
+
+		while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
+			sleep 1
+		end
+
+		# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
+
+		#TODO: change this to actually check status of document
+		#sleep 8
+
+		# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
 
 		target = find(id).versions.last
 
@@ -300,37 +312,22 @@ class Binder
 		target.update_attributes( 	:remote_imgfile_url => url,										
 									:imgstatus => stathash)
 
-		# binder = find(id).versions.last#.update_attributes( :imghash => "shitcock")
 
-		#find(id).versions.last.update_attributes( :imghash => "shitcock")
+	end
 
+	def self.get_thumbnail_from_url(id,url)
 
-		#statushash = binder.versions.last.imgfilestatus
-		#statushash['retrieved'] = true
+		target = find(id).versions.last
 
-		#binder.versions.last.imgfilestatus['retrieved'] = true
-		#binder.versions.last.imgfilestatus.retrieved = true
-		#binder.versions.last.imgfilestatus = statushash
-		#binder.versions.last.imghash = 'fuckballs'
-		#binder.remote_imgfile_url = url
+		stathash = target.imgstatus
+		if stathash['imgfile'].nil?
+			stathash[:imgfile][:retrieved] = true
+		else
+			stathash['imgfile']['retrieved'] = true
+		end
 
-		#binder.imghash = 'shitballs'
-		#binder.save
-
-		# binder.update_attributes( :imghash => "shitcock")
-		# 							#:remote_imgfile_url => url )
-		# #binder.versions.last.save
-
-
-		# binder.update_attributes( :remote_imgfile_url => url)#,
-		# 							#:imgstatus[:imgfile][:retrieved] => true )
-
-
-		# stathash = binder.imgstatus
-		# stathash['imgfile']['retrieved'] = true
-		# binder.imgstatus = stathash
-		# binder.save
-
+		target.update_attributes(	:remote_imgfile_url => url,
+									:imgstatus => stathash)
 
 	end
 
@@ -376,7 +373,8 @@ class Version
 
 	field :imghash,		:type => String
 
-	field :imgstatus, 	:type => Hash, 	:default => { 	:imgfile => 	{ :retrieved => false },
+	field :imgstatus, 	:type => Hash, 	:default => { 	:imageable => 	true,		
+														:imgfile => 	{ :retrieved => false },
 													 	:imgthumb_lg => { :retrieved => false },
 														:imgthumb_sm => { :retrieved => false } }
 
@@ -385,8 +383,8 @@ class Version
 	# field :imgthumb_smstatus, 	:type => Hash, :default => { :retrieved => false }
 
 	mount_uploader :imgfile, 		ImageUploader
-	mount_uploader :imgthumb_lg, 	ImageUploader
-	mount_uploader :imgthumb_sm, 	ImageUploader
+	#mount_uploader :imgthumb_lg, 	ImageUploader
+	#mount_uploader :imgthumb_sm, 	ImageUploader
 
 	embedded_in :binder
 

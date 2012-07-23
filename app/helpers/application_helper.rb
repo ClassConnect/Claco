@@ -255,10 +255,14 @@ module ApplicationHelper
 			return "<no image>"
 		elsif binder.versions.last.nil?
 			return "<no image>"
-		elsif binder.versions.last.imgfile.nil?
+		elsif binder.versions.last.imgstatus['imageable'] == false
+			return "[#{binder.versions.last.ext.upcase}]"
+		elsif binder.versions.last.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
 			return "<no image>"
 		else
-			return image_tag( "#{binder.versions.last.imgfile}", options )
+			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;') + 
+			return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}") + raw('&nbsp;') + 
+					image_tag( "#{binder.versions.last.imgfile.thumb_sm}" )
 		end
 
 

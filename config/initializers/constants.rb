@@ -30,6 +30,8 @@ CROC_API_OPTIONS = {
 
 	# Whether or not a session user can download the document.
 	:downloadable => true
+
+	#TODO: add default size argument
 }
 
 
@@ -44,3 +46,8 @@ URL2PNG_DEFAULT_BOUNDS = 's800x600-d3'
 
 YOUTUBE_IMG_URL = "http://img.youtube.com/vi/"
 YOUTUBE_IMG_FILE = "/0.jpg"
+
+# SUPPORTED DOCUMENTS 
+
+CLACO_SUPPORTED_THUMBNAIL_FILETYPES = %w[doc .doc docx .docx ppt .ppt pptx .pptx pdf .pdf jpg .jpg jpeg .jpeg png .png gif .gif]
+CLACO_VALID_IMAGE_FILETYPES = %w[jpg .jpg jpeg .jpeg png .png gif .gif]

@@ -2,9 +2,38 @@
 
 class ImageUploader < CarrierWave::Uploader::Base
 
+
+################################# EXAMPLE ################################
+
+
+# class MyUploader < CarrierWave::Uploader::Base
+#   include CarrierWave::RMagick
+
+#   process :resize_to_fit => [800, 800]
+
+#   version :thumb do
+#     process :resize_to_fill => [200,200]
+#   end
+
+# end
+# When this uploader is used, an uploaded image would be scaled 
+# to be no larger than 800 by 800 pixels. A version called thumb 
+# is then created, which is scaled and cropped to exactly 200 by 
+# 200 pixels. The uploader could be used like this:
+
+# uploader = AvatarUploader.new
+# uploader.store!(my_file)                              # size: 1024x768
+
+# uploader.url # => '/url/to/my_file.png'               # size: 800x600
+# uploader.thumb.url # => '/url/to/thumb_my_file.png'   # size: 200x200
+
+
+##########################################################################
+
+
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
-  # include CarrierWave::MiniMagick
+  include CarrierWave::MiniMagick
 
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
   # include Sprockets::Helpers::RailsHelper
@@ -27,6 +56,16 @@ class ImageUploader < CarrierWave::Uploader::Base
   #
   #   "/images/fallback/" + [version_name, "default.png"].compact.join('_')
   # end
+
+  version :thumb_lg do
+    #process :resize_to_fill => [130,93]
+    process :resize_and_pad => [130,93,'black','Center']
+  end
+
+  version :thumb_sm do
+    #process :resize_to_fill => [49,46]
+    process :resize_and_pad => [49,46,'black','Center']
+  end
 
   # Process files as they are uploaded:
   # process :scale => [200, 300]

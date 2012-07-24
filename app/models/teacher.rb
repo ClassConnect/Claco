@@ -204,7 +204,7 @@ end
 class Info
 	include Mongoid::Document
 	include ActiveModel::Validations
-	include CarrierWave::MiniMagick
+	#include CarrierWave::MiniMagick
 
 	#require 'carrierwave/processing/mini_magick'
 
@@ -242,7 +242,7 @@ class Info
 		#self.debug_data = []
 		#.save
 
-		avatar = MiniMagick::Image.open(params[:info][:avatar].path)
+		#avatar = MiniMagick::Image.open(params[:info][:avatar].path)
 
 		self.update_attributes(	:bio 				=> params[:info][:bio],
 								:avatar 			=> params[:info][:avatar],

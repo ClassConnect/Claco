@@ -38,8 +38,8 @@ gem 'devise'
 gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 
-gem 'mini_magick'
-gem 'rmagick'
+#gem 'mini_magick'
+#gem 'rmagick'
 
 gem 'log4r', '1.1.9'
 

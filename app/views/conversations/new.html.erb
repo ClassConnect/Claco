@@ -1,0 +1,21 @@
+<h3><%= "#{params[:controller]}##{params[:action]}" %></h3>
+<p>app/views/<%= params[:controller] %>/<%= params[:action] %>.html.erb</p>
+
+<%= form_for @conversation, :url => new_conversation_path do |f| %>
+
+	<div><%= f.label "Recipients" %><br />
+	<%= f.text_field :members %></div>
+
+	<div><%= f.label "Subject" %><br />
+	<%= f.text_field :subject %></div>
+
+	<%= fields_for Message.new do |g| %>
+
+		<div><%= g.label "Body" %><br />
+		<%= g.text_area :body %></div>
+
+	<% end %>
+
+  	<div><%= f.submit "Send Message" %></div>
+
+<% end %>

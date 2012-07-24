@@ -3,5 +3,6 @@
 <% if signed_in? %>
 	<%= link_to teachers_path, teachers_path %><br />
 	<%= link_to "Portfolio", binders_path(current_teacher.username || current_teacher.id) %><br />
-	<%= link_to tags_path, tags_path %>
+	<%= link_to tags_path, tags_path %><br />
+	<%= link_to "Conversations", conversations_path %>
 <% end %>

@@ -42,6 +42,22 @@ Claco::Application.routes.draw do
 
 	resources :teachers, :only => [:show, :index]
 
+	###################
+	# MESSAGE ROUTING #
+	###################
+
+	#Inbox
+	get		'/conversations'												=> 'teachers#conversations',:as => 'conversations'
+
+	#New conversation
+	get		'/conversations/new'											=> 'conversations#new',		:as => 'new_conversation'
+	post	'/conversations/new'											=> 'conversations#create'
+
+	#New message/reply
+	get		'/conversations/:id'											=> 'conversations#show',	:as => 'show_conversation'
+	get		'/conversations/:id/add'										=> 'conversations#newmessage',	:as => 'add_message'
+	put		'/conversations/:id/add'										=> 'conversations#createmessage'
+
 	##################
 	# BINDER ROUTING #
 	##################

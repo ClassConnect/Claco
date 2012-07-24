@@ -1,0 +1,11 @@
+<h3><%= "#{params[:controller]}##{params[:action]}" %></h3>
+<p>app/views/<%= "#{params[:controller]}/#{params[:action]}" %>.html.erb</p>
+
+<% @conversations.each do |conversation| %>
+
+	<%= link_to conversation.subject, show_conversation_path(conversation) %>
+	<%= conversation.read_by?(current_teacher.id.to_s) ? "Read" : "Unread" %>
+
+<% end %>
+
+<%= link_to "New conversation", new_conversation_path %>

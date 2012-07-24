@@ -1,0 +1,21 @@
+<h3><%= "#{params[:controller]}##{params[:action]}" %></h3>
+<p>app/views/<%= params[:controller] %>/<%= params[:action] %>.html.erb</p>
+
+Subject: <%= @conversation.subject %><br />
+Conversation between: <%= @conversation.members.each {|c| c + 
+	(@conversation.members.index(c) == @conversation.members.size - 1 ? String.new : ",")} %><br />
+<br />
+
+<% @messages.each do |message| %>
+	<br />
+	<hr />
+	<br />
+	Sender: <%= message.sender %><br />
+	Timestamp: <%= message.timestamp %><br />
+	Message: <%= message.body %><br />
+
+<% end %>
+<br />
+<hr />
+<br />
+<%= link_to "Reply", add_message_path(@conversation) %>

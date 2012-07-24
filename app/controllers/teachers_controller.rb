@@ -1,4 +1,4 @@
- class TeachersController < ApplicationController
+class TeachersController < ApplicationController
 	before_filter :authenticate_teacher!
 
 	#/teachers
@@ -269,5 +269,10 @@
 
 	end
 
-end
+	def conversations
 
+		@conversations = Conversation.where("members" => current_teacher.id.to_s)
+
+	end
+
+end

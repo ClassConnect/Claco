@@ -246,26 +246,33 @@ class BindersController < ApplicationController
 		stathash[:imgfile][:retrieved] = true
 
 
-		# YOUTUBE
 		if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
-			# is a youtube URL
-			#@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_youtube_url(params[:binder][:versions][:data]),										
-			#										:imgstatus => stathash)
+
+			# YOUTUBE
 			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:binder][:versions][:data]))
-		# VIMEO
+
 		elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+
+			# VIMEO
 			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'vimeo'})
-		# EDUCREATIONS
+
 		elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+
+			# EDUCREATIONS
 			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:binder][:versions][:data]))
+
 		elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+
+			# SCHOOLTUBE
 			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'schooltube'}) 
+
 		elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+
+			# SHOWME
 			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'showme'})
+
 		else
 			# generic URL, grab Url2png
-			#@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_url2png_url(params[:binder][:versions][:data]),										
-			#										:imgstatus => stathash)
 			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:binder][:versions][:data]))
 		end
 

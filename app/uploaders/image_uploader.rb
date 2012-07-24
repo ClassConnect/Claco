@@ -33,7 +33,7 @@ class ImageUploader < CarrierWave::Uploader::Base
 
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
-  include CarrierWave::MiniMagick
+  # include CarrierWave::MiniMagick
 
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
   # include Sprockets::Helpers::RailsHelper
@@ -57,15 +57,15 @@ class ImageUploader < CarrierWave::Uploader::Base
   #   "/images/fallback/" + [version_name, "default.png"].compact.join('_')
   # end
 
-  version :thumb_lg do
-    #process :resize_to_fill => [130,93]
-    process :resize_and_pad => [130,93,'black','Center']
-  end
+  # version :thumb_lg do
+  #   #process :resize_to_fill => [130,93]
+  #   process :resize_and_pad => [130,93,'black','Center']
+  # end
 
-  version :thumb_sm do
-    #process :resize_to_fill => [49,46]
-    process :resize_and_pad => [49,46,'black','Center']
-  end
+  # version :thumb_sm do
+  #   #process :resize_to_fill => [49,46]
+  #   process :resize_and_pad => [49,46,'black','Center']
+  # end
 
   # Process files as they are uploaded:
   # process :scale => [200, 300]

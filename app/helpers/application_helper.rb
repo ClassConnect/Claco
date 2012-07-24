@@ -260,9 +260,9 @@ module ApplicationHelper
 		elsif binder.versions.last.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
 			return "<no image>"
 		else
-			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;') + 
-			return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 
-					image_tag( "#{binder.versions.last.imgfile.thumb_sm}",options )
+			return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;')# + 
+			#return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 
+			#		image_tag( "#{binder.versions.last.imgfile.thumb_sm}",options )
 		end
 
 

@@ -14,7 +14,7 @@
 	<% else %>
 		<% @children.each do |binder| %>
 			[<%= binder.order_index %>]
-			<%= get_binder_image(binder,{ :border => 1 })#{ :height => 150, :border => 1 }) 
+			<%= get_binder_image(binder,{ :height => 150, :border => 1 }) #{ :border => 1 })
 			%>
 			<%= link_to binder.title, named_binder_route(binder) %>
 			<% if !binder.versions.last.nil? %>

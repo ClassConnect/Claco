@@ -261,8 +261,8 @@ module ApplicationHelper
 			return "<no image>"
 		else
 			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;') + 
-			return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}") + raw('&nbsp;') + 
-					image_tag( "#{binder.versions.last.imgfile.thumb_sm}" )
+			return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 
+					image_tag( "#{binder.versions.last.imgfile.thumb_sm}",options )
 		end
 
 

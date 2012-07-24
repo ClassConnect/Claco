@@ -281,35 +281,32 @@ class Binder
 		return title
 	end
 
+	##############################################################################################
+
 	# Delayed Job Methods
+
+	# Do not explicitly call these!  All these methods have very long latency.
 
 	def self.get_croc_thumbnail(id,url)
 
-		#Rails.logger.debug "Got to the self call"
+		# loop until Crocodoc has finished processing the file, or timeout is reached
+		timeout = 150 # in tenths of a second
+		#while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
 
-		#find(id).versions.last.get_thumbnail(url)
-		#find(id).get_thumbnail(url)
-
-
-
-
-		while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
-			sleep 1
+		# we can assume all HTTP codes above 400 represent a failure to fetch the image
+		while RestClient.get(url) {|response, request, result| response.code }.to_i >= 400
+			sleep 0.1
+			timeout -= 1
+			raise "Crocodoc thumbnail fetch timed out" and return if timeout == 0
 		end
-
-		# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
-
-		#TODO: change this to actually check status of document
-		#sleep 8
-
-		# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
 
 		target = find(id).versions.last
 
 		stathash = target.imgstatus
 		stathash['imgfile']['retrieved'] = true
 
-		target.update_attributes( 	:remote_imgfile_url => url,										
+		target.update_attributes( 	:remote_imgfile_url => url,
+									:imgclass => 3,										
 									:imgstatus => stathash)
 
 
@@ -327,6 +324,69 @@ class Binder
 		end
 
 		target.update_attributes(	:remote_imgfile_url => url,
+									:imgclass => 2,
+									:imgstatus => stathash)
+
+	end
+
+	def self.get_thumbnail_from_api(id,url,options={})
+		if options.empty?
+			raise "Called API request method without supplying parent site" and return
+		end
+
+		url = URI(url)
+
+		# interfacing with specific API		
+		if options[:site]=='vimeo'
+
+			vimeo_id = -1
+
+			# pull out vimeo video ID
+			url.path.split('/').each do |f|
+				if f.to_i.to_s.length==8
+					vimeo_id = f.to_i
+					break
+				end
+			end
+
+			if vimeo_id==-1
+				raise "Vimeo video ID not found in URL" and return
+			end
+
+			response = JSON.parse(RestClient.get("http://vimeo.com/api/v2/video/#{vimeo_id}.json"))
+
+			api_url = response.first['thumbnail_large']
+
+			#Rails.logger.debug response.first['thumbnail_large']
+		elsif options[:site]=='schooltube'
+
+			response = RestClient.get(url.to_s){ |resp, request, result| resp }
+
+			api_url = response.to_s.scan(/poster="(.*_lg.jpg)/).first.first
+
+		elsif options[:site]=='showme'
+
+			response = RestClient.get(url.to_s){ |resp, request, result| resp }
+
+			api_url = response.to_s.scan(/image:"(.*jpg)",skin/).first.first
+
+			#Rails.logger.debug api_url
+
+		else
+			raise "get_thumbnail_from_api called without specifying a valid API" and return
+		end
+
+		target = find(id).versions.last
+
+		stathash = target.imgstatus
+		if stathash['imgfile'].nil?
+			stathash[:imgfile][:retrieved] = true
+		else
+			stathash['imgfile']['retrieved'] = true
+		end
+
+		target.update_attributes(	:remote_imgfile_url => api_url,
+									:imgclass => 2,
 									:imgstatus => stathash)
 
 	end
@@ -358,58 +418,46 @@ class Version
 	field :data, :type => String #URL, path to file
 	field :active, :type => Boolean, :default => false
 
-	field :file_hash, :type => String
-	field :croc_uuid, :type => String
+	# MD5 hash of the uploaded file
+	field :file_hash
+
+	# UUID to access the document on crocodoc
+	field :croc_uuid
 
 	mount_uploader :file, DataUploader
 
-	# file image data
+	field :imgtitle
+	field :imgfilename
+	field :imgfiletype
 
-	field :imgtitle,	:type => String
-	field :imgfilename,	:type => String
-	field :imgfiletype,	:type => String
+	# imgclass represents how the file will be pulled into folder views
+	# integers are in order of priority
+	# 0 - image file
+	# 1 - video link
+	# 2 - general URL
+	# 3 - document file
+	# 4 - <no image>
 	field :imgclass,	:type => Integer
+
+	# dimensions of the uncompressed, unprocessed image
 	field :imgdims,		:type => Hash, 	:default => { :width => -1, :height => -1 }
 
-	field :imghash,		:type => String
+	# MD5 hash of the uploaded image
+	field :imghash
 
+	# this hash is updated when the image is retrieved, almost always asynchronously
+	# the :imgfile uploader cannot be reliably queried to determine if a file exists or not
 	field :imgstatus, 	:type => Hash, 	:default => { 	:imageable => 	true,		
 														:imgfile => 	{ :retrieved => false },
 													 	:imgthumb_lg => { :retrieved => false },
 														:imgthumb_sm => { :retrieved => false } }
 
-	# field :imgfilestatus, 		:type => Hash, :default => { :retrieved => false }
-	# field :imgthumb_lgstatus, 	:type => Hash, :default => { :retrieved => false }
-	# field :imgthumb_smstatus, 	:type => Hash, :default => { :retrieved => false }
-
+	# the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
 	mount_uploader :imgfile, 		ImageUploader
 	#mount_uploader :imgthumb_lg, 	ImageUploader
 	#mount_uploader :imgthumb_sm, 	ImageUploader
 
 	embedded_in :binder
-
-	# class Imageset
-	# 	include Mongoid::Document
-
-	# 	field :title,		:type => String
-	# 	field :filename,	:type => String
-	# 	field :filetype,	:type => String
-	# 	field :class,		:type => Integer
-	# 	field :dimensions,	:type => Hash, 	:default => {:width => -1, :height => -1}
-
-	# 	field :image_hash,	:type => String
-
-	# 	# file id from which the image was generated, should not be self-referential
-	# 	field :parent_file,	:type => String
-
-	# 	mount_uploader :fullimage, 		ImageUploader
-	# 	mount_uploader :thumbnail_lg, 	ImageUploader
-	# 	mount_uploader :thumbnail_sm, 	ImageUploader
-
-	# 	embedded_in :version
-
-	# end
-
 
 end
 

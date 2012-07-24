@@ -156,14 +156,7 @@ class BindersController < ApplicationController
 
 		#TODO: if the URL is to a document, ask if they want to upload it as a document instead
 
-		# TODO: check for URL validity
-		# use structure presented below
-
-		# require 'net/http'
-		# Net::HTTP.new('www.twitter.com').request_head('/').class
-
-		# determine format of image
-
+		################## URI REFERENCE - DO NOT DELETE! #####################
 
 
 		# require 'uri'
@@ -185,15 +178,24 @@ class BindersController < ApplicationController
 		# uri.to_s
 		# #=> "http://foo.com/posts?id=30&limit=5#time=1305298413"
 
-		respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
 
-		# the RestClient object will catch most of the error codes before getting to here
-		if ![200,301,302].include? respcode
-			raise "Invalud URL! Response code: #{respcode}" and return
+		#######################################################################
+
+
+		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
+		
+		# This will catch flawed URL structure, as well as bad HTTP response codes
+		begin
+			RestClient.get(params[:binder][:versions][:data])
+		rescue
+			Rails.logger.debug "Invalid URL detected"
+			raise "Invalid URL: <#{params[:binder][:versions][:data]}>" and return
 		end
 
-
-		#Rails.logger.debug RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_s
+		# the RestClient object will catch most of the error codes before getting to here
+		#if ![200,301,302].include? respcode
+		#	raise "Invalud URL! Response code: #{respcode}" and return
+		#end
 
 		@binder = Binder.new
 
@@ -209,16 +211,6 @@ class BindersController < ApplicationController
 		@parentperarr = @inherited[:parentperarr]
 
 		@parent_child_count = @inherited[:parent_child_count]
-
-		#TODO: check for URL validity, repair 
-
-
-
-		#head = open(params[:binder][:versions][:data].to_s, :method => :head)
-
-		#Rails.logger.debug head
-
-
 
 		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
 									:owner				=> current_teacher.id,
@@ -250,28 +242,26 @@ class BindersController < ApplicationController
 
 		uri = URI(params[:binder][:versions][:data])
 
-		#Rails.logger.debug uri.host
-		#Rails.logger.debug uri.path
-
-		# do not need to check for http, carrierwave handles this
-
-		# target = find(id).versions.last
-
-		#@binder.save
-
 		stathash = @binder.versions.last.imgstatus
 		stathash[:imgfile][:retrieved] = true
 
-		# target.update_attributes( 	:remote_imgfile_url => url,										
-		# 							:imgstatus => stathash)
 
-
-
+		# YOUTUBE
 		if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 			# is a youtube URL
 			#@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_youtube_url(params[:binder][:versions][:data]),										
 			#										:imgstatus => stathash)
 			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:binder][:versions][:data]))
+		# VIMEO
+		elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'vimeo'})
+		# EDUCREATIONS
+		elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:binder][:versions][:data]))
+		elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'schooltube'}) 
+		elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'showme'})
 		else
 			# generic URL, grab Url2png
 			#@binder.versions.last.update_attributes( :remote_imgfile_url => Url.get_url2png_url(params[:binder][:versions][:data]),										
@@ -279,32 +269,6 @@ class BindersController < ApplicationController
 			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:binder][:versions][:data]))
 		end
 
-
-
-
-
-
-
-
-		# get image of URL
-		#if head.meta['set-cookie'].to_s.include? 'youtube.com'
-			# is a youtube link, extract the static images
-			#vid_ext = CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v']
-
-			#Rails.logger.debug get_youtube_url(CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v'].first).to_s
-
-			#img = File.open( RestClient.get(get_youtube_url(CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v'].first).to_s) )
-
-
-
-			#@binder.versions.last.update_attributes(:imgfile => open(get_youtube_url(CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v'].first).to_s))
-			#@binder.versions.last.imgfile = File.open( RestClient.get(get_youtube_url(CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v'].first).to_s) )
-			#@binder.versions.last.imgfile = open( get_youtube_url(CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v'].first).to_s)# { |f| f.read }
-			#temp = open( get_youtube_url(CGI.parse(URI.parse(params[:binder][:versions][:data]).query)['v'].first).to_s)
-			#@binder.versions.last.imgfile.store! temp
-			#@binder.save
-
-		#end
 
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
@@ -434,100 +398,19 @@ class BindersController < ApplicationController
 					
 				filedata = filedata["uuid"] if !filedata.nil?
 
-				#OPENSSL::SSL::VERIFY_PEER = OPENSSL::SSL::VERIFY_NONE
+				@binder.versions.last.update_attributes(:croc_uuid => filedata)
 
-				#sleep 10
-
-				#Rails.logger.debug "filedata: #{filedata}"
-				#Rails.logger.debug "croc url: [#{ Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }) }]"
-				#Rails.logger.debug "response: #{ RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })){ |response, request, result| response } }"
-
-				#@binder.versions.last.imgfile.store! open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
-
-				#croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(filedata)["session"]
-
-				#Rails.logger.debug "croc png: #{Url.get_url2png_url(croc_url)}"
-				#sleep 3
-
-				#sleep 6
-
-
-				#Rails.logger.debug "about to retrieve the crocodoc thumbnail"
-
-				@binder.versions.last.update_attributes(:croc_uuid => filedata)#, 
-														#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata) )
-
-
-														#:remote_imgfile_url => Url.get_url2png_url(croc_url))
-														#:imgfile => open(Url.get_url2png_url(croc_url)))
-														#:imgfile => open( Crocodoc.get_thumbnail(filedata) ))
-
-				#Rails.logger.debug Crocodoc.get_thumbnail_url(filedata)
-
-				#@binder.get_thumbnail(Crocodoc.get_thumbnail(filedata))#update_attributes(:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
-
-				# url = Crocodoc.get_thumbnail_url(filedata)
-
-				# Rails.logger.debug "before:"
-				# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
-
+				# delegate image fetch to Delayed Job worker
 				Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-
-				# sleep 8
-
-				# Rails.logger.debug "after:"
-				# Rails.logger.debug RestClient.get(url){|response, request, result| response.code }.to_s
-
-
-				#@binder.save
-
-				# file = Tempfile.new
-				# file.binmode
-				# open(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })) { |data| file.write data.read }
-
-				# @binder.versions.last.update_attributes(:croc_uuid => filedata,
-				# 										:imgfile => file)
-
 				
-
-				# http = Net::HTTP.new('awebsite', 443)
-				# http.use_ssl = true
-				# http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-				# http.start() { |http|
-				#    req = Net::HTTP::Get.new("image.jpg")
-				#    req.basic_auth login, password
-				#    response = http.request(req)
-				#    attachment = Attachment.new(:uploaded_data => response.body)
-				#    attachement.save
-				# }
-
-				# File.open( "temp.png",'wb' ) do |f|
-				# 	f << RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
-				# end
-				# 	#f << Crocodoc.thumbnail(filedata[:uuid], :size => "300x300")
-				# 	#f << RestClient.get("#{API_URL + PATH_THUMBNAIL + '?' + params}")
-				# 	f << RestClient.get(Crocodoc.get_thumbnail(filedata))
-				# end
-
-				# OPENSSL::SSL:VERIFY_NONE
-				#Rails.logger.debug "thumbnail response:"
-				#Rails.logger.debug logger.debug RestClient.get(Crocodoc.get_thumbnail(filedata,{ :size => '300x300' })){ |response, request, result| response }
-
-				#@binder.versions.last.update_attributes(:croc_uuid => filedata,
-														#:remote_imgfile_url => Crocodoc.get_thumbnail(filedata))
-														#:imgfile => File.open( 'temp.png' ) { |f| f << RestClient.get(Crocodoc.get_thumbnail(filedata)) } )
-														#:imgfile => open(Crocodoc.get_thumbnail(filedata)) { |f| f.read } )
-				#										:remote_imgfile_url => Crocodoc.get_thumbnail(filedata,{ :size => '300x300' }))
-
-				#tf.close!
-
-				#OPENSSL::SSL::VERIFY_PEER = OPENSSL::SSL::VERIFY_PEER
 			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.versions.last.ext
 				# for now, image will be added as file AND as imgfile
 				stathash = @binder.versions.last.imgstatus#[:imgfile][:retrieved]
 				stathash[:imgfile][:retrieved] = true
 
-				@binder.versions.last.update_attributes( :imgfile => params[:binder][:versions][:file],
+				# upload image
+				@binder.versions.last.update_attributes( 	:imgfile => params[:binder][:versions][:file],
+															:imgclass => 0,
 															:imgstatus => stathash)
 			
 			end
@@ -535,20 +418,14 @@ class BindersController < ApplicationController
 			stathash = @binder.versions.last.imgstatus
 			stathash[:imageable] = false
 
-			@binder.versions.last.update_attributes(	:imgstatus => stathash )
+			# unable to derive iamge from filetype
+			@binder.versions.last.update_attributes(	:imgstatus => stathash,
+														:imgclass => 4 )
 		end
-
-
-
-
-
-
 
 
 		@binder.create_binder_tags(params,current_teacher.id)
  
-		#logger.debug RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => "3QsGvCVcSyYuN9HM2edPh4ZD", :url => @newversion["file"].to_s){ |response, request, result| response }
-
 		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
 		pids.each do |id|
@@ -1155,6 +1032,30 @@ class BindersController < ApplicationController
 		def get_youtube_url(url)
 
 			return YOUTUBE_IMG_URL + CGI.parse(URI.parse(url).query)['v'].first.to_s + YOUTUBE_IMG_FILE
+
+		end
+
+		def get_educreations_url(url)
+
+			url = URI(url)
+
+			educr_id = -1
+
+			# pull out educr video ID
+			url.path.split('/').each do |f|
+				if f.to_i.to_s.length==6
+					educr_id = f.to_i
+					break
+				end
+			end
+
+			if educr_id < 0
+				raise "Could not extract video ID from url" and return
+			end
+
+			imgkey = Digest::MD5.hexdigest(educr_id.to_s)[0..2]
+
+			return "http://media.educreations.com/recordings/#{imgkey}/#{educr_id}/thumbnail.280x175.png"
 
 		end
 

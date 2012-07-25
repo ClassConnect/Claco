@@ -1,12 +1,48 @@
-<h3>Binders#<%= params[:action] %></h3>
-<p>app/views/binders/<%= params[:action] %>.html.erb</p>
+<div class="content-header">
+  <div class="con-inner">
+    <div class="container">
+      
+      <div class="crumbster">
+        <ul class="crumbs">
 
-<p>Currently In:<% @binder.parents.each do |parent| %>
-	<% if parent["id"] == "0" %>
-		<%= link_to "Home", binders_path %> /
-	<% elsif parent["id"] == "-1" %>
-		<%= link_to "Trash", trash_path %> /
-	<% else %>
-		<%= link_to parent["title"], named_binder_route(parent["id"]) %> /
-	<% end %>
-<% end %><%= link_to @binder.title, named_binder_route(@binder) %></p>
+        	<% @binder.parents.each do |parent| %>
+				<% if parent["id"] == "0" %>
+					<!--<li><%= link_to "Home", binders_path %></li>-->
+
+				<% elsif parent["id"] == "-1" %>
+					<li><%= link_to "Trash", trash_path %></li>
+
+				<% else %>
+					<li><%= link_to parent["title"], named_binder_route(parent["id"]) %></li>
+				<% end %>
+			<% end %>
+
+			<li class="current-folder"><%= link_to @binder.title, named_binder_route(@binder) %></li>
+
+  		</ul>
+      </div>
+
+      <div class="titler">
+      <%= @binder.title %>
+      </div>
+
+      <div class="buttonbox">
+
+        <div class="btn-group">
+          <button id="newcreate-btn" data-toggle="dropdown" class="btn dropdown-toggle">
+          <div class="plusser">+</div> Add
+
+
+          </button>
+          <ul class="dropdown-menu" style="margin-left:-95px">
+            <li><a href="#">Web bookmark / Embed</a></li>
+            <li><a href="#" onClick="jQuery.facebox({ div: '#jack' }); return false">Upload File</a></li>
+            <li><a href="#">New Folder</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

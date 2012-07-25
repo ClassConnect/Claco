@@ -2,8 +2,21 @@
 <html>
 	<head>
 		<title>Claco | <%= @title %></title>
+		<%= stylesheet_link_tag    "strap", :media => "all" %>
 		<%= stylesheet_link_tag    "application", :media => "all" %>
+		<%= stylesheet_link_tag    "box", :media => "all" %>
+		<%= stylesheet_link_tag    "buttons/buttons", :media => "all" %>
+		<%= stylesheet_link_tag    "jqueryui", :media => "all" %>
+
+
 		<%= javascript_include_tag "application" %>
+		<%= javascript_include_tag "jqueryui" %>
+		<%= javascript_include_tag "dropdown" %>
+		<%= javascript_include_tag "facebox" %>
+		<%= javascript_include_tag "tooltip" %>
+
+		<%= yield :headcon %>
+
 		<%= csrf_meta_tags %>
 	</head>
 	<body>
@@ -15,10 +28,19 @@
 		<% end %> -->
 		<%= %> <!-- render 'shared/error_messages' -->
 		<%= yield %>
-		<% if Rails.env.development? %>
-		<div style="position:absolute; border:1px solid black; top:10px; right:10px;">
-			<%= debug(params) %>
+
+
+
+		<div class="container">
+			<div style="clear:both"></div>
+
+			<hr>
+
+			<footer>
+			<p>&copy; ClassConnect 2012</p>
+			</footer>
 		</div>
-		<% end %>
+
+
 	</body>
 </html>

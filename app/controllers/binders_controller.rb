@@ -401,13 +401,17 @@ class BindersController < ApplicationController
 		if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.versions.last.ext
 			# send file to crocodoc if the format is supported
 			if Crocodoc.check_format_validity(@binder.versions.last.ext)
-				filedata = Crocodoc.upload("#{@binder.versions.last.file.current_path}")
+
+				Rails.logger.debug "current path: #{@binder.versions.last.file.current_path.to_s}"
+
+				filedata = Crocodoc.upload("https://s3.amazonaws.com/claco/#{@binder.versions.last.file.current_path}")
 					
 				filedata = filedata["uuid"] if !filedata.nil?
 
 				@binder.versions.last.update_attributes(:croc_uuid => filedata)
 
 				# delegate image fetch to Delayed Job worker
+				#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 				Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 				
 			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.versions.last.ext
@@ -1100,10 +1104,15 @@ class BindersController < ApplicationController
 		# returns uuid of file
 		def upload(filestring)
 
+			require 'open-uri'
+
 			#filedata = JSON.parse(RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => CROC_API_TOKEN, :url => filestring.to_s){ |response, request, result| response })
 
+			Rails.logger.debug filestring
+
 			filedata = JSON.parse(RestClient.post(CROC_API_URL+PATH_UPLOAD, :token => CROC_API_TOKEN, 
-																			:file => File.open("#{filestring}")){ |response, request, result| response })
+																			#:file => File.open("#{filestring}")){ |response, request, result| response })
+																			:url => filestring))#open(filestring)){ |response, request, result| response })
 
 			Rails.logger.debug "filedata: #{filedata.to_s}"
 			Rails.logger.debug docstatus(filedata["uuid"])

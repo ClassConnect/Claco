@@ -293,6 +293,8 @@ class Binder
 		timeout = 150 # in tenths of a second
 		#while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
 
+		Rails.logger.debug "url: #{url.to_s}"
+
 		# we can assume all HTTP codes above 400 represent a failure to fetch the image
 		while RestClient.get(url) {|response, request, result| response.code }.to_i >= 400
 			sleep 0.1

@@ -5,11 +5,19 @@ class ConversationsController < ApplicationController
 
 		@conversation = Conversation.find(params[:id])
 
+		@unread = @conversation.unread_messages(current_teacher.id.to_s)
+
+		@conversation.unread[current_teacher.id.to_s] = 0
+
+		@conversation.save
+
 		@messages = @conversation.get_messages
 
-		read = @conversation.read_by.collect {|t| t["id"]}
+		@messages.each do |message|
 
-		@conversation.add_read(current_teacher) if !read.include?(current_teacher.id.to_s)
+			message.add_read(current_teacher) if !message.read_by?(current_teacher.id.to_s)
+
+		end
 
 	end
 
@@ -21,10 +29,16 @@ class ConversationsController < ApplicationController
 
 	def create
 
+		members = params[:conversation][:members].split.uniq << current_teacher.id.to_s
+
+		unread = {}
+
+		members.each {|member| unread[member] = (member == current_teacher.id.to_s ? 0 : 1)}
+
+
 		@conversation = Conversation.new(	:author		=> current_teacher.id.to_s,
-											:members	=> params[:conversation][:members].split.uniq << current_teacher.id.to_s,
-											:read_by	=> [{	"id" 		=> current_teacher.id.to_s,
-																"timestamp"	=> Time.now.to_i}],
+											:members	=> members,
+											:unread		=> unread,
 											:subject	=> params[:conversation][:subject])
 
 		@conversation.save

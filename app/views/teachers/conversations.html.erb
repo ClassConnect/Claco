@@ -3,9 +3,10 @@
 
 <% @conversations.each do |conversation| %>
 
+	<%= conversation.last_message.sender == current_teacher.id.to_s ? ">" : "<" %>
 	<%= link_to conversation.subject, show_conversation_path(conversation) %>
-	<%= conversation.read_by?(current_teacher.id.to_s) ? "Read" : "Unread" %>
+	<%= conversation.unread[current_teacher.id.to_s] == 0 ? "Read" : "Unread" %>
 
 <% end %>
-
+<br /><br />
 <%= link_to "New conversation", new_conversation_path %>

@@ -12,7 +12,7 @@ Conversation between: <%= @conversation.members.each {|c| c +
 	<br />
 	<% if @unread.include?(message) %>
 		<%= "*NEW*" %>
-		<%= raw("<br />") %>
+		<br />
 	<% end %>
 	Sender: <%= message.sender %><br />
 	Timestamp: <%= message.timestamp %><br />

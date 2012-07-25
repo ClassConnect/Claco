@@ -1,38 +1,246 @@
-<% if params[:action] == "show" %>
+<% content_for :headcon do
+	javascript_include_tag "wy/advanced"
+end %>
+<% content_for :headcon do
+	javascript_include_tag "wy/wysi5"
+end %>
+<% content_for :headcon do
+	javascript_include_tag "binders/pretags"
+end %>
+<% content_for :headcon do
+	javascript_include_tag "binders/folder"
+end %>
+<% content_for :headcon do
+	javascript_include_tag "binders/taginit"
+end %>
 
-	<div><% if !@binder.body.blank? %>
-		Body: <%= @binder.body %>
-		<br /><br />
-	<% end %></div>
 
-<% end %>
+<div class="container">
+	<div id="list-pane">
+		<% if params[:action] == "show" %>
 
-<div>Contents:
-	<br />
-	<% if @children.empty? %>
-		Empty
-	<% else %>
-		<% @children.each do |binder| %>
-			[<%= binder.order_index %>]
-			<%= get_binder_image(binder,{ :height => 150, :border => 1 }) #{ :border => 1 })
-			%>
-			<%= link_to binder.title, named_binder_route(binder) %>
-			<% if !binder.versions.last.nil? %>
-				<%= link_to "(Croc)", named_binder_route(binder)+'/croc' if !binder.versions.last.croc_uuid.nil? %>
-			<% end %>
-				<%= link_to "(Update)", named_binder_route(binder, "update") if binder.type == 2 %>
-				<%= link_to "(Versions)", named_binder_route(binder, "versions") if binder.type == 2 %>
-				<%= link_to "(Edit)", named_binder_route(binder, "edit") %>
-				<%= link_to "(Move)", named_binder_route(binder, "move") %>
-				<%= link_to "(Copy)", named_binder_route(binder, "copy") %>
-				<%= link_to "(Permissions)", named_binder_route(binder, "permissions") %>
-				<%= link_to "(Delete)", named_binder_route(binder), :method => :delete %>
-				<%= "(#{binder.body[0..20]}" + (binder.body.length > 20 ? "...)" : ")") if !binder.body.blank? %>
-				<%= "(#{binder.files} files, #{binder.folders} folders)" if binder.type == 1 %>
-			<% if !binder.versions.last.nil? %>
-				(<%= binder.type == 1 ? binder.total_size : binder.versions.last.size %>b)
-			<% end %>	
-			<br />
+			<div class="descbox content-editable">
+				<%= image_tag("pin.png", :class => 'pinim') %>
+          <div class="inner">
+
+            <div class="real-text">
+            	<% if !@binder.body.blank? %>
+					<%= @binder.body %>
+				<% end %>
+            </div>
+
+
+
+            <div class="wysi-edit">
+              <div id="wysitoolbar" style="display: none;">
+                <a data-wysihtml5-command="bold" title="CTRL+B"></a>
+                <a data-wysihtml5-command="italic" title="CTRL+I"></a>
+                <a data-wysihtml5-command="createLink"></a>
+                <a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1"></a>
+                <a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2"></a>
+                <a data-wysihtml5-command="insertUnorderedList"></a>
+                <a data-wysihtml5-command="insertOrderedList"></a>
+                <a data-wysihtml5-command="insertSpeech"></a>
+                
+                <div data-wysihtml5-dialog="createLink" style="display: none;">
+                  <label>
+                    Link:
+                    <input data-wysihtml5-dialog-field="href" value="http://">
+                  </label>
+                  <a data-wysihtml5-dialog-action="save">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel">Cancel</a>
+                </div>
+                
+                <div data-wysihtml5-dialog="insertImage" style="display: none;">
+                  <label>
+                    Image:
+                    <input data-wysihtml5-dialog-field="src" value="http://">
+                  </label>
+                  <label>
+                    Align:
+                    <select data-wysihtml5-dialog-field="className">
+                      <option value="">default</option>
+                      <option value="wysiwyg-float-left">left</option>
+                      <option value="wysiwyg-float-right">right</option>
+                    </select>
+                  </label>
+                  <a data-wysihtml5-dialog-action="save">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel">Cancel</a>
+                </div>
+                
+              </div>
+              <textarea id="notearea" class="danotepad" placeholder="Type a note..."></textarea>
+              <button class="btn btn-primary save-wysi">Save note</button>
+
+              <div style="clear:both"></div>
+            </div>
+
+
+
+          </div>
+        </div>
+
 		<% end %>
-	<% end %>
+
+
+	
+
+
+		<div class="content-list">
+
+
+	         <% if @children.empty? %>
+				Empty
+			<% else %>
+				<% @children.each do |binder| %>
+
+
+
+					<div id="<%= binder.id %>" class="content-item">
+
+			            <div class="folder-preview">
+			              <div class="single-hold" style="background-image:url('<%= get_binder_image(binder) %>');">
+			               
+			              </div>
+			            </div>
+
+
+
+			            <div class="titler"><%= link_to binder.title, named_binder_route(binder) %></div>
+
+			            <div class="descarea">Last updated by <a href="#">Eric Simons</a> at 2:33pm</div>
+
+			            <div class="drop-tog">
+			              <button id="droptog-btn" class="btn">
+			              <div class="tog-arrow"></div>
+			              </button>
+			            </div>
+
+
+			        </div>
+
+
+					<%= #get_binder_image(binder,{ :height => 150, :border => 1 }) #{ :border => 1 })
+					%>
+
+
+
+					
+				<% end %>
+			<% end %>
+
+
+		</div>
+
+	</div>
+
+
+
+
+
+
+
+	<div id="left-sidebar">
+        
+        <div id="folder-tags" class="conbox">
+          <div class="headstrip">
+            <div class="inner">
+            Tags 
+
+              <button class="btn" id="addtags-btn">
+              Add New
+              </button>
+            </div>
+          </div>
+
+          <div class="empty-tog fortags">You haven't added any tags...yet!</div>
+
+          <div class="content-fill" style="display:none">
+
+            <div class="tag-group tagged-grades">
+              <div class="announce">
+                Grade Levels
+              </div>
+
+              <div class="taggers">
+                <ul class="tags">
+                  
+                </ul>
+                <div style="clear:both"></div>
+              </div>
+            </div>
+
+
+            <div id="grade-addarea" class="add-area tagenter">
+              <input type="text" class="add-field grade-addfield" placeholder="Ex: '1st', 'Second Grade'" />
+              <div class="empty-auto-hold">Hit enter to add tag...</div>
+            </div>
+
+
+            <div class="tag-group tagged-subjects">
+              <div class="announce">
+                Subjects
+              </div>
+
+              <div class="taggers">
+                <ul class="tags">
+                  
+                </ul>
+                <div style="clear:both"></div>
+              </div>
+            </div>
+
+
+            <div id="subject-addarea" class="add-area tagenter">
+              <input type="text" class="add-field subject-addfield" placeholder="Ex: 'Math', 'History'" />
+              <div class="empty-auto-hold">Hit enter to add tag...</div>
+            </div>
+
+
+            <div class="tag-group tagged-standards">
+              <div class="announce">
+                Standards
+              </div>
+
+              <div class="taggers">
+                <ul class="tags">
+                  
+                </ul>
+                <div style="clear:both"></div>
+              </div>
+            </div>
+
+            <div id="standards-addarea" class="add-area tagenter">
+              <input type="text" class="add-field standards-addfield" placeholder="Ex: 'RL.K.1'" />
+              <div class="empty-auto-hold">Hit enter to add tag...</div>
+            </div>
+
+
+            <div class="tag-group tagged-other">
+              <div class="announce">
+                Other
+              </div>
+
+
+              <div class="taggers">
+                <ul class="tags">
+                  
+                </ul>
+                <div style="clear:both"></div>
+              </div>
+            </div>
+
+
+
+            <div id="other-addarea" class="add-area tagenter">
+              <input type="text" class="add-field other-addfield" placeholder="Ex: 'California', 'edchat'" />
+              <div class="empty-auto-hold">Hit enter to add tag...</div>
+            </div>
+
+          </div>
+        </div>
+
+
+      </div>
+
+
+
 </div>

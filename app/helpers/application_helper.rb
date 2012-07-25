@@ -267,6 +267,7 @@ module ApplicationHelper
 
 
 		#Rails.logger.debug "Imgfile: #{binder.versions.last.imgfile.to_s}"
+		#Rails.logger.debug "Imgfile: #{binder.versions.last.imgfile.url.to_s}"
 
 	end
 

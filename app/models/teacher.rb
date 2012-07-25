@@ -249,8 +249,8 @@ class Info
 								:size 				=> params[:info][:avatar].size,
 								:ext 				=> File.extname(params[:info][:avatar].original_filename),
 								:data 				=> params[:info][:avatar].path,
-								:avatar_width		=> avatar[:width],
-								:avatar_height		=> avatar[:height],
+								#:avatar_width		=> avatar[:width],
+								#:avatar_height		=> avatar[:height],
 								:website 			=> params[:info][:website])
 
 	end

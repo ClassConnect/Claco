@@ -121,4 +121,7 @@ Claco::Application.routes.draw do
 
 	get		'/assets'														=> 'binders#catcherr'
 
+	#Soulmate
+	mount Soulmate::Server, :at => "/sm"
+
 end

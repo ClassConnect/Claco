@@ -57,6 +57,10 @@ gem 'daemons'
 # elastic search
 gem 'tire'
 
+# Soulmate
+gem 'rack-contrib'
+gem 'soulmate', :require => 'soulmate/server'
+
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
 # To use ActiveModel has_secure_password

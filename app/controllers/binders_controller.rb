@@ -108,7 +108,7 @@ class BindersController < ApplicationController
 
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		send_data open(@binder.current_version.file.url).read, :filename => @binder.current_version.data and return if @binder.format == 1
+		redirect_to @binder.current_version.file.url, :filename => @binder.current_version.data and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -381,8 +381,6 @@ class BindersController < ApplicationController
  
 		#logger.debug(params[:binder][:versions][:file].class)
 
-		@name = Digest::MD5.hexdigest(File.basename(params[:binder][:versions][:file].path) + Time.now.to_i.to_s + params[:binder][:versions][:file].original_filename)
-
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
 										:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
 										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
@@ -413,7 +411,7 @@ class BindersController < ApplicationController
 
 				# delegate image fetch to Delayed Job worker
 				#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-				Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
+				Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 				
 			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
 				# for now, image will be added as file AND as imgfile

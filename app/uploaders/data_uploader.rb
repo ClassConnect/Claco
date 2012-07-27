@@ -17,7 +17,15 @@ class DataUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
-    "binders"
+    Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
+  end
+
+  def fog_directory
+    "claco_binders"
+  end
+
+  def fog_public
+    false
   end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
@@ -48,11 +56,11 @@ class DataUploader < CarrierWave::Uploader::Base
 
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
-  def filename
-    @name ||= Digest::MD5.hexdigest(File.basename(path) + Time.now.to_i.to_s + original_filename) if original_filename
-    "#{@name}"
-    #Digest::MD5.hexdigest(Time.now.to_i.to_s + original_filename) + File.extname(original_filename)
-    #path + Time.now.to_i.to_s + original_filename if original_filename
-  end
+  # def filename
+  #   @name ||= Digest::MD5.hexdigest(File.basename(path) + Time.now.to_i.to_s + original_filename) if original_filename
+  #   "#{@name}"
+  #   #Digest::MD5.hexdigest(Time.now.to_i.to_s + original_filename) + File.extname(original_filename)
+  #   #path + Time.now.to_i.to_s + original_filename if original_filename
+  # end
 
 end

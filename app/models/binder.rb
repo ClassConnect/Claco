@@ -302,7 +302,7 @@ class Binder
 			raise "Crocodoc thumbnail fetch timed out" and return if timeout == 0
 		end
 
-		target = find(id).versions.last
+		target = find(id).current_version
 
 		stathash = target.imgstatus
 		stathash['imgfile']['retrieved'] = true
@@ -316,7 +316,7 @@ class Binder
 
 	def self.get_thumbnail_from_url(id,url)
 
-		target = find(id).versions.last
+		target = find(id).current_version
 
 		stathash = target.imgstatus
 		if stathash['imgfile'].nil?
@@ -378,7 +378,7 @@ class Binder
 			raise "get_thumbnail_from_api called without specifying a valid API" and return
 		end
 
-		target = find(id).versions.last
+		target = find(id).current_version
 
 		stathash = target.imgstatus
 		if stathash['imgfile'].nil?

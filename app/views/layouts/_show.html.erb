@@ -18,9 +18,9 @@ end %>
   <div id="list-pane">
     <% if params[:action] == "show" %>
 
-<script type="javascript">
+<%= javascript_tag do %>
 	isEditable=<%= @binder.get_access(current_teacher.id.to_s) > 0 ? "true" : "false"  %>;
-</script>
+<% end %>
 
 			<div class="descbox content-editable">
 				<%= image_tag("pin.png", :class => 'pinim') %>

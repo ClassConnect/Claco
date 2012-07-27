@@ -118,7 +118,7 @@ end %>
 					          </button>
 
 					          <ul class="dropdown-menu">
-					            <li><a href="#">Rename</a></li>
+					            <li><a id="rename-act" class="modaction">Rename</a></li>
 					            <li><a href="#">Copy</a></li>
 					            <li><a href="#">Move</a></li>
 					            <li><a href="#">Delete</a></li>
@@ -256,5 +256,55 @@ end %>
       </div>
 
 
+
+</div>
+
+
+
+
+<div id="form-helpers" style="display:none">
+
+	<div id="upload-form" style="display:none">
+		<div class="headtitle">
+		  Upload File
+		</div>
+
+		<div class="bodcon">
+		  <div class="conitem">
+		    <div class="lablr">Choose a title</div>
+		    <input type="file" />
+		  </div>
+
+		  <div class="buttonbar">
+		     <button class="btn btn-primary">Upload File!</button>
+		     <button class="btn" onClick="closefBox()">Cancel</button>
+		  </div>
+
+		</div>
+	</div>
+
+
+
+	<div id="rename-form" style="display:none">
+		<div class="headtitle">
+		  Rename
+		</div>
+
+		<div class="errorBox"></div>
+
+		<form action="#" class="bodcon">
+		  <div class="conitem">
+		    <input name="title" class="firstfocus rename-title" style="width:260px" type="text" />
+		    <input name="conid" class="conid" type="hidden" />
+
+		  </div>
+
+		  <div class="buttonbar">
+		     <button class="btn btn-primary showloader" type="submit">Rename this!</button>
+		     <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+		  </div>
+
+		</form>
+	</div>
 
 </div>

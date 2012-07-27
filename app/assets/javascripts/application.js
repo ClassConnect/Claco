@@ -66,3 +66,40 @@ function htmlDecode(value) {
 function closefBox() {
 	jQuery(document).trigger('close.facebox');
 }
+
+
+// facebox form helpers
+function fbFormActLoader() {
+	$("input").blur();
+	$("#facebox").find('.showloader').append('<img src="/assets/miniload.gif" id="tempload" style="float:left;margin-right:10px;margin-top:4px" />');
+}
+
+function fbFormActRevert() {
+	$("#tempload").remove();
+}
+
+function fbFormDisable(formID) {
+	$('#facebox :input').attr('disabled', true);
+ 
+	$('#facebox :submit').attr('disabled', true);
+}
+
+function fbFormEnable(formID) {
+	$('#facebox :input').attr('disabled', false);
+ 
+	$('#facebox :submit').attr('disabled', false);
+}
+
+function fbFormSubmitted() {
+	fbFormActLoader();
+	fbFormDisable();
+}
+
+function fbFormRevert() {
+	fbFormActRevert();
+	fbFormEnable();
+}
+
+function showFormError(data) {
+	$("#facebox .errorBox").html(data).show();
+}

@@ -108,7 +108,7 @@ class BindersController < ApplicationController
 
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		send_file @binder.current_version.file.path and return if @binder.format == 1
+		send_data open(@binder.current_version.file.url).read, :filename => @binder.current_version.data and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -381,11 +381,12 @@ class BindersController < ApplicationController
  
 		#logger.debug(params[:binder][:versions][:file].class)
 
+		@name = Digest::MD5.hexdigest(File.basename(params[:binder][:versions][:file].path) + Time.now.to_i.to_s + params[:binder][:versions][:file].original_filename)
 
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
 										:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
 										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
-										:data		=> params[:binder][:versions][:file].path,
+										:data		=> params[:binder][:versions][:file].original_filename,
 										:size		=> params[:binder][:versions][:file].size,
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)#,
@@ -404,7 +405,7 @@ class BindersController < ApplicationController
 
 				Rails.logger.debug "current path: #{@binder.versions.last.file.current_path.to_s}"
 
-				filedata = Crocodoc.upload("https://s3.amazonaws.com/claco/#{@binder.versions.last.file.current_path}")
+				filedata = Crocodoc.upload(@binder.current_version.file.url)
 					
 				filedata = filedata["uuid"] if !filedata.nil?
 

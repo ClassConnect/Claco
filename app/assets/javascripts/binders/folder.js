@@ -19,6 +19,10 @@ $(document).ready(function() {
     // if we're doing a rename
     if ($(this).attr('id') == 'rename-act') {
       popForm('rename-form', $(this).parent().parent().parent().parent().parent());
+
+    } else if ($(this).attr('id') == 'delete-act') {
+      popForm('delete-form', $(this).parent().parent().parent().parent().parent());
+
     }
 
 
@@ -344,7 +348,44 @@ function popForm(formID, obje) {
     });
     // end of form handler
 
-    
+  ////////// if this is the delete form
+  } else if (formID == 'delete-form') {
+
+    // set a smaller facebox width
+    $('#facebox .content').width('300px');
+
+    $("#facebox").find('.conid').val( obje.attr("id") );
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "POST",  
+        url: "http://localhost/claco/post.php",  
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
+
+      return false;
+    });
+    // end of form handler
+
+
   }
 
 }

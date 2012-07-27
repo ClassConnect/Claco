@@ -14,12 +14,13 @@ end %>
 	javascript_include_tag "binders/taginit"
 end %>
 
+<div class="container">
+  <div id="list-pane">
+    <% if params[:action] == "show" %>
+
 <script type="javascript">
 	isEditable=<%= @binder.get_access(current_teacher.id.to_s) > 0 ? "true" : "false"  %>;
 </script>
-<div class="container">
-	<div id="list-pane">
-		<% if params[:action] == "show" %>
 
 			<div class="descbox content-editable">
 				<%= image_tag("pin.png", :class => 'pinim') %>

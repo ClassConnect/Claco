@@ -14,6 +14,20 @@ noteInit = false;
 
 $(document).ready(function() {
 
+  // for our modification actions
+  $('.modaction').click(function() {
+    // if we're doing a rename
+    if ($(this).attr('id') == 'rename-act') {
+      popForm('rename-form', $(this).parent().parent().parent().parent().parent());
+
+    } else if ($(this).attr('id') == 'delete-act') {
+      popForm('delete-form', $(this).parent().parent().parent().parent().parent());
+
+    }
+
+
+  });
+
   // init our folder autocomplete
   initAutoTagger('#folder-tags');
 
@@ -274,5 +288,104 @@ function killHover() {
 
   $('body').unbind('mousemove');
   $('.dropper-tog').remove();
+
+}
+
+
+
+
+
+
+
+
+
+
+// here are the popup form helpers
+function popForm(formID, obje) {
+  // fire the open event for facebox
+  jQuery.facebox({ div: '#' + formID });
+  //$("#facebox").find('.firstfocus').focus();
+  setTimeout(function() {$("#facebox").find('.firstfocus').focus();},100);
+
+  // extended if to handle the different form types
+  // if we're renaming a piece of content
+  if (formID == 'rename-form') {
+    // set a smaller facebox width
+    $('#facebox .content').width('300px');
+
+    // preset the title
+    var contitle = obje.find('.titler a').text();
+    $("#facebox").find('.rename-title').val(contitle);
+    $("#facebox").find('.conid').val( obje.attr("id") );
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+      $.ajax({
+        type: "POST",  
+        url: "http://localhost/claco/post.php",  
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            obje.find('.titler').html(newTitle);
+            setTimeout(function() {obje.effect('highlight');},250);
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
+
+      return false;
+    });
+    // end of form handler
+
+  ////////// if this is the delete form
+  } else if (formID == 'delete-form') {
+
+    // set a smaller facebox width
+    $('#facebox .content').width('300px');
+
+    $("#facebox").find('.conid').val( obje.attr("id") );
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "POST",  
+        url: "http://localhost/claco/post.php",  
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
+
+      return false;
+    });
+    // end of form handler
+
+
+  }
 
 }

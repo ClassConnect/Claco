@@ -108,7 +108,7 @@ class BindersController < ApplicationController
 
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		send_file @binder.current_version.file.path and return if @binder.format == 1
+		send_data open(@binder.current_version.file.url).read, :filename => @binder.current_version.data and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -129,7 +129,7 @@ class BindersController < ApplicationController
 
 		#@status = docstatus(@uuid)
 
-		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.versions.last.croc_uuid)["session"]
+		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
 
 	end
 
@@ -242,7 +242,7 @@ class BindersController < ApplicationController
 
 		uri = URI(params[:binder][:versions][:data])
 
-		stathash = @binder.versions.last.imgstatus
+		stathash = @binder.current_version.imgstatus
 		stathash[:imgfile][:retrieved] = true
 
 
@@ -381,11 +381,12 @@ class BindersController < ApplicationController
  
 		#logger.debug(params[:binder][:versions][:file].class)
 
+		@name = Digest::MD5.hexdigest(File.basename(params[:binder][:versions][:file].path) + Time.now.to_i.to_s + params[:binder][:versions][:file].original_filename)
 
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
 										:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
 										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
-										:data		=> params[:binder][:versions][:file].path,
+										:data		=> params[:binder][:versions][:file].original_filename,
 										:size		=> params[:binder][:versions][:file].size,
 										:timestamp	=> Time.now.to_i,
 										:owner		=> current_teacher.id)#,
@@ -398,39 +399,39 @@ class BindersController < ApplicationController
 		#logger.debug @binder.versions.last.file.url
 		#logger.debug "current path: #{@binder.versions.last.file.current_path}"
 		#logger.debug params[:binder][:versions][:file].current_path
-		if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.versions.last.ext
+		if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext
 			# send file to crocodoc if the format is supported
-			if Crocodoc.check_format_validity(@binder.versions.last.ext)
+			if Crocodoc.check_format_validity(@binder.current_version.ext)
 
-				Rails.logger.debug "current path: #{@binder.versions.last.file.current_path.to_s}"
+				Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 
-				filedata = Crocodoc.upload("https://s3.amazonaws.com/claco/#{@binder.versions.last.file.current_path}")
+				filedata = Crocodoc.upload(@binder.current_version.file.url)
 					
 				filedata = filedata["uuid"] if !filedata.nil?
 
-				@binder.versions.last.update_attributes(:croc_uuid => filedata)
+				@binder.current_version.update_attributes(:croc_uuid => filedata)
 
 				# delegate image fetch to Delayed Job worker
 				#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 				Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 				
-			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.versions.last.ext
+			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
 				# for now, image will be added as file AND as imgfile
-				stathash = @binder.versions.last.imgstatus#[:imgfile][:retrieved]
+				stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
 				stathash[:imgfile][:retrieved] = true
 
 				# upload image
-				@binder.versions.last.update_attributes( 	:imgfile => params[:binder][:versions][:file],
+				@binder.current_version.update_attributes( 	:imgfile => params[:binder][:versions][:file],
 															:imgclass => 0,
 															:imgstatus => stathash)
 			
 			end
 		else
-			stathash = @binder.versions.last.imgstatus
+			stathash = @binder.current_version.imgstatus
 			stathash[:imageable] = false
 
 			# unable to derive iamge from filetype
-			@binder.versions.last.update_attributes(	:imgstatus => stathash,
+			@binder.current_version.update_attributes(	:imgstatus => stathash,
 														:imgclass => 4 )
 		end
 
@@ -782,7 +783,7 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id,
 										:type				=> h.type,
 										:format				=> (h.type != 1 ? h.format : nil),
-										:forked_from		=> h.versions.last.id,
+										:forked_from		=> h.current_version.id,
 										:fork_stamp			=> Time.now.to_i)
 
 				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
@@ -852,13 +853,13 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		if Crocodoc.check_format_validity(@binder.versions.last.ext)
-			filedata = Crocodoc.upload(@binder.versions.last.file.current_path)
+		if Crocodoc.check_format_validity(@binder.current_version.ext)
+			filedata = Crocodoc.upload(@binder.current_version.file.current_path)
 				
 			filedata = filedata["uuid"] if !filedata.nil?
 		end
 
-		@binder.versions.last.update_attributes(:croc_uuid => filedata)
+		@binder.current_version.update_attributes(:croc_uuid => filedata)
 
 		if @binder.format == 1 && @old_size != params[:binder][:versions][:file].size
 

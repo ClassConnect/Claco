@@ -119,10 +119,10 @@ end %>
 					          </button>
 
 					          <ul class="dropdown-menu">
-					            <li><a href="#">Rename</a></li>
+					            <li><a id="rename-act" class="modaction">Rename</a></li>
 					            <li><a href="#">Copy</a></li>
 					            <li><a href="#">Move</a></li>
-					            <li><a href="#">Delete</a></li>
+					            <li><a id="delete-act" class="modaction">Delete</a></li>
 					          </ul>
 
 					        </div>
@@ -255,6 +255,96 @@ end %>
 
 
       </div>
+
+
+
+</div>
+
+
+
+
+<div id="form-helpers" style="display:none">
+
+	<div id="upload-form" style="display:none">
+		<div class="headtitle">
+		  Upload File
+		</div>
+
+		<div class="bodcon">
+		  <div class="conitem">
+		    <div class="lablr">Choose a title</div>
+		    <input type="file" />
+		  </div>
+
+		  <div class="buttonbar">
+		     <button class="btn btn-primary">Upload File!</button>
+		     <button class="btn" onClick="closefBox()">Cancel</button>
+		  </div>
+
+		</div>
+	</div>
+
+
+
+	<div id="rename-form" style="display:none">
+		<div class="headtitle">
+		  Rename
+		</div>
+
+		<div class="errorBox"></div>
+
+		<form action="#" class="bodcon">
+		  <div class="conitem">
+		    <input name="title" class="firstfocus rename-title" style="width:260px" type="text" />
+		    <input name="conid" class="conid" type="hidden" />
+
+		  </div>
+
+		  <div class="buttonbar">
+		     <button class="btn btn-primary showloader" type="submit">Rename this!</button>
+		     <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+		  </div>
+
+		</form>
+	</div>
+
+
+
+
+
+	<div id="delete-form" style="display:none">
+		<div class="headtitle">
+		  Delete
+		</div>
+
+		<div class="errorBox"></div>
+
+		<form action="#" class="bodcon">
+		  <div class="conitem">
+		    <div style="margin: 5px 0 5px 0">Are you <strong>absolutely positive</strong> you want to delete this?</div>
+		    <input name="conid" class="conid" type="hidden" />
+
+		  </div>
+
+		  <div class="buttonbar">
+		     <button class="btn btn-danger showloader" type="submit">Yes, delete this!</button>
+		     <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+		  </div>
+
+		</form>
+	</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

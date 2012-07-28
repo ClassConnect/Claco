@@ -226,7 +226,7 @@ $(document).ready(function() {
         // set the dropped variable
         isDropped = true;
         // post data to server
-        sendData = { "node": $('.ui-sortable-helper').attr("id"), "target": $(this).attr("id") };
+        sendData = { "target": $(this).attr("id") };
         $.ajax({
           url: $('.ui-sortable-helper').find('.titler a').attr("href") + "/move",
           data: sendData,
@@ -325,14 +325,14 @@ function popForm(formID, obje) {
       fbFormSubmitted();
 
       $.ajax({
-        type: "POST",  
-        url: "http://localhost/claco/post.php",  
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/rename",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            obje.find('.titler').html(newTitle);
-            setTimeout(function() {obje.effect('highlight');},250);
+            obje.find('.titler a').text(newTitle);
+            setTimeout(function() {obje.effect('highlight');},150);
 
           } else {
             fbFormRevert();

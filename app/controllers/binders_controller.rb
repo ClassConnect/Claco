@@ -326,6 +326,38 @@ class BindersController < ApplicationController
 
 	end
 
+
+	def rename
+
+		@binder = Binder.find(params[:id])
+
+		@binder.update_attributes(	:title				=> params[:newtitle][0..60],
+									:last_update		=> Time.now.to_i,
+									:last_updated_by	=> current_teacher.id.to_s)
+
+		
+
+		@children = @binder.children.sort_by {|binder| binder.parents.length}
+
+		@index = @binder.parents.length
+
+		@children.each do |h|
+
+			h.parent["title"] = params[:newtitle][0..60] if h.parent["id"] == params[:id]
+
+			h.parents[@index]["title"] = params[:newtitle][0..60]
+
+			h.save
+
+		end
+
+		respond_to do |format|
+			format.js {render :text => "1"}
+			format.html {render :text => "1"}
+		end
+
+	end
+
 	#Add new file
 	def newfile
 

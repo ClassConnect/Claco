@@ -127,9 +127,9 @@ $(document).ready(function() {
       noteSon = { 'text': $(editor.composer.element).html() };
 
       $.ajax({
-        url: "post.php",
+        url: document.location.href,
         data: noteSon,
-        type: 'post',
+        type: 'put',
         success: function(data) {
           alert(data);
         }
@@ -363,8 +363,8 @@ function popForm(formID, obje) {
 
 
       $.ajax({
-        type: "POST",  
-        url: "http://localhost/claco/post.php",  
+        type: "DELETE",  
+        url: obje.find('.titler a').attr("href"),  
         data: serData,
         success: function(retData) {
           if (retData == 1) {

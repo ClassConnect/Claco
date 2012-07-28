@@ -28,7 +28,7 @@ end %>
 
             <div class="real-text">
             	<% if !@binder.body.blank? %>
-					<%= @binder.body %>
+					<%= @binder.body.html_safe %>
 				<% end %>
             </div>
 

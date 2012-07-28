@@ -298,32 +298,15 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
-									:last_update		=> Time.now.to_i,
+		@binder.update_attributes(	:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s,
-									:body				=> params[:binder][:body])
+									:body				=> params[:text])
 
-		@binder.tag.update_node_tags(params,current_teacher.id)
 
-		@children = @binder.children.sort_by {|binder| binder.parents.length}
-
-		@index = @binder.parents.length
-
-		@children.each do |h|
-
-			h.parent["title"] = params[:binder][:title][0..60] if h.parent["id"] == params[:id]
-
-			h.parents[@index]["title"] = params[:binder][:title][0..60]
-			h.update_parent_tags()
-
-			h.save
-
+		respond_to do |format|
+			format.js {render :text => "1"}
+			format.html {render :text => "1"}
 		end
-
-		redirect_to named_binder_route(@binder.parent["id"]) and return if @binder.parent["id"] != "0"
-
-		redirect_to binders_path
-
 	end
 
 
@@ -1050,9 +1033,14 @@ class BindersController < ApplicationController
 			end
 		end
 
-		redirect_to named_binder_route(@op) and return if defined?(@op)
+		# redirect_to named_binder_route(@op) and return if defined?(@op)
 
-		redirect_to binders_path
+		# redirect_to binders_path
+
+		respond_to do |format|
+			format.js {render :text => "1"}
+			format.html {render :text => "1"}
+		end
 
 	end
 

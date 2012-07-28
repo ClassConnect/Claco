@@ -114,6 +114,13 @@ class BindersController < ApplicationController
 
 		@children = teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children
 		
+		# respond_to do |format|
+		# 	format.html
+		# 	format.js
+		# 	format.xml {render :xml => @children.to_xml}
+		# 	format.json {render :json => @children.to_json}
+		# end
+
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
 
@@ -477,7 +484,7 @@ class BindersController < ApplicationController
 
 		@binder.sift_siblings()
 
-		@inherited = inherit_from(params[:binder][:parent])
+		@inherited = inherit_from(params[:target])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
@@ -548,9 +555,14 @@ class BindersController < ApplicationController
 			end
 		end
 
-		redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+		# redirect_to named_binder_route(params[:target]) and return if params[:binder][:parent] != "0"
 
-		redirect_to binders_path
+		# redirect_to binders_path
+
+		respond_to do |format|
+			format.js {render :text => "1"}
+			format.html {render :text => "1"}
+		end
 
 	end
 
@@ -1223,7 +1235,7 @@ class BindersController < ApplicationController
 	#Because named_binder_route can accept an id or object, so can this check
 	def binder_routing_ok?(binder, action)
 
-		return request.fullpath == named_binder_route(binder, action)
+		return request.fullpath == named_binder_route(binder, action) || request.fullpath == named_binder_route(binder, action) + ".xml"
 
 	end
 

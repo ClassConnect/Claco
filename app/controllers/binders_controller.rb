@@ -114,12 +114,12 @@ class BindersController < ApplicationController
 
 		@children = teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children
 		
-		# respond_to do |format|
-		# 	format.html
-		# 	format.js
-		# 	format.xml {render :xml => @children.to_xml}
-		# 	format.json {render :json => @children.to_json}
-		# end
+		respond_to do |format|
+			format.html
+			format.js
+			format.xml {render :xml => @children.to_xml}
+			format.json {render :json => @children.to_json}
+		end
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -1255,7 +1255,7 @@ class BindersController < ApplicationController
 	#Because named_binder_route can accept an id or object, so can this check
 	def binder_routing_ok?(binder, action)
 
-		return request.fullpath == named_binder_route(binder, action) || request.fullpath == named_binder_route(binder, action) + ".xml"
+		return request.path == named_binder_route(binder, action)
 
 	end
 

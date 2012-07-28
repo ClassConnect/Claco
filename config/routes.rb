@@ -122,6 +122,7 @@ Claco::Application.routes.draw do
 	get		'/assets'														=> 'binders#catcherr'
 
 	#Soulmate
+	get		'/autocomplete'													=> 'home#autocomplete'
 	mount Soulmate::Server, :at => "/sm"
 
 end

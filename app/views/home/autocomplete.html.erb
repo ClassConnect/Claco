@@ -1,0 +1,15 @@
+<h1>Autocomplete Test</h1>
+
+<br /><br />
+<%= @results#.inspect 
+%>
+<br /><br />
+<%= @test
+%>
+<br /><br />
+<hr /><br />
+<hr /><br />
+<hr /><br />
+<hr /><br />
+<hr /><br />
+<%= JSON.pretty_generate(JSON.parse(File.read("app/assets/json/old/standards.json"))) %>

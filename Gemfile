@@ -57,6 +57,8 @@ gem 'daemons'
 # elastic search
 gem 'tire'
 
+gem 'yajl-ruby'
+
 # Soulmate
 gem 'rack-contrib'
 gem 'soulmate', :require => 'soulmate/server'

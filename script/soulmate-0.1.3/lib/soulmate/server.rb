@@ -30,14 +30,17 @@ module Soulmate
 
       types.each do |type|
         matcher = Matcher.new(type)
-	matcher.matches_for_term(term, :limit => limit).each { |result| smushset << "{ label: \"#{ result['data']['label'] }\", value: \"#{ result['data']['value'] }\" }" }
+	#matcher.matches_for_term(term, :limit => limit).each { |result| smushset << "{ label: \"#{ result['data']['label'] }\", value: \"#{ result['data']['value'] }\" }" }
+	matcher.matches_for_term(term, :limit => limit).each { |result| smushset << { :label => result['data']['label'], :value => result['data']['value'] } }
       end
 
-      smushset.uniq.each { |result| retstr += "#{result}," }
+      #smushset.uniq.each { |result| retstr += "#{result}," }
 
-      smushset.any? ? retstr[-1] = ']' : retstr = ''
+      #smushset.any? ? retstr[-1] = ']' : retstr = ''
 
-      return retstr
+      #return retstr
+
+      return MultiJson.encode(smushset.uniq)
 
     end
 

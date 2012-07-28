@@ -45,6 +45,7 @@ gem "fog", "~> 1.3.1"
 gem 'log4r', '1.1.9'
 
 gem 'rest-client'
+gem 'rack-pjax'
 
 gem 'delayed_job'
 gem 'delayed_job_mongoid'

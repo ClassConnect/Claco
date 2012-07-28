@@ -1,6 +1,6 @@
 
   /*
-  $( ".content-item" ).draggable({ 
+  $( ".content-item" ).draggable({
     revert: "invalid",
     distance: 20,
     zIndex: 99999
@@ -165,7 +165,7 @@ $(document).ready(function() {
 
           });
 
-          console.log(olist)
+          console.log(olist);
 
           olist = { data: olist };
 
@@ -226,11 +226,11 @@ $(document).ready(function() {
         // set the dropped variable
         isDropped = true;
         // post data to server
-        sendData = { "arrow": $('.ui-sortable-helper').attr("id"), "target": $(this).attr("id") };
+        sendData = { "target": $(this).attr("id") };
         $.ajax({
-          url: "post.php",
+          url: $('.ui-sortable-helper').find('.titler a').attr("href") + "/move",
           data: sendData,
-          type: 'post',
+          type: 'put',
           success: function(data) {
             alert(data);
           }
@@ -325,14 +325,14 @@ function popForm(formID, obje) {
       fbFormSubmitted();
 
       $.ajax({
-        type: "POST",  
-        url: "http://localhost/claco/post.php",  
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/rename",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            obje.find('.titler').html(newTitle);
-            setTimeout(function() {obje.effect('highlight');},250);
+            obje.find('.titler a').text(newTitle);
+            setTimeout(function() {obje.effect('highlight');},150);
 
           } else {
             fbFormRevert();

@@ -110,6 +110,7 @@ Claco::Application.routes.draw do
 
 	#Edit
 	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit'
+	put		'/:username/portfolio(/:root)/:title/:id/rename'				=> 'binders#rename'
 	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
 
 	#Show

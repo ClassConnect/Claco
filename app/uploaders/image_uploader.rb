@@ -2,35 +2,6 @@
 
 class ImageUploader < CarrierWave::Uploader::Base
 
-
-################################# EXAMPLE ################################
-
-
-# class MyUploader < CarrierWave::Uploader::Base
-#   include CarrierWave::RMagick
-
-#   process :resize_to_fit => [800, 800]
-
-#   version :thumb do
-#     process :resize_to_fill => [200,200]
-#   end
-
-# end
-# When this uploader is used, an uploaded image would be scaled 
-# to be no larger than 800 by 800 pixels. A version called thumb 
-# is then created, which is scaled and cropped to exactly 200 by 
-# 200 pixels. The uploader could be used like this:
-
-# uploader = AvatarUploader.new
-# uploader.store!(my_file)                              # size: 1024x768
-
-# uploader.url # => '/url/to/my_file.png'               # size: 800x600
-# uploader.thumb.url # => '/url/to/thumb_my_file.png'   # size: 200x200
-
-
-##########################################################################
-
-
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick
@@ -50,12 +21,16 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   def fog_directory
-    "claco_images"
+    "claco-images"
   end
 
   def fog_public
     true
   end
+
+  # def fog_host
+  #   "http://img.cla.co"
+  # end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
   # def default_url

@@ -107,7 +107,7 @@ end %>
 
 
 
-			            <div class="titler"><%= link_to binder.title, named_binder_route(binder) %></div>
+			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => "pjax" %></div>
 
 			            <div class="descarea">Last updated by <a href="#">Eric Simons</a> at 2:33pm</div>
 
@@ -295,7 +295,7 @@ end %>
 
 		<form action="#" class="bodcon">
 		  <div class="conitem">
-		    <input name="title" class="firstfocus rename-title" style="width:260px" type="text" />
+		    <input name="newtitle" class="firstfocus rename-title" style="width:260px" type="text" />
 		    <input name="conid" class="conid" type="hidden" />
 
 		  </div>

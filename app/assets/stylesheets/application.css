@@ -170,3 +170,146 @@
   -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
   box-shadow: 0 1px 3px rgba(34,25,25,0.5);
 }
+
+
+
+.fol-picker {
+
+}
+
+
+.fol-picker .togbar {
+  cursor:pointer;
+  width:300px;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+  padding:5px 5px 5px 10px;
+  color:#666;
+  font-weight:bolder;
+  text-shadow: 0px 1px 1px #fff;
+  background-color: #F1EEEE;
+  *background-color: #F1EEEE;
+  background-image: -ms-linear-gradient(top, #FEFBFB, #F1EEEE);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FEFBFB), to(#F1EEEE));
+  background-image: -webkit-linear-gradient(top, #FEFBFB, #F1EEEE);
+  background-image: -o-linear-gradient(top, #FEFBFB, #F1EEEE);
+  background-image: -moz-linear-gradient(top, #FEFBFB, #F1EEEE);
+  background-image: linear-gradient(top, #FEFBFB, #F1EEEE);
+  background-repeat: repeat-x;
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.2);
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#FEFBFB', endColorstr='#F1EEEE', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+  overflow:hidden;
+}
+
+.fol-picker .togbar:hover {
+  text-decoration: none;
+  background-color: #F1EEEE;
+  *background-color: #d9d9d9;
+  /* Buttons in IE7 don't get borders, so darken on hover */
+
+  background-position: 0 -15px;
+  -webkit-transition: background-position 0.1s linear;
+     -moz-transition: background-position 0.1s linear;
+      -ms-transition: background-position 0.1s linear;
+       -o-transition: background-position 0.1s linear;
+          transition: background-position 0.1s linear;
+}
+
+.fol-picker .togbar .down-arrow {
+  width:0px; 
+  height:0px; 
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:7px solid #666;
+  font-size:0px;
+  line-height:0px;
+  margin:7px 5px 0 0;
+  float:right;
+}
+
+.fol-picker .pickerpane {
+  display:none;
+  background:#f9f9f9;
+  position:absolute;
+  width:315px;
+  min-height:50px;
+  border: 1px solid;
+  border-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.4) rgba(0, 0, 0, 0.3);
+
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+
+  -moz-box-shadow:0 1px 3px rgba(34,25,25,0.4);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
+  box-shadow: 0 1px 10px rgba(34,25,25,0.3);
+}
+.fol-picker .pickerpane .bndr {
+  padding:8px;
+  border-bottom:1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.fol-picker .pickerpane .bndr:hover {
+  background-color:#fff;
+}
+
+
+.fol-picker .pickerpane .bndr .dirWrap {
+  margin-left:20px;
+  margin-top:5px;
+  display:none;
+}
+
+.fol-picker .pickerpane .bndr .dir {
+  font-size:14px;
+}
+
+.fol-picker .pickerpane .bndr .dir .dirtitle{
+  cursor:pointer;
+  padding:3px;
+}
+
+.fol-picker .pickerpane .bndr .dir .dirtitle .foldicon{
+  height:22px;
+  margin: 0 3px 0 3px;
+  margin-top:-2px !important;
+  float:left;
+}
+
+.fol-picker .pickerpane .bndr .dir .dirtitle:hover{
+  background-color: #E4FFF4;
+}
+
+
+.fol-picker .pickerpane .bndr .dir .arrow-down {
+  width:0px; 
+  height:0px; 
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-top:6px solid #666;
+  font-size:0px;
+  line-height:0px;
+  margin:5px 2px 0 0;
+  float:left;
+  cursor:pointer;
+}
+
+.fol-picker .pickerpane .bndr .dir .arrow-right {
+  width:0px; 
+  height:0px; 
+  border-left:6px solid #666;
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+  font-size:0px;
+  line-height:0px;
+  margin:3px 2px 0 0;
+  padding-right:5px;
+  float:left;
+  cursor:pointer;
+}

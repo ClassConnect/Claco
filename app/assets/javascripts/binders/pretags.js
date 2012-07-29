@@ -21,10 +21,4 @@ $(function() {
     ];
 
 
-    standards_data = [
-      { title: "RL.K.1", label: "<div style='text-align:left;line-height:1.2;padding:7px'><strong> RL.K.1 </strong><br /> With prompting and support, ask and answer questions about key details in a text.</div>", category: "Common Core" },
-
-    ];
-
-
 });

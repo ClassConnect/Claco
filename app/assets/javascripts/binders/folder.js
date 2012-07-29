@@ -14,6 +14,35 @@ noteInit = false;
 
 $(document).ready(function() {
 
+  // if we have edit permissions, enable editing functionality
+  if (isEditable === true) {
+    editInit();
+  }
+
+
+
+
+});
+
+
+$(document).on('pjax:start', function() { 
+  // show loading
+  initAsyc('<img src=\'/assets/miniload.gif\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
+
+}).on('pjax:end',   function() {
+  destroyAsyc();
+  editInit();
+});
+
+
+
+
+
+
+
+
+
+function editInit() {
   // for our modification actions
   $('.modaction').click(function() {
     // if we're doing a rename
@@ -22,6 +51,9 @@ $(document).ready(function() {
 
     } else if ($(this).attr('id') == 'delete-act') {
       popForm('delete-form', $(this).parent().parent().parent().parent().parent());
+
+    } else if ($(this).attr('id') == 'copy-act') {
+      popForm('copy-form', $(this).parent().parent().parent().parent().parent());
 
     }
 
@@ -131,7 +163,7 @@ $(document).ready(function() {
         data: noteSon,
         type: 'put',
         success: function(data) {
-          alert(data);
+          // do nothing
         }
       });
 
@@ -165,7 +197,6 @@ $(document).ready(function() {
 
           });
 
-          console.log(olist);
 
           olist = { data: olist };
 
@@ -174,7 +205,7 @@ $(document).ready(function() {
             data: olist,
             type: 'put',
             success: function(data) {
-              alert(data);
+              // nothing
             }
           });
 
@@ -231,7 +262,7 @@ $(document).ready(function() {
           data: sendData,
           type: 'put',
           success: function(data) {
-            alert(data);
+            // do nothing
           }
         });
 
@@ -256,11 +287,10 @@ $(document).ready(function() {
 
       }
     });
+}
 
 
 
-
-});
 
 
 
@@ -311,6 +341,7 @@ function popForm(formID, obje) {
   if (formID == 'rename-form') {
     // set a smaller facebox width
     $('#facebox .content').width('300px');
+    $('#facebox .popup').width('320px');
 
     // preset the title
     var contitle = obje.find('.titler a').text();
@@ -331,7 +362,7 @@ function popForm(formID, obje) {
           if (retData == 1) {
             closefBox();
             obje.find('.titler a').text(newTitle);
-            setTimeout(function() {obje.effect('highlight');},150);
+            setTimeout(function() {obje.effect('highlight');},100);
 
           } else {
             fbFormRevert();
@@ -352,6 +383,7 @@ function popForm(formID, obje) {
 
     // set a smaller facebox width
     $('#facebox .content').width('300px');
+    $('#facebox .popup').width('320px');
 
     $("#facebox").find('.conid').val( obje.attr("id") );
 
@@ -379,6 +411,47 @@ function popForm(formID, obje) {
         }
         
       });
+
+      return false;
+    });
+    // end of form handler
+
+
+
+
+  ////////// if this is the copy form
+  } else if (formID == 'copy-form') {
+
+
+    // set a smaller facebox width
+    $('#facebox .content').width('330px');
+    $('#facebox .popup').width('350px');
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/rename",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            obje.find('.titler a').text(newTitle);
+            setTimeout(function() {obje.effect('highlight');},100);
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
 
       return false;
     });

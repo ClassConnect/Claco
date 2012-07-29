@@ -6,3 +6,48 @@
 
 <%= link_to "Create new binder", new_binder_path %><br /><br />
 <%= link_to "Trash", trash_path(params[:username]) %>
+
+<br /><br />
+
+<div class="fol-picker" style="margin-left:100px">
+
+  <div class="togbar" onclick="togglePicker(this)">
+    <span class="chosenTitle">
+    	Unit 1: Kepler's Laws 
+    </span>
+    <div class="down-arrow"></div>
+    <input type="hidden" name="folid" class="chosenOne" value="" />
+  </div>
+
+  <div class="pickerpane">
+
+  	<div class="bndr">
+
+  		<div class="dir" folid="xyz">
+  			<div class="arrow-right" onclick="togglePickFolder(this)"></div>
+  			<span class="dirtitle" onclick="selectPickFolder(this)">
+  				<img src="/assets/binders/folder.png" class="foldicon" />
+  				Math Semester 1
+  			</span>
+  			<div class="dirWrap"></div>
+
+  		</div>
+  	</div>
+
+  	<div class="bndr">
+
+  		<div class="dir" folid="abc">
+  			<div class="arrow-right" onclick="togglePickFolder(this)"></div>
+  			<span class="dirtitle" onclick="selectPickFolder(this)">
+  				<img src="/assets/binders/folder.png" class="foldicon" />
+  				DES Semester 1
+  			</span>
+  			<div class="dirWrap"></div>
+
+  		</div>
+  	</div>
+
+  </div>
+
+
+</div>

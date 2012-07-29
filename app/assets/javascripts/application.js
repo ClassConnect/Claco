@@ -104,3 +104,63 @@ function fbFormRevert() {
 function showFormError(data) {
 	$("#facebox .errorBox").html(data).show();
 }
+
+
+
+
+
+// okay so now lets build the picker functions
+function togglePicker(tObj) {
+	tObj = $(tObj);
+	if (tObj.parent().find('.pickerpane').is(":visible")) {
+		tObj.parent().find('.pickerpane').hide();
+	} else {
+		tObj.parent().find('.pickerpane').show();
+	}
+}
+
+
+function togglePickFolder(fObj) {
+	var childs = $(fObj).parent().find('.dirWrap:first');
+	// if we've loaded the children already
+	if (childs.html() != '') {
+
+		// if it's visible, hide it
+		if (childs.is(":visible")) {
+			$(fObj).removeClass('arrow-down').addClass('arrow-right');
+            childs.hide();
+		} else {
+			$(fObj).addClass('arrow-down').removeClass('arrow-right');
+            childs.show();
+		}
+
+	// load the children
+	} else {
+		$(fObj).parent().find(".dirWrap").html('Loading...').show();
+		$(fObj).addClass('arrow-down').removeClass('arrow-right');
+		/*
+		$.ajax({
+			type: "GET",
+			url: "/app/common/picker/" + $(fObj).parent().attr('folid'),
+			success: function(data) {
+				$(fObj).parent().find(".dirWrap").html(data);
+			}
+		}); */
+
+	}
+
+}
+
+
+
+
+
+function selectPickFolder(fObj) {
+	var folid = $(fObj).parent().attr('folid');
+	var text = $(fObj).text();
+
+	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
+	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);
+	$(fObj).closest(".pickerpane").hide();
+
+}

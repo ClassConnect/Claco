@@ -108,18 +108,18 @@ class BindersController < ApplicationController
 
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
-		redirect_to @binder.current_version.file.url, :filename => @binder.current_version.data and return if @binder.format == 1
+		redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		@title = "Viewing: #{@binder.title}"
 
 		@children = teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children
 		
-		respond_to do |format|
-			format.html
-			format.js
-			format.xml {render :xml => @children.to_xml}
-			format.json {render :json => @children.to_json}
-		end
+		# respond_to do |format|
+		# 	format.html {render :text => 1}
+		# 	format.js
+		# 	format.xml {render :xml => @children.to_xml}
+		# 	format.json {render :json => @children.to_json}
+		# end
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -335,7 +335,6 @@ class BindersController < ApplicationController
 		end
 
 		respond_to do |format|
-			format.js {render :text => "1"}
 			format.html {render :text => "1"}
 		end
 
@@ -608,7 +607,6 @@ class BindersController < ApplicationController
 		# redirect_to binders_path
 
 		respond_to do |format|
-			format.js {render :text => "1"}
 			format.html {render :text => "1"}
 		end
 
@@ -1071,7 +1069,6 @@ class BindersController < ApplicationController
 		# redirect_to binders_path
 
 		respond_to do |format|
-			format.js {render :text => "1"}
 			format.html {render :text => "1"}
 		end
 
@@ -1288,7 +1285,7 @@ class BindersController < ApplicationController
 	#Because named_binder_route can accept an id or object, so can this check
 	def binder_routing_ok?(binder, action)
 
-		return request.path == named_binder_route(binder, action)
+		return request.path[0..named_binder_route(binder, action).size - 1] == named_binder_route(binder, action)
 
 	end
 
@@ -1316,12 +1313,6 @@ class BindersController < ApplicationController
 		else
 			return "/500.html"
 		end
-
-		#return "/#{binder.handle}/portfolio#{binder.parents.length == 1 ? String.new : "/" + CGI.escape(binder.root)}/#{CGI.escape(binder.title)}/#{binder.id}#{action == "show" ? String.new : "/#{action}"}" if binder.class == Binder
-
-		#return named_binder_route(Binder.find(binder), action) if binder.class == String
-
-		#return "/500.html"
 
 	end
 

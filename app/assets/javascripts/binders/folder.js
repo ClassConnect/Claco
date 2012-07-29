@@ -489,6 +489,7 @@ function popForm(formID, obje) {
             closefBox();
             initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
             setTimeout(function() {destroyAsyc();},1500);
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
 
 
           } else {

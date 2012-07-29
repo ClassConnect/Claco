@@ -116,7 +116,7 @@ class BindersController < ApplicationController
 		
 		respond_to do |format|
 		 	format.html
-			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.end}
+			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
 		end
 
 		rescue BSON::InvalidObjectId

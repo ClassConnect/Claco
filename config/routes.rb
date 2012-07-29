@@ -80,6 +80,8 @@ Claco::Application.routes.draw do
 	#Trash folder
 	get		'/:username/trash'												=> 'binders#trash',			:as => 'trash'
 
+	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem', :as => 'reorder_path'
+
 	################################################
 	# Paths handled by named_binder_route function #
 	################################################
@@ -87,7 +89,6 @@ Claco::Application.routes.draw do
 	#Move
 	get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move'#,	:as => 'move_binder_path'
 	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem'
-	put		'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem', :as => 'reorder_path'
 
 	#Copy
 	get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy'

@@ -203,7 +203,8 @@ function editInit() {
           $.ajax({
             url: document.location.href + "/reorder",
             data: olist,
-            type: 'put',
+            // post is the proper HTTP verb
+            type: 'post',
             success: function(data) {
               // nothing
             }

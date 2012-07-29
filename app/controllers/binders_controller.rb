@@ -112,11 +112,11 @@ class BindersController < ApplicationController
 
 		@title = "Viewing: #{@binder.title}"
 
-		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children).sort_by { |c| c.order_index }
+		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children).sort_by {|c| c.order_index}
 		
 		respond_to do |format|
 		 	format.html
-			format.json {render :json => @children.collect{|c| {"name" => c.title, "id" => c.id}}.to_json}
+			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c)}}.to_json}
 		end
 
 		rescue BSON::InvalidObjectId
@@ -1297,7 +1297,7 @@ class BindersController < ApplicationController
 				retstr += "/#{CGI.escape(binder.root)}" 
 			end
 
-			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+			retstr += "/#{binder.title.parameterize}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

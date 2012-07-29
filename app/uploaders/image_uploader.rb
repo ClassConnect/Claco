@@ -21,16 +21,16 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   def fog_directory
-    "claco-images"
+    "img.cla.co"
   end
 
   def fog_public
     true
   end
 
-  # def fog_host
-  #   "http://img.cla.co"
-  # end
+  def fog_host
+    "http://img.cla.co"
+  end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
   # def default_url

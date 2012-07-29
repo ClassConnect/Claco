@@ -629,7 +629,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from(params[:binder][:parent])
+		@inherited = inherit_from(params[:folid])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
@@ -718,13 +718,13 @@ class BindersController < ApplicationController
 										:total_size			=> h.total_size)
 
 				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-														:file_hash	=> h.current_version.file_hash,
-														:timestamp	=> h.current_version.timestamp,
-														:size		=> h.current_version.size,
-														:ext		=> h.current_version.ext,
-														:data		=> h.current_version.data,
-														:croc_uuid	=> h.current_version.croc_uuid,
-														:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+													:file_hash	=> h.current_version.file_hash,
+													:timestamp	=> h.current_version.timestamp,
+													:size		=> h.current_version.size,
+													:ext		=> h.current_version.ext,
+													:data		=> h.current_version.data,
+													:croc_uuid	=> h.current_version.croc_uuid,
+													:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
 				#TODO: copy related images?
 
@@ -752,9 +752,14 @@ class BindersController < ApplicationController
 			end
 		end
 
-		redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+		# redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
-		redirect_to binders_path
+		# redirect_to binders_path
+
+		respond_to do |format|
+			format.html {render :text => 1}
+		end
+
 	end
 
 

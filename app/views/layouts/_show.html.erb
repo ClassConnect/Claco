@@ -286,6 +286,35 @@ end %>
 
 
 
+  <div id="addweb-form" style="display:none">
+    <div class="headtitle">
+      Add web bookmark / embed
+    </div>
+
+    <div class="errorBox"></div>
+
+    <form action="#" class="bodcon">
+      <div class="conitem">
+        <input name="weblink" class="weblink" style="width:300px" type="text" placeholder="http:// or <embed>" />
+        <input name="webtitle" class="webtitle" style="width:300px" type="text" placeholder="Title of the web page" />
+
+        <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
+        <textarea class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the web page"></textarea>
+
+        <input name="conid" class="conid" type="hidden" />
+
+      </div>
+
+      <div class="buttonbar">
+         <button class="btn btn-primary showloader" type="submit">Add this!</button>
+         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+
+
 	<div id="rename-form" style="display:none">
 		<div class="headtitle">
 		  Rename

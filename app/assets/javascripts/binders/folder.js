@@ -26,6 +26,7 @@ $(document).ready(function() {
 
 
 $(document).on('pjax:start', function() {
+  $('html, body').animate({ scrollTop: 0 }, 'fast');
   // show loading
   initAsyc('<img src=\'/assets/miniload.gif\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
 
@@ -355,9 +356,6 @@ function popForm(formID, obje) {
   // extended if to handle the different form types
   // if we're renaming a piece of content
   if (formID == 'rename-form') {
-    // set a smaller facebox width
-    $('#facebox .content').width('300px');
-    $('#facebox .popup').width('320px');
 
     // preset the title
     var contitle = obje.find('.titler a').text();
@@ -397,9 +395,6 @@ function popForm(formID, obje) {
   ////////// if this is the delete form
   } else if (formID == 'delete-form') {
 
-    // set a smaller facebox width
-    $('#facebox .content').width('300px');
-    $('#facebox .popup').width('320px');
 
     $("#facebox").find('.conid').val( obje.attr("id") );
 
@@ -439,10 +434,6 @@ function popForm(formID, obje) {
   } else if (formID == 'copy-form') {
 
 
-    // set a smaller facebox width
-    $('#facebox .content').width('330px');
-    $('#facebox .popup').width('350px');
-
     // set the form handler
     $('#facebox .bodcon').submit(function() {
       var serData = $("#facebox .bodcon").serialize();
@@ -479,10 +470,6 @@ function popForm(formID, obje) {
   } else if (formID == 'move-form') {
 
 
-    // set a smaller facebox width
-    $('#facebox .content').width('330px');
-    $('#facebox .popup').width('350px');
-
     // set the form handler
     $('#facebox .bodcon').submit(function() {
       var serData = $("#facebox .bodcon").serialize();
@@ -515,6 +502,76 @@ function popForm(formID, obje) {
       return false;
     });
     // end of form handler
+
+
+
+
+  } else if (formID == 'addweb-form') {
+
+    titleCheck = false;
+
+    $('#facebox .webtitle').focus(function() {
+      if ($('#facebox .webtitle').val() == '' && $('#urlLoc').val() != '' && titleCheck == false) {
+        $('#facebox .weblink').val('Retrieving the title for you...');
+        $('#facebox .webtitle').attr('disabled', 'disabled');
+        fbFormActLoader();
+
+        // get the title
+        $.ajax({  
+          type: "POST",  
+          url: "/utils/gettitle",
+          data: 'url=' + escape($('#urlLoc').val()),
+          success: function(titleData) {
+            $('#facebox .webtitle').val(titleData.substring(0, 60));
+            $('#facebox .webtitle').removeAttr('disabled');
+            $('#facebox .webtitle').focus();
+            fbFormActRevert();
+
+            titleCheck = true;
+          }
+        });
+
+
+
+
+
+      }
+
+    });
+
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
+
+      return false;
+    });
+    // end of form handler
+
 
 
   }

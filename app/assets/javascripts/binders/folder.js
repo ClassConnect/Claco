@@ -25,7 +25,7 @@ $(document).ready(function() {
 });
 
 
-$(document).on('pjax:start', function() { 
+$(document).on('pjax:start', function() {
   // show loading
   initAsyc('<img src=\'/assets/miniload.gif\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
 

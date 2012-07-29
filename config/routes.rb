@@ -43,6 +43,8 @@ Claco::Application.routes.draw do
 
 	post	'utils/gettitle'												=> 'home#gettitle'
 
+	get	'utils/gettitle'												=> 'home#gettitle'
+
 	###################
 	# MESSAGE ROUTING #
 	###################

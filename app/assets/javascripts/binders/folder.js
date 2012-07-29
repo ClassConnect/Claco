@@ -171,9 +171,11 @@ $(document).ready(function() {
 
           // send final data to server
           $.ajax({
-            url: "post.php",
+            //url: "post.php",
+            //url: $('.ui-sortable-helper').find('.titler a').attr("href") + "/reorder",
+            url: "/reorder",
             data: olist,
-            type: 'post',
+            type: 'put',
             success: function(data) {
               alert(data);
             }

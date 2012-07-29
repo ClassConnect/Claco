@@ -489,6 +489,39 @@ class BindersController < ApplicationController
 
 	end
 
+	def reorderitem
+
+		#@binder = Binder.find(params[:id])
+
+		#@params = params
+
+		@children = Binder.where("parent.id" => Binder.find(params[:data].first.to_s).parent['id'])
+
+		i=0
+
+		params[:data].each do |f|
+
+			Binder.find(params[:data][i].to_s).update_attribute('order_index',i)
+			i += 1
+
+		end
+
+		#Rails.logger.debug params.to_s
+
+
+
+		#redirect_to '/reorder'
+
+
+		respond_to do |format|
+			format.js {render :text => "1"}
+			format.html {render :text => "1"}
+		end
+
+		#@binder.move_to_index
+
+	end
+
 	#Process for moving any binders
 	#TODO: Add sanity check, make sure no folder-in-self or folder-in-child situation
 	def moveitem

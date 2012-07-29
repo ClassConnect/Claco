@@ -37,10 +37,11 @@ Claco::Application.routes.draw do
 	#subscriptions
 	get		'/subs'															=> 'teachers#subs'
 
-
 	get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',	:as => 'show_binder'
 
 	resources :teachers, :only => [:show, :index]
+
+	post	'utils/gettitle'												=> 'home#gettitle'
 
 	###################
 	# MESSAGE ROUTING #

@@ -1,9 +1,17 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => :index,:except => :autocomplete
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete]
 
 	def index
 		@title = "Home Page"
 		@teachers = Teacher.all
+	end
+
+	def gettitle
+		open(params[:url].to_s).read =~ /<title>(.*?)<\/title>/
+
+		respond_to do |format|
+			format.html {render :text => $1}
+		end
 	end
 
 	def autocomplete

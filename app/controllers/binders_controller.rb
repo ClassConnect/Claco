@@ -112,7 +112,7 @@ class BindersController < ApplicationController
 
 		@title = "Viewing: #{@binder.title}"
 
-		@children = teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children
+		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children).sort_by { |c| c.order_index }
 		
 		# respond_to do |format|
 		# 	format.html {render :text => 1}

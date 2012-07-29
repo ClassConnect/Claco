@@ -73,7 +73,17 @@ function editInit() {
 
     if (container.hasClass('act-live')) {
 
-      tagsToJSON();
+      tagdata = tagsToJSON('#folder-tags');
+      
+      $.ajax({
+        url: document.location.href + '/tags',
+        data: tagdata,
+        type: 'put',
+        success: function(data) {
+          // do nothing
+        }
+      });
+
       container.removeClass('act-live');
       $(this).removeClass('btn-primary savebtn').html('Add New');
 

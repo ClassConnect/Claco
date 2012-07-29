@@ -307,16 +307,7 @@ function tagsToJSON(identifier) {
   });
 
 
-  console.log(finTags);
-
-  $.ajax({
-  url: "post.php",
-  data: finTags,
-  type: 'post',
-  success: function(data) {
-    alert(data);
-  }
-});
+  return finTags;
 }
 
 

@@ -112,11 +112,11 @@ class BindersController < ApplicationController
 
 		@title = "Viewing: #{@binder.title}"
 
-		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children).sort_by { |c| c.order_index }
+		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children).sort_by {|c| c.order_index}
 		
 		respond_to do |format|
 		 	format.html
-			format.json {render :json => @children.collect{|c| {"name" => c.title, "id" => c.id}}.to_json}
+			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.to_json}
 		end
 
 		rescue BSON::InvalidObjectId
@@ -637,7 +637,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from(params[:binder][:parent])
+		@inherited = inherit_from(params[:folid])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
@@ -726,13 +726,13 @@ class BindersController < ApplicationController
 										:total_size			=> h.total_size)
 
 				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-														:file_hash	=> h.current_version.file_hash,
-														:timestamp	=> h.current_version.timestamp,
-														:size		=> h.current_version.size,
-														:ext		=> h.current_version.ext,
-														:data		=> h.current_version.data,
-														:croc_uuid	=> h.current_version.croc_uuid,
-														:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+													:file_hash	=> h.current_version.file_hash,
+													:timestamp	=> h.current_version.timestamp,
+													:size		=> h.current_version.size,
+													:ext		=> h.current_version.ext,
+													:data		=> h.current_version.data,
+													:croc_uuid	=> h.current_version.croc_uuid,
+													:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
 				#TODO: copy related images?
 
@@ -760,9 +760,14 @@ class BindersController < ApplicationController
 			end
 		end
 
-		redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
+		# redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
-		redirect_to binders_path
+		# redirect_to binders_path
+
+		respond_to do |format|
+			format.html {render :text => 1}
+		end
+
 	end
 
 
@@ -1305,7 +1310,7 @@ class BindersController < ApplicationController
 				retstr += "/#{CGI.escape(binder.root)}" 
 			end
 
-			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+			retstr += "/#{binder.title.parameterize}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

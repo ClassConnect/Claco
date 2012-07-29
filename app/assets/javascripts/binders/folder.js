@@ -55,6 +55,9 @@ function editInit() {
     } else if ($(this).attr('id') == 'copy-act') {
       popForm('copy-form', $(this).parent().parent().parent().parent().parent());
 
+    } else if ($(this).attr('id') == 'move-act') {
+      popForm('move-form', $(this).parent().parent().parent().parent().parent());
+
     }
 
 
@@ -69,6 +72,18 @@ function editInit() {
     container = $(this).parent().parent().parent();
 
     if (container.hasClass('act-live')) {
+
+      tagdata = tagsToJSON('#folder-tags');
+      
+      $.ajax({
+        url: document.location.href + '/tags',
+        data: tagdata,
+        type: 'put',
+        success: function(data) {
+          // do nothing
+        }
+      });
+
       container.removeClass('act-live');
       $(this).removeClass('btn-primary savebtn').html('Add New');
 
@@ -434,15 +449,58 @@ function popForm(formID, obje) {
       newTitle = $("#facebox").find('.rename-title').val();
       fbFormSubmitted();
 
+
       $.ajax({
         type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/rename",
+        url: obje.find('.titler a').attr("href") + "/copy",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            obje.find('.titler a').text(newTitle);
-            setTimeout(function() {obje.effect('highlight');},100);
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Copied successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+
+  } else if (formID == 'move-form') {
+
+
+    // set a smaller facebox width
+    $('#facebox .content').width('330px');
+    $('#facebox .popup').width('350px');
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/move",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+
 
           } else {
             fbFormRevert();

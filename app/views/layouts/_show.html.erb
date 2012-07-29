@@ -121,7 +121,7 @@ end %>
 					          <ul class="dropdown-menu">
 					            <li><a id="rename-act" class="modaction">Rename</a></li>
 					            <li><a id="copy-act" class="modaction">Copy</a></li>
-					            <li><a href="#">Move</a></li>
+					            <li><a id="move-act" class="modaction">Move</a></li>
 					            <li><a id="delete-act" class="modaction">Delete</a></li>
 					          </ul>
 
@@ -347,14 +347,11 @@ end %>
     <form action="#" class="bodcon">
       <div class="conitem">
 
-
-        
-
         <div class="fol-picker" style="margin-bottom:10px">
 
           <div class="togbar" onclick="togglePicker(this)">
             <span class="chosenTitle">
-              <i>Choose a binder or folder to copy to</i>
+              <i>Choose a binder or folder to copy this to</i>
             </span>
             <div class="down-arrow"></div>
             <input type="hidden" name="folid" class="chosenOne" value="" />
@@ -362,31 +359,24 @@ end %>
 
           <div class="pickerpane">
 
+
+            <% Binder.where("parent.id" => "0", :owner => current_teacher.id).each do |binder| %>
+
             <div class="bndr">
 
-              <div class="dir" folid="xyz">
+              <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
                 <div class="arrow-right" onclick="togglePickFolder(this)"></div>
                 <span class="dirtitle" onclick="selectPickFolder(this)">
                   <img src="/assets/binders/folder.png" class="foldicon" />
-                  Math Semester 1
+                  <%= binder.title %>
                 </span>
                 <div class="dirWrap"></div>
 
               </div>
             </div>
 
-            <div class="bndr">
+            <% end %>
 
-              <div class="dir" folid="abc">
-                <div class="arrow-right" onclick="togglePickFolder(this)"></div>
-                <span class="dirtitle" onclick="selectPickFolder(this)">
-                  <img src="/assets/binders/folder.png" class="foldicon" />
-                  DES Semester 1
-                </span>
-                <div class="dirWrap"></div>
-
-              </div>
-            </div>
 
           </div>
         </div>
@@ -397,6 +387,64 @@ end %>
 
       <div class="buttonbar">
          <button class="btn btn-primary showloader" type="submit">Copy this!</button>
+         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+
+
+  <div id="move-form" style="display:none">
+    <div class="headtitle">
+      Move
+    </div>
+
+    <div class="errorBox"></div>
+
+    <form action="#" class="bodcon">
+      <div class="conitem">
+
+        <div class="fol-picker" style="margin-bottom:10px">
+
+          <div class="togbar" onclick="togglePicker(this)">
+            <span class="chosenTitle">
+              <i>Choose a binder or folder to move this to</i>
+            </span>
+            <div class="down-arrow"></div>
+            <input type="hidden" name="target" class="chosenOne" value="" />
+          </div>
+
+          <div class="pickerpane">
+
+
+            <% Binder.where("parent.id" => "0", :owner => current_teacher.id).each do |binder| %>
+
+            <div class="bndr">
+
+              <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
+                <div class="arrow-right" onclick="togglePickFolder(this)"></div>
+                <span class="dirtitle" onclick="selectPickFolder(this)">
+                  <img src="/assets/binders/folder.png" class="foldicon" />
+                  <%= binder.title %>
+                </span>
+                <div class="dirWrap"></div>
+
+              </div>
+            </div>
+
+            <% end %>
+
+
+          </div>
+        </div>
+
+
+
+      </div>
+
+      <div class="buttonbar">
+         <button class="btn btn-primary showloader" type="submit">Move this!</button>
          <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
       </div>
 

@@ -89,7 +89,7 @@ Claco::Application.routes.draw do
 	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem'
 	#post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem'
 
-	put		'/reorder'														=> 'binders#reorderitem', :as => 'reorder_path'
+	put		'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem', :as => 'reorder_path'
 	#get	'/reorder'														=> 'binders#reorderitem'
 
 	#Copy

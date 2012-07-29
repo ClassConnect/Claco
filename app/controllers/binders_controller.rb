@@ -494,7 +494,7 @@ class BindersController < ApplicationController
 
 		#@params = params
 
-		@children = Binder.where("parent.id" => Binder.find(params[:data].first.to_s).parent['id'])
+		@children = Binder.where("parent.id" => params[:parentid].to_s)
 
 		i=0
 

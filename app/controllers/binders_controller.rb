@@ -114,12 +114,10 @@ class BindersController < ApplicationController
 
 		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0 } : @binder.children).sort_by { |c| c.order_index }
 		
-		# respond_to do |format|
-		# 	format.html {render :text => 1}
-		# 	format.js
-		# 	format.xml {render :xml => @children.to_xml}
-		# 	format.json {render :json => @children.to_json}
-		# end
+		respond_to do |format|
+		 	format.html
+			format.json {render :json => @children.collect(&:id).to_json}
+		end
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -304,7 +302,6 @@ class BindersController < ApplicationController
 
 
 		respond_to do |format|
-			format.js {render :text => "1"}
 			format.html {render :text => "1"}
 		end
 	end
@@ -513,7 +510,6 @@ class BindersController < ApplicationController
 
 
 		respond_to do |format|
-			format.js {render :text => "1"}
 			format.html {render :text => "1"}
 		end
 

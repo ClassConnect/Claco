@@ -346,7 +346,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });
@@ -367,8 +367,8 @@ function popForm(formID, obje) {
 
 
       $.ajax({
-        type: "DELETE",  
-        url: obje.find('.titler a').attr("href"),  
+        type: "DELETE",
+        url: obje.find('.titler a').attr("href"),
         data: serData,
         success: function(retData) {
           if (retData == 1) {
@@ -383,7 +383,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });

@@ -25,10 +25,7 @@
 		<header>
 			<%= render 'layouts/navigation' %>
 		</header>
-		<!-- <% if current_teacher %>
-		<%= current_teacher.inspect %>
-		<% end %> -->
-		<%= %> <!-- render 'shared/error_messages' -->
+
 		<div data-pjax-container>
 			<%= yield %>
 		</div>
@@ -40,7 +37,7 @@
 			<hr>
 
 			<footer>
-			<p>&copy; ClassConnect 2012 <%= Random.rand(1001) %></p>
+			<p>&copy; ClassConnect 2012</p>
 			</footer>
 		</div>
 

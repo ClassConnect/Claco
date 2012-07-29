@@ -169,13 +169,8 @@ $(document).ready(function() {
 
           olist = { data: olist };
 
-          //alert(document.location.href + "/reorder");
-
-          // send final data to server
           $.ajax({
-            //url: "post.php",
             url: document.location.href + "/reorder",
-            //url: "/reorder",
             data: olist,
             type: 'put',
             success: function(data) {

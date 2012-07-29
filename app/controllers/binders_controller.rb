@@ -302,7 +302,6 @@ class BindersController < ApplicationController
 									:last_updated_by	=> current_teacher.id.to_s,
 									:body				=> params[:text])
 
-
 		respond_to do |format|
 			format.html {render :text => "1"}
 		end
@@ -341,7 +340,25 @@ class BindersController < ApplicationController
 
 	def updatetags
 
+		@binder = Binder.find(params[:id])
+
 		Rails.logger.debug params.to_s
+		Rails.logger.debug params["standards"].to_s
+
+		@binder.tag.update_node_tags(params,current_teacher.id)
+
+		@binder.children.sort_by {|binder| binder.parents.length}.each do |h|
+
+			h.update_parent_tags()
+
+			#h.save
+
+		end
+
+		respond_to do |format|
+			format.html {render :text => "1"}
+			format.html {render :text => "1"}
+		end
 
 	end
 

@@ -74,11 +74,11 @@ function editInit() {
     if (container.hasClass('act-live')) {
 
       tagdata = tagsToJSON('#folder-tags');
-      
+
       $.ajax({
-        url: document.location.href + '/tags',
+        url: document.location.href + "/tags",
         data: tagdata,
-        type: 'put',
+        type: 'post',
         success: function(data) {
           // do nothing
         }

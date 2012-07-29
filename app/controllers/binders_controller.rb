@@ -116,8 +116,8 @@ class BindersController < ApplicationController
 		
 		respond_to do |format|
 		 	format.html
-			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.to_json}
-		end
+			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.end}
+		to_json
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -507,6 +507,23 @@ class BindersController < ApplicationController
 
 
 		#redirect_to '/reorder'
+
+
+		# @children = Binder.where("parent.id" => params[:id])
+
+		# @ok = @children.size == params[:data].size
+
+		# if @ok
+
+		# 	@childids = @children.collect{|c| c.id.to_s}
+
+		# 	params[:data].each {|d| @ok = false if !@childids.include?(d)}
+
+		# end
+
+		# @children.each {|c| c.update_attributes(:order_index => params[:data].index(c.id.to_s))} if @ok
+
+
 
 
 		respond_to do |format|

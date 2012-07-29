@@ -194,7 +194,9 @@ class BindersController < ApplicationController
 			RestClient.get(params[:binder][:versions][:data])
 		rescue
 			Rails.logger.debug "Invalid URL detected"
-			raise "Invalid URL: <#{params[:binder][:versions][:data]}>" and return
+			#raise "Invalid URL: <#{params[:binder][:versions][:data]}>" and return
+			flash[:invalidurl] = "Invalid URL passed"
+			render new_binder_content_path and return
 		end
 
 		# the RestClient object will catch most of the error codes before getting to here
@@ -206,7 +208,7 @@ class BindersController < ApplicationController
 
 		#Trim to 60 chars (old spec)
 		if params[:binder][:title].length < 1
-			redirect_to new_binder_content_path and return
+			render new_binder_content_path and return
 		end
 
 		@inherited = inherit_from(params[:binder][:parent])
@@ -334,6 +336,12 @@ class BindersController < ApplicationController
 		respond_to do |format|
 			format.html {render :text => "1"}
 		end
+
+	end
+
+	def updatetags
+
+		Rails.logger.debug params.to_s
 
 	end
 

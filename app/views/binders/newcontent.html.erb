@@ -1,6 +1,10 @@
 <h3>Binders#newcontent</h3>
 <p>app/views/binders/newcontent.html.erb</p>
 
+<% if flash[:invalidurl] %>
+  <%= flash[:invalidurl] %>
+<% end %>
+
 <%= form_for Binder.new, :url => new_binder_content_path do |f| %>
 
   <div><%= f.label :title, "Title" %><br />

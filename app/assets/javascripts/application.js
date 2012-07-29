@@ -138,14 +138,30 @@ function togglePickFolder(fObj) {
 	} else {
 		$(fObj).parent().find(".dirWrap").html('Loading...').show();
 		$(fObj).addClass('arrow-down').removeClass('arrow-right');
-		/*
-		$.ajax({
-			type: "GET",
-			url: "/app/common/picker/" + $(fObj).parent().attr('folid'),
-			success: function(data) {
-				$(fObj).parent().find(".dirWrap").html(data);
+		
+
+		$.getJSON($(fObj).parent().attr('turl') + '.json', function(data) {
+
+			$(fObj).parent().find(".dirWrap").html('');
+
+			$.each(data, function(key, val) {
+				if (val['type'] == 1) {
+					$(fObj).parent().find(".dirWrap").append('<div class="dir" folid="' + val['id'] + '" turl="' + val['path'] + '">\
+                <div class="arrow-right" onclick="togglePickFolder(this)"></div>\
+                <span class="dirtitle" onclick="selectPickFolder(this)">\
+                  <img src="/assets/binders/folder.png" class="foldicon" />\
+                  ' + val['name'] + '\
+                </span>\
+                <div class="dirWrap"></div>\
+              </div>');
+				}
+			});
+
+
+			if ($(fObj).parent().find(".dirWrap").html() == '') {
+				$(fObj).parent().find(".dirWrap").html('No folders found here');
 			}
-		}); */
+		});
 
 	}
 

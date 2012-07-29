@@ -347,9 +347,6 @@ end %>
     <form action="#" class="bodcon">
       <div class="conitem">
 
-
-        
-
         <div class="fol-picker" style="margin-bottom:10px">
 
           <div class="togbar" onclick="togglePicker(this)">
@@ -362,31 +359,24 @@ end %>
 
           <div class="pickerpane">
 
+
+            <% Binder.where("parent.id" => "0", :owner => current_teacher.id).each do |binder| %>
+
             <div class="bndr">
 
-              <div class="dir" folid="xyz">
+              <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
                 <div class="arrow-right" onclick="togglePickFolder(this)"></div>
                 <span class="dirtitle" onclick="selectPickFolder(this)">
                   <img src="/assets/binders/folder.png" class="foldicon" />
-                  Math Semester 1
+                  <%= binder.title %>
                 </span>
                 <div class="dirWrap"></div>
 
               </div>
             </div>
 
-            <div class="bndr">
+            <% end %>
 
-              <div class="dir" folid="abc">
-                <div class="arrow-right" onclick="togglePickFolder(this)"></div>
-                <span class="dirtitle" onclick="selectPickFolder(this)">
-                  <img src="/assets/binders/folder.png" class="foldicon" />
-                  DES Semester 1
-                </span>
-                <div class="dirWrap"></div>
-
-              </div>
-            </div>
 
           </div>
         </div>

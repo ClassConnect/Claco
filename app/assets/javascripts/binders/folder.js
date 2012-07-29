@@ -434,15 +434,17 @@ function popForm(formID, obje) {
       newTitle = $("#facebox").find('.rename-title').val();
       fbFormSubmitted();
 
+
       $.ajax({
         type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/rename",
+        url: obje.find('.titler a').attr("href") + "/copy",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            obje.find('.titler a').text(newTitle);
-            setTimeout(function() {obje.effect('highlight');},100);
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Copied successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+
 
           } else {
             fbFormRevert();

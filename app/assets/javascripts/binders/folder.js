@@ -55,6 +55,9 @@ function editInit() {
     } else if ($(this).attr('id') == 'copy-act') {
       popForm('copy-form', $(this).parent().parent().parent().parent().parent());
 
+    } else if ($(this).attr('id') == 'move-act') {
+      popForm('move-form', $(this).parent().parent().parent().parent().parent());
+
     }
 
 
@@ -455,6 +458,46 @@ function popForm(formID, obje) {
         }
         
       });
+
+      return false;
+    });
+    // end of form handler
+
+
+  } else if (formID == 'move-form') {
+
+
+    // set a smaller facebox width
+    $('#facebox .content').width('330px');
+    $('#facebox .popup').width('350px');
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/move",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
 
       return false;
     });

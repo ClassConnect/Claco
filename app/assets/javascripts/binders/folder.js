@@ -169,13 +169,8 @@ $(document).ready(function() {
 
           olist = { data: olist };
 
-          //alert(document.location.href + "/reorder");
-
-          // send final data to server
           $.ajax({
-            //url: "post.php",
             url: document.location.href + "/reorder",
-            //url: "/reorder",
             data: olist,
             type: 'put',
             success: function(data) {
@@ -346,7 +341,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });
@@ -367,8 +362,8 @@ function popForm(formID, obje) {
 
 
       $.ajax({
-        type: "DELETE",  
-        url: obje.find('.titler a').attr("href"),  
+        type: "DELETE",
+        url: obje.find('.titler a').attr("href"),
         data: serData,
         success: function(retData) {
           if (retData == 1) {
@@ -383,7 +378,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });

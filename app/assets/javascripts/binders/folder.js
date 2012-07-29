@@ -72,6 +72,8 @@ function editInit() {
     container = $(this).parent().parent().parent();
 
     if (container.hasClass('act-live')) {
+
+      tagsToJSON();
       container.removeClass('act-live');
       $(this).removeClass('btn-primary savebtn').html('Add New');
 

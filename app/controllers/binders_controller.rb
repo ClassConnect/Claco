@@ -657,15 +657,17 @@ class BindersController < ApplicationController
 
 		#@new_parent.format = @binder.format if @binder.type == 2
 
-		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-											:file_hash	=> @binder.current_version.file_hash,
-											:timestamp	=> @binder.current_version.timestamp,
-											:size		=> @binder.current_version.size,
-											:ext		=> @binder.current_version.ext,
-											:data		=> @binder.current_version.data,
-											:croc_uuid 	=> @binder.current_version.croc_uuid,
-											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
+		# @new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
+		# 									:file_hash	=> @binder.current_version.file_hash,
+		# 									:timestamp	=> @binder.current_version.timestamp,
+		# 									:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
+		# 									:size		=> @binder.current_version.size,
+		# 									:ext		=> @binder.current_version.ext,
+		# 									:data		=> @binder.current_version.data,
+		# 									:croc_uuid 	=> @binder.current_version.croc_uuid,
+		# 									:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
 
+		@new_parent.versions << @binder.current_version
 
 		#TODO: copy related images?
 
@@ -717,14 +719,17 @@ class BindersController < ApplicationController
 										:folders			=> h.folders,
 										:total_size			=> h.total_size)
 
-				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-													:file_hash	=> h.current_version.file_hash,
-													:timestamp	=> h.current_version.timestamp,
-													:size		=> h.current_version.size,
-													:ext		=> h.current_version.ext,
-													:data		=> h.current_version.data,
-													:croc_uuid	=> h.current_version.croc_uuid,
-													:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+				# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+				# 									:file_hash	=> h.current_version.file_hash,
+				# 									:timestamp	=> h.current_version.timestamp,
+				# 									:size		=> h.current_version.size,
+				# 									:ext		=> h.current_version.ext,
+				# 									:data		=> h.current_version.data,
+				# 									:croc_uuid	=> h.current_version.croc_uuid,
+				# 									:imgfile	=> h.current_version.imgfile,
+				# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+
+				@new_node.versions << h.current_version
 
 				#TODO: copy related images?
 

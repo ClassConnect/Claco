@@ -133,9 +133,9 @@ function editInit() {
       if ($('.tags li').length > 0) {
         // we're doing a custom open up
         $('.tag-group').each(function(index) {
-            //if ($(this).find('.tags li').length == 0) {
+            if ($(this).find('.tags li').length == 0) {
               $(this).css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
-            //}
+            }
         });
 
         

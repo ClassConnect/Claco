@@ -384,6 +384,8 @@ class BindersController < ApplicationController
 
 		@binder.children.sort_by {|binder| binder.parents.length}.each do |h|
 
+			h.tag = Tag.new
+
 			h.update_parent_tags()
 
 			#h.save

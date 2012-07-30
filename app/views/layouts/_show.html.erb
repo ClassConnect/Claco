@@ -115,7 +115,7 @@ end %>
 
 			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => binder.type == 1 ? "pjax" : "" %></div>
 
-			            <div class="descarea">Last updated by <a href="#">Eric Simons</a> at 2:33pm</div>
+			            <div class="descarea">Last updated by <%= link_to binder.handle, "#" %> at <%= Time.at(binder.last_update).to_datetime %></div>
 
 			            <div class="drop-tog">
 			            	<div class="btn-group">
@@ -339,8 +339,6 @@ end %>
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the web page"></textarea>
 
-        <% #<input name="conid" class="conid" type="hidden" /> %>
-
       </div>
 
       <div class="buttonbar">
@@ -369,8 +367,6 @@ end %>
 
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the folder"></textarea>
-
-        <input name="conid" class="conid" type="hidden" />
 
       </div>
 

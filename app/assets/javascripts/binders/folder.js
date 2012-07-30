@@ -578,7 +578,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });
@@ -596,8 +596,8 @@ function popForm(formID, obje) {
 
 
       $.ajax({
-        type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/",
+        type: "POST",
+        url: document.location.href + "/create",
         data: serData,
         success: function(retData) {
           if (retData == 1) {

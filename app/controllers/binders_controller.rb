@@ -32,63 +32,82 @@ class BindersController < ApplicationController
 		#Must be logged in to write
 
 		#Trim to 60 chars (old spec)
-		if params[:binder][:title].length < 1
-			redirect_to new_binder_path and return
-		end
 
-		@inherited = inherit_from(params[:binder][:parent])
+		errors = []
 
-		@parenthash = @inherited[:parenthash]
-		@parentsarr = @inherited[:parentsarr]
-		@parentperarr = @inherited[:parentperarr]
+		if params[:foldertitle].length > 1
 
-		@parent = @inherited[:parent]
+			@inherited = inherit_from(params[:id])
 
-		@parent_child_count = @inherited[:parent_child_count]
+			@parenthash = @inherited[:parenthash]
+			@parentsarr = @inherited[:parentsarr]
+			@parentperarr = @inherited[:parentperarr]
 
-		# doesn't work
-		#redirect_to "/403.html" and return if @parent.get_access(current_teacher.id) != 1
+			@parent = @inherited[:parent]
 
-		#Update parents' folder counts
-		if @parentsarr.size > 1
-			pids = @parentsarr.collect {|p| p["id"] || p[:id]}
-			
-			pids.each do |pid| 
-				if pid != "0"
-					Binder.find(pid).inc(:folders, 1)
+			@parent_child_count = @inherited[:parent_child_count]
+
+			if @parent.get_access(current_teacher.id) == 2
+
+				#Update parents' folder counts
+				if @parentsarr.size > 1
+					pids = @parentsarr.collect {|p| p["id"] || p[:id]}
+					
+					pids.each do |pid| 
+						if pid != "0"
+							Binder.find(pid).inc(:folders, 1)
+						end
+						#Binder.find(pid).inc(:folders, 1) if pid != "0"
+					end
+
+					Binder.find(pids.last).inc(:children,1) if pids.last != "0"
 				end
-				#Binder.find(pid).inc(:folders, 1) if pid != "0"
+
+				new_binder = Binder.new(:owner				=> current_teacher.id,
+										:fname				=> current_teacher.fname,
+										:lname				=> current_teacher.lname,
+										:username			=> current_teacher.username,
+										:title				=> params[:foldertitle].to_s[0..60],
+										:parent				=> @parenthash,
+										:parents			=> @parentsarr,
+										:body				=> params[:body],
+										# :permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
+										# 													:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
+										# 													:auth_level	=> params[:auth_level]}] : []),
+										:order_index		=> @parent_child_count,
+										:parent_permissions	=> @parentperarr,
+										:last_update		=> Time.now.to_i,
+										:last_updated_by	=> current_teacher.id.to_s,
+										:type				=> 1)
+
+				new_binder.save
+
+				new_binder.create_binder_tags(params,current_teacher.id)
+
+			else
+
+				errors << "You do not have permissions to write to #{@parent.title}"
+
 			end
 
-			Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+		else
+
+			errors << "Please enter a title"
+
 		end
-
-		new_binder = Binder.new(:owner				=> current_teacher.id,
-								:fname				=> current_teacher.fname,
-								:lname				=> current_teacher.lname,
-								:username			=> current_teacher.username,
-								:title				=> params[:binder][:title].to_s[0..60],
-								:parent				=> @parenthash,
-								:parents			=> @parentsarr,
-								:body				=> params[:binder][:body],
-								:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
-																					:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-																					:auth_level	=> params[:auth_level]}] : []),
-								:order_index		=> @parent_child_count,
-								:parent_permissions	=> @parentperarr,
-								:last_update		=> Time.now.to_i,
-								:last_updated_by	=> current_teacher.id.to_s,
-								:type				=> 1)
-
-		new_binder.save
-
-		new_binder.create_binder_tags(params,current_teacher.id)
 
 		# this line breaks creation of new leaf binders
 		#redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
 		#redirect_to named_binder_route(params[:binder][:parent]) if params[:binder][:parent] != "0"
 
-		redirect_to binders_path
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
+			end
 
 	end
 
@@ -101,7 +120,9 @@ class BindersController < ApplicationController
 
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
-		redirect_to "/404.html" and return if !binder_routing_ok?(@binder, params[:action])
+		if !binder_routing_ok?(@binder, params[:action])
+			redirect_to named_binder_route(@binder, params[:action]) and return
+		end
 
 		redirect_to "/403.html" and return if @access == 0
 
@@ -241,7 +262,7 @@ class BindersController < ApplicationController
 										:parents			=> @parentsarr,
 										:last_update		=> Time.now.to_i,
 										:last_updated_by	=> current_teacher.id.to_s,
-										#:body				=> params[:binder][:body],
+										:body				=> params[:body],
 										#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
 										#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
 										#						:auth_level => params[:auth_level]}] : []),
@@ -430,6 +451,7 @@ class BindersController < ApplicationController
 									:owner				=> current_teacher.id,
 									:fname				=> current_teacher.fname,
 									:lname				=> current_teacher.lname,
+									:username			=> current_teacher.username,
 									:parent				=> @parenthash,
 									:parents			=> @parentsarr,
 									:last_update		=> Time.now.to_i,
@@ -610,7 +632,6 @@ class BindersController < ApplicationController
 	end
 
 	#Process for moving any binders
-	#TODO: Add sanity check, make sure no folder-in-self or folder-in-child situation
 	def moveitem
 
 		errors = []

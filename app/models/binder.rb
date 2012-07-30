@@ -233,6 +233,10 @@ class Binder
 		return owner == id.to_s
 	end
 
+	def user
+		return username || "#{fname} #{lname}"
+	end
+
 	def handle
 		return username || owner
 	end

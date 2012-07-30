@@ -6,7 +6,7 @@ class HomeController < ApplicationController
 		@teachers = Teacher.all
 	end
 
-	def gettitle
+	def fetchtitle
 		RestClient.get(params[:url]) =~ /<title>(.*?)<\/title>/
 
 		rescue

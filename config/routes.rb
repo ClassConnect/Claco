@@ -41,9 +41,7 @@ Claco::Application.routes.draw do
 
 	resources :teachers, :only => [:show, :index]
 
-	post	'utils/gettitle'												=> 'home#gettitle'
-
-	get	'utils/gettitle'												=> 'home#gettitle'
+	post	'utils/fetchtitle'												=> 'home#fetchtitle'
 
 	###################
 	# MESSAGE ROUTING #

@@ -531,7 +531,7 @@ function popForm(formID, obje) {
         // get the title
         $.ajax({
           type: "POST",
-          url: "/utils/gettitle",
+          url: "/utils/fetchtitle",
           data: 'url=' + escape($('#facebox .weblink').val()),
           success: function(titleData) {
             $('#facebox .webtitle').val(titleData.substring(0, 60));

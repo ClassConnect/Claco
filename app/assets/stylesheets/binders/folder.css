@@ -1274,3 +1274,48 @@ a.fork {
   font-weight:bolder;
   margin-left:3px;
 }
+
+
+
+
+
+
+
+
+
+.file-upload-btn {
+  margin-left:55px;
+  overflow: hidden;
+  display: inline-block;
+  position: relative; 
+  vertical-align: middle;
+  text-align: center;
+
+
+  /* Nice if your browser can do it */
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+  text-shadow: #000 1px 1px 4px;
+}
+
+
+.file-upload-btn input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  font-size: 70px;
+
+  /* Loses tab index in webkit if width is set to 0 */
+  opacity: 0;
+  filter: alpha(opacity=0);
+}
+
+.file-upload-btn .btnsauce {
+  font-size:12px;
+  font-weight:bolder;
+  padding:7px 20px 5px 20px;
+
+  display: inline-block;
+}

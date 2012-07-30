@@ -320,7 +320,7 @@ class BindersController < ApplicationController
 
 		@binder.update_attributes(	:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s,
-									:body				=> params[:text])
+									:body				=> params[:text].strip)
 
 		respond_to do |format|
 			format.html {render :text => "1"}
@@ -1374,7 +1374,7 @@ class BindersController < ApplicationController
 				retstr += "/#{CGI.escape(binder.root)}" 
 			end
 
-			retstr += "/#{binder.title.parameterize}/#{binder.id}"
+			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

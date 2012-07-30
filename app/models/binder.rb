@@ -54,7 +54,7 @@ class Binder
 	field :comments, :type => Array
 
 	# [Large, Small1, Small2] - strings
-	field :thumbimgids, :type => Array
+	field :thumbimgids, :type => Array, :default => []
 
 	field :debug_data, :type => Array, :default => []
 
@@ -80,7 +80,7 @@ class Binder
 
 
 	# recursive call to parent to set the folder thumbnail
-	def generate_folder_thumbnail(id,imageset)
+	def self.generate_folder_thumbnail(id,imageset = [[],[],[],[]])
 
 		binder = Binder.find(id.to_s)
 
@@ -111,7 +111,7 @@ class Binder
 					break# if binder.thumbids.size == 3
 				end
 			end
-			break if binder.thumbids.size == 1
+			break if binder.thumbimgids.size == 1
 		end
 
 		# generate remaining thumbnails
@@ -122,10 +122,10 @@ class Binder
 					# technically not necessary until random retrieval
 					# is popping the LAST one, not the first one
 					binder.thumbimgids << i.pop
-					break if binder.thumbids.size == 3
+					break if binder.thumbimgids.size == 3
 				end
 			end
-			break if binder.thumbids.size == 3
+			break if binder.thumbimgids.size == 3
 		end
 
 		binder.save
@@ -388,6 +388,8 @@ class Binder
 									:imgclass => 3,										
 									:imgstatus => stathash)
 
+		self.generate_folder_thumbnail(id)
+
 
 	end
 
@@ -405,6 +407,8 @@ class Binder
 		target.update_attributes(	:remote_imgfile_url => url,
 									:imgclass => 2,
 									:imgstatus => stathash)
+
+		self.generate_folder_thumbnail(id)
 
 	end
 
@@ -467,6 +471,8 @@ class Binder
 		target.update_attributes(	:remote_imgfile_url => api_url,
 									:imgclass => 2,
 									:imgstatus => stathash)
+
+		self.generate_folder_thumbnail(id)
 
 	end
 

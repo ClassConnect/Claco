@@ -166,9 +166,9 @@ end %>
           <div class="empty-tog fortags" style="<%= @tagset.any? ? raw("opacity: 0; display: none;") : raw("") %>">You haven't added any tags...yet!</div>
 
           <!-- <div class="content-fill" style="display:none"> -->
-          <div class="content-fill" style="display:block; opacity:1;">
+          <div class="content-fill" style="<%= @tagset.any? ? raw("display:block; opacity:1;") : raw("display:none") %>">
 
-            <div class="tag-group tagged-grades" <%= tagvis(@tags[0]) %>>
+            <div class="tag-group tagged-grades" <%= tagvis(@tags[0],@tagset) %>>
               <div class="announce">
                 Grade Levels
               </div>
@@ -189,15 +189,15 @@ end %>
             </div>
 
 
-            <div id="grade-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
-            <%= #tagvis(@tags[0]) 
+            <div id="grade-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
+            %><%= boxvis(@tagset)  
             %>>
               <input type="text" class="add-field grade-addfield" placeholder="Ex: '1st', 'Second Grade'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
 
 
-            <div class="tag-group tagged-subjects" <%= tagvis(@tags[1]) %>>
+            <div class="tag-group tagged-subjects" <%= tagvis(@tags[1],@tagset) %>>
               <div class="announce">
                 Subjects
               </div>
@@ -218,15 +218,15 @@ end %>
             </div>
 
 
-            <div id="subject-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
-            <%= #tagvis(@tags[1]) 
+            <div id="subject-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
+            %><%= boxvis(@tagset) 
             %>>
               <input type="text" class="add-field subject-addfield" placeholder="Ex: 'Math', 'History'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
 
 
-            <div class="tag-group tagged-standards" <%= tagvis(@tags[2]) %>>
+            <div class="tag-group tagged-standards" <%= tagvis(@tags[2],@tagset) %>>
               <div class="announce">
                 Standards
               </div>
@@ -246,15 +246,15 @@ end %>
               </div>
             </div>
 
-            <div id="standards-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
-            <%= #tagvis(@tags[2]) 
+            <div id="standards-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
+            %><%= boxvis(@tagset)  
             %>>
               <input type="text" class="add-field standards-addfield" placeholder="Ex: 'RL.K.1'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
 
 
-            <div class="tag-group tagged-other" <%= tagvis(@tags[3]) %>>
+            <div class="tag-group tagged-other" <%= tagvis(@tags[3],@tagset) %>>
               <div class="announce">
                 Keywords
               </div>
@@ -277,8 +277,8 @@ end %>
 
 
 
-            <div id="other-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
-            <%= #tagvis(@tags[3]) 
+            <div id="other-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
+            %><%= boxvis(@tagset)  
             %>>
               <input type="text" class="add-field other-addfield" placeholder="Ex: 'Civil War', 'edchat'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>

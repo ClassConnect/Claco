@@ -90,7 +90,7 @@ function editInit() {
       $.ajax({
         url: document.location.href + '/tags',
         data: tagdata,
-        type: 'put',
+        type: 'post',
         success: function(data) {
           // do nothing
         }

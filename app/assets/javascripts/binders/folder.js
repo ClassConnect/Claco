@@ -11,6 +11,7 @@ hovBool = false;
 isDropped = false;
 noteClick = false;
 noteInit = false;
+scrollBottom = false;
 
 $(document).ready(function() {
 
@@ -24,7 +25,12 @@ $(document).ready(function() {
 
 
 $(document).on('pjax:start', function() {
-  $('html, body').animate({ scrollTop: 0 }, 'fast');
+  if (scrollBottom === false) {
+    $('html, body').animate({ scrollTop: 0 }, 1500);
+  } else {
+    scrollBottom = false;
+  }
+  
   // show loading
   initAsyc('<img src=\'/assets/miniload.gif\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
 
@@ -35,6 +41,14 @@ $(document).on('pjax:start', function() {
 
 
 
+// function for soft refreshes
+function softRefresh() {
+  $.pjax({
+    url: document.location.href,
+    container: '[data-pjax-container]',
+    push: false
+  });
+}
 
 
 
@@ -520,8 +534,8 @@ function popForm(formID, obje) {
     titleCheck = false;
 
     $('#facebox .webtitle').focus(function() {
-      if ($('#facebox .webtitle').val() == '' && $('#urlLoc').val() != '' && titleCheck == false) {
-        $('#facebox .weblink').val('Retrieving the title for you...');
+      if ($('#facebox .webtitle').val() == '' && $('#facebox .weblink').val() != '' && titleCheck == false) {
+        $('#facebox .webtitle').val('Retrieving the title for you...');
         $('#facebox .webtitle').attr('disabled', 'disabled');
         fbFormActLoader();
 
@@ -529,7 +543,7 @@ function popForm(formID, obje) {
         $.ajax({
           type: "POST",
           url: "/utils/gettitle",
-          data: 'url=' + escape($('#urlLoc').val()),
+          data: 'url=' + escape($('#facebox .weblink').val()),
           success: function(titleData) {
             $('#facebox .webtitle').val(titleData.substring(0, 60));
             $('#facebox .webtitle').removeAttr('disabled');
@@ -561,10 +575,96 @@ function popForm(formID, obje) {
         data: serData,
         success: function(retData) {
           if (retData == 1) {
+            scrollBottom = true;
+            softRefresh();
             closefBox();
-            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
-            setTimeout(function() {destroyAsyc();},1500);
-            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
+
+      return false;
+    });
+    // end of form handler
+
+
+
+
+  } else if (formID == 'addfolder-form') {
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            scrollBottom = true;
+            softRefresh();
+            closefBox();
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });  
+
+      return false;
+    });
+    // end of form handler
+
+
+
+
+  } else if (formID == 'addfile-form') {
+
+
+    // initialize the file upload functionality
+    $('#facebox .filepick').fileupload({
+        dataType: 'json',
+        add: function (e, data) {
+            alert('added')
+        },
+        done: function (e, data) {
+            alert(1)
+        }
+    });
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            scrollBottom = true;
+            softRefresh();
+            closefBox();
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
 
 
           } else {

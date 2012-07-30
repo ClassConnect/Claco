@@ -146,11 +146,11 @@ class Binder
 	# updates all data within the Tag class
 	def create_binder_tags(params,teacher_id)
 
-		new_binder_parent = Binder.find(params[:binder][:parent]) if params[:binder][:parent] != "0"
+		new_binder_parent = Binder.find(params[:id]) if params[:id] != "0"
 
 		self.tag = Tag.new
 
-		self.tag.set_parent_tags(params,new_binder_parent) if params[:binder][:parent] != "0"
+		self.tag.set_parent_tags(params,new_binder_parent) if params[:id] != "0"
 
 		self.tag.set_node_tags(params,new_binder_parent,teacher_id)
 

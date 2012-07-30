@@ -7,13 +7,13 @@ class HomeController < ApplicationController
 	end
 
 	def gettitle
-		open(URI.parse(params[:url].to_s).to_s).read =~ /<title>(.*?)<\/title>/
+		RestClient.get(params[:url]) =~ /<title>(.*?)<\/title>/
 
-		rescue Exception
-			ex = true
+		rescue
+			
 		ensure
 			respond_to do |format|
-				format.html {render :text => ex ? " " : $1}
+				format.html {render :text => $1 || " "}
 			end
 	end
 

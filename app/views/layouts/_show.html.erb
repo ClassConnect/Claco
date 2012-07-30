@@ -13,6 +13,12 @@ end %>
 <% content_for :headcon do
 	javascript_include_tag "binders/taginit"
 end %>
+<% content_for :headcon do
+  javascript_include_tag "binders/upload/iframe-transport"
+end %>
+<% content_for :headcon do
+  javascript_include_tag "binders/upload/fileupload"
+end %>
 
 <div class="container">
   <div id="list-pane">
@@ -333,12 +339,77 @@ end %>
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the web page"></textarea>
 
-        <input name="conid" class="conid" type="hidden" />
+        <% #<input name="conid" class="conid" type="hidden" /> %>
 
       </div>
 
       <div class="buttonbar">
          <button class="btn btn-primary showloader" type="submit">Add this!</button>
+         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+
+
+
+
+
+  <div id="addfolder-form" style="display:none">
+    <div class="headtitle">
+      Add new folder
+    </div>
+
+    <div class="errorBox"></div>
+
+    <form action="#" class="bodcon">
+      <div class="conitem">
+        <input name="foldertitle" class="firstfocus webtitle" style="width:300px" type="text" placeholder="Title of the new folder" />
+
+        <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
+        <textarea class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the folder"></textarea>
+
+        <input name="conid" class="conid" type="hidden" />
+
+      </div>
+
+      <div class="buttonbar">
+         <button class="btn btn-primary showloader" type="submit">Add folder!</button>
+         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+
+
+
+
+  <div id="addfile-form" style="display:none">
+    <div class="headtitle">
+      Upload file
+    </div>
+
+    <div class="errorBox"></div>
+
+    <form action="#" class="bodcon">
+      <div class="conitem">
+
+        <div class="file-upload-btn">
+          <button class="btn btn-primary" style="font-size:16px; font-weight:bolder; padding:15px 20px 15px 20px">Choose a file to upload!</button>
+          <input name="file" class="filepick" style="width:300px" type="file" />
+        </div>
+
+
+        <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
+        <textarea class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the folder"></textarea>
+
+        <input name="conid" class="conid" type="hidden" />
+
+      </div>
+
+      <div class="buttonbar">
          <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
       </div>
 

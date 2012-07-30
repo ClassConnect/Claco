@@ -99,10 +99,7 @@ class BindersController < ApplicationController
 
 	def show
 
-		# example sort:
-		# @children = @binder.children.sort_by {|binder| binder.parents.length}
-
-		@binder = Binder.find(params[:id])#.sort_by { |binder| binder.order_index }
+		@binder = Binder.find(params[:id])
 
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
@@ -114,9 +111,15 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		redirect_to @binder.current_version.data and return if @binder.format == 2
+		@croc = false
 
-		redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
+		@croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
+
+		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
+
+		#redirect_to @binder.current_version.data and return if @binder.format == 2
+
+		#redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
@@ -139,6 +142,29 @@ class BindersController < ApplicationController
 		 	format.html
 			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
 		end
+
+		rescue BSON::InvalidObjectId
+			redirect_to "/404.html" and return
+		rescue Mongoid::Errors::DocumentNotFound
+			redirect_to "/404.html" and return
+
+	end
+
+	def download
+
+		@binder = Binder.find(params[:id])
+
+		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
+
+		if !binder_routing_ok?(@binder, params[:action])
+			redirect_to named_binder_route(@binder, params[:action]) and return
+		end
+
+		redirect_to "/403.html" and return if @access == 0
+
+		#TODO: Verify permissions before rendering view
+
+		redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -285,6 +311,7 @@ class BindersController < ApplicationController
 					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
 				end
 
+				@binder.create_binder_tags(params,current_teacher.id)
 
 				pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 

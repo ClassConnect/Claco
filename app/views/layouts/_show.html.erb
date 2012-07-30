@@ -28,66 +28,16 @@ end %>
 	isEditable=<%= @binder.get_access(current_teacher.id.to_s) > 0 ? "true" : "false"  %>;
 <% end %>
 
-			<div class="descbox content-editable">
-				<%= image_tag("pin.png", :class => 'pinim') %>
-          <div class="inner">
+    <%= render 'layouts/embed' if @binder.type == 2%>
 
-            <div class="real-text"><%= @binder.body.html_safe if !@binder.body.blank? %></div>
+    <%= render 'layouts/notepad' %>
 
-
-
-            <div class="wysi-edit">
-              <div id="wysitoolbar" style="display: none;">
-                <a data-wysihtml5-command="bold" title="CTRL+B"></a>
-                <a data-wysihtml5-command="italic" title="CTRL+I"></a>
-                <a data-wysihtml5-command="createLink"></a>
-                <a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1"></a>
-                <a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2"></a>
-                <a data-wysihtml5-command="insertUnorderedList"></a>
-                <a data-wysihtml5-command="insertOrderedList"></a>
-                <a data-wysihtml5-command="insertSpeech"></a>
-                
-                <div data-wysihtml5-dialog="createLink" style="display: none;">
-                  <label>
-                    Link:
-                    <input data-wysihtml5-dialog-field="href" value="http://">
-                  </label>
-                  <a data-wysihtml5-dialog-action="save">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel">Cancel</a>
-                </div>
-                
-                <div data-wysihtml5-dialog="insertImage" style="display: none;">
-                  <label>
-                    Image:
-                    <input data-wysihtml5-dialog-field="src" value="http://">
-                  </label>
-                  <label>
-                    Align:
-                    <select data-wysihtml5-dialog-field="className">
-                      <option value="">default</option>
-                      <option value="wysiwyg-float-left">left</option>
-                      <option value="wysiwyg-float-right">right</option>
-                    </select>
-                  </label>
-                  <a data-wysihtml5-dialog-action="save">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel">Cancel</a>
-                </div>
-                
-              </div>
-              <textarea id="notearea" class="danotepad" placeholder="Type a note..."><%= @binder.body.html_safe if !@binder.body.blank? %></textarea>
-              <button class="btn btn-primary save-wysi">Save note</button>
-
-              <div style="clear:both"></div>
-            </div>
-
-
-
-          </div>
-        </div>
 
 		<% end %>
 
 
 	
-
+    <% if @binder.type == 1 %>
 
 		<div class="content-list">
 
@@ -146,6 +96,7 @@ end %>
 
 
 		</div>
+    <% end %>
 
 	</div>
 

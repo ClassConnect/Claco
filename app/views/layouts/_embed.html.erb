@@ -1,0 +1,22 @@
+<% if @binder.format == 1 %>
+	<% if @croc %>
+
+		<iframe id="crocFrame" style="width: 700px; height: 600px;" src=<%= @croc_url %> ></iframe>
+
+	<% elsif @binder.current_version.imgclass == 0 %>
+
+		<% image_tag @binder.current_version.imgfile.url %>
+
+	<% end %>
+
+		<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download")%>	
+
+<% end %>
+
+<% if @binder.format == 2 %>
+
+	<%= link_to @binder.title, @binder.current_version.data %>
+
+<% end %>
+
+<br /><br /><br />

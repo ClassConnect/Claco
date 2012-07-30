@@ -123,6 +123,7 @@ Claco::Application.routes.draw do
 	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Show
+	get		'/:username/portfolio(/:root)/:title/:id/download'				=> 'binders#download',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 

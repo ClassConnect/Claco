@@ -56,6 +56,7 @@ function softRefresh() {
 
 
 function editInit() {
+  noteInit = false;
   // for our modification actions
   $('.modaction').click(function() {
     // if we're doing a rename
@@ -155,17 +156,18 @@ function editInit() {
   // if we click the notepad, open the editor
   $(".descbox").click(function() {
     if ($('.real-text').is(':visible') && noteClick == false) {
+
       if (noteInit == false) {
         // init notepad stuff
         editor = new wysihtml5.Editor("notearea", {
           toolbar:      "wysitoolbar",
-          stylesheets:  "css/stylesheet.css",
           parserRules:  wysihtml5ParserRules
         });
 
         noteInit = true;
       }
-      $(editor.composer.element).html($('.real-text').html());
+      //$(editor.composer.element).html($('.real-text').html());
+
       $('.real-text').hide();
       $('.wysi-edit').show();
       editor.composer.element.focus();
@@ -534,12 +536,18 @@ function popForm(formID, obje) {
           url: "/utils/fetchtitle",
           data: 'url=' + escape($('#facebox .weblink').val()),
           success: function(titleData) {
-            $('#facebox .webtitle').val(titleData.substring(0, 60));
+            titleCheck = true;
+            $('#facebox .webtitle').val(titleData.substring(0, 55));
             $('#facebox .webtitle').removeAttr('disabled');
             $('#facebox .webtitle').focus();
             fbFormActRevert();
-
+          },
+          error: function(titleData) {
             titleCheck = true;
+            $('#facebox .webtitle').val('');
+            $('#facebox .webtitle').removeAttr('disabled');
+            $('#facebox .webtitle').focus();
+            fbFormActRevert();
           }
         });
 

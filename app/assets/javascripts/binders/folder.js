@@ -80,18 +80,17 @@ function editInit() {
   initAutoTagger('#folder-tags');
 
 
-  // JS for tags related stuff
   $('#addtags-btn').click(function() {
     container = $(this).parent().parent().parent();
 
     if (container.hasClass('act-live')) {
 
       tagdata = tagsToJSON('#folder-tags');
-
+      
       $.ajax({
-        url: document.location.href + "/tags",
+        url: document.location.href + '/tags',
         data: tagdata,
-        type: 'post',
+        type: 'put',
         success: function(data) {
           // do nothing
         }
@@ -123,8 +122,6 @@ function editInit() {
 
 
     } else {
-      // 'Add New' is clicked
-
       container.addClass('act-live');
       $(this).addClass('btn-primary savebtn').html('&nbsp;&nbsp;Save&nbsp;&nbsp;');
 
@@ -138,22 +135,13 @@ function editInit() {
             }
         });
 
-        
+        $('.tagenter').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+
 
       } else {
         container.find('.fortags').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
       container.find('.content-fill').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
       }
-
-      $('.tag-group').each(function(index) {
-        $(this).css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
-        $(this).css('display', 'none').slideDown(150).animate({ display: 'block' },{ queue: false, duration: 150});
-      });
-
-      $('.tagenter').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
-      $('.tagenter').css('display', 'none').slideDown(150).animate({ display: 'block' },{ queue: false, duration: 150});
-
-
 
       //setTimeout(function() {$("#tag-adder").focus();},150);
 
@@ -162,6 +150,7 @@ function editInit() {
 
 
   });
+
 
   // if we click the notepad, open the editor
   $(".descbox").click(function() {

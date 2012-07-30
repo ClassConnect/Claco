@@ -14,18 +14,6 @@ class BindersController < ApplicationController
 		@tags = [[],[],[],[]]
 	end
 
-	def new
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
-
-		@title = "Create a new binder"
-
-		@new_binder = Binder.new
-
-		@new_binder.tag = Tag.new
-
-		@colleagues = Teacher.all.reject {|t| t == current_teacher}
-	end
-
 	#Add Folder Function
 	def create
 
@@ -96,10 +84,6 @@ class BindersController < ApplicationController
 
 		end
 
-		# this line breaks creation of new leaf binders
-		#redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
-		#redirect_to named_binder_route(params[:binder][:parent]) if params[:binder][:parent] != "0"
-
 		rescue BSON::InvalidObjectId
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
@@ -125,8 +109,6 @@ class BindersController < ApplicationController
 		end
 
 		redirect_to "/403.html" and return if @access == 0
-
-		#redirect_to show_binder_path(@binder.owner, @binder.root, @binder.title, params[:id])
 
 		#TODO: Verify permissions before rendering view
 
@@ -172,24 +154,6 @@ class BindersController < ApplicationController
 		#@status = docstatus(@uuid)
 
 		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
-
-	end
-
-
-	def edit
-
-		@title = "Edit binder"
-
-		@binder = Binder.find(params[:id])
-
-		#@binders = Binder.where(:owner => current_teacher.id).reject {|x| x.id == params[:id]}#:id => params[:id])
-	end
-
-	def newcontent
-
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
-
-		@title = "Add new content"
 
 	end
 
@@ -415,17 +379,7 @@ class BindersController < ApplicationController
 
 		respond_to do |format|
 			format.html {render :text => "1"}
-			format.html {render :text => "1"}
 		end
-
-	end
-
-	#Add new file
-	def newfile
-
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1).reject {|b| b.parents.first["id"] == "-1"}
-
-		@title = "Add new files"
 
 	end
 
@@ -571,43 +525,8 @@ class BindersController < ApplicationController
 			end
 
 	end
- 
-	def move
-
-		@binder = Binder.find(params[:id])
-
-		redirect_to "/404.html" and return if !binder_routing_ok?(@binder, params[:action])
-
-		@binders = Binder.where(:owner => current_teacher.id, #Query for possible new parents
-								:type => 1).reject {|b| (b.id.to_s == params[:id] || #Reject current Binder
-														(b.id.to_s == @binder.parent["id"]) || #Reject current parent
-														(b.parents.first["id"] == "-1") || #Reject any trash binders
-														(b.parents.any? {|c| c["id"] == params[:id]}))} #Reject any child folders
-
-	end
 
 	def reorderitem
-
-		#@binder = Binder.find(params[:id])
-
-		#@params = params
-
-		# @children = Binder.where("parent.id" => params[:parentid].to_s)
-
-		# i=0
-
-		# params[:data].each do |f|
-
-		# 	Binder.find(params[:data][i].to_s).update_attribute('order_index',i)
-		# 	i += 1
-
-		# end
-
-		#Rails.logger.debug params.to_s
-
-
-
-		#redirect_to '/reorder'
 
 		errors = []
 
@@ -758,22 +677,6 @@ class BindersController < ApplicationController
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
 			end
-
-	end
-
-	#Copy will only be available to current user
-	#(Nearly the same functionality as fork without updating fork counts)
-	def copy		
-
-		@binder = Binder.find(params[:id])
-
-		redirect_to "/404.html" and return if !binder_routing_ok?(@binder, params[:action])
-
-		@binders = Binder.where(:owner => current_teacher.id,
-								:type => 1).reject {|b| (b.id.to_s == params[:id] ||
-														b.id.to_s == @binder.parent["id"] ||
-														b.parents.first["id"] == "-1" ||
-														b.parents.any? {|c| c["id"] == params[:id]})}
 
 	end
 
@@ -937,16 +840,6 @@ class BindersController < ApplicationController
 	end
 
 
-	def fork
-
-		@binder = Binder.find(params[:id])
-
-		redirect_to named_binder_route(params[:id]) and return if @binder.owner == current_teacher.id.to_s
-
-		@binders = Binder.where(:owner => current_teacher.id, :type => 1)
-
-	end
-
 	#Copy Binders to new location
 	def forkitem
 
@@ -1051,12 +944,6 @@ class BindersController < ApplicationController
 		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
-	end
-
-	def newversion
-		@binder = Binder.find(params[:id])
-
-		redirect_to named_binder_route(@binder) if @binder.type != 2
 	end
 
 	def createversion

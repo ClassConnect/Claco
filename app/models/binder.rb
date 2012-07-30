@@ -53,6 +53,9 @@ class Binder
 	field :likes, :type => Integer
 	field :comments, :type => Array
 
+	# [Large, Small1, Small2] - strings
+	field :thumbimgids, :type => Array
+
 	field :debug_data, :type => Array, :default => []
 
 	#TODO: Add indexing functions that allow binders to be put in a user-defined order via dragon drop
@@ -74,6 +77,76 @@ class Binder
 	# 	end
 
 	# end
+
+
+	# recursive call to parent to set the folder thumbnail
+	def generate_folder_thumbnail(id,imageset)
+
+		binder = Binder.find(id.to_s)
+
+		# retrieve images, add to imageset
+
+		children = Binder.where("parent.id" => binder['id'])
+
+		imageset_loc = [[],[],[],[]]
+		imgset_dup = Array.new(imageset)
+
+		if children.any?
+			children.each do |c|
+				if c.type != 1
+					# array values arranged by class
+					imageset_loc[c.current_version.imgclass.to_i] << c.id
+				end
+			end
+		end
+
+		# generate first thumbnail from local imageset if possible
+
+		imageset_loc.each do |i|
+			if i.any?
+				i.each do |j|
+					# technically not necessary until random retrieval
+					# is popping the LAST one, not the first one
+					binder.thumbimgids << i#.pop
+					break# if binder.thumbids.size == 3
+				end
+			end
+			break if binder.thumbids.size == 1
+		end
+
+		# generate remaining thumbnails
+
+		imgset_dup.each do |i|
+			if i.any?
+				i.each do |j|
+					# technically not necessary until random retrieval
+					# is popping the LAST one, not the first one
+					binder.thumbimgids << i.pop
+					break if binder.thumbids.size == 3
+				end
+			end
+			break if binder.thumbids.size == 3
+		end
+
+		binder.save
+
+		# merge local thumbnails into all other thumbnails before continuing
+
+		(0..3).each do |l|
+			if imageset_loc[l].any?
+				imageset_loc[l].each do |m|
+					imageset[l] << m
+				end
+			end
+		end
+
+		if binder.parent['id'] == "0"
+			return
+		else
+			return generate_folder_thumbnail(binder.parent['id'],imageset)
+		end
+
+	end
 
 	# passed the index to sift above
 	# decrement all binders with an index >= that index
@@ -231,6 +304,10 @@ class Binder
 
 	def owner?(id)
 		return owner == id.to_s
+	end
+
+	def user
+		return username || "#{fname} #{lname}"
 	end
 
 	def handle

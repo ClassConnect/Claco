@@ -115,7 +115,7 @@ end %>
 
 			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => binder.type == 1 ? "pjax" : "" %></div>
 
-			            <div class="descarea">Last updated by <a href="#">Eric Simons</a> at 2:33pm</div>
+			            <div class="descarea">Last updated by <%= link_to binder.user, "#" %> at <%= Time.at(binder.last_update).to_datetime %></div>
 
 			            <div class="drop-tog">
 			            	<div class="btn-group">
@@ -339,8 +339,6 @@ end %>
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the web page"></textarea>
 
-        <% #<input name="conid" class="conid" type="hidden" /> %>
-
       </div>
 
       <div class="buttonbar">
@@ -370,8 +368,6 @@ end %>
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the folder"></textarea>
 
-        <input name="conid" class="conid" type="hidden" />
-
       </div>
 
       <div class="buttonbar">
@@ -397,20 +393,15 @@ end %>
       <div class="conitem">
 
         <div class="file-upload-btn">
-          <a class="btn btn-primary" style="font-size:16px; font-weight:bolder; padding:15px 20px 15px 20px">Choose a file to upload!</a>
-          <input name="file" class="filepick" style="width:300px" type="file" />
+          <input name="file" class="filepick" type="file" />
+          <a class="btn btn-primary btnsauce">Choose a file to upload!</a>
         </div>
 
-
-        <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
-        <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the folder"></textarea>
-
-        <input name="conid" class="conid" type="hidden" />
 
       </div>
 
       <div class="buttonbar">
-         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+         <button class="btn canceler" type="reset" onClick="$('#facebox .filepick').fileupload('destroy'); closefBox()">Cancel</button>
       </div>
 
     </form>

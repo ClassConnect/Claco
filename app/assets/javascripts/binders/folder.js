@@ -26,7 +26,7 @@ $(document).ready(function() {
 
 $(document).on('pjax:start', function() {
   if (scrollBottom === false) {
-    $('html, body').animate({ scrollTop: 0 }, 1500);
+    $('html, body').animate({ scrollTop: 0 }, 500);
   } else {
     scrollBottom = false;
   }
@@ -567,7 +567,7 @@ function popForm(formID, obje) {
             scrollBottom = true;
             softRefresh();
             closefBox();
-            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
 
 
           } else {
@@ -578,7 +578,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });
@@ -596,64 +596,15 @@ function popForm(formID, obje) {
 
 
       $.ajax({
-        type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/",
+        type: "POST",
+        url: document.location.href + "/create",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
             scrollBottom = true;
             softRefresh();
             closefBox();
-            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
-
-
-          } else {
-            fbFormRevert();
-            showFormError(retData);
-
-          }
-
-        }
-        
-      });  
-
-      return false;
-    });
-    // end of form handler
-
-
-
-
-  } else if (formID == 'addfile-form') {
-
-
-    // initialize the file upload functionality
-    $('#facebox .filepick').fileupload({
-        dataType: 'json',
-        add: function (e, data) {
-            alert('added')
-        },
-        done: function (e, data) {
-            alert(1)
-        }
-    });
-
-    // set the form handler
-    $('#facebox .bodcon').submit(function() {
-      var serData = $("#facebox .bodcon").serialize();
-      fbFormSubmitted();
-
-
-      $.ajax({
-        type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/",
-        data: serData,
-        success: function(retData) {
-          if (retData == 1) {
-            scrollBottom = true;
-            softRefresh();
-            closefBox();
-            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
 
 
           } else {
@@ -669,6 +620,35 @@ function popForm(formID, obje) {
       return false;
     });
     // end of form handler
+
+
+
+
+  } else if (formID == 'addfile-form') {
+
+
+    // initialize the file upload functionality
+    $('#facebox .filepick').fileupload({
+        url: document.location.href + '/createfile',
+        dataType: 'json',
+        add: function (e, data) {
+            data.submit();
+        },
+        start: function (e, data) {
+          $('#facebox .file-upload-btn').after('<div class="tempprog" style="margin-left:50px;margin-top:5px"><img src="/assets/miniload.gif" style="float:left;margin-right:8px;margin-top:3px" /> <span style="font-size:14px;font-weight:bolder">Uploading your file...</span></div>');
+          $('#facebox .file-upload-btn').hide();
+        },
+        done: function (e, data) {
+            scrollBottom = true;
+            softRefresh();
+            closefBox();
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
+        },
+        fail: function (e, data) {
+          $('#facebox .tempprog').html('We had an issue uploading your file...<br /><strong>Please try again!</strong>');
+          $('#facebox .file-upload-btn').show();
+        }
+    });
 
 
 

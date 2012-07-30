@@ -148,11 +148,6 @@ end %>
 	</div>
 
 
-
-
-
-
-
 	<div id="left-sidebar">
         
         <div id="folder-tags" class="conbox">
@@ -166,70 +161,98 @@ end %>
             </div>
           </div>
 
-          <div class="empty-tog fortags">You haven't added any tags...yet!</div>
+          <div class="empty-tog fortags" style="<%= @tagset.any? ? raw("opacity: 0; display: none;") : raw("") %>">You haven't added any tags...yet!</div>
 
-          <div class="content-fill" style="display:none">
+          <!-- <div class="content-fill" style="display:none"> -->
+          <div class="content-fill" style="display:block; opacity:1;">
 
-            <div class="tag-group tagged-grades">
+            <div class="tag-group tagged-grades" <%= tagvis(@tags[0]) %>>
               <div class="announce">
                 Grade Levels
               </div>
 
               <div class="taggers">
-                <ul class="tags">
-                  
+                <ul class="tags"> 
+                  <% if true %>
+                    <% @tags[0].each do |f| %>
+                      <li>
+                        <a href="#"><%= f["title"] %></a>
+                        <div class="delcir" onclick="delTag(this)">x</div>
+                      </li>
+                    <% end %>
+                  <% end %>
                 </ul>
                 <div style="clear:both"></div>
               </div>
             </div>
 
 
-            <div id="grade-addarea" class="add-area tagenter">
+            <div id="grade-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
+            <%= tagvis(@tags[0]) 
+            %>>
               <input type="text" class="add-field grade-addfield" placeholder="Ex: '1st', 'Second Grade'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
 
 
-            <div class="tag-group tagged-subjects">
+            <div class="tag-group tagged-subjects" <%= tagvis(@tags[1]) %>>
               <div class="announce">
                 Subjects
               </div>
 
               <div class="taggers">
                 <ul class="tags">
-                  
+                  <% if true %>
+                    <% @tags[1].each do |f| %>
+                      <li>
+                        <a href="#"><%= f["title"] %></a>
+                        <div class="delcir" onclick="delTag(this)">x</div>
+                      </li>
+                    <% end %>
+                  <% end %>
                 </ul>
                 <div style="clear:both"></div>
               </div>
             </div>
 
 
-            <div id="subject-addarea" class="add-area tagenter">
+            <div id="subject-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
+            <%= tagvis(@tags[1]) 
+            %>>
               <input type="text" class="add-field subject-addfield" placeholder="Ex: 'Math', 'History'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
 
 
-            <div class="tag-group tagged-standards">
+            <div class="tag-group tagged-standards" <%= tagvis(@tags[2]) %>>
               <div class="announce">
                 Standards
               </div>
 
               <div class="taggers">
                 <ul class="tags">
-                  
+                  <% if true %>
+                    <% @tags[2].each do |f| %>
+                      <li>
+                        <a href="#"><%= f["title"] %></a>
+                        <div class="delcir" onclick="delTag(this)">x</div>
+                      </li>
+                    <% end %>
+                  <% end %>
                 </ul>
                 <div style="clear:both"></div>
               </div>
             </div>
 
-            <div id="standards-addarea" class="add-area tagenter">
+            <div id="standards-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
+            <%= #tagvis(@tags[2]) 
+            %>>
               <input type="text" class="add-field standards-addfield" placeholder="Ex: 'RL.K.1'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
 
 
-            <div class="tag-group tagged-other">
+            <div class="tag-group tagged-other" <%= tagvis(@tags[3]) %>>
               <div class="announce">
                 Keywords
               </div>
@@ -237,7 +260,14 @@ end %>
 
               <div class="taggers">
                 <ul class="tags">
-                  
+                  <% if true %>
+                    <% @tags[3].each do |f| %>
+                      <li>
+                        <a href="#"><%= f["title"] %></a>
+                        <div class="delcir" onclick="delTag(this)">x</div>
+                      </li>
+                    <% end %>
+                  <% end %>
                 </ul>
                 <div style="clear:both"></div>
               </div>
@@ -245,7 +275,9 @@ end %>
 
 
 
-            <div id="other-addarea" class="add-area tagenter">
+            <div id="other-addarea" class="add-area tagenter" style="display: none; opacity: 0;" 
+            <%= #tagvis(@tags[3]) 
+            %>>
               <input type="text" class="add-field other-addfield" placeholder="Ex: 'Civil War', 'edchat'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>

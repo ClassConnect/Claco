@@ -20,8 +20,6 @@ $(document).ready(function() {
   }
 
 
-
-
 });
 
 
@@ -110,6 +108,8 @@ function editInit() {
 
 
     } else {
+      // 'Add New' is clicked
+
       container.addClass('act-live');
       $(this).addClass('btn-primary savebtn').html('&nbsp;&nbsp;Save&nbsp;&nbsp;');
 
@@ -118,18 +118,27 @@ function editInit() {
       if ($('.tags li').length > 0) {
         // we're doing a custom open up
         $('.tag-group').each(function(index) {
-            if ($(this).find('.tags li').length == 0) {
+            //if ($(this).find('.tags li').length == 0) {
               $(this).css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
-            }
+            //}
         });
 
-        $('.tagenter').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
-
+        
 
       } else {
         container.find('.fortags').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
       container.find('.content-fill').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
       }
+
+      $('.tag-group').each(function(index) {
+        $(this).css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+        $(this).css('display', 'none').slideDown(150).animate({ display: 'block' },{ queue: false, duration: 150});
+      });
+
+      $('.tagenter').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+      $('.tagenter').css('display', 'none').slideDown(150).animate({ display: 'block' },{ queue: false, duration: 150});
+
+
 
       //setTimeout(function() {$("#tag-adder").focus();},150);
 

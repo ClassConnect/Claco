@@ -9,6 +9,9 @@ class BindersController < ApplicationController
 
 		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
 
+		@tagset = []
+
+		@tags = [[],[],[],[]]
 	end
 
 	def new
@@ -109,6 +112,19 @@ class BindersController < ApplicationController
 		redirect_to @binder.current_version.data and return if @binder.format == 2
 
 		redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
+
+		# sort the tags into an array
+		@tags = [[],[],[],[]]
+
+		@tagset = @binder.tag.get_tags()
+
+		if @tagset.any?
+			@tagset.each do |tag|
+				@tags[tag['type']] << tag
+			end
+		end
+
+		Rails.logger.debug @tags
 
 		@title = "Viewing: #{@binder.title}"
 

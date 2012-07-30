@@ -278,4 +278,38 @@ module ApplicationHelper
 
 	end
 
+	# FUCK THESE GODDAMN VIEW HELPERS
+	def write_tags(tags)
+
+		return if tags.empty?
+
+		tags.each do |f|
+        	raw("<li><a href=\"#\">")
+        	f["title"] 
+        	raw("</a><div class=\"delcir\" onclick=\"delTag(this)\">x</div></li>")
+        end
+
+		# <% @tags[0].each do |f| %>
+		#   <li>
+		#     <a href="#"><%= f["title"] %></a>
+		#     <div class="delcir" onclick="delTag(this)">x</div>
+		#   </li>
+		# <% end %>
+
+	end
+
+	def tagvis(set)
+
+		#@tags[0].any? ? raw("style=\"display: block; opacity: 1;\"") : raw("style=\"display: none; opacity: 0;\"")
+
+		if set.any?
+			raw("style=\"display: block; opacity: 1;\"")
+			#raw("style=\"opacity: 1;\"")
+		else
+			raw("style=\"display: none; opacity: 0;\"")
+			#raw("style=\"opacity: 0;\"")
+		end
+
+	end
+
 end

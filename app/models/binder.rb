@@ -476,11 +476,17 @@ class Tag
 	field :parent_tags,			:type => Array,	:default => []
 	field :node_tags,			:type => Array,	:default => []
 
-	field :debug_data,			:type => Array,	:default => []
+	#field :debug_data,			:type => Array,	:default => []
 
 	embedded_in :binder
 
 	# Class Methods
+
+	def get_tags()
+
+		return self.parent_tags | self.node_tags
+
+	end
 
 	# creates a union of parent_binder's parent and node tags
 	def set_parent_tags(params,parent_binder)
@@ -599,25 +605,25 @@ class Tag
 
 		if b_params["grades"]
 			b_params["grades"].size.times do |g|
-				ret_set.add({ "title" => b_params["grades"][g.to_s]["title"].sub(' ',''), "type" => 0, "owner" => teacher_id.to_s })
+				ret_set.add({ "title" => b_params["grades"][g.to_s]["title"].strip, "type" => 0, "owner" => teacher_id.to_s })
 			end
 		end	
 
 		if b_params["subjects"]
 			b_params["subjects"].size.times do |g|
-				ret_set.add({ "title" => b_params["subjects"][g.to_s]["title"].sub(' ',''), "type" => 1, "owner" => teacher_id.to_s })
+				ret_set.add({ "title" => b_params["subjects"][g.to_s]["title"].strip, "type" => 1, "owner" => teacher_id.to_s })
 			end
 		end
 
 		if b_params["standards"]
 			b_params["standards"].size.times do |g|
-				ret_set.add({ "title" => b_params["standards"][g.to_s]["title"].sub(' ',''), "type" => 2, "owner" => teacher_id.to_s })
+				ret_set.add({ "title" => b_params["standards"][g.to_s]["title"].strip, "type" => 2, "owner" => teacher_id.to_s })
 			end
 		end
 
 		if b_params["other"]
 			b_params["other"].size.times do |g|
-				ret_set.add({ "title" => b_params["other"][g.to_s]["title"].sub(' ',''), "type" => 3, "owner" => teacher_id.to_s })
+				ret_set.add({ "title" => b_params["other"][g.to_s]["title"].strip, "type" => 3, "owner" => teacher_id.to_s })
 			end
 		end
 

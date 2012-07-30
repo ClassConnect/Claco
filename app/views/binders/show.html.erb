@@ -6,10 +6,3 @@ end %>
 
 <%= render 'layouts/show' %>
 
-<br />
-<%= link_to "Up one level", @binder.parent["id"] == "0" ? binders_path : binders_path(@binder.parent["id"]) %> |
-<%= link_to "Create new binder", new_binder_path %> |
-<%= link_to "Edit this binder", named_binder_route(@binder, "edit") %> |
-<%= link_to "Add content", new_binder_content_path %> |
-<%= link_to "Add File", new_binder_file_path %>
-<br /><br />

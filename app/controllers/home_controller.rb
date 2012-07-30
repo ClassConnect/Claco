@@ -13,7 +13,7 @@ class HomeController < ApplicationController
 			
 		ensure
 			respond_to do |format|
-				format.html {render :text => $1 || " "}
+				format.html {render :text => CGI.unescapeHTML($1) || " "}
 			end
 	end
 

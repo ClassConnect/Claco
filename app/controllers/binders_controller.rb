@@ -121,6 +121,9 @@ class BindersController < ApplicationController
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
 
+		# this is a hack
+		@binder.tag = Tag.new if !@binder.tag
+
 		@tagset = @binder.tag.get_tags()
 
 		if @tagset.any?
@@ -473,7 +476,7 @@ class BindersController < ApplicationController
 
 					# delegate image fetch to Delayed Job worker
 					#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-					Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+					Binder.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 					
 				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
 					# for now, image will be added as file AND as imgfile

@@ -78,15 +78,37 @@ class Binder
 
 	# end
 
+	# returns array of URLs of images, in order of size
+	def self.get_folder_array(id)
+
+		binder = Binder.find(id.to_s)
+
+		retarr = Array.new
+
+		Rails.logger.debug binder.thumbimgids[0].to_s
+
+		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if binder.thumbimgids.size > 0
+		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if binder.thumbimgids.size > 1
+		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if binder.thumbimgids.size > 2
+
+		Rails.logger.debug retarr.to_s
+
+		return retarr
+
+	end
 
 	# recursive call to parent to set the folder thumbnail
 	def self.generate_folder_thumbnail(id,imageset = [[],[],[],[]])
 
 		binder = Binder.find(id.to_s)
 
+		#Rails.logger.debug "BINDER INSPECT: #{binder.inspect.to_s}"
+
 		# retrieve images, add to imageset
 
-		children = Binder.where("parent.id" => binder['id'])
+		children = Binder.where("parent.id" => binder.parent['id'])
+
+		Rails.logger.debug "CHILDREN INSPECT: #{children.inspect.to_s}"
 
 		imageset_loc = [[],[],[],[]]
 		imgset_dup = Array.new(imageset)
@@ -107,7 +129,7 @@ class Binder
 				i.each do |j|
 					# technically not necessary until random retrieval
 					# is popping the LAST one, not the first one
-					binder.thumbimgids << i#.pop
+					binder.thumbimgids << i.to_s#.pop
 					break# if binder.thumbids.size == 3
 				end
 			end
@@ -121,7 +143,7 @@ class Binder
 				i.each do |j|
 					# technically not necessary until random retrieval
 					# is popping the LAST one, not the first one
-					binder.thumbimgids << i.pop
+					binder.thumbimgids << i.pop.to_s
 					break if binder.thumbimgids.size == 3
 				end
 			end
@@ -135,7 +157,7 @@ class Binder
 		(0..3).each do |l|
 			if imageset_loc[l].any?
 				imageset_loc[l].each do |m|
-					imageset[l] << m
+					imageset[l] << m.to_s
 				end
 			end
 		end

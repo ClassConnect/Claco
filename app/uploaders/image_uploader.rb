@@ -27,6 +27,11 @@ class ImageUploader < CarrierWave::Uploader::Base
     process :resize_and_pad => [45,45,'black','Center']
   end
 
+  version :contentview do
+    #process :resize_to_fill => [49,46]
+    process :resize_to_fit => [700, 8000]
+  end
+
   def store_dir
     Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
   end

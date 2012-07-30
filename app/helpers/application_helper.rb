@@ -272,6 +272,7 @@ module ApplicationHelper
 
 	end
 
+
 	def get_username(teacher_id)
 
 		return Teacher.find(teacher_id).username

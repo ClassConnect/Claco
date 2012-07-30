@@ -72,7 +72,7 @@ end %>
                 </div>
                 
               </div>
-              <textarea id="notearea" class="danotepad" placeholder="Type a note..."></textarea>
+              <textarea id="notearea" class="danotepad" placeholder="Type a note..."><%= @binder.body.html_safe if !@binder.body.blank? %></textarea>
               <button class="btn btn-primary save-wysi">Save note</button>
 
               <div style="clear:both"></div>

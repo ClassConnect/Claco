@@ -140,6 +140,8 @@ class BindersController < ApplicationController
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
+		rescue Mongoid::Errors::DocumentNotFound
+			redirect_to "/404.html" and return
 
 	end
 
@@ -320,7 +322,7 @@ class BindersController < ApplicationController
 
 		@binder.update_attributes(	:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s,
-									:body				=> params[:text].strip)
+									:body				=> params[:text].gsub(/<br>/, "<br/>"))
 
 		respond_to do |format|
 			format.html {render :text => "1"}

@@ -44,7 +44,7 @@ $(document).on('pjax:start', function() {
 // function for soft refreshes
 function softRefresh() {
   $.pjax({
-    url: document.location.href,
+    url: location.protocol+'//'+location.host+location.pathname,
     container: '[data-pjax-container]',
     push: false
   });
@@ -88,7 +88,7 @@ function editInit() {
       tagdata = tagsToJSON('#folder-tags');
       
       $.ajax({
-        url: document.location.href + '/tags',
+        url: location.protocol+'//'+location.host+location.pathname + '/tags',
         data: tagdata,
         type: 'post',
         success: function(data) {
@@ -187,7 +187,7 @@ function editInit() {
       noteSon = { 'text': $(editor.composer.element).html() };
 
       $.ajax({
-        url: document.location.href,
+        url: location.protocol+'//'+location.host+location.pathname,
         data: noteSon,
         type: 'put',
         success: function(data) {
@@ -229,7 +229,7 @@ function editInit() {
           olist = { data: olist };
 
           $.ajax({
-            url: document.location.href + "/reorder",
+            url: location.protocol+'//'+location.host+location.pathname + "/reorder",
             data: olist,
             // post is the proper HTTP verb
             type: 'post',
@@ -531,7 +531,7 @@ function popForm(formID, obje) {
         // get the title
         $.ajax({
           type: "POST",
-          url: "/utils/gettitle",
+          url: "/utils/fetchtitle",
           data: 'url=' + escape($('#facebox .weblink').val()),
           success: function(titleData) {
             $('#facebox .webtitle').val(titleData.substring(0, 60));
@@ -560,7 +560,7 @@ function popForm(formID, obje) {
 
       $.ajax({
         type: "POST",
-        url: document.location.href + "/createcontent",
+        url: location.protocol+'//'+location.host+location.pathname + "/createcontent",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
@@ -597,7 +597,7 @@ function popForm(formID, obje) {
 
       $.ajax({
         type: "POST",
-        url: document.location.href + "/create",
+        url: location.protocol+'//'+location.host+location.pathname + "/create",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
@@ -629,7 +629,7 @@ function popForm(formID, obje) {
 
     // initialize the file upload functionality
     $('#facebox .filepick').fileupload({
-        url: document.location.href + '/createfile',
+        url: location.protocol+'//'+location.host+location.pathname + '/createfile',
         dataType: 'json',
         add: function (e, data) {
             data.submit();

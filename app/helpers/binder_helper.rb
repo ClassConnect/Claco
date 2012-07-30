@@ -14,7 +14,7 @@ module BinderHelper
 				retstr += "/#{CGI.escape(binder.root)}" 
 			end
 
-			retstr += "/#{binder.title.parameterize}/#{binder.id}"
+			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

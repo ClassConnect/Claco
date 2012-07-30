@@ -152,7 +152,7 @@ class Binder
 
 		self.tag.set_parent_tags(params,new_binder_parent) if params[:id] != "0"
 
-		self.tag.set_node_tags(params,new_binder_parent,teacher_id)
+		# self.tag.set_node_tags(params,new_binder_parent,teacher_id)
 
 	end
 

@@ -506,7 +506,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });
@@ -526,8 +526,8 @@ function popForm(formID, obje) {
         fbFormActLoader();
 
         // get the title
-        $.ajax({  
-          type: "POST",  
+        $.ajax({
+          type: "POST",
           url: "/utils/gettitle",
           data: 'url=' + escape($('#urlLoc').val()),
           success: function(titleData) {
@@ -556,8 +556,8 @@ function popForm(formID, obje) {
 
 
       $.ajax({
-        type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/",
+        type: "POST",
+        url: document.location.href + "/createcontent",
         data: serData,
         success: function(retData) {
           if (retData == 1) {
@@ -575,7 +575,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });

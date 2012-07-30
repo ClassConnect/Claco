@@ -206,107 +206,126 @@ class BindersController < ApplicationController
 		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
 		
 		# This will catch flawed URL structure, as well as bad HTTP response codes
-		begin
-			RestClient.get(params[:binder][:versions][:data])
-		rescue
-			Rails.logger.debug "Invalid URL detected"
-			#raise "Invalid URL: <#{params[:binder][:versions][:data]}>" and return
-			flash[:invalidurl] = "Invalid URL passed"
-			render new_binder_content_path and return
-		end
+		RestClient.get(params[:weblink])
+		
+		
 
 		# the RestClient object will catch most of the error codes before getting to here
 		#if ![200,301,302].include? respcode
 		#	raise "Invalud URL! Response code: #{respcode}" and return
 		#end
 
-		@binder = Binder.new
+		#@binder = Binder.new
+
+		errors = []
 
 		#Trim to 60 chars (old spec)
-		if params[:binder][:title].length < 1
-			render new_binder_content_path and return
-		end
+		if params[:webtitle].length > 1
 
-		@inherited = inherit_from(params[:binder][:parent])
+			@inherited = inherit_from(params[:id])
 
-		@parenthash = @inherited[:parenthash]
-		@parentsarr = @inherited[:parentsarr]
-		@parentperarr = @inherited[:parentperarr]
+			@parenthash = @inherited[:parenthash]
+			@parentsarr = @inherited[:parentsarr]
+			@parentperarr = @inherited[:parentperarr]
 
-		@parent_child_count = @inherited[:parent_child_count]
+			@parent_child_count = @inherited[:parent_child_count]
 
-		@binder.update_attributes(	:title				=> params[:binder][:title][0..60],
-									:owner				=> current_teacher.id,
-									:username			=> current_teacher.username,
-									:fname				=> current_teacher.fname,
-									:lname				=> current_teacher.lname,
-									:parent				=> @parenthash,
-									:parents			=> @parentsarr,
-									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id.to_s,
-									:body				=> params[:binder][:body],
-									:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
-															:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
-															:auth_level => params[:auth_level]}] : []),
-									:order_index		=> @parent_child_count,
-									:parent_permissions	=> @parentperarr,
-									:files				=> 1,
-									:type				=> 2,
-									:format				=> 2)
+			if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
-		@binder.versions << Version.new(:data		=> params[:binder][:versions][:data],
-										:timestamp	=> Time.now.to_i,
-										:owner		=> current_teacher.id)
+				@binder = Binder.new(	:title				=> params[:webtitle],
+										:owner				=> current_teacher.id,
+										:username			=> current_teacher.username,
+										:fname				=> current_teacher.fname,
+										:lname				=> current_teacher.lname,
+										:parent				=> @parenthash,
+										:parents			=> @parentsarr,
+										:last_update		=> Time.now.to_i,
+										:last_updated_by	=> current_teacher.id.to_s,
+										#:body				=> params[:binder][:body],
+										#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
+										#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
+										#						:auth_level => params[:auth_level]}] : []),
+										:order_index		=> @parent_child_count,
+										:parent_permissions	=> @parentperarr,
+										:files				=> 1,
+										:type				=> 2,
+										:format				=> 2)
 
-
-		@binder.create_binder_tags(params,current_teacher.id)
+				@binder.versions << Version.new(:data		=> params[:weblink],
+												:timestamp	=> Time.now.to_i,
+												:owner		=> current_teacher.id)
 
 
+				#@binder.create_binder_tags(params,current_teacher.id)
 
-		uri = URI(params[:binder][:versions][:data])
+				@binder.save
 
-		stathash = @binder.current_version.imgstatus
-		stathash[:imgfile][:retrieved] = true
+				uri = URI(params[:weblink])
+
+				stathash = @binder.current_version.imgstatus
+				stathash[:imgfile][:retrieved] = true
 
 
-		if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+				if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 
-			# YOUTUBE
-			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:binder][:versions][:data]))
+					# YOUTUBE
+					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
 
-		elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+				elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
-			# VIMEO
-			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'vimeo'})
+					# VIMEO
+					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
 
-		elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+				elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
 
-			# EDUCREATIONS
-			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:binder][:versions][:data]))
+					# EDUCREATIONS
+					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
 
-		elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+				elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
-			# SCHOOLTUBE
-			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'schooltube'}) 
+					# SCHOOLTUBE
+					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
 
-		elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+				elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
-			# SHOWME
-			Binder.delay.get_thumbnail_from_api(@binder.id,params[:binder][:versions][:data],{:site => 'showme'})
+					# SHOWME
+					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+
+				else
+					# generic URL, grab Url2png
+					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+				end
+
+
+				pids = @parentsarr.collect {|x| x["id"] || x[:id]}
+
+				pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
+
+				Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
+
+			else
+
+				errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+
+			end
 
 		else
-			# generic URL, grab Url2png
-			Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:binder][:versions][:data]))
+
+			errors << "You must enter a title"
+
 		end
 
-
-		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
-
-		pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
-
-		Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
-
-		redirect_to named_binder_route(params[:binder][:parent])
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		rescue
+			Rails.logger.debug "Invalid URL detected"
+			errors << "Invalid URL detected"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
+			end
 
 	end
 
@@ -1404,7 +1423,7 @@ class BindersController < ApplicationController
 				:parentsarr => parentsarr,
 				:parentperarr => parentperarr, 
 				:parent => parent, 
-				:parent_child_count => Binder.where("parent.id" => parentid.to_s).count }
+				:parent_child_count => parent.children.count}
 
 	end
 

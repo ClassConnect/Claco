@@ -16,18 +16,19 @@
   -webkit-box-shadow:0 0 18px rgba(0,0,0,0.4);
   -moz-box-shadow:0 0 18px rgba(0,0,0,0.4);
   box-shadow:0 0 18px rgba(0,0,0,0.4);
+
+  min-width:320px;
 }
 
 #facebox .content {
   display:table;
-  width: 370px;
+  width: 300px;
   padding: 10px;
   background: #FFFFFF;
   -webkit-border-radius:4px;
   -moz-border-radius:4px;
   border-radius:4px;
 
-  margin-right:20px;
 }
 
 #facebox .content .headtitle {

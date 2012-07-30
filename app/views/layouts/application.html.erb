@@ -14,9 +14,7 @@
 		<%= javascript_include_tag "dropdown" %>
 		<%= javascript_include_tag "facebox" %>
 		<%= javascript_include_tag "tooltip" %>
-		<script type="text/javascript">
-			$('a').pjax('[data-pjax-container]')
-		</script>
+		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]')" %>
 		<%= yield :headcon %>
 
 		<%= csrf_meta_tags %>

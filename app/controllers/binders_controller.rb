@@ -132,7 +132,7 @@ class BindersController < ApplicationController
 		
 		respond_to do |format|
 		 	format.html
-			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.to_json}
+			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
 		end
 
 		rescue BSON::InvalidObjectId
@@ -532,16 +532,16 @@ class BindersController < ApplicationController
 
 		#@params = params
 
-		@children = Binder.where("parent.id" => params[:parentid].to_s)
+		# @children = Binder.where("parent.id" => params[:parentid].to_s)
 
-		i=0
+		# i=0
 
-		params[:data].each do |f|
+		# params[:data].each do |f|
 
-			Binder.find(params[:data][i].to_s).update_attribute('order_index',i)
-			i += 1
+		# 	Binder.find(params[:data][i].to_s).update_attribute('order_index',i)
+		# 	i += 1
 
-		end
+		# end
 
 		#Rails.logger.debug params.to_s
 
@@ -549,12 +549,42 @@ class BindersController < ApplicationController
 
 		#redirect_to '/reorder'
 
+		errors = []
 
-		respond_to do |format|
-			format.html {render :text => "1"}
+		@children = Binder.where("parent.id" => params[:id])
+
+		@ok = @children.size == params[:data].size
+
+		if @ok
+
+			@childids = @children.collect{|c| c.id.to_s}
+
+			params[:data].each {|d| @ok = false if !@childids.include?(d)}
+
+		else
+
+			errors << "Invalid Request - Refresh the page?"
+
 		end
 
-		#@binder.move_to_index
+		if @ok
+
+			@children.each {|c| c.update_attributes(:order_index => params[:data].index(c.id.to_s))}
+
+		else
+
+			errors << "Invalid Request"
+
+		end
+
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
+			end
 
 	end
 
@@ -562,90 +592,113 @@ class BindersController < ApplicationController
 	#TODO: Add sanity check, make sure no folder-in-self or folder-in-child situation
 	def moveitem
 
+		errors = []
+
 		@binder = Binder.find(params[:id])
 
 		#logger.debug "FUCKYOU NIGGER"
 
-		@binder.sift_siblings()
+		if params[:target] != params[:id]
 
-		@inherited = inherit_from(params[:target])
+			@binder.sift_siblings()
 
-		@parenthash = @inherited[:parenthash]
-		@parentsarr = @inherited[:parentsarr]
-		@parentperarr = @inherited[:parentperarr]
+			@inherited = inherit_from(params[:target])
 
-		@parent_child_count = @inherited[:parent_child_count]
+			@parenthash = @inherited[:parenthash]
+			@parentsarr = @inherited[:parentsarr]
+			@parentperarr = @inherited[:parentperarr]
 
-		@ops = @binder.parents.collect {|x| x["id"] || x[:id]}
-		@ops.each do |opid|
-			if opid != "0"
-				op = Binder.find(opid)
+			@parent_child_count = @inherited[:parent_child_count]
 
-				op.update_attributes(	:files		=> op.files - @binder.files,
-										:folders	=> op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-										:total_size	=> op.total_size - @binder.total_size)
+			#nps = new parents, ops = old parents
+
+			@nps = @parentsarr.collect {|x| x["id"] || x[:id]}
+
+			if !@nps.include?(params[:id])
+
+				@ops = @binder.parents.collect {|x| x["id"] || x[:id]}
+				@ops.each do |opid|
+					if opid != "0"
+						op = Binder.find(opid)
+
+						op.update_attributes(	:files		=> op.files - @binder.files,
+												:folders	=> op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
+												:total_size	=> op.total_size - @binder.total_size)
+					end
+				end
+		 
+				#Binder.find(op.last).inc(:children,-1)
+
+				#Save old permissions to remove childrens' inherited permissions
+				@ppers = @binder.parent_permissions
+
+				@binder.update_attributes(	:parent				=> @parenthash,
+											:parents			=> @parentsarr,
+											:parent_permissions	=> @parentperarr,
+											:order_index		=> @parent_child_count)
+
+
+				# must update the common ancestor of the children before 
+				@binder.update_parent_tags()
+
+				#@binder is the object being moved
+				#If directory, deal with the children
+				if @binder.type == 1 #Eventually will apply to type == 3 too
+
+					@children = @binder.children
+
+					@children.each do |h|
+
+						@current_parents = h.parents
+
+						@size = @current_parents.size
+
+						@npperarr = h.parent_permissions
+						
+						@ppers.each {|p| @npperarr.delete(p)}
+
+						h.update_attributes(:parents			=> @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)],
+											:parent_permissions	=> @parentperarr + @npperarr)
+
+						h.update_parent_tags()
+
+					end
+
+				end
+
+				#Update new parents' folder/file/size counts
+				@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
+
+				@parents.each do |pid|
+					if pid != "0"
+						parent = Binder.find(pid)
+
+						parent.update_attributes(	:files		=> parent.files + @binder.files,
+													:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
+													:total_size	=> parent.total_size + @binder.total_size)
+					end
+				end
+
+			else
+
+				errors << "Invalid target location"
+
 			end
+
+		else
+
+			errors << "You cannot put something inside itself"
+
 		end
- 
-		#Binder.find(op.last).inc(:children,-1)
 
-		#Save old permissions to remove childrens' inherited permissions
-		@ppers = @binder.parent_permissions
-
-		@binder.update_attributes(	:parent				=> @parenthash,
-									:parents			=> @parentsarr,
-									:parent_permissions	=> @parentperarr,
-									:order_index		=> @parent_child_count)
-
-
-		# must update the common ancestor of the children before 
-		@binder.update_parent_tags()
-
-		#@binder is the object being moved
-		#If directory, deal with the children
-		if @binder.type == 1 #Eventually will apply to type == 3 too
-
-			@children = @binder.children
-
-			@children.each do |h|
-
-				@current_parents = h.parents
-
-				@size = @current_parents.size
-
-				@npperarr = h.parent_permissions
-				
-				@ppers.each {|p| @npperarr.delete(p)}
-
-				h.update_attributes(:parents			=> @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)],
-									:parent_permissions	=> @parentperarr + @npperarr)
-
-				h.update_parent_tags()
-
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
 			end
-
-		end
-
-		#Update new parents' folder/file/size counts
-		@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
-
-		@parents.each do |pid|
-			if pid != "0"
-				parent = Binder.find(pid)
-
-				parent.update_attributes(	:files		=> parent.files + @binder.files,
-											:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
-											:total_size	=> parent.total_size + @binder.total_size)
-			end
-		end
-
-		# redirect_to named_binder_route(params[:target]) and return if params[:binder][:parent] != "0"
-
-		# redirect_to binders_path
-
-		respond_to do |format|
-			format.html {render :text => "1"}
-		end
 
 	end
 
@@ -668,7 +721,11 @@ class BindersController < ApplicationController
 	#Copy Binders to new location
 	def copyitem
 
+		errors = []
+
 		@binder = Binder.find(params[:id])
+
+#		if @binder.parent["id"] != params[:folid]
 
 		@inherited = inherit_from(params[:folid])
 
@@ -676,136 +733,148 @@ class BindersController < ApplicationController
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
 
-		@parent_child_count = @inherited[:parent_child_count]
+		if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
-		@ppers = @binder.parent_permissions
+			@parent_child_count = @inherited[:parent_child_count]
 
-		@new_parent = Binder.new(	:title				=> @binder.title,
-									:body				=> @binder.body,
-									:type				=> @binder.type,
-									:format				=> @binder.type == 2 ? @binder.format : nil,
-									:files				=> @binder.files,
-									:folders			=> @binder.folders,
-									:total_size			=> @binder.total_size,
-									:order_index		=> @parent_child_count,
-									:parent				=> @parenthash,
-									:parents			=> @parentsarr,
-									:permissions		=> @binder.permissions,
-									:parent_permissions	=> @parentperarr,
-									:owner				=> current_teacher.id,
-									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id)
+			@ppers = @binder.parent_permissions
 
-		#@new_parent.format = @binder.format if @binder.type == 2
-
-		# @new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-		# 									:file_hash	=> @binder.current_version.file_hash,
-		# 									:timestamp	=> @binder.current_version.timestamp,
-		# 									:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
-		# 									:size		=> @binder.current_version.size,
-		# 									:ext		=> @binder.current_version.ext,
-		# 									:data		=> @binder.current_version.data,
-		# 									:croc_uuid 	=> @binder.current_version.croc_uuid,
-		# 									:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
-
-		@new_parent.versions << @binder.current_version
-
-		#TODO: copy related images?
-
-		@new_parent.save
-
-		@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
-
-		@new_parent.update_parent_tags()
-
-		#Hash table for oldid => newid lookups
-		@hash_index = {params[:id] => @new_parent.id.to_s}
-
-
-		#If directory, deal with the children
-		if @binder.type == 1 #Eventually will apply to type == 3 too
-
-			@index = @binder.parents.length
-
-			#Select old children, order by parents.length
-			@children = @binder.children.sort_by {|binder| binder.parents.length}
-
-			#Spawn new children, These children need to have updated parent ids
-			@children.each do |h|
-
-				@node_parent = {"id"	=> @hash_index[h.parent["id"]],
-								"title"	=> h.parent["title"]}
-
-				@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
-
-				@old_permissions = h.parent_permissions
-
-				@ppers.each {|p| @old_permissions.delete(p)}
-
-				#Swap old folder ids with new folder ids
-				@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
-
-				@new_node = Binder.new(	:title				=> h.title,
-										:body				=> h.body,
-										:parent				=> @node_parent,
-										:parents			=> @node_parents,
-										:permissions		=> h.permissions,
-										:parent_permissions	=> @parentperarr + @old_permissions,
+			@new_parent = Binder.new(	:title				=> @binder.title,
+										:body				=> @binder.body,
+										:type				=> @binder.type,
+										:format				=> @binder.type == 2 ? @binder.format : nil,
+										:files				=> @binder.files,
+										:folders			=> @binder.folders,
+										:total_size			=> @binder.total_size,
+										:order_index		=> @parent_child_count,
+										:parent				=> @parenthash,
+										:parents			=> @parentsarr,
+										:permissions		=> @binder.permissions,
+										:parent_permissions	=> @parentperarr,
 										:owner				=> current_teacher.id,
 										:last_update		=> Time.now.to_i,
-										:last_updated_by	=> current_teacher.id,
-										:type				=> h.type,
-										:format				=> (h.type != 1 ? h.format : nil),
-										:files				=> h.files,
-										:folders			=> h.folders,
-										:total_size			=> h.total_size)
+										:last_updated_by	=> current_teacher.id)
 
-				# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-				# 									:file_hash	=> h.current_version.file_hash,
-				# 									:timestamp	=> h.current_version.timestamp,
-				# 									:size		=> h.current_version.size,
-				# 									:ext		=> h.current_version.ext,
-				# 									:data		=> h.current_version.data,
-				# 									:croc_uuid	=> h.current_version.croc_uuid,
-				# 									:imgfile	=> h.current_version.imgfile,
-				# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+			#@new_parent.format = @binder.format if @binder.type == 2
 
-				@new_node.versions << h.current_version
+			# @new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
+			# 									:file_hash	=> @binder.current_version.file_hash,
+			# 									:timestamp	=> @binder.current_version.timestamp,
+			# 									:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
+			# 									:size		=> @binder.current_version.size,
+			# 									:ext		=> @binder.current_version.ext,
+			# 									:data		=> @binder.current_version.data,
+			# 									:croc_uuid 	=> @binder.current_version.croc_uuid,
+			# 									:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
 
-				#TODO: copy related images?
+			@new_parent.versions << @binder.current_version
 
-				@new_node.save
+			#TODO: copy related images?
 
-				@new_node.tag = Tag.new(:node_tags => h.tag.node_tags)
+			@new_parent.save
 
-				@new_node.update_parent_tags()
+			@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
 
-				@hash_index[h.id.to_s] = @new_node.id.to_s
+			@new_parent.update_parent_tags()
+
+			#Hash table for oldid => newid lookups
+			@hash_index = {params[:id] => @new_parent.id.to_s}
+
+
+			#If directory, deal with the children
+			if @binder.type == 1 #Eventually will apply to type == 3 too
+
+				@index = @binder.parents.length
+
+				#Select old children, order by parents.length
+				@children = @binder.children.sort_by {|binder| binder.parents.length}
+
+				#Spawn new children, These children need to have updated parent ids
+				@children.each do |h|
+
+					@node_parent = {"id"	=> @hash_index[h.parent["id"]],
+									"title"	=> h.parent["title"]}
+
+					@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
+
+					@old_permissions = h.parent_permissions
+
+					@ppers.each {|p| @old_permissions.delete(p)}
+
+					#Swap old folder ids with new folder ids
+					@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
+
+					@new_node = Binder.new(	:title				=> h.title,
+											:body				=> h.body,
+											:parent				=> @node_parent,
+											:parents			=> @node_parents,
+											:permissions		=> h.permissions,
+											:parent_permissions	=> @parentperarr + @old_permissions,
+											:owner				=> current_teacher.id,
+											:last_update		=> Time.now.to_i,
+											:last_updated_by	=> current_teacher.id,
+											:type				=> h.type,
+											:format				=> (h.type != 1 ? h.format : nil),
+											:files				=> h.files,
+											:folders			=> h.folders,
+											:total_size			=> h.total_size)
+
+					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+					# 									:file_hash	=> h.current_version.file_hash,
+					# 									:timestamp	=> h.current_version.timestamp,
+					# 									:size		=> h.current_version.size,
+					# 									:ext		=> h.current_version.ext,
+					# 									:data		=> h.current_version.data,
+					# 									:croc_uuid	=> h.current_version.croc_uuid,
+					# 									:imgfile	=> h.current_version.imgfile,
+					# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+
+					@new_node.versions << h.current_version
+
+					#TODO: copy related images?
+
+					@new_node.save
+
+					@new_node.tag = Tag.new(:node_tags => h.tag.node_tags)
+
+					@new_node.update_parent_tags()
+
+					@hash_index[h.id.to_s] = @new_node.id.to_s
+				end
+
 			end
 
-		end
+			#Update parents' folder/file/size counts
+			@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
 
-		#Update parents' folder/file/size counts
-		@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+			@parents.each do |pid|
+				if pid != "0"
+					parent = Binder.find(pid)
 
-		@parents.each do |pid|
-			if pid != "0"
-				parent = Binder.find(pid)
-
-				parent.update_attributes(	:files		=> parent.files + @new_parent.files,
-											:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-											:total_size	=> parent.total_size + @new_parent.total_size)
+					parent.update_attributes(	:files		=> parent.files + @new_parent.files,
+												:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
+												:total_size	=> parent.total_size + @new_parent.total_size)
+				end
 			end
+		else
+
+			errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+
 		end
 
 		# redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
 
 		# redirect_to binders_path
 
-		respond_to do |format|
-			format.html {render :text => 1}
-		end
 
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
+			end
 	end
 
 
@@ -1028,10 +1097,10 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		@binder.children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
-																								:shared_id => params[:shared_id],
-																								:auth_level => params[:auth_level],
-																								:folder_id => params[:id]})} if !@new
+		@binder.children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {	:type => params[:type],
+																										:shared_id => params[:shared_id],
+																										:auth_level => params[:auth_level],
+																										:folder_id => params[:id]})} if !@new
 
 		redirect_to named_binder_route(@binder, "permissions")
 	end
@@ -1067,57 +1136,68 @@ class BindersController < ApplicationController
 	def destroy
 		@binder = Binder.find(params[:id])
 
-		@binder.sift_siblings()
+		errors = []
 
-		@parenthash = {	:id		=> "-1",
-						:title	=> ""}
+		if @binder.get_access(current_teacher.id.to_s == 2)
 
-		@parentsarr = [@parenthash]
+			@binder.sift_siblings()
 
-		#OP = Original Parent
-		if @binder.parent["id"] != "0"
-			@op = Binder.find(@binder.parent["id"])
+			@parenthash = {	:id		=> "-1",
+							:title	=> ""}
 
-			@op.update_attributes(	:files		=> @op.files - @binder.files,
-									:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-									:total_size	=> @op.total_size - @binder.total_size)
-		end
+			@parentsarr = [@parenthash]
 
-		@binder.update_attributes(	:parent		=> @parenthash,
-									:parents	=> @parentsarr)
+			#OP = Original Parent
+			if @binder.parent["id"] != "0"
+				@op = Binder.find(@binder.parent["id"])
 
-
-		#If directory, deal with the children
-		if @binder.type == 1 #Eventually will apply to type == 3 too
-
-			@binder.children.each do |h|
-				@current_parents = h.parents
-				@size = @current_parents.size
-				h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
+				@op.update_attributes(	:files		=> @op.files - @binder.files,
+										:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
+										:total_size	=> @op.total_size - @binder.total_size)
 			end
 
-		end
+			@binder.update_attributes(	:parent		=> @parenthash,
+										:parents	=> @parentsarr)
 
 
-		@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
+			#If directory, deal with the children
+			if @binder.type == 1 #Eventually will apply to type == 3 too
 
-		@parents.each do |pid|
-			if pid != "-1"
-				parent = Binder.find(pid)
+				@binder.children.each do |h|
+					@current_parents = h.parents
+					@size = @current_parents.size
+					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
+				end
 
-				parent.update_attributes(	:files		=> parent.files + @binder.files,
-											:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
-											:total_size	=> parent.total_size + @binder.total_size)
 			end
+
+
+			@parents = @binder.parents.collect {|x| x["id"] || x[:id]}
+
+			@parents.each do |pid|
+				if pid != "-1"
+					parent = Binder.find(pid)
+
+					parent.update_attributes(	:files		=> parent.files + @binder.files,
+												:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
+												:total_size	=> parent.total_size + @binder.total_size)
+				end
+			end
+
+		else
+
+			errors << "You do not have permissions to delete this item"
+
 		end
 
-		# redirect_to named_binder_route(@op) and return if defined?(@op)
-
-		# redirect_to binders_path
-
-		respond_to do |format|
-			format.html {render :text => "1"}
-		end
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
+			end
 
 	end
 

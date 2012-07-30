@@ -536,12 +536,18 @@ function popForm(formID, obje) {
           url: "/utils/fetchtitle",
           data: 'url=' + escape($('#facebox .weblink').val()),
           success: function(titleData) {
-            $('#facebox .webtitle').val(titleData.substring(0, 60));
+            titleCheck = true;
+            $('#facebox .webtitle').val(titleData.substring(0, 55));
             $('#facebox .webtitle').removeAttr('disabled');
             $('#facebox .webtitle').focus();
             fbFormActRevert();
-
+          },
+          error: function(titleData) {
             titleCheck = true;
+            $('#facebox .webtitle').val('');
+            $('#facebox .webtitle').removeAttr('disabled');
+            $('#facebox .webtitle').focus();
+            fbFormActRevert();
           }
         });
 

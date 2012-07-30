@@ -9,6 +9,8 @@ class BindersController < ApplicationController
 
 		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
 
+		# these are temporary fixes:
+
 		@tagset = []
 
 		@tags = [[],[],[],[]]

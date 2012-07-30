@@ -298,9 +298,11 @@ module ApplicationHelper
 
 	end
 
-	def tagvis(set)
+	def tagvis(set,tagset)
 
 		#@tags[0].any? ? raw("style=\"display: block; opacity: 1;\"") : raw("style=\"display: none; opacity: 0;\"")
+
+		return raw("") if tagset.empty?
 
 		if set.any?
 			raw("style=\"display: block; opacity: 1;\"")
@@ -308,6 +310,16 @@ module ApplicationHelper
 		else
 			raw("style=\"display: none; opacity: 0;\"")
 			#raw("style=\"opacity: 0;\"")
+		end
+
+	end
+
+	def boxvis(tagset)
+
+		if tagset.empty?
+			return raw("style=\"\"")
+		else
+			return raw("style=\"display: none; opacity: 0;\"")
 		end
 
 	end

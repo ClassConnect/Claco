@@ -39,7 +39,7 @@ gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "fog", "~> 1.3.1"
 
-#gem 'mini_magick'
+gem 'mini_magick'
 #gem 'rmagick'
 
 gem 'log4r', '1.1.9'

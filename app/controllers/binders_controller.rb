@@ -432,126 +432,143 @@ class BindersController < ApplicationController
 	#Add file process
 	def createfile
 
-		@binder = Binder.new
+		errors = []
 
-		@inherited = inherit_from(params[:binder][:parent])
+		@inherited = inherit_from(params[:id])
 
-		@parenthash = @inherited[:parenthash]
-		@parentsarr = @inherited[:parentsarr]
-		@parentperarr = @inherited[:parentperarr]
-
-		@parent_child_count = @inherited[:parent_child_count]
-
-		#@filedata = 6
-
-		#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
-
-		@binder.update_attributes(	:title				=> File.basename(	params[:binder][:versions][:file].original_filename,
-																			File.extname(params[:binder][:versions][:file].original_filename)),
-									:owner				=> current_teacher.id,
-									:fname				=> current_teacher.fname,
-									:lname				=> current_teacher.lname,
-									:username			=> current_teacher.username,
-									:parent				=> @parenthash,
-									:parents			=> @parentsarr,
-									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id.to_s,
-									:body				=> params[:binder][:body],
-									:total_size			=> params[:binder][:versions][:file].size,
-									:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
-																						:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-																						:auth_level	=> params[:auth_level]}] : []),
-									:order_index 		=> @parent_child_count,
-									:parent_permissions	=> @parentperarr,
-									:files				=> 1,
-									:type				=> 2,
-									:format				=> 1)
-
-
-		# send file to crocodoc if the format is supported
-		# if check_format_validity(File.extname(params[:binder][:versions][:file].original_filename))
-		# 	filedata = upload(params[:binder][:versions][:file])
-				
-		# 	filedata = filedata["uuid"] if !filedata.nil?
-		# end
-
-		# this may work:
-		# RestClient.post '/data', :myfile => File.new("/path/to/image.jpg", 'rb')
-
-		#logger.debug DataUploader.new(params[:binder][:versions][:file]).current_path
-		#temp.file = params[:binder][:versions][:file]
- 
-		#logger.debug(params[:binder][:versions][:file].class)
-
-		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-										:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
-										:ext		=> File.extname(params[:binder][:versions][:file].original_filename),
-										:data		=> params[:binder][:versions][:file].original_filename,
-										:size		=> params[:binder][:versions][:file].size,
-										:timestamp	=> Time.now.to_i,
-										:owner		=> current_teacher.id)#,
-										#:croc_uuid => filedata)
-
-		@binder.save
-
-		#logger.debug(@binder.versions.last.file.class)
-
-		#logger.debug @binder.versions.last.file.url
-		#logger.debug "current path: #{@binder.versions.last.file.current_path}"
-		#logger.debug params[:binder][:versions][:file].current_path
-		if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext
-			# send file to crocodoc if the format is supported
-			if Crocodoc.check_format_validity(@binder.current_version.ext)
-
-				Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
-
-				filedata = Crocodoc.upload(@binder.current_version.file.url)
-					
-				filedata = filedata["uuid"] if !filedata.nil?
-
-				@binder.current_version.update_attributes(:croc_uuid => filedata)
-
-				# delegate image fetch to Delayed Job worker
-				#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-				Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
-				
-			elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
-				# for now, image will be added as file AND as imgfile
-				stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
-				stathash[:imgfile][:retrieved] = true
-
-				# upload image
-				@binder.current_version.update_attributes( 	:imgfile => params[:binder][:versions][:file],
-															:imgclass => 0,
-															:imgstatus => stathash)
+		if @inherited[:parent].get_access(current_teacher.id.to_s)
 			
+			@binder = Binder.new
+
+			@parenthash = @inherited[:parenthash]
+			@parentsarr = @inherited[:parentsarr]
+			@parentperarr = @inherited[:parentperarr]
+
+			@parent_child_count = @inherited[:parent_child_count]
+
+			#@filedata = 6
+
+			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
+
+			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
+																				File.extname(params[:file].original_filename)),
+										:owner				=> current_teacher.id,
+										:fname				=> current_teacher.fname,
+										:lname				=> current_teacher.lname,
+										:username			=> current_teacher.username,
+										:parent				=> @parenthash,
+										:parents			=> @parentsarr,
+										:last_update		=> Time.now.to_i,
+										:last_updated_by	=> current_teacher.id.to_s,
+										#:body				=> params[:binder][:body],
+										:total_size			=> params[:file].size,
+										#:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
+										#													:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
+										#													:auth_level	=> params[:auth_level]}] : []),
+										:order_index 		=> @parent_child_count,
+										:parent_permissions	=> @parentperarr,
+										:files				=> 1,
+										:type				=> 2,
+										:format				=> 1)
+
+
+			# send file to crocodoc if the format is supported
+			# if check_format_validity(File.extname(params[:binder][:versions][:file].original_filename))
+			# 	filedata = upload(params[:binder][:versions][:file])
+					
+			# 	filedata = filedata["uuid"] if !filedata.nil?
+			# end
+
+			# this may work:
+			# RestClient.post '/data', :myfile => File.new("/path/to/image.jpg", 'rb')
+
+			#logger.debug DataUploader.new(params[:binder][:versions][:file]).current_path
+			#temp.file = params[:binder][:versions][:file]
+	 
+			#logger.debug(params[:binder][:versions][:file].class)
+
+			@binder.versions << Version.new(:file		=> params[:file],
+											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:file].path).to_s),
+											:ext		=> File.extname(params[:file].original_filename),
+											:data		=> params[:file].original_filename,
+											:size		=> params[:file].size,
+											:timestamp	=> Time.now.to_i,
+											:owner		=> current_teacher.id)#,
+											#:croc_uuid => filedata)
+
+			@binder.save
+
+			#logger.debug(@binder.versions.last.file.class)
+
+			#logger.debug @binder.versions.last.file.url
+			#logger.debug "current path: #{@binder.versions.last.file.current_path}"
+			#logger.debug params[:binder][:versions][:file].current_path
+			if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext
+				# send file to crocodoc if the format is supported
+				if Crocodoc.check_format_validity(@binder.current_version.ext)
+
+					Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
+
+					filedata = Crocodoc.upload(@binder.current_version.file.url)
+						
+					filedata = filedata["uuid"] if !filedata.nil?
+
+					@binder.current_version.update_attributes(:croc_uuid => filedata)
+
+					# delegate image fetch to Delayed Job worker
+					#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
+					Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+					
+				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
+					# for now, image will be added as file AND as imgfile
+					stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
+					stathash[:imgfile][:retrieved] = true
+
+					# upload image
+					@binder.current_version.update_attributes( 	:imgfile => params[:file],
+																:imgclass => 0,
+																:imgstatus => stathash)
+				
+				end
+			else
+				stathash = @binder.current_version.imgstatus
+				stathash[:imageable] = false
+
+				# unable to derive iamge from filetype
+				@binder.current_version.update_attributes(	:imgstatus => stathash,
+															:imgclass => 4 )
 			end
+
+
+			@binder.create_binder_tags(params,current_teacher.id)
+	 
+			pids = @parentsarr.collect {|x| x["id"] || x[:id]}
+
+			pids.each do |id|
+
+				if id != "0"
+					parent = Binder.find(id)
+					parent.update_attributes(	:files		=> parent.files + 1,
+												:total_size	=> parent.total_size + params[:file].size)
+				end
+			end
+
+			Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+
 		else
-			stathash = @binder.current_version.imgstatus
-			stathash[:imageable] = false
 
-			# unable to derive iamge from filetype
-			@binder.current_version.update_attributes(	:imgstatus => stathash,
-														:imgclass => 4 )
+			errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+
 		end
 
-
-		@binder.create_binder_tags(params,current_teacher.id)
- 
-		pids = @parentsarr.collect {|x| x["id"] || x[:id]}
-
-		pids.each do |id|
-
-			if id != "0"
-				parent = Binder.find(id)
-				parent.update_attributes(	:files		=> parent.files + 1,
-											:total_size	=> parent.total_size + params[:binder][:versions][:file].size)
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
 			end
-		end
-
-		Binder.find(pids.last).inc(:children,1) if pids.last != "0"
-
-		redirect_to named_binder_route(params[:binder][:parent])
 
 	end
  

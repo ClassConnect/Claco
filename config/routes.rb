@@ -91,6 +91,7 @@ Claco::Application.routes.draw do
 
 	#New
 	post	'/:username/portfolio(/:root)/:title/:id/create'				=> 'binders#create'
+	post	'/:username/portfolio(/:root)/:title/:id/createfile'			=> 'binders#createfile'
 	post	'/:username/portfolio(/:root)/:title/:id/createcontent'			=> 'binders#createcontent'
 
 	#Move

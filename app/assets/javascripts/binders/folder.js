@@ -615,7 +615,7 @@ function popForm(formID, obje) {
 
         }
         
-      });  
+      });
 
       return false;
     });
@@ -629,7 +629,7 @@ function popForm(formID, obje) {
 
     // initialize the file upload functionality
     $('#facebox .filepick').fileupload({
-        url: '/',
+        url: document.location.href + '/createfile',
         dataType: 'json',
         add: function (e, data) {
             data.submit();
@@ -649,38 +649,6 @@ function popForm(formID, obje) {
           $('#facebox .file-upload-btn').show();
         }
     });
-
-    // set the form handler
-    $('#facebox .bodcon').submit(function() {
-      var serData = $("#facebox .bodcon").serialize();
-      fbFormSubmitted();
-
-
-      $.ajax({
-        type: "PUT",
-        url: obje.find('.titler a').attr("href") + "/",
-        data: serData,
-        success: function(retData) {
-          if (retData == 1) {
-            scrollBottom = true;
-            softRefresh();
-            closefBox();
-            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 1500);
-
-
-          } else {
-            fbFormRevert();
-            showFormError(retData);
-
-          }
-
-        }
-        
-      });
-
-      return false;
-    });
-    // end of form handler
 
 
 

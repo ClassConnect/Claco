@@ -52,13 +52,22 @@ end %>
           <%
             # imgarr is an array of length 0 to 3 that contains the URLs of the images
             # the first image is the large thumbnail, the second and third are the small thumbnails
+            #imgarr[0]
           %>
 
 					<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
 
 			            <div class="folder-preview">
-			              <div class="single-hold" style="background-image:url('<%= get_binder_image(binder) %>');">
-			               
+			              <div class="single-hold" style="background-image:url('get_binder_image(binder)');">
+
+                      <div class="thumb-wrap">
+                        <img class="thumb1" src="<%= imgarr[1] %>" />
+
+                        <br />
+
+                        <img class="thumb2" src="<%= imgarr[2] %>" />
+                      </div>
+
 			              </div>
 			            </div>
 

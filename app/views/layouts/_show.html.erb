@@ -1,24 +1,12 @@
-<% content_for :headcon do
-	javascript_include_tag "wy/advanced"
-end %>
-<% content_for :headcon do
-	javascript_include_tag "wy/wysi5"
-end %>
-<% content_for :headcon do
-	javascript_include_tag "binders/pretags"
-end %>
-<% content_for :headcon do
-	javascript_include_tag "binders/folder"
-end %>
-<% content_for :headcon do
-	javascript_include_tag "binders/taginit"
-end %>
-<% content_for :headcon do
-  javascript_include_tag "binders/upload/iframe-transport"
-end %>
-<% content_for :headcon do
-  javascript_include_tag "binders/upload/fileupload"
-end %>
+<% content_for :headcon do %>
+	<%= javascript_include_tag "wy/advanced" %>
+	<%= javascript_include_tag "wy/wysi5" %>
+	<%= javascript_include_tag "binders/pretags" %>
+	<%= javascript_include_tag "binders/folder" %>
+	<%= javascript_include_tag "binders/taginit" %>
+  <%= javascript_include_tag "binders/upload/iframe-transport" %>
+  <%= javascript_include_tag "binders/upload/fileupload" %>
+<% end %>
 
 <div class="container">
   <div id="list-pane">

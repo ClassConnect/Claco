@@ -1,0 +1,87 @@
+		<div class="content-list">
+
+
+	     <% if @children.empty? %>
+				Empty
+			<% else %>
+				<% @children.each do |binder| %>
+
+          <% imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 %>
+
+          <%
+            # imgarr is an array of length 0 to 3 that contains the URLs of the images
+            # the first image is the large thumbnail, the second and third are the small thumbnails
+            #imgarr[0]
+          %>
+
+					<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
+
+
+                  <% if binder.type != 1 
+                    # is a file/link 
+                  %> 
+
+                    <div class="folder-preview">
+                      <div class="single-hold" style="background-image:url('<%= get_binder_image(binder) %>');">
+                      </div>
+                    </div>
+
+                  <% else 
+                    # is a folder
+                  %>
+
+    		            <div class="folder-preview">
+    		              <!-- <div class="single-hold" src="<%= imgarr[0].to_s %>" > -->
+                      <div class="single-hold" style="background-image:url('<%= imgarr[0].to_s %>');">
+
+                        <div class="thumb-wrap">
+                          <img class="thumb1" src="<%= imgarr[1].to_s %>" />
+
+                          <br />
+
+                          <img class="thumb2" src="<%= imgarr[2].to_s %>" />
+                        </div>
+
+    		              </div>
+    		            </div>
+
+                  <% end %>
+
+
+			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => "pjax" %></div>
+
+			            <div class="descarea">Last updated by <%= link_to binder.user, "#" %> at <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
+
+			            <div class="drop-tog">
+			            	<div class="btn-group">
+
+					          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
+					          <div class="tog-arrow"></div>
+					          </button>
+
+					          <ul class="dropdown-menu">
+					            <li><a id="rename-act" class="modaction">Rename</a></li>
+					            <li><a id="copy-act" class="modaction">Copy</a></li>
+					            <li><a id="move-act" class="modaction">Move</a></li>
+					            <li><a id="delete-act" class="modaction">Delete</a></li>
+					          </ul>
+
+					        </div>
+
+			            </div>
+
+
+			        </div>
+
+
+					<%= #get_binder_image(binder,{ :height => 150, :border => 1 }) #{ :border => 1 })
+					%>
+
+
+
+					
+				<% end %>
+			<% end %>
+
+
+		</div>

@@ -17,20 +17,20 @@ class ImageUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
 
+  version :contentview do
+    process resize_to_fill: [700, 8000]
+  end
+
   version :thumb_lg do
-      #process :resize_to_fill => [130,93]
+      #process :resize_to_fill => [200,91]
       process :resize_and_pad => [200,91,'black','Center']
   end
 
   version :thumb_sm do
-    #process :resize_to_fill => [49,46]
+    #process :resize_to_fill => [45,45]
     process :resize_and_pad => [45,45,'black','Center']
   end
 
-  version :contentview do
-    #process :resize_to_fill => [49,46]
-    process :resize_to_fit => [700, 8000]
-  end
 
   def store_dir
     Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)

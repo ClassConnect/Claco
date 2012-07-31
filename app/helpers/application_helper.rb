@@ -263,7 +263,7 @@ module ApplicationHelper
 			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;')# + 
 			#return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 
 			#		image_tag( "#{binder.versions.last.imgfile.thumb_sm}",options )
-			return "#{binder.current_version.imgfile.url}"
+			return "#{binder.current_version.imgfile.thumb_lg.url}"
 		end
 
 

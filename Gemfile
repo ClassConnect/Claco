@@ -34,6 +34,7 @@ gem 'mongoid', "~> 2.4"
 #gem "mongoid", "~> 3.0.0.rc"
 gem 'bson_ext', "~> 1.5"
 gem 'devise'
+gem 'addressable'
 
 gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'

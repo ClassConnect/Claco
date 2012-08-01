@@ -612,6 +612,7 @@ class Version
 	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
 	field :data, :type => String #URL, path to file
+	field :embed, :type => Boolean, :default => false
 	field :active, :type => Boolean, :default => false
 
 	# MD5 hash of the uploaded file

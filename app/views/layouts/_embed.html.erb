@@ -3,19 +3,24 @@
 
 		<iframe id="crocFrame" style="width: 700px; height: 600px;" src="<%= @croc_url %>" ></iframe>
 
-	<% elsif @binder.current_version.imgclass == 0 %>
-
-		<% image_tag @binder.current_version.imgfile.contentview.url %>
-
 	<% end %>
 
-		<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download")%>	
+	<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download")%>	
 
 <% end %>
 
 <% if @binder.format == 2 %>
+	
+	<% if @binder.current_version.embed %>
 
-	<%= link_to @binder.title, @binder.current_version.data %>
+		<%= @binder.current_version.data.html_safe %>
+
+	<% else %>
+
+		<%= image_tag @binder.current_version.imgfile.contentview.url %>
+		<%= link_to @binder.title, @binder.current_version.data %>
+
+	<% end %>
 
 <% end %>
 

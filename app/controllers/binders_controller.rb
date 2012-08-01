@@ -173,7 +173,7 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
+		redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -230,9 +230,6 @@ class BindersController < ApplicationController
 		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
 		
 		# This will catch flawed URL structure, as well as bad HTTP response codes
-		RestClient.get(params[:weblink])
-		
-		
 
 		# the RestClient object will catch most of the error codes before getting to here
 		#if ![200,301,302].include? respcode
@@ -246,91 +243,122 @@ class BindersController < ApplicationController
 		#Trim to 60 chars (old spec)
 		if params[:webtitle].length > 1
 
-			@inherited = inherit_from(params[:id])
+			embed = false
+			url = false
 
-			@parenthash = @inherited[:parenthash]
-			@parentsarr = @inherited[:parentsarr]
-			@parentperarr = @inherited[:parentperarr]
+			if !(params[:weblink] =~ /(<iframe.*>)(<\/iframe>)?/).nil?
 
-			@parent_child_count = @inherited[:parent_child_count]
+				embed = true
 
-			if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
+			elsif !(params[:weblink] =~ /(<embed.*>)(<\/embed>)?/).nil?
 
-				@binder = Binder.new(	:title				=> params[:webtitle],
-										:owner				=> current_teacher.id,
-										:username			=> current_teacher.username,
-										:fname				=> current_teacher.fname,
-										:lname				=> current_teacher.lname,
-										:parent				=> @parenthash,
-										:parents			=> @parentsarr,
-										:last_update		=> Time.now.to_i,
-										:last_updated_by	=> current_teacher.id.to_s,
-										:body				=> params[:body],
-										#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
-										#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
-										#						:auth_level => params[:auth_level]}] : []),
-										:order_index		=> @parent_child_count,
-										:parent_permissions	=> @parentperarr,
-										:files				=> 1,
-										:type				=> 2,
-										:format				=> 2)
+				embed = true
 
-				@binder.versions << Version.new(:data		=> params[:weblink],
-												:timestamp	=> Time.now.to_i,
-												:owner		=> current_teacher.id)
+			end
+
+			if !embed
+				RestClient.get(params[:weblink])
+				url = true
+			end
+
+			if url || embed
+
+				@inherited = inherit_from(params[:id])
+
+				@parenthash = @inherited[:parenthash]
+				@parentsarr = @inherited[:parentsarr]
+				@parentperarr = @inherited[:parentperarr]
+
+				@parent_child_count = @inherited[:parent_child_count]
+
+				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
+
+					@binder = Binder.new(	:title				=> params[:webtitle],
+											:owner				=> current_teacher.id,
+											:username			=> current_teacher.username,
+											:fname				=> current_teacher.fname,
+											:lname				=> current_teacher.lname,
+											:parent				=> @parenthash,
+											:parents			=> @parentsarr,
+											:last_update		=> Time.now.to_i,
+											:last_updated_by	=> current_teacher.id.to_s,
+											:body				=> params[:body],
+											#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
+											#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
+											#						:auth_level => params[:auth_level]}] : []),
+											:order_index		=> @parent_child_count,
+											:parent_permissions	=> @parentperarr,
+											:files				=> 1,
+											:type				=> 2,
+											:format				=> 2)
+
+					@binder.versions << Version.new(:data		=> url ? Addressable::URI.heuristic_parse(params[:weblink]).to_s : params[:weblink],
+													:embed		=> embed,
+													:timestamp	=> Time.now.to_i,
+													:owner		=> current_teacher.id)
 
 
-				#@binder.create_binder_tags(params,current_teacher.id)
+					#@binder.create_binder_tags(params,current_teacher.id)
 
-				@binder.save
+					@binder.save
 
-				uri = URI(params[:weblink])
+					if url
 
-				stathash = @binder.current_version.imgstatus
-				stathash[:imgfile][:retrieved] = true
+						uri = URI(params[:weblink])
+
+						stathash = @binder.current_version.imgstatus
+						stathash[:imgfile][:retrieved] = true
 
 
-				if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+						if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 
-					# YOUTUBE
-					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
+							# YOUTUBE
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
 
-				elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
-					# VIMEO
-					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
+							# VIMEO
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
 
-				elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
 
-					# EDUCREATIONS
-					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
+							# EDUCREATIONS
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
 
-				elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+						elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
-					# SCHOOLTUBE
-					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
+							# SCHOOLTUBE
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
 
-				elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+						elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
-					# SHOWME
-					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+							# SHOWME
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+
+						else
+							# generic URL, grab Url2png
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+						end
+
+					end
+
+					@binder.create_binder_tags(params,current_teacher.id)
+
+					pids = @parentsarr.collect {|x| x["id"] || x[:id]}
+
+					pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
+
+					Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
 				else
-					# generic URL, grab Url2png
-					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+
+					errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+
 				end
-
-				@binder.create_binder_tags(params,current_teacher.id)
-
-				pids = @parentsarr.collect {|x| x["id"] || x[:id]}
-
-				pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
-
-				Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
 			else
 
-				errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+				errors << "Invalid input data"
 
 			end
 
@@ -344,9 +372,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue
-			Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid URL detected"
+		rescue Exception => exc
+			#Rails.logger.debug "Invalid URL detected"
+			errors << "Invalid input data #{exc.message}"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}

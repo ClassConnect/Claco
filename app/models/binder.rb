@@ -397,7 +397,7 @@ class Binder
 	end
 
 	def subtree
-		return Binder.any_in( parents: [{ "id" => self.id.to_s, "title" => self.title.to_s },{ :id => self.id.to_s, :title => self.title.to_s }] )
+		return Binder.where("parents.id" => self.id.to_s)
 	end
 
 	def current_version

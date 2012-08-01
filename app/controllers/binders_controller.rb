@@ -702,7 +702,7 @@ class BindersController < ApplicationController
 				#If directory, deal with the children
 				if @binder.type == 1 #Eventually will apply to type == 3 too
 
-					@children = @binder.children
+					@children = @binder.subtree
 
 					@children.each do |h|
 
@@ -793,6 +793,9 @@ class BindersController < ApplicationController
 										:permissions		=> @binder.permissions,
 										:parent_permissions	=> @parentperarr,
 										:owner				=> current_teacher.id,
+										:username			=> @binder.username,
+										:fname				=> @binder.fname,
+										:lname				=> @binder.lname,
 										:last_update		=> Time.now.to_i,
 										:last_updated_by	=> current_teacher.id)
 
@@ -830,7 +833,7 @@ class BindersController < ApplicationController
 				@index = @binder.parents.length
 
 				#Select old children, order by parents.length
-				@children = @binder.children.sort_by {|binder| binder.parents.length}
+				@children = @binder.subtree.sort_by {|binder| binder.parents.length}
 
 				#Spawn new children, These children need to have updated parent ids
 				@children.each do |h|
@@ -854,6 +857,9 @@ class BindersController < ApplicationController
 											:permissions		=> h.permissions,
 											:parent_permissions	=> @parentperarr + @old_permissions,
 											:owner				=> current_teacher.id,
+											:username			=> h.username,
+											:fname				=> h.fname,
+											:lname				=> h.lname,
 											:last_update		=> Time.now.to_i,
 											:last_updated_by	=> current_teacher.id,
 											:type				=> h.type,
@@ -925,112 +931,112 @@ class BindersController < ApplicationController
 
 
 	#Copy Binders to new location
-	def forkitem
+	# def forkitem
 
-		@binder = Binder.find(params[:id])
+	# 	@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from(params[:binder][:parent])
+	# 	@inherited = inherit_from(params[:binder][:parent])
 
-		@parenthash = @inherited[:parenthash]
-		@parentsarr = @inherited[:parentsarr]
-		@parentperarr = @inherited[:parentperarr]
+	# 	@parenthash = @inherited[:parenthash]
+	# 	@parentsarr = @inherited[:parentsarr]
+	# 	@parentperarr = @inherited[:parentperarr]
 
-		@parent_child_count = @inherited[:parent_child_count]
+	# 	@parent_child_count = @inherited[:parent_child_count]
 
-		@new_parent = Binder.new(	:title				=> @binder.title,
-									:body				=> @binder.body,
-									:type				=> @binder.type,
-									:files				=> @binder.files,
-									:folders			=> @binder.folders,
-									:total_size			=> @binder.total_size,
-									:order_index		=> @parent_child_count,
-									:parent				=> @parenthash,
-									:parents			=> @parentsarr,
-									:owner				=> current_teacher.id,
-									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id,
-									:format				=> @binder.type == 2 ? @binder.format : nil)
-
-
-		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-												:file_hash	=> @binder.current_version.file_hash,
-												:timestamp	=> @binder.current_version.timestamp,
-												:size		=> @binder.current_version.size,
-												:ext		=> @binder.current_version.ext,
-												:data		=> @binder.current_version.data,
-												:croc_uuid	=> @binder.current_version.croc_uuid,
-												:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
-
-		@new_parent.save
-
-		@hash_index = {params[:id] => @new_parent.id.to_s}
+	# 	@new_parent = Binder.new(	:title				=> @binder.title,
+	# 								:body				=> @binder.body,
+	# 								:type				=> @binder.type,
+	# 								:files				=> @binder.files,
+	# 								:folders			=> @binder.folders,
+	# 								:total_size			=> @binder.total_size,
+	# 								:order_index		=> @parent_child_count,
+	# 								:parent				=> @parenthash,
+	# 								:parents			=> @parentsarr,
+	# 								:owner				=> current_teacher.id,
+	# 								:last_update		=> Time.now.to_i,
+	# 								:last_updated_by	=> current_teacher.id,
+	# 								:format				=> @binder.type == 2 ? @binder.format : nil)
 
 
-		#If directory, deal with the children
-		if @binder.type == 1 #Eventually will apply to type == 3 too
+	# 	@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
+	# 											:file_hash	=> @binder.current_version.file_hash,
+	# 											:timestamp	=> @binder.current_version.timestamp,
+	# 											:size		=> @binder.current_version.size,
+	# 											:ext		=> @binder.current_version.ext,
+	# 											:data		=> @binder.current_version.data,
+	# 											:croc_uuid	=> @binder.current_version.croc_uuid,
+	# 											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
 
-			@index = @binder.parents.length
+	# 	@new_parent.save
 
-			#Select old children, order by parents.length
-			@children = @binder.children.sort_by {|binder| binder.parents.length}
-
-			#Spawn new children, These children need to have updated parent ids
-			@children.each do |h|
-
-				@node_parent = {"id"	=> @hash_index[h.parent["id"]],
-								"title"	=> h.parent["title"]}
-
-				@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
-
-				@new_node = Binder.new(	:title				=> h.title,
-										:body				=> h.body,
-										:parent				=> @node_parent,
-										:parents			=> @node_parents,
-										:owner				=> current_teacher.id,
-										:last_update		=> h.last_update,
-										:last_updated_by	=> current_teacher.id,
-										:type				=> h.type,
-										:format				=> (h.type != 1 ? h.format : nil),
-										:forked_from		=> h.current_version.id,
-										:fork_stamp			=> Time.now.to_i)
-
-				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-														:file_hash	=> h.current_version.file_hash,
-														:timestamp	=> h.current_version.timestamp,
-														:size		=> h.current_version.size,
-														:ext		=> h.current_version.ext,
-														:data		=> h.current_version.data,
-														:croc_uuid	=> h.current_version.croc_uuid,
-														:file		=> h.format == 1 ? h.current_version.file : nil)
-
-				@new_node.save
-
-				h.inc(:fork_total, 1)
-
-				@hash_index[h.id.to_s] = @new_node.id.to_s
-			end
-
-		end
+	# 	@hash_index = {params[:id] => @new_parent.id.to_s}
 
 
-		@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+	# 	#If directory, deal with the children
+	# 	if @binder.type == 1 #Eventually will apply to type == 3 too
 
-		@parents.each do |pid|
-			if pid != "0"
-				parent = Binder.find(pid)
+	# 		@index = @binder.parents.length
 
-				parent.update_attributes(	:files		=> parent.files + @new_parent.files,
-											:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-											:total_size	=> parent.total_size + @new_parent.total_size)
-			end
-		end
+	# 		#Select old children, order by parents.length
+	# 		@children = @binder.children.sort_by {|binder| binder.parents.length}
 
-		Binder.delay.generate_folder_thumbnail(@new_parent.id)
+	# 		#Spawn new children, These children need to have updated parent ids
+	# 		@children.each do |h|
 
-		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
+	# 			@node_parent = {"id"	=> @hash_index[h.parent["id"]],
+	# 							"title"	=> h.parent["title"]}
 
-		redirect_to binders_path
-	end
+	# 			@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
+
+	# 			@new_node = Binder.new(	:title				=> h.title,
+	# 									:body				=> h.body,
+	# 									:parent				=> @node_parent,
+	# 									:parents			=> @node_parents,
+	# 									:owner				=> current_teacher.id,
+	# 									:last_update		=> h.last_update,
+	# 									:last_updated_by	=> current_teacher.id,
+	# 									:type				=> h.type,
+	# 									:format				=> (h.type != 1 ? h.format : nil),
+	# 									:forked_from		=> h.current_version.id,
+	# 									:fork_stamp			=> Time.now.to_i)
+
+	# 			@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+	# 													:file_hash	=> h.current_version.file_hash,
+	# 													:timestamp	=> h.current_version.timestamp,
+	# 													:size		=> h.current_version.size,
+	# 													:ext		=> h.current_version.ext,
+	# 													:data		=> h.current_version.data,
+	# 													:croc_uuid	=> h.current_version.croc_uuid,
+	# 													:file		=> h.format == 1 ? h.current_version.file : nil)
+
+	# 			@new_node.save
+
+	# 			h.inc(:fork_total, 1)
+
+	# 			@hash_index[h.id.to_s] = @new_node.id.to_s
+	# 		end
+
+	# 	end
+
+
+	# 	@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+
+	# 	@parents.each do |pid|
+	# 		if pid != "0"
+	# 			parent = Binder.find(pid)
+
+	# 			parent.update_attributes(	:files		=> parent.files + @new_parent.files,
+	# 										:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
+	# 										:total_size	=> parent.total_size + @new_parent.total_size)
+	# 		end
+	# 	end
+
+	# 	Binder.delay.generate_folder_thumbnail(@new_parent.id)
+
+	# 	redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
+
+	# 	redirect_to binders_path
+	# end
 
 	def createversion
 		@binder = Binder.find(params[:id])
@@ -1201,21 +1207,21 @@ class BindersController < ApplicationController
 			#If directory, deal with the children
 			if @binder.type == 1 #Eventually will apply to type == 3 too
 
-				# @binder.children.each do |h|
-				# 	@current_parents = h.parents
-				# 	@size = @current_parents.size
-				# 	h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
-				# end
-
 				@binder.subtree.each do |h|
-					# if the binder is not included, this is not necessary...
-					if h.id != @binder.id				
-					 	@current_parents = h.parents
-					 	@size = @current_parents.size
-						h.update_attributes(	:parent		=> @parenthash,
-												:parents	=> @parentsarr)
-					end
+					@current_parents = h.parents
+					@size = @current_parents.size
+					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
 				end
+
+				# @binder.subtree.each do |h|
+				# 	# if the binder is not included, this is not necessary...
+				# 	if h.id != @binder.id				
+				# 	 	@current_parents = h.parents
+				# 	 	@size = @current_parents.size
+				# 		h.update_attributes(	:parent		=> @parenthash,
+				# 								:parents	=> @parentsarr)
+				# 	end
+				# end
 
 			end
 

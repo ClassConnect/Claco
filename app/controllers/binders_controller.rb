@@ -25,7 +25,7 @@ class BindersController < ApplicationController
 
 		errors = []
 
-		if params[:foldertitle].length > 1
+		if params[:foldertitle].strip.length > 0
 
 			@inherited = inherit_from(params[:id])
 
@@ -57,7 +57,7 @@ class BindersController < ApplicationController
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
 										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].to_s[0..60],
+										:title				=> params[:foldertitle].strip[0..55],
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
 										:body				=> params[:body],
@@ -241,7 +241,7 @@ class BindersController < ApplicationController
 		errors = []
 
 		#Trim to 60 chars (old spec)
-		if params[:webtitle].length > 1
+		if params[:webtitle].strip.length > 0
 
 			embed = false
 			url = false
@@ -273,7 +273,7 @@ class BindersController < ApplicationController
 
 				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
-					@binder = Binder.new(	:title				=> params[:webtitle],
+					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..55],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
 											:fname				=> current_teacher.fname,
@@ -473,7 +473,7 @@ class BindersController < ApplicationController
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
-																				File.extname(params[:file].original_filename)),
+																				File.extname(params[:file].original_filename)).strip[0..55],
 										:owner				=> current_teacher.id,
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,

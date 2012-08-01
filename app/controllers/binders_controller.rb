@@ -528,7 +528,7 @@ class BindersController < ApplicationController
 					Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
 					Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
 
-					Binder.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+					Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 				
 				end
 			else

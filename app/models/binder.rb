@@ -183,9 +183,9 @@ class Binder
 		Rails.logger.debug "Moving up tree!"
 		Rails.logger.debug "parents: #{binder.parents.size}"
 
-		binder.parents.each do |parent|
-			Binder.generate_folder_thumbnail(parent["id"] || parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
-		end
+		#binder.parents.each do |parent|
+			Binder.generate_folder_thumbnail(binder.parent["id"] || binder.parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
+		#end
 
 		# generate first thumbnail from local imageset if possible
 
@@ -494,7 +494,7 @@ class Binder
 									:imgstatus => stathash)
 
 		#Binder.delay.generate_folder_thumbnail(id)
-		Binder.generate_folder_thumbnail(target.parent['id'])
+		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
 
 	end
@@ -516,7 +516,7 @@ class Binder
 									:imgstatus => stathash)
 
 		#Binder.delay.generate_folder_thumbnail(id)
-		Binder.generate_folder_thumbnail(target.parent['id'])
+		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
 	end
 
@@ -861,6 +861,21 @@ class Tag
 		end
 
 		return ret_set
+
+	end
+
+	def self.seedbinder(id)
+
+		a = Binder.new
+
+		a.update_attributes( 	:owner => id.to_s,
+								:parent => { :id => "0", :title => "" },
+								:parents => [{ :id => "0", :title => "" }],
+								:title => "seed binder",
+								:type => 1,
+								:last_update => Time.now)
+
+		a.save
 
 	end
 

@@ -491,7 +491,7 @@ class BindersController < ApplicationController
 			#logger.debug @binder.versions.last.file.url
 			#logger.debug "current path: #{@binder.versions.last.file.current_path}"
 			#logger.debug params[:binder][:versions][:file].current_path
-			if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext
+			if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext.downcase
 				# send file to crocodoc if the format is supported
 				if Crocodoc.check_format_validity(@binder.current_version.ext)
 
@@ -505,9 +505,9 @@ class BindersController < ApplicationController
 
 					# delegate image fetch to Delayed Job worker
 					#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-					Binder.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+					Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 					
-				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
+				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
 					# for now, image will be added as file AND as imgfile
 					stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
 					stathash[:imgfile][:retrieved] = true
@@ -518,7 +518,11 @@ class BindersController < ApplicationController
 																:imgstatus => stathash)
 
 					#Binder.generate_folder_thumbnail(@binder.id)
-					Binder.generate_folder_thumbnail(@binder.parent['id'])
+
+					Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
+					Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
+
+					Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 				
 				end
 			else

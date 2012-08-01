@@ -54,7 +54,7 @@ class Binder
 	field :comments, :type => Array
 
 	# [Large, Small1, Small2] - strings
-	field :thumbimgids, :type => Array, :default => []
+	field :thumbimgids, :type => Array, :default => ["","",""]
 
 	field :debug_data, :type => Array, :default => []
 

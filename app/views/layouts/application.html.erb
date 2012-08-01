@@ -14,7 +14,8 @@
 		<%= javascript_include_tag "dropdown" %>
 		<%= javascript_include_tag "facebox" %>
 		<%= javascript_include_tag "tooltip" %>
-		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]')" %>
+		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]');" %>
+		<%= javascript_tag "$.pjax.defaults.timeout = 5000;" %>
 		<%= yield :headcon %>
 
 		<%= csrf_meta_tags %>

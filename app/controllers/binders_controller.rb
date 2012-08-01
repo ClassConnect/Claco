@@ -141,15 +141,21 @@ class BindersController < ApplicationController
 
 		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children).sort_by {|c| c.order_index}
 		
-		respond_to do |format|
-		 	format.html
-			format.json {render :json => @children.collect{|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
-		end
+		error = false
 
 		rescue BSON::InvalidObjectId
+			error = true
 			redirect_to "/404.html" and return
 		rescue Mongoid::Errors::DocumentNotFound
+			error = true
 			redirect_to "/404.html" and return
+		ensure
+			if !error
+				respond_to do |format|
+				 	format.html
+					format.json {render :json => @children.collect {|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
+				end
+			end
 
 	end
 

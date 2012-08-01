@@ -1,11 +1,11 @@
 <% if @binder.format == 1 %>
 	<% if @croc %>
 
-		<iframe id="crocFrame" style="width: 700px; height: 600px;" src=<%= @croc_url %> ></iframe>
+		<iframe id="crocFrame" style="width: 700px; height: 600px;" src="<%= @croc_url %>" ></iframe>
 
 	<% elsif @binder.current_version.imgclass == 0 %>
 
-		<% image_tag @binder.current_version.imgfile.url %>
+		<% image_tag @binder.current_version.imgfile.contentview.url %>
 
 	<% end %>
 

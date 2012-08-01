@@ -85,13 +85,13 @@ class Binder
 
 		retarr = Array.new
 
-		Rails.logger.debug binder.thumbimgids[0].to_s
+		Rails.logger.debug "Thumbimbids array: #{binder.thumbimgids.to_s}"
 
-		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if binder.thumbimgids.size > 0
-		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if binder.thumbimgids.size > 1
-		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if binder.thumbimgids.size > 2
+		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if !binder.thumbimgids[0].empty?
+		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
+		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
 
-		Rails.logger.debug retarr.to_s
+		Rails.logger.debug "Return array: #{retarr.to_s}"
 
 		return retarr
 
@@ -100,67 +100,107 @@ class Binder
 	# recursive call to parent to set the folder thumbnail
 	def self.generate_folder_thumbnail(id,imageset = [[],[],[],[]])
 
+		Rails.logger.debug "GEN: #{id.to_s}"
+
+		#return if id.to_s == "-1" || id.to_s == "0"
+ 
 		binder = Binder.find(id.to_s)
+
+		binder.thumbimgids = []
 
 		#Rails.logger.debug "BINDER INSPECT: #{binder.inspect.to_s}"
 
 		# retrieve images, add to imageset
 
-		children = Binder.where("parent.id" => binder.parent['id'])
+		#children = Binder.where("parent.id" => binder.parent['id'])
+		#children = Binder.where("parent.id" => binder.id.to_s)
 
-		Rails.logger.debug "CHILDREN INSPECT: #{children.inspect.to_s}"
+		#binder.parents.collect { |x| Binder.find((x["id"] || x[:id]).to_s) }
+
+		#children = Binder.collection.where( "parents.id" => id.to_s )
+		#children = Binder.any_in( parents: [{ "id" => "#{binder.id.to_s}","title" => "" }] )#.excludes( parent: { "id" => "-1", "title" => "" } )
+		children = Binder.where( "parent.id" => id.to_s )
+
+		Rails.logger.debug "GOT HERE"
+
+		# @ops.each do |opid|
+		# 	if opid != "0"
+		# 		op = Binder.find(opid)
+
+		Rails.logger.debug "#{binder.title.to_s} CHILDREN INSPECT: (size:#{children.size})"
+		children.each do |c|
+			Rails.logger.debug "#{c.inspect.to_s}"
+		end
 
 		imageset_loc = [[],[],[],[]]
-		imgset_dup = Array.new(imageset)
+		#imgset_dup = Array.new(imageset)
 
 		if children.any?
 			children.each do |c|
 				if c.type != 1
 					# array values arranged by class
-					imageset_loc[c.current_version.imgclass.to_i] << c.id
+					imageset_loc[c.current_version.imgclass.to_i] << c.id if c.current_version.imgclass.to_i != 4
 				end
 			end
-		end
-
-		# generate first thumbnail from local imageset if possible
-
-		imageset_loc.each do |i|
-			if i.any?
-				i.each do |j|
-					# technically not necessary until random retrieval
-					# is popping the LAST one, not the first one
-					binder.thumbimgids << i.to_s#.pop
-					break# if binder.thumbids.size == 3
-				end
+			[3,imageset_loc.size].min.times do |i|
+				binder.thumbimgids << imageset_loc.flatten[i].to_s
 			end
-			break if binder.thumbimgids.size == 1
-		end
-
-		# generate remaining thumbnails
-
-		imgset_dup.each do |i|
-			if i.any?
-				i.each do |j|
-					# technically not necessary until random retrieval
-					# is popping the LAST one, not the first one
-					binder.thumbimgids << i.pop.to_s
-					break if binder.thumbimgids.size == 3
-				end
-			end
-			break if binder.thumbimgids.size == 3
 		end
 
 		binder.save
 
-		# merge local thumbnails into all other thumbnails before continuing
+		# generate first thumbnail from local imageset if possible
 
-		(0..3).each do |l|
-			if imageset_loc[l].any?
-				imageset_loc[l].each do |m|
-					imageset[l] << m.to_s
-				end
-			end
-		end
+		# Rails.logger.debug "imageset_loc.size #{imageset_loc.size}"
+		# Rails.logger.debug "imageset_loc #{imageset_loc}"
+		
+		# imageset_loc.each do |i|
+		# 	if i.any?
+		# 		i.each do |j|
+		# 			# technically not necessary until random retrieval
+		# 			# is popping the LAST one, not the first one
+
+		# 			Rails.logger.debug "Existing item found! #{j.to_s}"
+		# 			binder.thumbimgids << i.pop.to_s#.pop
+		# 			break# if binder.thumbids.size == 3
+		# 		end
+		# 		break# if binder.thumbimgids.size == 1
+		# 	end
+		# end
+
+
+		# Rails.logger.debug "Thumbimbids array after searching locally: #{binder.thumbimgids.to_s}"
+		# # generate remaining thumbnails
+
+		# temp = []
+
+		# imgset_dup.each do |i|
+		# 	if i.any?
+		# 		i.each do |j|
+		# 			# technically not necessary until random retrieval
+		# 			# is popping the LAST one, not the first one
+		# 			temp << i.pop.to_s
+		# 			break if temp.size > 2
+		# 		end
+		# 	end
+		# 	break if temp.size > 2
+		# end
+
+		# binder.thumbimgids = binder.thumbimgids | temp
+
+		# Rails.logger.debug "DB_WRITE #{binder.thumbimgids.to_s}"
+
+		# binder.save
+
+		# # merge local thumbnails into all other thumbnails before continuing
+
+		# (0..3).each do |l|
+		# 	if imageset_loc[l].any?
+		# 		imageset_loc[l].each do |m|
+		# 			imageset[l] << m.to_s
+		# 		end
+		# 	end
+		# end
 
 		if binder.parent['id'] == "0"
 			return
@@ -386,6 +426,7 @@ class Binder
 
 	# Do not explicitly call these!  All these methods have very long latency.
 
+	# this method is fucking sloppy
 	def self.get_croc_thumbnail(id,url)
 
 		# loop until Crocodoc has finished processing the file, or timeout is reached
@@ -401,39 +442,43 @@ class Binder
 			raise "Crocodoc thumbnail fetch timed out" and return if timeout == 0
 		end
 
-		target = find(id).current_version
+		target = find(id)
 
-		stathash = target.imgstatus
+		stathash = target.current_version.imgstatus
 		stathash['imgfile']['retrieved'] = true
 
-		target.update_attributes( 	:remote_imgfile_url => url,
+		target.current_version.update_attributes( 	:remote_imgfile_url => url,
 									:imgclass => 3,										
 									:imgstatus => stathash)
 
-		self.generate_folder_thumbnail(id)
+		#Binder.delay.generate_folder_thumbnail(id)
+		Binder.generate_folder_thumbnail(target.parent['id'])
 
 
 	end
 
+	# this method is fucking sloppy
 	def self.get_thumbnail_from_url(id,url)
 
-		target = find(id).current_version
+		target = find(id)
 
-		stathash = target.imgstatus
+		stathash = target.current_version.imgstatus
 		if stathash['imgfile'].nil?
 			stathash[:imgfile][:retrieved] = true
 		else
 			stathash['imgfile']['retrieved'] = true
 		end
 
-		target.update_attributes(	:remote_imgfile_url => url,
+		target.current_version.update_attributes(	:remote_imgfile_url => url,
 									:imgclass => 2,
 									:imgstatus => stathash)
 
-		self.generate_folder_thumbnail(id)
+		#Binder.delay.generate_folder_thumbnail(id)
+		Binder.generate_folder_thumbnail(target.parent['id'])
 
 	end
 
+	# this method is fucking sloppy
 	def self.get_thumbnail_from_api(id,url,options={})
 		if options.empty?
 			raise "Called API request method without supplying parent site" and return
@@ -494,7 +539,9 @@ class Binder
 									:imgclass => 2,
 									:imgstatus => stathash)
 
-		self.generate_folder_thumbnail(id)
+		#Binder.delay.generate_folder_thumbnail(id)
+		#Binder.generate_folder_thumbnail(id)
+		Binder.generate_folder_thumbnail(Binder.find(id).parent['id'])
 
 	end
 

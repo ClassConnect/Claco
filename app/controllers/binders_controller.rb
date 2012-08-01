@@ -135,7 +135,7 @@ class BindersController < ApplicationController
 			end
 		end
 
-		Rails.logger.debug @tags
+		#Rails.logger.debug @tags
 
 		@title = "Viewing: #{@binder.title}"
 
@@ -505,7 +505,7 @@ class BindersController < ApplicationController
 
 					# delegate image fetch to Delayed Job worker
 					#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
-					Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+					Binder.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 					
 				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext
 					# for now, image will be added as file AND as imgfile
@@ -516,6 +516,9 @@ class BindersController < ApplicationController
 					@binder.current_version.update_attributes( 	:imgfile => params[:file],
 																:imgclass => 0,
 																:imgstatus => stathash)
+
+					#Binder.generate_folder_thumbnail(@binder.id)
+					Binder.generate_folder_thumbnail(@binder.parent['id'])
 				
 				end
 			else
@@ -1100,6 +1103,10 @@ class BindersController < ApplicationController
 		end
 
 		@binder.save
+
+		#Binder.delay.generate_folder_thumbnail(params[:id])
+		#Binder.generate_folder_thumbnail(params[:id])
+		Binder.generate_folder_thumbnail(@binder.parent['id'])
 
 		redirect_to named_binder_route(@binder, "permissions")
 	end

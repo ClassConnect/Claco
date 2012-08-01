@@ -47,7 +47,7 @@ end %>
 			<% else %>
 				<% @children.each do |binder| %>
 
-          <% imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 %>
+          <% imgarr = Array.new(Binder.get_folder_array(binder.id.to_s)) if binder.type == 1 %>
 
           <%
             # imgarr is an array of length 0 to 3 that contains the URLs of the images

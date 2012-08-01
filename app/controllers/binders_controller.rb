@@ -528,7 +528,7 @@ class BindersController < ApplicationController
 					Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
 					Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
 
-					Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+					Binder.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 				
 				end
 			else
@@ -654,6 +654,8 @@ class BindersController < ApplicationController
 		 
 				#Binder.find(op.last).inc(:children,-1)
 
+				Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
 				#Save old permissions to remove childrens' inherited permissions
 				@ppers = @binder.parent_permissions
 
@@ -662,6 +664,8 @@ class BindersController < ApplicationController
 											:parent_permissions	=> @parentperarr,
 											:order_index		=> @parent_child_count)
 
+
+				Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
 				# must update the common ancestor of the children before 
 				@binder.update_parent_tags()
@@ -782,6 +786,8 @@ class BindersController < ApplicationController
 
 			@new_parent.save
 
+
+
 			@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
 
 			@new_parent.update_parent_tags()
@@ -865,6 +871,9 @@ class BindersController < ApplicationController
 												:total_size	=> parent.total_size + @new_parent.total_size)
 				end
 			end
+
+			Binder.delay.generate_folder_thumbnail(@new_parent.id)
+
 		else
 
 			errors << "You do not have permissions to write to #{@inherited[:parent].title}"
@@ -988,6 +997,8 @@ class BindersController < ApplicationController
 			end
 		end
 
+		Binder.delay.generate_folder_thumbnail(@new_parent.id)
+
 		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
 
 		redirect_to binders_path
@@ -1043,6 +1054,8 @@ class BindersController < ApplicationController
 			end
 
 		end
+
+		Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
 		redirect_to named_binder_route(@parent || @binder.parent["id"])
 	end
@@ -1160,10 +1173,20 @@ class BindersController < ApplicationController
 			#If directory, deal with the children
 			if @binder.type == 1 #Eventually will apply to type == 3 too
 
-				@binder.children.each do |h|
-					@current_parents = h.parents
-					@size = @current_parents.size
-					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
+				# @binder.children.each do |h|
+				# 	@current_parents = h.parents
+				# 	@size = @current_parents.size
+				# 	h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
+				# end
+
+				@binder.subtree.each do |h|
+					# if the binder is not included, this is not necessary...
+					if h.id != @binder.id				
+					 	@current_parents = h.parents
+					 	@size = @current_parents.size
+						h.update_attributes(	:parent		=> @parenthash,
+												:parents	=> @parentsarr)
+					end
 				end
 
 			end

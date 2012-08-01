@@ -102,10 +102,11 @@ class Binder
 
 		Rails.logger.debug "GEN: #{id.to_s}"
 
-		#return if id.to_s == "-1" || id.to_s == "0"
+		return if id.to_s == "-1" || id.to_s == "0"
  
 		binder = Binder.find(id.to_s)
 
+		# wipe out thumbimbids array.  must be restored to 3 values again before saving!
 		binder.thumbimgids = []
 
 		#Rails.logger.debug "BINDER INSPECT: #{binder.inspect.to_s}"
@@ -118,8 +119,10 @@ class Binder
 		#binder.parents.collect { |x| Binder.find((x["id"] || x[:id]).to_s) }
 
 		#children = Binder.collection.where( "parents.id" => id.to_s )
-		#children = Binder.any_in( parents: [{ "id" => "#{binder.id.to_s}","title" => "" }] )#.excludes( parent: { "id" => "-1", "title" => "" } )
-		children = Binder.where( "parent.id" => id.to_s )
+		#children = Binder.any_in( parents: [{ "id" => "#{binder.id.to_s}","title" => "#{binder.title.to_s}" }] ).excludes( parent: { "id" => "-1", "title" => "" } )
+		children = binder.children
+		#subtree = binder.subtree
+		subtree = children.map { |c| c.subtree }.flatten if children.any?
 
 		Rails.logger.debug "GOT HERE"
 
@@ -127,14 +130,16 @@ class Binder
 		# 	if opid != "0"
 		# 		op = Binder.find(opid)
 
-		Rails.logger.debug "#{binder.title.to_s} CHILDREN INSPECT: (size:#{children.size})"
-		children.each do |c|
-			Rails.logger.debug "#{c.inspect.to_s}"
-		end
+		# Rails.logger.debug "#{binder.title.to_s} CHILDREN INSPECT: (size:#{children.size})"
+		# children.each do |c|
+		# 	Rails.logger.debug "#{c.inspect.to_s}"
+		# end
 
 		imageset_loc = [[],[],[],[]]
+		#imageset = [[],[],[],[]]
 		#imgset_dup = Array.new(imageset)
 
+		# if possible, retrieve pictures locally
 		if children.any?
 			children.each do |c|
 				if c.type != 1
@@ -142,12 +147,45 @@ class Binder
 					imageset_loc[c.current_version.imgclass.to_i] << c.id if c.current_version.imgclass.to_i != 4
 				end
 			end
-			[3,imageset_loc.size].min.times do |i|
+			[3,imageset_loc.flatten.size].min.times do |i|
 				binder.thumbimgids << imageset_loc.flatten[i].to_s
 			end
 		end
 
+		if binder.thumbimgids.size < 3
+			#if ((subtree.map { |x| x.id.to_s }) - (children.map { |y| y.id.to_s })).any? 
+			if subtree.any?
+				subtree.each do |s|
+					if s.type != 1
+						# array values arranged by class
+						imageset[s.current_version.imgclass.to_i] << s.id if s.current_version.imgclass.to_i != 4
+					end
+				end
+			end
+			(3 - binder.thumbimgids.size).times do |i|
+				binder.thumbimgids << imageset.flatten[i].to_s
+			end
+			#end
+		end
+
+		# perform for each category in the array
+		# imageset.size.times do |i|
+		# 	imageset[i] |= imageset_loc[i]
+		# end
+
+		# fill up extra space so there are always 3 entries
+		(3 - binder.thumbimgids.size).times do |i|
+			binder.thumbimgids << ""
+		end
+
 		binder.save
+
+		Rails.logger.debug "Moving up tree!"
+		Rails.logger.debug "parents: #{binder.parents.size}"
+
+		binder.parents.each do |parent|
+			Binder.generate_folder_thumbnail(parent["id"] || parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
+		end
 
 		# generate first thumbnail from local imageset if possible
 
@@ -202,11 +240,11 @@ class Binder
 		# 	end
 		# end
 
-		if binder.parent['id'] == "0"
-			return
-		else
-			return generate_folder_thumbnail(binder.parent['id'],imageset)
-		end
+		# if binder.parent['id'] == "0" || binder.parent[:id]
+		# 	return
+		# else
+		# 	return generate_folder_thumbnail(binder.parent['id'] || binder.parent[:id])
+		# end
 
 	end
 
@@ -356,6 +394,10 @@ class Binder
 
 	def children
 		return Binder.where("parent.id" => self.id.to_s)
+	end
+
+	def subtree
+		return Binder.any_in( parents: [{ "id" => self.id.to_s, "title" => self.title.to_s },{ :id => self.id.to_s, :title => self.title.to_s }] )
 	end
 
 	def current_version

@@ -462,7 +462,7 @@ class Binder
 		return title
 	end
 
-	##############################################################################################
+	###############################################################################################
 
 	# Delayed Job Methods
 
@@ -490,8 +490,8 @@ class Binder
 		stathash['imgfile']['retrieved'] = true
 
 		target.current_version.update_attributes( 	:remote_imgfile_url => url,
-									:imgclass => 3,										
-									:imgstatus => stathash)
+													:imgclass => 3,										
+													:imgstatus => stathash)
 
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
@@ -587,6 +587,160 @@ class Binder
 
 	end
 
+
+	# resize thumbnail to manageable size, perform smart thumbnail generation
+	# THIS METHOD IS VERY SLOW
+	# def self.smartthumbgen(id)
+
+	# 	include Magick
+
+	# 	binder = Binder.find(id.to_s)
+
+
+	# 	# def smart_thumbnail(dims = ["",""])
+	# 	#   manipulate! do |origimg|
+	# 	#     origimg = origimg.resize_and_pad(200,91,'black','Center')
+	# 	#   end
+	# 	# end
+
+	# 	# def smart_thumbnail(dims = ["",""])
+	# 	#   maniplulate! do |origimg|
+
+	# 	origimg = Magick::ImageList.new  
+	# 	urlimage = open(binder.current_version.imgfile.url.to_s) # Image URL 
+	# 	origimg.from_blob(urlimage.read)
+
+	# 	#origimg = Magick::ImageList.new()
+		  
+	# 	img = origimg.edge(1)
+
+	# 	xcount = 0
+	# 	ycount = 0
+	# 	xsum = 0
+	# 	ysum = 0
+	# 	xsqr = 0
+	# 	ysqr = 0
+
+	# 	width = img.columns
+	# 	height = img.rows
+
+	# 	imgview = img.view(0,0,width,height)
+
+	# 	height.times do |y|
+	# 	#puts "new row"
+	# 	#img.columns.times do |x|
+	# 	width.times do |x|
+	# 	  #if img.view(0,0,width,height)[y][x].red == 0
+	# 	  pixel = imgview[y][x]
+	# 	  #pixel2 = imgview2[y][x]
+	# 	  #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+	# 	    #str = str + '0'
+	# 	  #else
+	# 	  if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+	# 	    xcount += 1
+	# 	    ycount += 1
+	# 	    xsum += x
+	# 	    ysum += y
+	# 	    xsqr += x**2
+	# 	    ysqr += y**2
+	# 	    #str = str + '1'
+	# 	  end
+	# 	end
+	# 	#puts str
+	# 	#str = ""
+	# 	end
+
+	# 	xcentroid = Float(xsum)/Float(xcount)
+	# 	ycentroid = Float(ysum)/Float(ycount)
+
+	# 	# Unused
+	# 	# xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
+	# 	# yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
+
+	# 	# Unused
+	# 	# xsigma = Math.sqrt(xvariance)
+	# 	# ysigma = Math.sqrt(yvariance)
+
+	# 	topcount = 0
+	# 	topsum = 0
+	# 	topsqr = 0
+	# 	bottomcount = 0
+	# 	bottomsum = 0
+	# 	bottomsqr = 0
+	# 	leftcount = 0
+	# 	leftsum = 0
+	# 	leftsqr = 0
+	# 	rightcount = 0
+	# 	rightsum = 0
+	# 	rightsqr = 0
+
+	# 	#img.rows.times do |y|
+	# 	height.times do |y|
+	# 	#puts "new row"
+	# 	#img.columns.times do |x|
+	# 	width.times do |x|
+	# 	  #if img.view(0,0,width,height)[y][x].red == 0
+	# 	  pixel = imgview[y][x]
+	# 	  #pixel2 = imgview2[y][x]
+	# 	  #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+	# 	    #str = str + '0'
+	# 	  #else
+	# 	  #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+	# 	  if pixel.red > 1000 || pixel.green > 1000 || pixel.blue > 1000
+	# 	    if x < xcentroid
+	# 	      leftcount += 1
+	# 	      leftsum += x
+	# 	      leftsqr += x**2
+	# 	    else
+	# 	      rightcount += 1
+	# 	      rightsum += x
+	# 	      rightsqr += x**2
+	# 	    end
+
+	# 	    if y < ycentroid
+	# 	      topcount += 1
+	# 	      topsum += y
+	# 	      topsqr += y**2
+	# 	    else
+	# 	      bottomcount += 1
+	# 	      bottomsum += y
+	# 	      bottomsqr += y**2
+	# 	    end
+	# 	  end
+	# 	end
+	# 	end
+
+	# 	topcentroid = Float(topsum)/Float(topcount)
+	# 	bottomcentroid = Float(bottomsum)/Float(bottomcount)
+	# 	leftcentroid = Float(leftsum)/Float(leftcount)
+	# 	rightcentroid = Float(rightsum)/Float(rightcount)
+
+	# 	topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
+	# 	bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
+	# 	leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
+	# 	rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
+
+	# 	topsigma = Math.sqrt(topvariance)
+	# 	bottomsigma = Math.sqrt(bottomvariance)
+	# 	leftsigma = Math.sqrt(leftvariance)
+	# 	rightsigma = Math.sqrt(rightvariance)
+
+	# 	topedge = Integer(topcentroid - topsigma)
+	# 	bottomedge = Integer(bottomcentroid + bottomsigma)
+	# 	leftedge = Integer(leftcentroid - leftsigma)
+	# 	rightedge = Integer(rightcentroid + rightsigma)
+
+	# 	origimg = origimg.crop(leftedge,topedge,rightedge,bottomedge)
+
+	# 	binder.current_version.update_attributes( :imgfile => File.open(origimg) )
+
+	# 	GC.start
+
+	# 	#   end
+	# 	# end
+
+	# end
+
 	# def get_thumbnail(url)
 
 	# 	Rails.logger.debug "Got here! url:#{url}"
@@ -600,7 +754,9 @@ class Binder
 
 end
 
+# End Delayed Job Methods
 
+###################################################################################################
 
 class Version
 	include Mongoid::Document

@@ -18,7 +18,8 @@ class ImageUploader < CarrierWave::Uploader::Base
   # This is a sensible default for uploaders that are meant to be mounted:
 
   version :contentview do
-    process resize_to_fill: [700, 1]
+    process resize_to_fill: [700, nil]
+
   end
 
   # version :thumb_lg do
@@ -225,7 +226,59 @@ class ImageUploader < CarrierWave::Uploader::Base
       leftedge = Integer(leftcentroid - leftsigma)
       rightedge = Integer(rightcentroid + rightsigma)
 
-      #if Float()
+      Rails.logger.debug "91/200 ratio: #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
+
+      if Float(bottomedge-topedge)/Float(rightedge-leftedge) < 91.0/200.0
+        # smartselect aspect ratio is wider than thumbnail aspect ratio, expand vertically
+        y = Integer((91.0*width)/200.0 - height)
+
+        if height - (bottomedge-topedge) < y
+          # cannot fully expand to desired aspect ratio
+          topedge = 0
+          bottomedge = height
+        else
+          # sufficient space to expand
+          if topedge < y/2
+            # too close to top of image
+            y -= topedge
+            topedge = 0
+            bottomedge += y
+          elsif (height-bottomedge) < y/2
+            # too close to bottom of image
+            y -= (height-bottomedge)
+            bottomedge = height
+            topedge -= y
+          else
+            topedge -= y/2
+            bottomedge += y/2
+          end
+        end
+      else
+        # smartselect aspect ratio is taller than thumbnail aspect ratio, expand horizontally
+        x = Integer((200.0*height)/91.0 - width)
+
+        if width - (rightedge-leftedge) < x
+          # cannot fully expand to desired aspect ratio
+          leftedge = 0
+          rightedge = width
+        else
+          # sufficient space to expand
+          if leftedge < x/2
+            # too close to left of image
+            x -= leftedge
+            leftedge = 0
+            rightedge += x
+          elsif (width-rightedge) < y/2
+            # too close to right of image
+            x -= (width-rightedge)
+            rightedge = width
+            leftedge -= x
+          else
+            leftedge -= x/2
+            rightedge += x/2
+          end
+        end
+      end
 
       origimg = origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))
 

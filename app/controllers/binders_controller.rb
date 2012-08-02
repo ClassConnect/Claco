@@ -104,6 +104,7 @@ class BindersController < ApplicationController
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
 		if !binder_routing_ok?(@binder, params[:action])
+			error = true
 			redirect_to named_binder_route(@binder, params[:action]) and return
 		end
 
@@ -766,8 +767,6 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-#		if @binder.parent["id"] != params[:folid]
-
 		@inherited = inherit_from(params[:folid])
 
 		@parenthash = @inherited[:parenthash]
@@ -802,14 +801,14 @@ class BindersController < ApplicationController
 			#@new_parent.format = @binder.format if @binder.type == 2
 
 			# @new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-			# 									:file_hash	=> @binder.current_version.file_hash,
-			# 									:timestamp	=> @binder.current_version.timestamp,
-			# 									:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
-			# 									:size		=> @binder.current_version.size,
-			# 									:ext		=> @binder.current_version.ext,
-			# 									:data		=> @binder.current_version.data,
-			# 									:croc_uuid 	=> @binder.current_version.croc_uuid,
-			# 									:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
+			# 										:file_hash	=> @binder.current_version.file_hash,
+			# 										:timestamp	=> @binder.current_version.timestamp,
+			# 										:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
+			# 										:size		=> @binder.current_version.size,
+			# 										:ext		=> @binder.current_version.ext,
+			# 										:data		=> @binder.current_version.data,
+			# 										:croc_uuid 	=> @binder.current_version.croc_uuid,
+			# 										:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
 
 			@new_parent.versions << @binder.current_version
 
@@ -833,7 +832,7 @@ class BindersController < ApplicationController
 				@index = @binder.parents.length
 
 				#Select old children, order by parents.length
-				@children = @binder.subtree.sort_by {|binder| binder.parents.length}
+				@children = @binder.subtree.sort_by {|binder| binder.parents.length}.reject{|binder| binder.id == @new_parent.id}
 
 				#Spawn new children, These children need to have updated parent ids
 				@children.each do |h|
@@ -913,11 +912,6 @@ class BindersController < ApplicationController
 			errors << "You do not have permissions to write to #{@inherited[:parent].title}"
 
 		end
-
-		# redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
-
-		# redirect_to binders_path
-
 
 		rescue BSON::InvalidObjectId
 			errors << "Invalid Request"
@@ -1053,13 +1047,13 @@ class BindersController < ApplicationController
 		#end
 
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
-											:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
-											:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
-											#:croc_uuid	=> (@binder.format == 1 ? filedata : nil),
-											:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
-											:timestamp	=> Time.now.to_i,
-											:active		=> true)
+										:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
+										:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
+										:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
+										#:croc_uuid	=> (@binder.format == 1 ? filedata : nil),
+										:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
+										:timestamp	=> Time.now.to_i,
+										:active		=> true)
 
 		@binder.save
 

@@ -397,7 +397,7 @@ class Binder
 	end
 
 	def subtree
-		return Binder.any_in( parents: [{ "id" => self.id.to_s, "title" => self.title.to_s },{ :id => self.id.to_s, :title => self.title.to_s }] )
+		return Binder.where("parents.id" => self.id.to_s)
 	end
 
 	def current_version
@@ -768,6 +768,7 @@ class Version
 	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
 	field :data, :type => String #URL, path to file
+	field :embed, :type => Boolean, :default => false
 	field :active, :type => Boolean, :default => false
 
 	# MD5 hash of the uploaded file
@@ -810,6 +811,22 @@ class Version
 	#mount_uploader :imgthumb_sm, 	ImageUploader
 
 	embedded_in :binder
+
+	def get_html
+
+		if self.binder.format == 2
+
+			parsed_url = URI.parse(data)
+
+			if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
+
+				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url)[v]}\" frameborder=\"0\" allowfullscreen></iframe>"
+
+			end
+
+		end
+
+	end
 
 end
 

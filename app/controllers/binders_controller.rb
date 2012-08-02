@@ -25,7 +25,7 @@ class BindersController < ApplicationController
 
 		errors = []
 
-		if params[:foldertitle].length > 1
+		if params[:foldertitle].strip.length > 0
 
 			@inherited = inherit_from(params[:id])
 
@@ -57,7 +57,7 @@ class BindersController < ApplicationController
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
 										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].to_s[0..60],
+										:title				=> params[:foldertitle].strip[0..55],
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
 										:body				=> params[:body],
@@ -104,6 +104,7 @@ class BindersController < ApplicationController
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
 		if !binder_routing_ok?(@binder, params[:action])
+			error = true
 			redirect_to named_binder_route(@binder, params[:action]) and return
 		end
 
@@ -173,7 +174,7 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
+		redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -230,9 +231,6 @@ class BindersController < ApplicationController
 		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
 		
 		# This will catch flawed URL structure, as well as bad HTTP response codes
-		RestClient.get(params[:weblink])
-		
-		
 
 		# the RestClient object will catch most of the error codes before getting to here
 		#if ![200,301,302].include? respcode
@@ -244,93 +242,124 @@ class BindersController < ApplicationController
 		errors = []
 
 		#Trim to 60 chars (old spec)
-		if params[:webtitle].length > 1
+		if params[:webtitle].strip.length > 0
 
-			@inherited = inherit_from(params[:id])
+			embed = false
+			url = false
 
-			@parenthash = @inherited[:parenthash]
-			@parentsarr = @inherited[:parentsarr]
-			@parentperarr = @inherited[:parentperarr]
+			if !(params[:weblink] =~ /(<iframe.*>)(<\/iframe>)?/).nil?
 
-			@parent_child_count = @inherited[:parent_child_count]
+				embed = true
 
-			if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
+			elsif !(params[:weblink] =~ /(<embed.*>)(<\/embed>)?/).nil?
 
-				@binder = Binder.new(	:title				=> params[:webtitle],
-										:owner				=> current_teacher.id,
-										:username			=> current_teacher.username,
-										:fname				=> current_teacher.fname,
-										:lname				=> current_teacher.lname,
-										:parent				=> @parenthash,
-										:parents			=> @parentsarr,
-										:last_update		=> Time.now.to_i,
-										:last_updated_by	=> current_teacher.id.to_s,
-										:body				=> params[:body],
-										#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
-										#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
-										#						:auth_level => params[:auth_level]}] : []),
-										:order_index		=> @parent_child_count,
-										:parent_permissions	=> @parentperarr,
-										:files				=> 1,
-										:type				=> 2,
-										:format				=> 2)
+				embed = true
 
-				@binder.versions << Version.new(:data		=> params[:weblink],
-												:timestamp	=> Time.now.to_i,
-												:owner		=> current_teacher.id)
+			end
+
+			if !embed
+				RestClient.get(params[:weblink])
+				url = true
+			end
+
+			if url || embed
+
+				@inherited = inherit_from(params[:id])
+
+				@parenthash = @inherited[:parenthash]
+				@parentsarr = @inherited[:parentsarr]
+				@parentperarr = @inherited[:parentperarr]
+
+				@parent_child_count = @inherited[:parent_child_count]
+
+				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
+
+					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..55],
+											:owner				=> current_teacher.id,
+											:username			=> current_teacher.username,
+											:fname				=> current_teacher.fname,
+											:lname				=> current_teacher.lname,
+											:parent				=> @parenthash,
+											:parents			=> @parentsarr,
+											:last_update		=> Time.now.to_i,
+											:last_updated_by	=> current_teacher.id.to_s,
+											:body				=> params[:body],
+											#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
+											#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
+											#						:auth_level => params[:auth_level]}] : []),
+											:order_index		=> @parent_child_count,
+											:parent_permissions	=> @parentperarr,
+											:files				=> 1,
+											:type				=> 2,
+											:format				=> 2)
+
+					@binder.versions << Version.new(:data		=> url ? Addressable::URI.heuristic_parse(params[:weblink]).to_s : params[:weblink],
+													:embed		=> embed,
+													:timestamp	=> Time.now.to_i,
+													:owner		=> current_teacher.id)
 
 
-				#@binder.create_binder_tags(params,current_teacher.id)
+					#@binder.create_binder_tags(params,current_teacher.id)
 
-				@binder.save
+					@binder.save
 
-				uri = URI(params[:weblink])
+					if url
 
-				stathash = @binder.current_version.imgstatus
-				stathash[:imgfile][:retrieved] = true
+						uri = URI(params[:weblink])
+
+						stathash = @binder.current_version.imgstatus
+						stathash[:imgfile][:retrieved] = true
 
 
-				if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+						if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 
-					# YOUTUBE
-					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
+							# YOUTUBE
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
 
-				elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
-					# VIMEO
-					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
+							# VIMEO
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
 
-				elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
 
-					# EDUCREATIONS
-					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
+							# EDUCREATIONS
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
 
-				elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+						elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
-					# SCHOOLTUBE
-					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
+							# SCHOOLTUBE
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
 
-				elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+						elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
-					# SHOWME
-					Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+							# SHOWME
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+
+						else
+							# generic URL, grab Url2png
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+						end
+
+					end
+
+					@binder.create_binder_tags(params,current_teacher.id)
+
+					pids = @parentsarr.collect {|x| x["id"] || x[:id]}
+
+					pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
+
+					Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
 				else
-					# generic URL, grab Url2png
-					Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+
+					errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+
 				end
-
-				@binder.create_binder_tags(params,current_teacher.id)
-
-				pids = @parentsarr.collect {|x| x["id"] || x[:id]}
-
-				pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
-
-				Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
 			else
 
-				errors << "You do not have permissions to write to #{@inherited[:parent].title}"
+				errors << "Invalid input data"
 
 			end
 
@@ -344,9 +373,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue
-			Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid URL detected"
+		rescue Exception => exc
+			#Rails.logger.debug "Invalid URL detected"
+			errors << "Invalid input data #{exc.message}"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
@@ -445,7 +474,7 @@ class BindersController < ApplicationController
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
-																				File.extname(params[:file].original_filename)),
+																				File.extname(params[:file].original_filename)).strip[0..55],
 										:owner				=> current_teacher.id,
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
@@ -674,7 +703,7 @@ class BindersController < ApplicationController
 				#If directory, deal with the children
 				if @binder.type == 1 #Eventually will apply to type == 3 too
 
-					@children = @binder.children
+					@children = @binder.subtree
 
 					@children.each do |h|
 
@@ -738,8 +767,6 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-#		if @binder.parent["id"] != params[:folid]
-
 		@inherited = inherit_from(params[:folid])
 
 		@parenthash = @inherited[:parenthash]
@@ -765,20 +792,23 @@ class BindersController < ApplicationController
 										:permissions		=> @binder.permissions,
 										:parent_permissions	=> @parentperarr,
 										:owner				=> current_teacher.id,
+										:username			=> @binder.username,
+										:fname				=> @binder.fname,
+										:lname				=> @binder.lname,
 										:last_update		=> Time.now.to_i,
 										:last_updated_by	=> current_teacher.id)
 
 			#@new_parent.format = @binder.format if @binder.type == 2
 
 			# @new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-			# 									:file_hash	=> @binder.current_version.file_hash,
-			# 									:timestamp	=> @binder.current_version.timestamp,
-			# 									:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
-			# 									:size		=> @binder.current_version.size,
-			# 									:ext		=> @binder.current_version.ext,
-			# 									:data		=> @binder.current_version.data,
-			# 									:croc_uuid 	=> @binder.current_version.croc_uuid,
-			# 									:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
+			# 										:file_hash	=> @binder.current_version.file_hash,
+			# 										:timestamp	=> @binder.current_version.timestamp,
+			# 										:remote_imgfile_url	=> @binder.current_version.imgfile.url.to_s,
+			# 										:size		=> @binder.current_version.size,
+			# 										:ext		=> @binder.current_version.ext,
+			# 										:data		=> @binder.current_version.data,
+			# 										:croc_uuid 	=> @binder.current_version.croc_uuid,
+			# 										:remote_file_url		=> @binder.format == 1 ? @binder.current_version.file.url.to_s : nil) if @binder.type == 2
 
 			@new_parent.versions << @binder.current_version
 
@@ -802,7 +832,7 @@ class BindersController < ApplicationController
 				@index = @binder.parents.length
 
 				#Select old children, order by parents.length
-				@children = @binder.children.sort_by {|binder| binder.parents.length}
+				@children = @binder.subtree.sort_by {|binder| binder.parents.length}.reject{|binder| binder.id == @new_parent.id}
 
 				#Spawn new children, These children need to have updated parent ids
 				@children.each do |h|
@@ -826,6 +856,9 @@ class BindersController < ApplicationController
 											:permissions		=> h.permissions,
 											:parent_permissions	=> @parentperarr + @old_permissions,
 											:owner				=> current_teacher.id,
+											:username			=> h.username,
+											:fname				=> h.fname,
+											:lname				=> h.lname,
 											:last_update		=> Time.now.to_i,
 											:last_updated_by	=> current_teacher.id,
 											:type				=> h.type,
@@ -880,11 +913,6 @@ class BindersController < ApplicationController
 
 		end
 
-		# redirect_to named_binder_route(params[:binder][:parent]) and return if params[:binder][:parent] != "0"
-
-		# redirect_to binders_path
-
-
 		rescue BSON::InvalidObjectId
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
@@ -897,112 +925,112 @@ class BindersController < ApplicationController
 
 
 	#Copy Binders to new location
-	def forkitem
+	# def forkitem
 
-		@binder = Binder.find(params[:id])
+	# 	@binder = Binder.find(params[:id])
 
-		@inherited = inherit_from(params[:binder][:parent])
+	# 	@inherited = inherit_from(params[:binder][:parent])
 
-		@parenthash = @inherited[:parenthash]
-		@parentsarr = @inherited[:parentsarr]
-		@parentperarr = @inherited[:parentperarr]
+	# 	@parenthash = @inherited[:parenthash]
+	# 	@parentsarr = @inherited[:parentsarr]
+	# 	@parentperarr = @inherited[:parentperarr]
 
-		@parent_child_count = @inherited[:parent_child_count]
+	# 	@parent_child_count = @inherited[:parent_child_count]
 
-		@new_parent = Binder.new(	:title				=> @binder.title,
-									:body				=> @binder.body,
-									:type				=> @binder.type,
-									:files				=> @binder.files,
-									:folders			=> @binder.folders,
-									:total_size			=> @binder.total_size,
-									:order_index		=> @parent_child_count,
-									:parent				=> @parenthash,
-									:parents			=> @parentsarr,
-									:owner				=> current_teacher.id,
-									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id,
-									:format				=> @binder.type == 2 ? @binder.format : nil)
-
-
-		@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-												:file_hash	=> @binder.current_version.file_hash,
-												:timestamp	=> @binder.current_version.timestamp,
-												:size		=> @binder.current_version.size,
-												:ext		=> @binder.current_version.ext,
-												:data		=> @binder.current_version.data,
-												:croc_uuid	=> @binder.current_version.croc_uuid,
-												:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
-
-		@new_parent.save
-
-		@hash_index = {params[:id] => @new_parent.id.to_s}
+	# 	@new_parent = Binder.new(	:title				=> @binder.title,
+	# 								:body				=> @binder.body,
+	# 								:type				=> @binder.type,
+	# 								:files				=> @binder.files,
+	# 								:folders			=> @binder.folders,
+	# 								:total_size			=> @binder.total_size,
+	# 								:order_index		=> @parent_child_count,
+	# 								:parent				=> @parenthash,
+	# 								:parents			=> @parentsarr,
+	# 								:owner				=> current_teacher.id,
+	# 								:last_update		=> Time.now.to_i,
+	# 								:last_updated_by	=> current_teacher.id,
+	# 								:format				=> @binder.type == 2 ? @binder.format : nil)
 
 
-		#If directory, deal with the children
-		if @binder.type == 1 #Eventually will apply to type == 3 too
+	# 	@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
+	# 											:file_hash	=> @binder.current_version.file_hash,
+	# 											:timestamp	=> @binder.current_version.timestamp,
+	# 											:size		=> @binder.current_version.size,
+	# 											:ext		=> @binder.current_version.ext,
+	# 											:data		=> @binder.current_version.data,
+	# 											:croc_uuid	=> @binder.current_version.croc_uuid,
+	# 											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
 
-			@index = @binder.parents.length
+	# 	@new_parent.save
 
-			#Select old children, order by parents.length
-			@children = @binder.children.sort_by {|binder| binder.parents.length}
-
-			#Spawn new children, These children need to have updated parent ids
-			@children.each do |h|
-
-				@node_parent = {"id"	=> @hash_index[h.parent["id"]],
-								"title"	=> h.parent["title"]}
-
-				@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
-
-				@new_node = Binder.new(	:title				=> h.title,
-										:body				=> h.body,
-										:parent				=> @node_parent,
-										:parents			=> @node_parents,
-										:owner				=> current_teacher.id,
-										:last_update		=> h.last_update,
-										:last_updated_by	=> current_teacher.id,
-										:type				=> h.type,
-										:format				=> (h.type != 1 ? h.format : nil),
-										:forked_from		=> h.current_version.id,
-										:fork_stamp			=> Time.now.to_i)
-
-				@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-														:file_hash	=> h.current_version.file_hash,
-														:timestamp	=> h.current_version.timestamp,
-														:size		=> h.current_version.size,
-														:ext		=> h.current_version.ext,
-														:data		=> h.current_version.data,
-														:croc_uuid	=> h.current_version.croc_uuid,
-														:file		=> h.format == 1 ? h.current_version.file : nil)
-
-				@new_node.save
-
-				h.inc(:fork_total, 1)
-
-				@hash_index[h.id.to_s] = @new_node.id.to_s
-			end
-
-		end
+	# 	@hash_index = {params[:id] => @new_parent.id.to_s}
 
 
-		@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+	# 	#If directory, deal with the children
+	# 	if @binder.type == 1 #Eventually will apply to type == 3 too
 
-		@parents.each do |pid|
-			if pid != "0"
-				parent = Binder.find(pid)
+	# 		@index = @binder.parents.length
 
-				parent.update_attributes(	:files		=> parent.files + @new_parent.files,
-											:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-											:total_size	=> parent.total_size + @new_parent.total_size)
-			end
-		end
+	# 		#Select old children, order by parents.length
+	# 		@children = @binder.children.sort_by {|binder| binder.parents.length}
 
-		Binder.delay.generate_folder_thumbnail(@new_parent.id)
+	# 		#Spawn new children, These children need to have updated parent ids
+	# 		@children.each do |h|
 
-		redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
+	# 			@node_parent = {"id"	=> @hash_index[h.parent["id"]],
+	# 							"title"	=> h.parent["title"]}
 
-		redirect_to binders_path
-	end
+	# 			@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
+
+	# 			@new_node = Binder.new(	:title				=> h.title,
+	# 									:body				=> h.body,
+	# 									:parent				=> @node_parent,
+	# 									:parents			=> @node_parents,
+	# 									:owner				=> current_teacher.id,
+	# 									:last_update		=> h.last_update,
+	# 									:last_updated_by	=> current_teacher.id,
+	# 									:type				=> h.type,
+	# 									:format				=> (h.type != 1 ? h.format : nil),
+	# 									:forked_from		=> h.current_version.id,
+	# 									:fork_stamp			=> Time.now.to_i)
+
+	# 			@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+	# 													:file_hash	=> h.current_version.file_hash,
+	# 													:timestamp	=> h.current_version.timestamp,
+	# 													:size		=> h.current_version.size,
+	# 													:ext		=> h.current_version.ext,
+	# 													:data		=> h.current_version.data,
+	# 													:croc_uuid	=> h.current_version.croc_uuid,
+	# 													:file		=> h.format == 1 ? h.current_version.file : nil)
+
+	# 			@new_node.save
+
+	# 			h.inc(:fork_total, 1)
+
+	# 			@hash_index[h.id.to_s] = @new_node.id.to_s
+	# 		end
+
+	# 	end
+
+
+	# 	@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+
+	# 	@parents.each do |pid|
+	# 		if pid != "0"
+	# 			parent = Binder.find(pid)
+
+	# 			parent.update_attributes(	:files		=> parent.files + @new_parent.files,
+	# 										:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
+	# 										:total_size	=> parent.total_size + @new_parent.total_size)
+	# 		end
+	# 	end
+
+	# 	Binder.delay.generate_folder_thumbnail(@new_parent.id)
+
+	# 	redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
+
+	# 	redirect_to binders_path
+	# end
 
 	def createversion
 		@binder = Binder.find(params[:id])
@@ -1019,13 +1047,13 @@ class BindersController < ApplicationController
 		#end
 
 		@binder.versions << Version.new(:file		=> params[:binder][:versions][:file],
-											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
-											:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
-											:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
-											#:croc_uuid	=> (@binder.format == 1 ? filedata : nil),
-											:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
-											:timestamp	=> Time.now.to_i,
-											:active		=> true)
+										:file_hash	=> Digest::MD5.hexdigest(File.read(params[:binder][:versions][:file].path).to_s),
+										:ext		=> (@binder.format == 1 ? File.extname(params[:binder][:versions][:file].original_filename) : nil),
+										:size		=> (@binder.format == 1 ? params[:binder][:versions][:file].size : nil),
+										#:croc_uuid	=> (@binder.format == 1 ? filedata : nil),
+										:data		=> (@binder.format == 1 ? params[:binder][:versions][:file].path : params[:binder][:versions][:data]),
+										:timestamp	=> Time.now.to_i,
+										:active		=> true)
 
 		@binder.save
 
@@ -1173,21 +1201,21 @@ class BindersController < ApplicationController
 			#If directory, deal with the children
 			if @binder.type == 1 #Eventually will apply to type == 3 too
 
-				# @binder.children.each do |h|
-				# 	@current_parents = h.parents
-				# 	@size = @current_parents.size
-				# 	h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
-				# end
-
 				@binder.subtree.each do |h|
-					# if the binder is not included, this is not necessary...
-					if h.id != @binder.id				
-					 	@current_parents = h.parents
-					 	@size = @current_parents.size
-						h.update_attributes(	:parent		=> @parenthash,
-												:parents	=> @parentsarr)
-					end
+					@current_parents = h.parents
+					@size = @current_parents.size
+					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
 				end
+
+				# @binder.subtree.each do |h|
+				# 	# if the binder is not included, this is not necessary...
+				# 	if h.id != @binder.id				
+				# 	 	@current_parents = h.parents
+				# 	 	@size = @current_parents.size
+				# 		h.update_attributes(	:parent		=> @parenthash,
+				# 								:parents	=> @parentsarr)
+				# 	end
+				# end
 
 			end
 

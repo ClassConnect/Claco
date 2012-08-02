@@ -225,6 +225,8 @@ class ImageUploader < CarrierWave::Uploader::Base
       leftedge = Integer(leftcentroid - leftsigma)
       rightedge = Integer(rightcentroid + rightsigma)
 
+      #if Float()
+
       origimg = origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))
 
     end

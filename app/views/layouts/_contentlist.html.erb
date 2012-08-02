@@ -50,7 +50,7 @@
 
 			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => "pjax" %></div>
 
-			            <div class="descarea">Last updated by <%= link_to binder.user, "#" %> at <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
+			            <div class="descarea">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
 
 			            <div class="drop-tog">
 			            	<div class="btn-group">

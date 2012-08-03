@@ -814,6 +814,12 @@ class Version
 
 	def get_html
 
+		if embed
+
+			return data
+
+		end
+
 		if self.binder.format == 2
 
 			parsed_url = URI.parse(data)
@@ -825,6 +831,20 @@ class Version
 			end
 
 		end
+
+		if self.binder.format == 1
+
+			# if Crocodoc.check_format_validity(ext)
+			if CROC_VALID_FILE_FORMATS.include? ext.downcase
+
+				# url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
+				url = "https://crocodoc.com/view/" + (JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response }))["session"]
+				return '<iframe id="crocFrame" style="width: 700px; height: 600px;" src="' + url + '" ></iframe>'
+
+			end
+		end
+
+		return ""
 
 	end
 

@@ -112,11 +112,11 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		@croc = false
+		# @croc = false
 
-		@croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
+		# @croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
 
-		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
+		# @croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
 
 		#redirect_to @binder.current_version.data and return if @binder.format == 2
 
@@ -154,7 +154,7 @@ class BindersController < ApplicationController
 			if !error
 				respond_to do |format|
 				 	format.html
-					format.json {render :json => @children.collect {|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
+					format.json {render :json => @children.collect {|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.to_json}
 				end
 			end
 
@@ -229,8 +229,8 @@ class BindersController < ApplicationController
 
 
 		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
-		
-		# This will catch flawed URL structure, as well as bad HTTP response codes
+	
+			# This will catch flawed URL structure, as well as bad HTTP response codes
 
 		# the RestClient object will catch most of the error codes before getting to here
 		#if ![200,301,302].include? respcode
@@ -247,18 +247,20 @@ class BindersController < ApplicationController
 			embed = false
 			url = false
 
-			if !(params[:weblink] =~ /(<iframe.*>)(<\/iframe>)?/).nil?
+			doc = Nokogiri::HTML(params[:weblink])			
+
+			if !doc.at("iframe").nil?
 
 				embed = true
 
-			elsif !(params[:weblink] =~ /(<embed.*>)(<\/embed>)?/).nil?
+			elsif !doc.at("embed").nil?
 
 				embed = true
 
 			end
 
 			if !embed
-				RestClient.get(params[:weblink])
+				RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
 				url = true
 			end
 
@@ -373,9 +375,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue Exception => exc
+		rescue
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid input data #{exc.message}"
+			errors << "Invalid input data"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
@@ -401,7 +403,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:title				=> params[:newtitle][0..60],
+		@binder.update_attributes(	:title				=> params[:newtitle][0..55],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
 

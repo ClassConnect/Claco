@@ -18,7 +18,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # This is a sensible default for uploaders that are meant to be mounted:
 
   version :contentview do
-    process resize_to_fill: [700, nil]
+    process resize_to_fit: [700, nil]
 
   end
 

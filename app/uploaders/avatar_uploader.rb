@@ -23,11 +23,15 @@ class AvatarUploader < CarrierWave::Uploader::Base
   end
 
   def fog_directory
-    "claco-images"
+    "img.cla.co"
   end
 
   def fog_public
     true
+  end
+
+  def fog_host
+    "http://img.cla.co"
   end
 
   def extension_white_list

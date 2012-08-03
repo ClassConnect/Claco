@@ -1,27 +1,25 @@
-<% if @binder.format == 1 %>
-	<% if @croc %>
+<% if !@binder.current_version.get_html.empty? %>
+	
+	<%= @binder.current_version.get_html.html_safe %>
 
-		<iframe id="crocFrame" style="width: 700px; height: 600px;" src="<%= @croc_url %>" ></iframe>
+<% else %>
 
-	<% end %>
-
-	<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download")%>	
+	<%= link_to(image_tag(@binder.current_version.imgfile.contentview.url), @binder.current_version.data, :target => "_blank") %>
 
 <% end %>
 
-<% if @binder.format == 2 %>
-	
-	<% if @binder.current_version.embed %>
+<br /><br />
 
-		<%= @binder.current_version.data.html_safe %>
+<% if !@binder.current_version.embed %>
+	<% if @binder.format == 1 %>
+
+		<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download"), :target => "_blank" %>	
 
 	<% else %>
 
-		<%= image_tag @binder.current_version.imgfile.contentview.url %>
-		<%= link_to @binder.title, @binder.current_version.data %>
+		<%= link_to @binder.title, @binder.current_version.data, :target => "_blank" %>
 
 	<% end %>
-
 <% end %>
 
 <br /><br /><br />

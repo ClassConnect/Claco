@@ -826,7 +826,7 @@ class Version
 
 			if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
 
-				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url)[v]}\" frameborder=\"0\" allowfullscreen></iframe>"
+				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}\" frameborder=\"0\" allowfullscreen></iframe>"
 
 			end
 

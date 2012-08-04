@@ -6,6 +6,8 @@
 	<%= javascript_include_tag "binders/taginit" %>
   <%= javascript_include_tag "binders/upload/iframe-transport" %>
   <%= javascript_include_tag "binders/upload/fileupload" %>
+  <%= javascript_include_tag "binders/icheck" %>
+  <%= stylesheet_link_tag    "widgets/icheck", :media => "all" %>
 <% end %>
 
 <div class="container">
@@ -32,6 +34,64 @@
 
 
 	<div id="left-sidebar">
+
+
+        <div class="conbox">
+          <div class="headstrip" style="margin-bottom:10px">
+
+            <div style="float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" /></div>
+            <div class="inner">
+            Share 
+            </div>
+
+          </div>
+
+
+
+          <div class="noShare">
+            All folders & files that you share publicly are <strong>free storage</strong> - and you can share them on social networks!
+          </div>
+
+
+          <div class="sharelinks" style="display:none">
+
+            <div>
+
+              <div class="input-prepend" style="margin-left:10px">
+                  <span class="add-on" style="margin-right:-14px">
+                    <img src="http://cdn1.iconfinder.com/data/icons/officeicons/PNG/48/Internet_link_02.png" style="height:14px; margin-top:-4px" />
+                  </span>
+
+                  <input type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="http://claco.com/emsimons/portfolio/math/id" readonly />
+              </div>
+
+            </div>
+
+
+            <div style="margin: 10px 2px 5px 0;">
+
+              <div style="margin: 0 8px 0 15px; height:20px; float:left">
+                <a href="http://pinterest.com/pin/create/button/?url=http%3A%2F%2Fwww.classconnect.com&media=http%3A%2F%2Fwww.classconnect.com" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+              </div>
+
+              <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=I'm a pioneer! %23UnitedWeTeach&url=http://www.classconnect.com" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>
+
+              <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.claco.com&amp;send=false&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=90&amp;appId=213954741999891" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
+
+            </div>
+
+            <div style="clear:both; height:7px"></div>
+
+          </div>
+
+        </div>
+
+
+
+
+
+
+
         
         <div id="folder-tags" class="conbox">
           <div class="headstrip">

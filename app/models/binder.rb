@@ -512,8 +512,8 @@ class Binder
 		end
 
 		target.current_version.update_attributes(	:remote_imgfile_url => url,
-									:imgclass => 2,
-									:imgstatus => stathash)
+													:imgclass => 2,
+													:imgstatus => stathash)
 
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
@@ -761,6 +761,8 @@ end
 class Version
 	include Mongoid::Document
 
+	#attr_accessible :thumbnailgen
+
 	field :owner, :type => String #Owner of version
 	field :timestamp, :type => Integer
 	field :comments_priv, :type => Array
@@ -782,6 +784,12 @@ class Version
 	field :imgtitle
 	field :imgfilename
 	field :imgfiletype
+
+	# 0 - standard (smartthumb detection)
+	# 1 - video (horiz fill, crop top & bottom)
+	# 2 - website (horiz fill, crop bottom)
+	# 3 - document (center, no cropping)
+	field :thumbnailgen, :type => Integer, :default => 0
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority
@@ -811,6 +819,12 @@ class Version
 	#mount_uploader :imgthumb_sm, 	ImageUploader
 
 	embedded_in :binder
+
+	def thumbnailgen
+
+		return self.thumbnailgen
+
+	end
 
 	def get_html
 

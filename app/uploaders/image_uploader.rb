@@ -18,7 +18,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # This is a sensible default for uploaders that are meant to be mounted:
 
   version :contentview do
-    process resize_to_fill: [700, nil]
+    process resize_to_fit: [700, nil]
 
   end
 
@@ -99,7 +99,7 @@ protected
     #Rails.logger.debug "Thumbnailgen: #{model[:thumbnailgen].to_s}"
 
     case model[:thumbnailgen].to_i
-    when 0
+    when 0#(0..1)
 
       #include CarrierWave::RMagick
 
@@ -329,148 +329,31 @@ protected
       #include CarrierWave::RMagick
 
       # video
-      # manipulate! do |origimg|
-
-      #   width = origimg.columns
-      #   height = origimg.rows
-
-      #   if Float(height)/Float(width) < 91.0/200.0
-      #     # image aspect ratio is wider than thumbnail aspect ratio, crop horizontally
-          
-      #     origimg = origimg.crop((width/2)-(200.0/2),0,width,height)
-          
-      #   else
-      #     # image aspect ratio is taller than thumbnail aspect ratio, crop vertically
-          
-      #     origimg = origimg.crop(0,(height/2)-(91.0/2),width,height)
-
-      #   end
-
-      # end
-
       manipulate! do |origimg|
+
         origimg.resize_to_fill!(200.0,91.0,Magick::CenterGravity)
+
       end
 
     when 2
-
-      #include CarrierWave::RMagick
 
       # url
       manipulate! do |origimg|
 
         origimg.resize_to_fill!(200.0,91.0,Magick::NorthGravity)
 
-        # width = origimg.columns
-        # height = origimg.rows
-
-        # if Float(height)/Float(width) < 91.0/200.0
-        #   # image aspect ratio is wider than thumbnail aspect ratio, crop horizontally
-          
-        #   origimg = origimg.crop((width/2)-(200.0/2),0,width,height)
-          
-        # else
-        #   # image aspect ratio is taller than thumbnail aspect ratio, crop vertically
-          
-        #   origimg = origimg.crop(0,0,width,height)
-
-        # end
-
       end
     when 3
 
+      # this is a temporary implementation
+      # ideally, the entire page of the document would be shown with resize_and_pad, which doesn't work for some reason
+
+      # document
       manipulate! do |origimg|
         origimg.resize_to_fill!(200.0,91.0,Magick::NorthGravity)
       end
 
-      #include CarrierWave::MiniMagick
-
-      # document
-
-
-      #process :resize_and_pad => [200.0,91.0,'black',Magick::CenterGravity
-
-      #manipulate! do |origimg|
-
-        #grey_bg = Magick::Image.new(200.0, 91.0) do
-        #         self.background_color = "#757575"
-        #end
-
-        #origimg.resize_to_fit!(200.0,91.0)
-        #origimg.resize_to_fill!(200.0,91.0,Magick::NorthGravity)
-        #origimg = origimg.resize_and_pad(200.0,91.0,'black',Magick::CenterGravity)
-
-        #origimg = grey_bg.composite(origimg,Magick::CenterGravity,Magick::OverCompositeOp)
-
-      #require 'RMagick'
-
-
-
-      # manipulate! do |origimg|
-
-      #   width = origimg.columns
-      #   height = origimg.rows
-
-      #   if Float(height)/Float(width) < 91.0/200.0
-      #     # image aspect ratio is wider than thumbnail aspect ratio, crop horizontally
-          
-      #     origimg = origimg.crop((width/2)-(200.0/2),0,width,height)
-          
-      #   else
-      #     # image aspect ratio is taller than thumbnail aspect ratio, crop vertically
-          
-      #     origimg = origimg.crop(0,(height/2)-(91.0/2),width,height)
-
-      #   end
-
-      # end
-
-      #manipulate! do |img|
-
-        #img = ImageList.new(img)
-
-        #img.resize_to_fit!(200.0,91.0)
-
-        #Rails.logger.debug "Class of img: #{img.class.to_s}"
-
-        #img = img.from_blob(img.to_blob)
-
-        # width = 200.0
-        # height = 91.0
-        # background = 'black'
-        # gravity = Magick::CenterGravity
-
-        #img.resize_to_fit!(width, height)
-
-        #img = img.resize_and_pad(width,height,'black')
-
-        #new_img = ::Magick::Image.new(width, height)
-        #new_img = Magick::Image.new(Integer(width), Integer(height))
-        # if background == :transparent
-        #   filled = new_img.matte_floodfill(1, 1)
-        # else
-        #   filled = new_img.color_floodfill(1, 1, ::Magick::Pixel.from_color(background))
-        # end
-        # destroy_image(new_img)
-        # filled.composite!(img, gravity, ::Magick::OverCompositeOp)
-        # destroy_image(img)
-        # filled = yield(filled) if block_given?
-        # filled
-      #end       
-
-        #origimg = origimg.resize_and_pad(200.0,91.0,"#757575")
-
-        # clown = Magick::ImageList.new("clown.jpg")
-        # face = clown.crop(50, 15, 150, 165)
-        # white_bg = Magick::Image.new(clown.columns, clown.rows)
-        # clown = white_bg.composite(face, 50, 15,
-        #                                Magick::OverCompositeOp)
-        # clown.write('crop.jpg')
-
-      #end
-
     end
-
 
   end
 

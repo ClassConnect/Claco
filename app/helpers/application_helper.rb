@@ -253,12 +253,14 @@ module ApplicationHelper
 
 		if binder.versions.nil?
 			return "<no image>"
-		elsif binder.versions.last.nil?
+		elsif binder.current_version.nil?
 			return "<no image>"
-		elsif binder.versions.last.imgstatus['imageable'] == false
-			return "[#{binder.current_version.ext.upcase}]"
-		elsif binder.versions.last.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
-			return "<no image>"
+		elsif binder.current_version.imgstatus['imageable'] == false
+			#return "[#{binder.current_version.ext.upcase}]"
+			return asset_path("stockfilethumbs/#{binder.current_version.ext.downcase.sub('.','')}.png")
+		elsif binder.current_version.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
+			#return "<no image>"
+			return asset_path("stockfilethumbs/#{binder.current_version.ext.downcase.sub('.','')}.png")
 		else
 			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;')# + 
 			#return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 

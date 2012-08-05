@@ -316,37 +316,37 @@ class BindersController < ApplicationController
 
 							# YOUTUBE
 							# DELAYTAG
-							Binder.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
 
 						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
 							# VIMEO
 							# DELAYTAG
-							Binder.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
 
 						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
 
 							# EDUCREATIONS
 							# DELAYTAG
-							Binder.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
 
 						elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
 							# SCHOOLTUBE
 							# DELAYTAG
-							Binder.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
 
 						elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
 							# SHOWME
 							# DELAYTAG
-							Binder.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+							Binder.delay.get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
 
 						else
 							@binder.versions.last.update_attributes( :thumbnailgen => 2 )
 							# generic URL, grab Url2png
 							# DELAYTAG
-							Binder.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+							Binder.delay.get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
 						end
 
 					end
@@ -554,8 +554,8 @@ class BindersController < ApplicationController
 					#Binder.delay.get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 
 					# DELAYTAG
-					Binder.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
-					
+					Binder.delay.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+
 				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
 					# for now, image will be added as file AND as imgfile
 					stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
@@ -568,12 +568,14 @@ class BindersController < ApplicationController
 
 					#Binder.generate_folder_thumbnail(@binder.id)
 
+					GC.start
+
 					Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
 					Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
 
 					# DELAYTAG
-					Binder.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
-				
+					Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
 				end
 			else
 				stathash = @binder.current_version.imgstatus
@@ -699,7 +701,7 @@ class BindersController < ApplicationController
 				#Binder.find(op.last).inc(:children,-1)
 
 				# DELAYTAG
-				Binder.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+				Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
 				#Save old permissions to remove childrens' inherited permissions
 				@ppers = @binder.parent_permissions
@@ -711,7 +713,7 @@ class BindersController < ApplicationController
 
 
 				# DELAYTAG
-				Binder.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+				Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
 				# must update the common ancestor of the children before 
 				@binder.update_parent_tags()
@@ -923,7 +925,7 @@ class BindersController < ApplicationController
 			end
 
 			# DELAYTAG
-			Binder.generate_folder_thumbnail(@new_parent.id)
+			Binder.delay.generate_folder_thumbnail(@new_parent.id)
 
 		else
 
@@ -1102,7 +1104,7 @@ class BindersController < ApplicationController
 		end
 
 		# DELAYTAG
-		Binder.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+		Binder.delay.generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
 		redirect_to named_binder_route(@parent || @binder.parent["id"])
 	end

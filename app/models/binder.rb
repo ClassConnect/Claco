@@ -115,7 +115,7 @@ class Binder
 
 		#children = Binder.where("parent.id" => binder.parent['id'])
 		#children = Binder.where("parent.id" => binder.id.to_s)
-
+ 
 		#binder.parents.collect { |x| Binder.find((x["id"] || x[:id]).to_s) }
 
 		#children = Binder.collection.where( "parents.id" => id.to_s )
@@ -493,6 +493,8 @@ class Binder
 													:imgclass => 3,										
 													:imgstatus => stathash)
 
+		GC.start
+
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
@@ -514,6 +516,8 @@ class Binder
 		target.current_version.update_attributes(	:remote_imgfile_url => url,
 													:imgclass => 2,
 													:imgstatus => stathash)
+
+		GC.start
 
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
@@ -580,6 +584,9 @@ class Binder
 		target.update_attributes(	:remote_imgfile_url => api_url,
 									:imgclass => 2,
 									:imgstatus => stathash)
+
+							
+		GC.start
 
 		#Binder.delay.generate_folder_thumbnail(id)
 		#Binder.generate_folder_thumbnail(id)

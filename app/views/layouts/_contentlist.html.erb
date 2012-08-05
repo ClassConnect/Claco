@@ -32,7 +32,7 @@
 
     		            <div class="folder-preview">
     		              <!-- <div class="single-hold" src="<%= imgarr[0].to_s %>" > -->
-                      <div class="single-hold" style="background-image:url('<%= imgarr[0].to_s %>');">
+                      <div class="single-hold" style="background-image:url('<%= imgarr[0].to_s.empty? ? asset_path("stockfilethumbs/wideemptyfolder.png") : imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
 
                       	<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 

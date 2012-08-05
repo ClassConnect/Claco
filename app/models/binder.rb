@@ -839,41 +839,75 @@ class Version
 
 	end
 
-	def get_html
+	def get_croc_session
 
-		if embed
+		if CROC_VALID_FILE_FORMATS.include? ext.downcase
 
-			return data
+			return JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response })["session"]
 
-		end
-
-		if self.binder.format == 2
-
-			parsed_url = URI.parse(data)
-
-			if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
-
-				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}?modestbranding=1\" frameborder=\"0\" allowfullscreen></iframe>"
-
-			end
-
-		end
-
-		if self.binder.format == 1
-
-			# if Crocodoc.check_format_validity(ext)
-			if CROC_VALID_FILE_FORMATS.include? ext.downcase
-
-				# url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
-				url = "https://crocodoc.com/view/" + (JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response }))["session"]
-				return '<iframe id="crocFrame" style="width: 700px; height: 600px;" src="' + url + '" ></iframe>'
-
-			end
 		end
 
 		return ""
 
 	end
+
+	def croc?
+
+		return CROC_VALID_FILE_FORMATS.include? ext.downcase if !ext.nil?
+
+		return false
+
+	end
+
+	def youtube?
+
+		return URI.parse(data).host.include? "youtube.com"
+
+	end
+
+	# def get_html
+
+	# 	if embed
+
+	# 		return data
+
+	# 	end
+
+	# 	if self.binder.format == 2
+
+	# 		parsed_url = URI.parse(data)
+
+	# 		if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
+
+	# 			return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}?modestbranding=1\" frameborder=\"0\" allowfullscreen></iframe>"
+
+	# 		end
+
+	# 	end
+
+	# 	# if self.binder.format == 1
+
+	# 	# 	# # if Crocodoc.check_format_validity(ext)
+	# 	# 	# if CROC_VALID_FILE_FORMATS.include? ext.downcase
+
+	# 	# 	# 	# url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
+	# 	# 	# 	url = "https://crocodoc.com/view/" + (JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response }))["session"]
+	# 	# 	# 	return '<iframe id="crocFrame" style="width: 700px; height: 600px;" src="' + url + '" ></iframe>'
+
+	# 	# 	# end
+
+	# 	# 	if CROC_VALID_FILE_FORMATS.include? ext.downcase
+
+	# 	# 		url = "https://crocodoc.com/webservice/document.js?session=" + get_croc_session
+	# 	# 		return "<script src=\"http://static-v2.crocodoc.com/core/docviewer.js\"></script><script type=\"text/javascript\" src=\"#{url}\"></script/><div id=\"docviewer\"></div><script type=\"text/javascript\">var docviewer = new DocViewer({ \"id\": \"docviewer\" });</script>"
+
+	# 	# 	end
+
+	# 	# end
+
+	# 	return ""
+
+	# end
 
 end
 

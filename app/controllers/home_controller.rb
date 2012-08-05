@@ -7,7 +7,7 @@ class HomeController < ApplicationController
 	end
 
 	def fetchtitle
-		title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze
+		title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze(" ")
 
 		rescue
 			

@@ -1139,6 +1139,24 @@ class BindersController < ApplicationController
 
 			end
 
+			@binder.subtree.each do |h|
+
+				if h.parent_permissions.find {|p| p["type"] == 3}.nil?
+					
+					h.parent_permissions << {	:type		=> 3,
+												:folder_id => params[:id],
+												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+					h.save
+
+				else
+
+					h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+					h.save
+
+				end
+
+			end
+
 		else
 
 			error = "You are not allowed to change permissions on this item"

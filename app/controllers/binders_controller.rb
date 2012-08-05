@@ -112,11 +112,11 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 
-		@croc = false
+		# @croc = false
 
-		@croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
+		# @croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
 
-		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
+		# @croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
 
 		#redirect_to @binder.current_version.data and return if @binder.format == 2
 
@@ -154,7 +154,7 @@ class BindersController < ApplicationController
 			if !error
 				respond_to do |format|
 				 	format.html
-					format.json {render :json => @children.collect {|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}}
+					format.json {render :json => @children.collect {|c| {"id" => c.id, "name" => c.title, "path" => named_binder_route(c), "type" => c.type}}.to_json}
 				end
 			end
 
@@ -229,8 +229,8 @@ class BindersController < ApplicationController
 
 
 		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
-		
-		# This will catch flawed URL structure, as well as bad HTTP response codes
+	
+			# This will catch flawed URL structure, as well as bad HTTP response codes
 
 		# the RestClient object will catch most of the error codes before getting to here
 		#if ![200,301,302].include? respcode
@@ -247,18 +247,20 @@ class BindersController < ApplicationController
 			embed = false
 			url = false
 
-			if !(params[:weblink] =~ /(<iframe.*>)(<\/iframe>)?/).nil?
+			doc = Nokogiri::HTML(params[:weblink])			
+
+			if !doc.at("iframe").nil?
 
 				embed = true
 
-			elsif !(params[:weblink] =~ /(<embed.*>)(<\/embed>)?/).nil?
+			elsif !doc.at("embed").nil?
 
 				embed = true
 
 			end
 
 			if !embed
-				RestClient.get(params[:weblink])
+				RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
 				url = true
 			end
 
@@ -306,7 +308,7 @@ class BindersController < ApplicationController
 
 					if url
 
-						uri = URI(params[:weblink])
+						uri = URI.parse(params[:weblink])
 
 						stathash = @binder.current_version.imgstatus
 						stathash[:imgfile][:retrieved] = true
@@ -381,9 +383,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue Exception => exc
+		rescue
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid input data #{exc.message}"
+			errors << "Invalid input data"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
@@ -409,7 +411,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:title				=> params[:newtitle][0..60],
+		@binder.update_attributes(	:title				=> params[:newtitle][0..55],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
 
@@ -1137,6 +1139,62 @@ class BindersController < ApplicationController
 		@colleagues = Teacher.all.reject {|t| t == current_teacher}
 	end
 
+	def setpub
+
+		@binder = Binder.find(params[:id])
+
+		error = ""
+
+		if @binder.get_access(current_teacher.id.to_s) == 2
+
+			if @binder.permissions.find {|p| p["type"] == 3}.nil?
+
+				@binder.permissions << {:type		=> 3,
+										:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+				@binder.save
+
+			else
+
+				@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+				@binder.save
+
+			end
+
+			@binder.subtree.each do |h|
+
+				if h.parent_permissions.find {|p| p["type"] == 3}.nil?
+					
+					h.parent_permissions << {	:type		=> 3,
+												:folder_id => params[:id],
+												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+					h.save
+
+				else
+
+					h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+					h.save
+
+				end
+
+			end
+
+		else
+
+			error = "You are not allowed to change permissions on this item"
+
+		end
+		
+		rescue BSON::InvalidObjectId
+			error = "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			error = "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => error.empty? ? 1 : error}
+			end
+
+	end
+
 	def createpermission
 		@binder = Binder.find(params[:id])
 
@@ -1152,7 +1210,7 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		@binder.children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {	:type => params[:type],
+		@binder.subtree.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {	:type => params[:type],
 																										:shared_id => params[:shared_id],
 																										:auth_level => params[:auth_level],
 																										:folder_id => params[:id]})} if !@new
@@ -1169,7 +1227,7 @@ class BindersController < ApplicationController
 
 		@binder.permissions.delete_at(params[:pid].to_i)
 
-		@binder.children.each do |c|
+		@binder.subtree.each do |c|
 			c.parent_permissions.delete(pper)
 			c.save
 		end

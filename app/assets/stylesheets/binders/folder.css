@@ -257,6 +257,13 @@
   border-top-left-radius:4px;
 }
 
+#left-sidebar .conbox .noShare {
+  padding: 0 3px 10px 10px;
+  color:#777;
+  font-size:11px;
+  line-height:13px;
+}
+
 #left-sidebar .conbox .empty-tog {
   color:#777;
   text-align:center;

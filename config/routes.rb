@@ -93,31 +93,32 @@ Claco::Application.routes.draw do
 	post	'/:username/portfolio(/:root)/:title/:id/createcontent'			=> 'binders#createcontent',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Move
-	get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Copy
-	get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Fork (Snap)
-	get		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#fork',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#fork',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#forkitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Versioning
-	get		'/:username/portfolio(/:root)/:title/:id/versions'				=> 'binders#versions',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	get		'/:username/portfolio(/:root)/:title/:id/swap'					=> 'binders#swap',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	get		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#newversion',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/versions'				=> 'binders#versions',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/swap'					=> 'binders#swap',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#newversion',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#createversion',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Permissions
-	get		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#permissions',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#permissions',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions"), :constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	post	'/:username/portfolio(/:root)/:title/:id/setpub'				=> 'binders#setpub',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Edit
-	get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	#get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/rename'				=> 'binders#rename',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	post	'/:username/portfolio(/:root)/:title/:id/tags'					=> 'binders#updatetags',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}

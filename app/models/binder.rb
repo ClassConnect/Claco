@@ -418,41 +418,47 @@ class Binder
 		return username || owner
 	end
 
-	def get_access(id)
+	def get_access(id = 0)
 		#Owner will always have r/w access
 		return 2 if owner?(id)
 
 		#Only owner will be able to see trash folders
 		return 0 if parents.first["id"] == "-1"
 
-		#Explicit permissions always take precedence
-		permissions.each do |p|
+		#Parent permissions always take precedence
+		parent_permissions.each do |p|
 
 			#Check what type of permission it is: 1 = person
-			return p.auth_level if p.shared_id == id && p.type == 1
+			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
 
 			#2 is reserved for classes
 
 			#3 = Public and always read-only
-			return 1 if p.type == 3
+			return p["auth_level"] if p["type"] == 3
+
+		end
+
+		permissions.each do |p|
+
+			#Check what type of permission it is: 1 = person
+			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
+
+			#2 is reserved for classes
+
+			#3 = Public and always read-only
+			return p["auth_level"] if p["type"] == 3
 
 			#4 is reserved for networks
 
 		end
 
-		parent_permissions.each do |p|
-
-			#Check what type of permission it is: 1 = person
-			return p.auth_level if p.shared_id == id && p.type == 1
-
-			#2 is reserved for classes
-
-			#3 = Public and always read-only
-			return 1 if p.type == 3
-
-		end
-
 		return 0
+
+	end
+
+	def is_pub?
+
+		return get_access == 1
 
 	end
 
@@ -835,17 +841,37 @@ class Version
 
 	def get_html
 
+		if embed
+
+			return data
+
+		end
+
 		if self.binder.format == 2
 
 			parsed_url = URI.parse(data)
 
 			if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
 
-				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url)[v]}\" frameborder=\"0\" allowfullscreen></iframe>"
+				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}?modestbranding=1\" frameborder=\"0\" allowfullscreen></iframe>"
 
 			end
 
 		end
+
+		if self.binder.format == 1
+
+			# if Crocodoc.check_format_validity(ext)
+			if CROC_VALID_FILE_FORMATS.include? ext.downcase
+
+				# url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
+				url = "https://crocodoc.com/view/" + (JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response }))["session"]
+				return '<iframe id="crocFrame" style="width: 700px; height: 600px;" src="' + url + '" ></iframe>'
+
+			end
+		end
+
+		return ""
 
 	end
 

@@ -7,13 +7,13 @@ class HomeController < ApplicationController
 	end
 
 	def fetchtitle
-		RestClient.get(params[:url]) =~ /<title>(.*?)<\/title>/
+		title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze
 
 		rescue
 			
 		ensure
 			respond_to do |format|
-				format.html {render :text => CGI.unescapeHTML($1) || " "}
+				format.html {render :text => title || " "}
 			end
 	end
 

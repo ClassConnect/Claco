@@ -57,6 +57,61 @@ function softRefresh() {
 
 function editInit() {
   noteInit = false;
+  dontPjax = false;
+
+  // click on box, redirect
+  $('.content-item').click(function() {
+
+    if (dontPjax === false) {
+      $.pjax({
+        url: $(this).find('.titler a').attr("href"),
+        container: '[data-pjax-container]'
+      });
+
+    }
+
+  });
+
+
+  // set all of the items that won't activate pjax on click
+  $('.drop-tog, .linkster').click(function() {
+    dontPjax = true;
+  });
+
+  // show the sharing iphone-esque toggle
+  $('.pub_on').iphoneStyle({
+    onChange: function(elem, value) {
+      // this is now public (!)
+      if (value === true) {
+        $(".noShare").css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
+        $(".sharelinks").css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+
+      // this is now private... :(
+      } else {
+        $(".sharelinks").css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
+        $(".noShare").css('opacity', 0).slideDown(50).animate({ opacity: 1 },{ queue: false, duration: 50});
+      }
+
+      pubshare = { enabled: value };
+
+      $.ajax({
+        url: location.protocol+'//'+location.host+location.pathname + '/setpub',
+        data: pubshare,
+        type: 'post',
+        success: function(data) {
+          // if the data isn't success (aka "1")
+          if (data != '1') {
+            $('.pub_on').click();
+            alert(data);
+          }
+
+        }
+      });
+
+    }
+  });
+
+
   // for our modification actions
   $('.modaction').click(function() {
     // if we're doing a rename

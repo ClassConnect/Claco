@@ -425,7 +425,19 @@ class Binder
 		#Only owner will be able to see trash folders
 		return 0 if parents.first["id"] == "-1"
 
-		#Explicit permissions always take precedence
+		#Parent permissions always take precedence
+		parent_permissions.each do |p|
+
+			#Check what type of permission it is: 1 = person
+			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
+
+			#2 is reserved for classes
+
+			#3 = Public and always read-only
+			return p["auth_level"] if p["type"] == 3
+
+		end
+
 		permissions.each do |p|
 
 			#Check what type of permission it is: 1 = person
@@ -437,18 +449,6 @@ class Binder
 			return p["auth_level"] if p["type"] == 3
 
 			#4 is reserved for networks
-
-		end
-
-		parent_permissions.each do |p|
-
-			#Check what type of permission it is: 1 = person
-			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
-
-			#2 is reserved for classes
-
-			#3 = Public and always read-only
-			return p["auth_level"] if p["type"] == 3
 
 		end
 

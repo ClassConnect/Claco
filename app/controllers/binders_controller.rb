@@ -307,7 +307,7 @@ class BindersController < ApplicationController
 
 					if url
 
-						uri = URI(params[:weblink])
+						uri = URI.parse(params[:weblink])
 
 						stathash = @binder.current_version.imgstatus
 						stathash[:imgfile][:retrieved] = true
@@ -1118,6 +1118,44 @@ class BindersController < ApplicationController
 		@colleagues = Teacher.all.reject {|t| t == current_teacher}
 	end
 
+	def setpub
+
+		@binder = Binder.find(params[:id])
+
+		error = ""
+
+		if @binder.get_access(current_teacher.id.to_s) == 2
+
+			if @binder.permissions.find {|p| p["type"] == 3}.nil?
+
+				@binder.permissions << {:type		=> 3,
+										:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+				@binder.save
+
+			else
+
+				@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+				@binder.save
+
+			end
+
+		else
+
+			error = "You are not allowed to change permissions on this item"
+
+		end
+		
+		rescue BSON::InvalidObjectId
+			error = "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			error = "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => error.empty? ? 1 : error}
+			end
+
+	end
+
 	def createpermission
 		@binder = Binder.find(params[:id])
 
@@ -1133,7 +1171,7 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		@binder.children.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {	:type => params[:type],
+		@binder.subtree.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {	:type => params[:type],
 																										:shared_id => params[:shared_id],
 																										:auth_level => params[:auth_level],
 																										:folder_id => params[:id]})} if !@new
@@ -1150,7 +1188,7 @@ class BindersController < ApplicationController
 
 		@binder.permissions.delete_at(params[:pid].to_i)
 
-		@binder.children.each do |c|
+		@binder.subtree.each do |c|
 			c.parent_permissions.delete(pper)
 			c.save
 		end

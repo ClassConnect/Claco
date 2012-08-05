@@ -95,7 +95,7 @@ function editInit() {
       pubshare = { enabled: value };
 
       $.ajax({
-        url: location.protocol+'//'+location.host+location.pathname + '/sharepub',
+        url: location.protocol+'//'+location.host+location.pathname + '/setpub',
         data: pubshare,
         type: 'post',
         success: function(data) {

@@ -115,6 +115,7 @@ Claco::Application.routes.draw do
 	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions"), :constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	post	'/:username/portfolio(/:root)/:title/:id/setpub'				=> 'binders#setpub',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Edit
 	#get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}

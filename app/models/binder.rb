@@ -418,7 +418,7 @@ class Binder
 		return username || owner
 	end
 
-	def get_access(id)
+	def get_access(id = 0)
 		#Owner will always have r/w access
 		return 2 if owner?(id)
 
@@ -429,12 +429,12 @@ class Binder
 		permissions.each do |p|
 
 			#Check what type of permission it is: 1 = person
-			return p.auth_level if p.shared_id == id && p.type == 1
+			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
 
 			#2 is reserved for classes
 
 			#3 = Public and always read-only
-			return 1 if p.type == 3
+			return p["auth_level"] if p["type"] == 3
 
 			#4 is reserved for networks
 
@@ -443,16 +443,22 @@ class Binder
 		parent_permissions.each do |p|
 
 			#Check what type of permission it is: 1 = person
-			return p.auth_level if p.shared_id == id && p.type == 1
+			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
 
 			#2 is reserved for classes
 
 			#3 = Public and always read-only
-			return 1 if p.type == 3
+			return p["auth_level"] if p["type"] == 3
 
 		end
 
 		return 0
+
+	end
+
+	def is_pub?
+
+		return get_access == 1
 
 	end
 
@@ -826,7 +832,7 @@ class Version
 
 			if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
 
-				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}\" frameborder=\"0\" allowfullscreen></iframe>"
+				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}?modestbranding=1\" frameborder=\"0\" allowfullscreen></iframe>"
 
 			end
 

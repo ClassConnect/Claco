@@ -841,13 +841,7 @@ class Version
 
 	def get_croc_session
 
-		if CROC_VALID_FILE_FORMATS.include? ext.downcase
-
-			return JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response })["session"]
-
-		end
-
-		return ""
+		return CROC_VALID_FILE_FORMATS.include? ext.downcase ? JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response })["session"] : ""
 
 	end
 
@@ -861,8 +855,12 @@ class Version
 
 	def youtube?
 
-		return URI.parse(data).host.include? "youtube.com"
+		uri = URI.parse(data)
 
+		return uri.host.nil? ? false : uri.host.include?("youtube.com")
+
+		rescue URI::InvalidURIError
+			return false
 	end
 
 	# def get_html

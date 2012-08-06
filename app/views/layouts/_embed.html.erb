@@ -3,7 +3,7 @@
 	<!--
 	<iframe id="crocFrame" style="width: 700px; height: 600px;" src="https://crocodoc.com/view/@binder.current_version.get_croc_session" ></iframe>
 	-->
-	
+
 	<%= javascript_include_tag "http://static-v2.crocodoc.com/core/docviewer.js" %>
 	<%= javascript_include_tag "https://crocodoc.com/webservice/document.js?session=#{@binder.current_version.get_croc_session}" %>
 	<div id="docviewer"></div>
@@ -15,9 +15,9 @@
 
 <% else %>
 
-	<%= link_to(image_tag(@binder.current_version.imgfile.contentview.url),
-				@binder.current_version.data,
-				:target => "_blank") %>
+	<%= link_to(	image_tag(@binder.current_version.imgfile.contentview.url),
+					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
+					:target => "_blank") %>
 
 <% end %>
 

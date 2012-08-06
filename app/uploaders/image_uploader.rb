@@ -23,7 +23,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   # version :thumb_lg do
-  #     #process :resize_and_pad => [200,91,'black','Center']
+  #     #process :resize_and_pad => [180,91,'black','Center']
   #     process :testproc
   # end
   #version
@@ -47,16 +47,16 @@ class ImageUploader < CarrierWave::Uploader::Base
   version :smart_thumb do
     process :resize_to_fit => [600,600]
     process :smart_thumbnail
-    #process :resize_and_pad => [200,91,'black']
+    #process :resize_and_pad => [180,91,'black']
   end
 
  #include CarrierWave::RMagick
 
   version :thumb_lg, :from_version => :smart_thumb do
     #include CarrierWave::RMagick
-    #process :smart_thumbnail => [[200,91]]
-    #process :resize_and_pad => [200,91,'black']
-    process :resize_to_fill => [200,91]
+    #process :smart_thumbnail => [[180,91]]
+    #process :resize_and_pad => [180,91,'black']
+    process :resize_to_fill => [180,91]
   end
 
   version :thumb_sm, :from_version => :smart_thumb do
@@ -69,13 +69,17 @@ class ImageUploader < CarrierWave::Uploader::Base
 
   # def smart_thumbnail(dims = ["",""])
   #   manipulate! do |origimg|
-  #     origimg = origimg.resize_and_pad(200,91,'black','Center')
+  #     origimg = origimg.resize_and_pad(180,91,'black','Center')
   #   end
   # end
 
 
   def store_dir
-    Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
+    if model.nil?
+      return "testdir"
+    else
+      Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
+    end
   end
 
   def fog_directory
@@ -97,6 +101,8 @@ protected
     #Rails.logger.debug "Model Class: #{model.class.to_s}"
     #Rails.logger.debug "Thumbnailgen: #{model.inspect.to_s}"
     #Rails.logger.debug "Thumbnailgen: #{model[:thumbnailgen].to_s}"
+
+    return if model.nil?
 
     case model[:thumbnailgen].to_i
     when 0#(0..1)
@@ -267,11 +273,11 @@ protected
         leftedge = Integer(leftcentroid - leftsigma)
         rightedge = Integer(rightcentroid + rightsigma)
 
-        Rails.logger.debug "91/200 ratio: #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
+        Rails.logger.debug "91/180 ratio: #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
 
-        if Float(bottomedge-topedge)/Float(rightedge-leftedge) < 91.0/200.0
+        if Float(bottomedge-topedge)/Float(rightedge-leftedge) < 91.0/180.0
           # smartselect aspect ratio is wider than thumbnail aspect ratio, expand vertically
-          y = Integer((91.0*width)/200.0 - height)
+          y = Integer((91.0*width)/180.0 - height)
 
           if height - (bottomedge-topedge) < y
             # cannot fully expand to desired aspect ratio
@@ -296,7 +302,7 @@ protected
           end
         else
           # smartselect aspect ratio is taller than thumbnail aspect ratio, expand horizontally
-          x = Integer((200.0*height)/91.0 - width)
+          x = Integer((180.0*height)/91.0 - width)
 
           if width - (rightedge-leftedge) < x
             # cannot fully expand to desired aspect ratio
@@ -331,7 +337,7 @@ protected
       # video
       manipulate! do |origimg|
 
-        origimg.resize_to_fill!(200.0,91.0,Magick::CenterGravity)
+        origimg.resize_to_fill!(180.0,91.0,Magick::CenterGravity)
 
       end
 
@@ -340,7 +346,7 @@ protected
       # url
       manipulate! do |origimg|
 
-        origimg.resize_to_fill!(200.0,91.0,Magick::NorthGravity)
+        origimg.resize_to_fill!(180.0,91.0,Magick::NorthGravity)
 
       end
     when 3
@@ -350,7 +356,7 @@ protected
 
       # document
       manipulate! do |origimg|
-        origimg.resize_to_fill!(200.0,91.0,Magick::NorthGravity)
+        origimg.resize_to_fill!(180.0,91.0,Magick::NorthGravity)
       end
 
     end

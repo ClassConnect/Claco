@@ -85,13 +85,13 @@ class Binder
 
 		retarr = Array.new
 
-		Rails.logger.debug "Thumbimbids array: #{binder.thumbimgids.to_s}"
+		#Rails.logger.debug "Thumbimbids array: #{binder.thumbimgids.to_s}"
 
 		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if !binder.thumbimgids[0].empty?
 		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
 		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
 
-		Rails.logger.debug "Return array: #{retarr.to_s}"
+		#Rails.logger.debug "Return array: #{retarr.to_s}"
 
 		return retarr
 
@@ -100,7 +100,7 @@ class Binder
 	# recursive call to parent to set the folder thumbnail
 	def self.generate_folder_thumbnail(id,imageset = [[],[],[],[]])
 
-		Rails.logger.debug "GEN: #{id.to_s}"
+		#Rails.logger.debug "GEN: #{id.to_s}"
 
 		return if id.to_s == "-1" || id.to_s == "0"
  
@@ -109,35 +109,11 @@ class Binder
 		# wipe out thumbimbids array.  must be restored to 3 values again before saving!
 		binder.thumbimgids = []
 
-		#Rails.logger.debug "BINDER INSPECT: #{binder.inspect.to_s}"
-
-		# retrieve images, add to imageset
-
-		#children = Binder.where("parent.id" => binder.parent['id'])
-		#children = Binder.where("parent.id" => binder.id.to_s)
- 
-		#binder.parents.collect { |x| Binder.find((x["id"] || x[:id]).to_s) }
-
-		#children = Binder.collection.where( "parents.id" => id.to_s )
-		#children = Binder.any_in( parents: [{ "id" => "#{binder.id.to_s}","title" => "#{binder.title.to_s}" }] ).excludes( parent: { "id" => "-1", "title" => "" } )
 		children = binder.children
-		#subtree = binder.subtree
+
 		subtree = children.map { |c| c.subtree }.flatten if children.any?
 
-		Rails.logger.debug "GOT HERE"
-
-		# @ops.each do |opid|
-		# 	if opid != "0"
-		# 		op = Binder.find(opid)
-
-		# Rails.logger.debug "#{binder.title.to_s} CHILDREN INSPECT: (size:#{children.size})"
-		# children.each do |c|
-		# 	Rails.logger.debug "#{c.inspect.to_s}"
-		# end
-
 		imageset_loc = [[],[],[],[]]
-		#imageset = [[],[],[],[]]
-		#imgset_dup = Array.new(imageset)
 
 		# if possible, retrieve pictures locally
 		if children.any?
@@ -152,8 +128,8 @@ class Binder
 			end
 		end
 
+		# variable number of pictures retrieved locally, now expand scope to all descendant binders
 		if binder.thumbimgids.size < 3
-			#if ((subtree.map { |x| x.id.to_s }) - (children.map { |y| y.id.to_s })).any? 
 			if subtree.any?
 				subtree.each do |s|
 					if s.type != 1
@@ -168,83 +144,15 @@ class Binder
 			#end
 		end
 
-		# perform for each category in the array
-		# imageset.size.times do |i|
-		# 	imageset[i] |= imageset_loc[i]
-		# end
-
 		# fill up extra space so there are always 3 entries
 		(3 - binder.thumbimgids.size).times do |i|
 			binder.thumbimgids << ""
 		end
 
+		# technically not necessary to save until reaching the top node
 		binder.save
 
-		Rails.logger.debug "Moving up tree!"
-		Rails.logger.debug "parents: #{binder.parents.size}"
-
-		#binder.parents.each do |parent|
-			Binder.generate_folder_thumbnail(binder.parent["id"] || binder.parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
-		#end
-
-		# generate first thumbnail from local imageset if possible
-
-		# Rails.logger.debug "imageset_loc.size #{imageset_loc.size}"
-		# Rails.logger.debug "imageset_loc #{imageset_loc}"
-		
-		# imageset_loc.each do |i|
-		# 	if i.any?
-		# 		i.each do |j|
-		# 			# technically not necessary until random retrieval
-		# 			# is popping the LAST one, not the first one
-
-		# 			Rails.logger.debug "Existing item found! #{j.to_s}"
-		# 			binder.thumbimgids << i.pop.to_s#.pop
-		# 			break# if binder.thumbids.size == 3
-		# 		end
-		# 		break# if binder.thumbimgids.size == 1
-		# 	end
-		# end
-
-
-		# Rails.logger.debug "Thumbimbids array after searching locally: #{binder.thumbimgids.to_s}"
-		# # generate remaining thumbnails
-
-		# temp = []
-
-		# imgset_dup.each do |i|
-		# 	if i.any?
-		# 		i.each do |j|
-		# 			# technically not necessary until random retrieval
-		# 			# is popping the LAST one, not the first one
-		# 			temp << i.pop.to_s
-		# 			break if temp.size > 2
-		# 		end
-		# 	end
-		# 	break if temp.size > 2
-		# end
-
-		# binder.thumbimgids = binder.thumbimgids | temp
-
-		# Rails.logger.debug "DB_WRITE #{binder.thumbimgids.to_s}"
-
-		# binder.save
-
-		# # merge local thumbnails into all other thumbnails before continuing
-
-		# (0..3).each do |l|
-		# 	if imageset_loc[l].any?
-		# 		imageset_loc[l].each do |m|
-		# 			imageset[l] << m.to_s
-		# 		end
-		# 	end
-		# end
-
-		# if binder.parent['id'] == "0" || binder.parent[:id]
-		# 	return
-		# else
-		# 	return generate_folder_thumbnail(binder.parent['id'] || binder.parent[:id])
-		# end
+		Binder.generate_folder_thumbnail(binder.parent["id"] || binder.parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
 
 	end
 
@@ -474,6 +382,16 @@ class Binder
 
 	# Do not explicitly call these!  All these methods have very long latency.
 
+	def self.gen_thumbnails(id)
+
+		# u = ImageUploader.new
+
+		# open(url) do |f|
+		# 	u.store!(f)
+		# end
+
+	end
+
 	# this method is fucking sloppy
 	def self.get_croc_thumbnail(id,url)
 
@@ -599,169 +517,6 @@ class Binder
 		Binder.generate_folder_thumbnail(Binder.find(id).parent['id'])
 
 	end
-
-
-	# resize thumbnail to manageable size, perform smart thumbnail generation
-	# THIS METHOD IS VERY SLOW
-	# def self.smartthumbgen(id)
-
-	# 	include Magick
-
-	# 	binder = Binder.find(id.to_s)
-
-
-	# 	# def smart_thumbnail(dims = ["",""])
-	# 	#   manipulate! do |origimg|
-	# 	#     origimg = origimg.resize_and_pad(200,91,'black','Center')
-	# 	#   end
-	# 	# end
-
-	# 	# def smart_thumbnail(dims = ["",""])
-	# 	#   maniplulate! do |origimg|
-
-	# 	origimg = Magick::ImageList.new  
-	# 	urlimage = open(binder.current_version.imgfile.url.to_s) # Image URL 
-	# 	origimg.from_blob(urlimage.read)
-
-	# 	#origimg = Magick::ImageList.new()
-		  
-	# 	img = origimg.edge(1)
-
-	# 	xcount = 0
-	# 	ycount = 0
-	# 	xsum = 0
-	# 	ysum = 0
-	# 	xsqr = 0
-	# 	ysqr = 0
-
-	# 	width = img.columns
-	# 	height = img.rows
-
-	# 	imgview = img.view(0,0,width,height)
-
-	# 	height.times do |y|
-	# 	#puts "new row"
-	# 	#img.columns.times do |x|
-	# 	width.times do |x|
-	# 	  #if img.view(0,0,width,height)[y][x].red == 0
-	# 	  pixel = imgview[y][x]
-	# 	  #pixel2 = imgview2[y][x]
-	# 	  #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
-	# 	    #str = str + '0'
-	# 	  #else
-	# 	  if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
-	# 	    xcount += 1
-	# 	    ycount += 1
-	# 	    xsum += x
-	# 	    ysum += y
-	# 	    xsqr += x**2
-	# 	    ysqr += y**2
-	# 	    #str = str + '1'
-	# 	  end
-	# 	end
-	# 	#puts str
-	# 	#str = ""
-	# 	end
-
-	# 	xcentroid = Float(xsum)/Float(xcount)
-	# 	ycentroid = Float(ysum)/Float(ycount)
-
-	# 	# Unused
-	# 	# xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
-	# 	# yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
-
-	# 	# Unused
-	# 	# xsigma = Math.sqrt(xvariance)
-	# 	# ysigma = Math.sqrt(yvariance)
-
-	# 	topcount = 0
-	# 	topsum = 0
-	# 	topsqr = 0
-	# 	bottomcount = 0
-	# 	bottomsum = 0
-	# 	bottomsqr = 0
-	# 	leftcount = 0
-	# 	leftsum = 0
-	# 	leftsqr = 0
-	# 	rightcount = 0
-	# 	rightsum = 0
-	# 	rightsqr = 0
-
-	# 	#img.rows.times do |y|
-	# 	height.times do |y|
-	# 	#puts "new row"
-	# 	#img.columns.times do |x|
-	# 	width.times do |x|
-	# 	  #if img.view(0,0,width,height)[y][x].red == 0
-	# 	  pixel = imgview[y][x]
-	# 	  #pixel2 = imgview2[y][x]
-	# 	  #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
-	# 	    #str = str + '0'
-	# 	  #else
-	# 	  #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
-	# 	  if pixel.red > 1000 || pixel.green > 1000 || pixel.blue > 1000
-	# 	    if x < xcentroid
-	# 	      leftcount += 1
-	# 	      leftsum += x
-	# 	      leftsqr += x**2
-	# 	    else
-	# 	      rightcount += 1
-	# 	      rightsum += x
-	# 	      rightsqr += x**2
-	# 	    end
-
-	# 	    if y < ycentroid
-	# 	      topcount += 1
-	# 	      topsum += y
-	# 	      topsqr += y**2
-	# 	    else
-	# 	      bottomcount += 1
-	# 	      bottomsum += y
-	# 	      bottomsqr += y**2
-	# 	    end
-	# 	  end
-	# 	end
-	# 	end
-
-	# 	topcentroid = Float(topsum)/Float(topcount)
-	# 	bottomcentroid = Float(bottomsum)/Float(bottomcount)
-	# 	leftcentroid = Float(leftsum)/Float(leftcount)
-	# 	rightcentroid = Float(rightsum)/Float(rightcount)
-
-	# 	topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
-	# 	bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
-	# 	leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
-	# 	rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
-
-	# 	topsigma = Math.sqrt(topvariance)
-	# 	bottomsigma = Math.sqrt(bottomvariance)
-	# 	leftsigma = Math.sqrt(leftvariance)
-	# 	rightsigma = Math.sqrt(rightvariance)
-
-	# 	topedge = Integer(topcentroid - topsigma)
-	# 	bottomedge = Integer(bottomcentroid + bottomsigma)
-	# 	leftedge = Integer(leftcentroid - leftsigma)
-	# 	rightedge = Integer(rightcentroid + rightsigma)
-
-	# 	origimg = origimg.crop(leftedge,topedge,rightedge,bottomedge)
-
-	# 	binder.current_version.update_attributes( :imgfile => File.open(origimg) )
-
-	# 	GC.start
-
-	# 	#   end
-	# 	# end
-
-	# end
-
-	# def get_thumbnail(url)
-
-	# 	Rails.logger.debug "Got here! url:#{url}"
-
-	# 	sleep 8
-
-	# 	versions.last.update_attribute(:remote_imgfile_url => url)
-	# end
 
 	#handle_asynchronously :get_thumbnail#, :run_at => Proc.new { 10.seconds.from_now }
 

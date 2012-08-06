@@ -12,6 +12,7 @@ isDropped = false;
 noteClick = false;
 noteInit = false;
 scrollBottom = false;
+permissionFail = false;
 
 $(document).ready(function() {
 
@@ -92,6 +93,12 @@ function editInit() {
         $(".noShare").css('opacity', 0).slideDown(50).animate({ opacity: 1 },{ queue: false, duration: 50});
       }
 
+
+      if (permissionFail === true) {
+        permissionFail = false;
+        return false;
+      }
+      
       pubshare = { enabled: value };
 
       $.ajax({
@@ -101,6 +108,7 @@ function editInit() {
         success: function(data) {
           // if the data isn't success (aka "1")
           if (data != '1') {
+            permissionFail = true;
             $('.pub_on').click();
             alert(data);
           }

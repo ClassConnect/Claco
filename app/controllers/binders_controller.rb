@@ -1147,32 +1147,81 @@ class BindersController < ApplicationController
 
 		if @binder.get_access(current_teacher.id.to_s) == 2
 
-			if @binder.permissions.find {|p| p["type"] == 3}.nil?
+			if @binder.parent_permissions.find {|p| p["type"] == 3}.nil?
 
-				@binder.permissions << {:type		=> 3,
-										:auth_level	=> params[:enabled] == "true" ? 1 : 0}
-				@binder.save
+				if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
-			else
-
-				@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
-				@binder.save
-
-			end
-
-			@binder.subtree.each do |h|
-
-				if h.parent_permissions.find {|p| p["type"] == 3}.nil?
-					
-					h.parent_permissions << {	:type		=> 3,
-												:folder_id => params[:id],
-												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
-					h.save
+					@binder.permissions << {:type		=> 3,
+											:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+					@binder.save
 
 				else
 
-					h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
-					h.save
+					@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+					@binder.save
+
+				end
+
+				@binder.subtree.each do |h|
+
+					h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
+
+					if h.parent_permissions.find {|p| p["type"] == 3}.nil?
+						
+						h.parent_permissions << {	:type		=> 3,
+													:folder_id => params[:id],
+													:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+						h.save
+
+					else
+
+						h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+						h.save
+
+					end
+
+				end
+
+			else
+
+				if @binder.parent_permissions.find {|p| p["type"] == 3}["auth_level"] == 1 && params[:enabled] == "false"
+
+					error = "Oops! The parent is currently shared."
+
+				else
+
+					if @binder.permissions.find {|p| p["type"] == 3}.nil?
+
+						@binder.permissions << {:type		=> 3,
+												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+						@binder.save
+
+					else
+
+						@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+						@binder.save
+
+					end
+
+					@binder.subtree.each do |h|
+
+						h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
+
+						if h.parent_permissions.find {|p| p["type"] == 3}.nil?
+							
+							h.parent_permissions << {	:type		=> 3,
+														:folder_id => params[:id],
+														:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+							h.save
+
+						else
+
+							h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+							h.save
+
+						end
+
+					end
 
 				end
 
@@ -1180,7 +1229,7 @@ class BindersController < ApplicationController
 
 		else
 
-			error = "You are not allowed to change permissions on this item"
+			error = "You are not allowed to change permissions on this item."
 
 		end
 		

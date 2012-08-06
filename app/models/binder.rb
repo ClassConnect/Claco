@@ -426,32 +426,22 @@ class Binder
 		return 0 if parents.first["id"] == "-1"
 
 		#Parent permissions always take precedence
-		parent_permissions.each do |p|
+		parent_permissions.each {|p| return p["auth_level"] if p["shared_id"] == id && p["type"] == 1} if id != 0
 
-			#Check what type of permission it is: 1 = person
-			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
+		permissions.each {|p| return p["auth_level"] if p["shared_id"] == id && p["type"] == 1} if id != 0
 
-			#2 is reserved for classes
-
-			#3 = Public and always read-only
-			return p["auth_level"] if p["type"] == 3
-
+		if !permissions.find{|p| p["type"] == 3}.nil?
+			
+			return 1 if permissions.find{|p| p["type"] == 3}["auth_level"] == 1
+		
 		end
 
-		permissions.each do |p|
+		if !parent_permissions.find{|p| p["type"] == 3}.nil?
 
-			#Check what type of permission it is: 1 = person
-			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
-
-			#2 is reserved for classes
-
-			#3 = Public and always read-only
-			return p["auth_level"] if p["type"] == 3
-
-			#4 is reserved for networks
+			return 1 if parent_permissions.find{|p| p["type"] == 3}["auth_level"] == 1
 
 		end
-
+		
 		return 0
 
 	end
@@ -857,7 +847,7 @@ class Version
 
 		uri = URI.parse(data)
 
-		return uri.host.nil? ? false : uri.host.include?("youtube.com")
+		return uri.host.nil? ? false : uri.host.include?("youtube.com") && uri.path.include?("watch")
 
 		rescue URI::InvalidURIError
 			return false

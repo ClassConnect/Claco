@@ -12,6 +12,77 @@
     }
   });*/
 
+function initAutoSharer(identifier) {
+  emailRegEx = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+  $(identifier).find('.collaborator-addfield').autocomplete({
+      autoFocus: true,
+      delay: 0,
+      source: grade_data,
+      select: function( event, ui ) {
+        $('.tooltip').remove();
+        $(this).val('');
+
+
+        var maincontain = $(identifier).find('.shared-collaborators');
+        
+
+        maincontain.find('.sharelist').append('<li> \
+            <div class="delcir" onclick="delShare(this)">x</div> \
+            <img src="http://a0.twimg.com/profile_images/2439352532/ki676g1vzl8y83rjog10_normal.jpeg" class="ppl-image" /> \
+            <div class="ppl-name"><a href="#">' + ui.item.title + '</a></div> \
+            <div style="clear:both"></div> \
+          </li>');
+
+        return false;
+      }
+    }).keypress(function(e) {
+
+      
+
+          if (e.keyCode === 13) 
+          {
+
+            // dont post if there is no content
+            if ($(this).val() != '' && $(this).val().search(emailRegEx) != -1) {
+              $(identifier).find('.shared-collaborators').find('.sharelist').append('<li> \
+            <div class="delcir" onclick="delShare(this)">x</div> \
+            <img src="/assets/binders/email.png" class="ppl-image" /> \
+            <div class="ppl-name"><a href="#">' + htmlEncode($(this).val()) + '</a></div> \
+            <div style="clear:both"></div> \
+          </li>');
+
+
+              $(this).parent().find('.empty-auto-hold').hide();
+
+              $(this).val('');
+
+            }
+
+          } else {
+
+            if ($(this).val() != '') {
+              $(this).parent().find('.empty-auto-hold').show();
+            } else {
+              $(this).parent().find('.empty-auto-hold').hide();
+            }
+
+          }
+
+      })
+
+    .data("autocomplete")._renderItem = function(ul, item) {
+      return $( "<li></li>" )
+      .data( "item.autocomplete", item )
+      .append( "<a style='padding-left:5px'>" + item.title + "</a>")
+      .appendTo( ul );
+    };
+
+}
+
+
+
+
 
 function initAutoTagger(identifier) {
 
@@ -330,7 +401,11 @@ function delTag(objc) {
   var mePar = $(objc).parent().parent();
   $(objc).parent().remove();
 
-  if (mePar.find('.delcir').length == 0) {
-    mePar.parent().parent().find('.no-tags').show();
-  }
+}
+
+
+function delShare(objc) {
+  var mePar = $(objc).parent().parent();
+  $(objc).parent().remove();
+
 }

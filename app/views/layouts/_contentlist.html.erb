@@ -21,8 +21,29 @@
                     # is a file/link 
                   %> 
 
+                  <!-- DYNAMIC CONTENT
+
+                  <div class="folder-preview">
+                  	<div class="dyncon">
+
+                  		<div class="gen-file">
+                  			<div class="filebox">
+                  				<div class="filext">
+                  					docx
+                  				</div>
+                  			</div>
+                  		</div>
+
+                  	</div>
+                  </div>
+
+              -->
+
                     <div class="folder-preview">
-                      <div class="single-hold" style="background-image:url('<%= get_binder_image(binder) %>');">
+                      <div class="single-hold" style="margin-top:-1px;background-image:url('<%= get_binder_image(binder) %>');">
+                      </div>
+                      <div class="contype">
+                      	<img src="/assets/binders/types/file.png" style="width:24px" />
                       </div>
                     </div>
 
@@ -30,9 +51,24 @@
                     # is a folder
                   %>
 
+                  <!-- EMPTY FOLDER
+
+                  <div class="folder-preview">
+                  	<div class="dyncon">
+
+                  		<div class="empty-folder">
+                  			<div class="nubfol"></div>
+                  			<div class="mainfol"></div>
+                  		</div>
+
+                  	</div>
+                  </div>
+
+              	  -->
+
     		            <div class="folder-preview">
     		              <!-- <div class="single-hold" src="<%= imgarr[0].to_s %>" > -->
-                      <div class="single-hold" style="background-image:url('<%= imgarr[0].to_s %>');">
+                      <div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');">
 
                       	<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
@@ -50,14 +86,23 @@
 	                    <% end %>
 
     		              </div>
+
+    		              <div class="contype">
+	                      	<img src="/assets/binders/types/folder.png" style="width:24px" />
+	                      </div>
     		            </div>
 
                   <% end %>
 
-
+                  	<div class="innerd">
 			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => "pjax linkster" %></div>
 
-			            <div class="descarea">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
+			            <div class="reflink"><img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" />10 &bull; 4mb</div>
+
+			            <div class="descarea">In Unit 1 we will be covering a couple of different topics. Be sure to follow along closely, we don't have time to dilly daddle!</div>
+			        </div>
+
+			        <div class="lastupdate">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
 
 			            <div class="drop-tog">
 			            	<div class="btn-group">

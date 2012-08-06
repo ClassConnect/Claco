@@ -431,7 +431,7 @@ class Binder
 		permissions.each {|p| return p["auth_level"] if p["shared_id"] == id && p["type"] == 1} if id != 0
 
 		if !permissions.find{|p| p["type"] == 3}.nil?
-			
+
 			return 1 if permissions.find{|p| p["type"] == 3}["auth_level"] == 1
 		
 		end
@@ -441,7 +441,7 @@ class Binder
 			return 1 if parent_permissions.find{|p| p["type"] == 3}["auth_level"] == 1
 
 		end
-		
+
 		return 0
 
 	end
@@ -831,7 +831,7 @@ class Version
 
 	def get_croc_session
 
-		return CROC_VALID_FILE_FORMATS.include? ext.downcase ? JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response })["session"] : ""
+		return CROC_VALID_FILE_FORMATS.include?(ext.downcase) ? JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response })["session"] : ""
 
 	end
 

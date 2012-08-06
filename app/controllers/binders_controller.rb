@@ -796,6 +796,10 @@ class BindersController < ApplicationController
 
 		if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
+			fork = @inherited[:parent].owner != @binder.owner
+
+			@binder.inc(:fork_total, 1) if fork
+
 			@parent_child_count = @inherited[:parent_child_count]
 
 			@ppers = @binder.parent_permissions
@@ -806,6 +810,8 @@ class BindersController < ApplicationController
 										:format				=> @binder.type == 2 ? @binder.format : nil,
 										:files				=> @binder.files,
 										:folders			=> @binder.folders,
+										:forked_from		=> fork ? @binder.id.to_s : nil,
+										:fork_stamp			=> fork ? Time.now.to_i : nil,
 										:total_size			=> @binder.total_size,
 										:order_index		=> @parent_child_count,
 										:parent				=> @parenthash,
@@ -886,6 +892,8 @@ class BindersController < ApplicationController
 											:format				=> (h.type != 1 ? h.format : nil),
 											:files				=> h.files,
 											:folders			=> h.folders,
+											:forked_from		=> fork ? h.id.to_s : nil,
+											:fork_stamp			=> fork ? Time.now.to_i : nil,
 											:total_size			=> h.total_size)
 
 					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
@@ -1139,6 +1147,7 @@ class BindersController < ApplicationController
 		@colleagues = Teacher.all.reject {|t| t == current_teacher}
 	end
 
+	#This is so nasty.
 	def setpub
 
 		@binder = Binder.find(params[:id])

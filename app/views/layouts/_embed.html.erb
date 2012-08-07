@@ -4,13 +4,19 @@
 
 <% elsif @binder.current_version.youtube? %>
 
-	<iframe title="YouTube video player" width="640" height="390" src="http://www.youtube.com/embed/<%= CGI.parse(URI.parse(@binder.current_version.data).query)["v"].first %>?modestbranding=1" frameborder="0" allowfullscreen></iframe>
+	<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= CGI.parse(URI.parse(@binder.current_version.data).query)["v"].first %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>
+
+<% elsif @binder.current_version.img? %>
+
+	<center><%= link_to(	image_tag(@binder.current_version.imgfile.contentview.url, :class => "embeddrop"),
+					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
+					:target => "_blank") %></center>
 
 <% else %>
 
-	<%= link_to(	image_tag(@binder.current_version.imgfile.contentview.url),
-					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
-					:target => "_blank") %>
+	<div class="embedlink">
+	<%= image_tag(@binder.current_version.imgfile.contentview.url) %>
+	</div>
 
 <% end %>
 

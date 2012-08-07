@@ -117,13 +117,13 @@
 
 		            		<% else %>
 
-								<img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" /><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+								<%= binder.current_version.ext %> &bull; <%= number_to_human_size(binder.total_size) %>
 
 			            	<% end %>
 
 			            </div>
 
-			            <div class="descarea"><%= binder.body.empty? ? "No description..." : truncate(sanitize(binder.body.gsub(/<br\/>/, ' ')), :length => 250, :omission => "... See more...") %></div>
+			            <div class="descarea"><%= binder.body.empty? ? "No description..." : truncate(sanitize(binder.body, :tags => []), :length => 250, :omission => "... See more...") %></div>
 			        </div>
 
 			        <div class="lastupdate">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>

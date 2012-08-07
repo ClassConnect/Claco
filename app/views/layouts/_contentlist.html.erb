@@ -14,57 +14,63 @@
             #imgarr[0]
           %>
 
-					<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
+				<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
 
 
-                  <% if binder.type != 1 
-                    # is a file/link 
-                  %> 
+	                <% if binder.type != 1 
+	                    # is a file/link 
+	                 %> 
 
-                  <!-- DYNAMIC CONTENT
+					<% if get_binder_image(binder) == "<no image>" %>
 
-                  <div class="folder-preview">
-                  	<div class="dyncon">
+	                  	<div class="folder-preview">
+		                  	<div class="dyncon">
 
-                  		<div class="gen-file">
-                  			<div class="filebox">
-                  				<div class="filext">
-                  					docx
-                  				</div>
-                  			</div>
-                  		</div>
+		                  		<div class="gen-file">
+		                  			<div class="filebox">
+		                  				<div class="filext">
+		                  					binder.current_version.ext
+		                  				</div>
+		                  			</div>
+		                  		</div>
 
-                  	</div>
-                  </div>
+							</div>
+							<div class="contype">
+								<img src="/assets/binders/types/file.png" style="width:24px" />
+							</div>
+						</div>
 
-              -->
+					<% else %>
 
-                    <div class="folder-preview">
-                      <div class="single-hold" style="margin-top:-1px;background-image:url('<%= get_binder_image(binder) %>');">
-                      </div>
-                      <div class="contype">
-                      	<img src="/assets/binders/types/file.png" style="width:24px" />
-                      </div>
-                    </div>
+						<div class="folder-preview">
+							<div class="single-hold" style="margin-top:-1px;background-image:url('<%= get_binder_image(binder) %>');">
+							</div>
+							<div class="contype">
+								<img src="<%= get_contype_icon(binder) %>" style="width:24px" />
+	                      	</div>
+	                    </div>
+
+                    <% end %>
 
                   <% else 
                     # is a folder
                   %>
 
-                  <!-- EMPTY FOLDER
+                  	<% if binder.children.count == 0%>
 
-                  <div class="folder-preview">
-                  	<div class="dyncon">
+						<div class="folder-preview">
+							<div class="dyncon">
 
-                  		<div class="empty-folder">
-                  			<div class="nubfol"></div>
-                  			<div class="mainfol"></div>
-                  		</div>
+								<div class="empty-folder">
+									<div class="nubfol"></div>
+									<div class="mainfol"></div>
+								</div>
 
-                  	</div>
-                  </div>
+							</div>
+						</div>
 
-              	  -->
+
+              	  	<% else %>
 
     		            <div class="folder-preview">
     		              <!-- <div class="single-hold" src="<%= imgarr[0].to_s %>" > -->
@@ -92,14 +98,32 @@
 	                      </div>
     		            </div>
 
+		            <% end %>
+
                   <% end %>
 
                   	<div class="innerd">
-			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => "pjax linkster" %></div>
+			            <div class="titler"><%= link_to binder.title[0..50], named_binder_route(binder), :class => "pjax linkster" %></div>
 
-			            <div class="reflink"><img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" />10 &bull; 4mb</div>
+			            <div class="reflink">
 
-			            <div class="descarea">In Unit 1 we will be covering a couple of different topics. Be sure to follow along closely, we don't have time to dilly daddle!</div>
+			            	<% if binder.type == 1 %>
+
+			            		<img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" /><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+
+			            	<% elsif binder.format == 2  && !binder.current_version.embed %>
+
+			            		<%= URI.parse(binder.current_version.data).host.sub(/www\./, "") %>
+
+		            		<% else %>
+
+								<img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" /><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+
+			            	<% end %>
+
+			            </div>
+
+			            <div class="descarea"><%= binder.body.empty? ? "No description..." : truncate(sanitize(binder.body.gsub(/<br\/>/, ' ')), :length => 250, :omission => "... See more...") %></div>
 			        </div>
 
 			        <div class="lastupdate">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>

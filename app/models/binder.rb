@@ -16,7 +16,7 @@ class Binder
 	field :fname, :type => String
 	field :lname, :type => String
 	field :title, :type => String#File/directory name
-	field :body, :type => String #Directory annotation
+	field :body, :type => String, :default => "" #Directory annotation
 	field :type, :type => Integer # 1 = Directory, 2 = File, 3 = Lesson
 
 	field :format, :type => Integer, :default => 0 #Only used if type = 2, 1 = File, 2 = Content(link)
@@ -47,6 +47,8 @@ class Binder
 	field :folders, :type => Integer, :default => 0
 	field :children, :type => Integer, :default => 0
 	field :total_size, :type => Integer, :default => 0
+	field :pub_size, :type => Integer, :default => 0
+	field :priv_size, :type => Integer, :default => 0
 	field :fork_total, :type => Integer, :default => 0
 
 	#Social
@@ -851,6 +853,10 @@ class Version
 
 		rescue URI::InvalidURIError
 			return false
+	end
+
+	def img?
+		return imgclass == 0
 	end
 
 	# def get_html

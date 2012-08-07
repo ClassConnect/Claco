@@ -876,6 +876,8 @@ class BindersController < ApplicationController
 					#Swap old folder ids with new folder ids
 					@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
 
+					h.inc(:fork_total, 1) if fork
+
 					@new_node = Binder.new(	:title				=> h.title,
 											:body				=> h.body,
 											:parent				=> @node_parent,

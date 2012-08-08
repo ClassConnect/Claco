@@ -257,10 +257,10 @@ module ApplicationHelper
 			return "<no image>"
 		elsif binder.current_version.imgstatus['imageable'] == false
 			#return "[#{binder.current_version.ext.upcase}]"
-			return asset_path("stockfilethumbs/#{binder.current_version.ext.downcase.sub('.','')}.png")
+			#return asset_path("stockfilethumbs/#{binder.current_version.ext.downcase.sub('.','')}.png")
 		elsif binder.current_version.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
 			#return "<no image>"
-			return asset_path("stockfilethumbs/#{binder.current_version.ext.downcase.sub('.','')}.png")
+			#return asset_path("stockfilethumbs/#{binder.current_version.ext.downcase.sub('.','')}.png")
 		else
 			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;')# + 
 			#return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 
@@ -296,6 +296,8 @@ module ApplicationHelper
 			return asset_path("binders/types/folder.png")
 		elsif binder.format == 2
 			return asset_path("binders/types/web.png")
+		else
+			return asset_path("binders/types/file.png")
 		end
 			
 

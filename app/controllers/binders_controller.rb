@@ -57,7 +57,7 @@ class BindersController < ApplicationController
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
 										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].strip[0..55],
+										:title				=> params[:foldertitle].strip[0..50],
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
 										:body				=> params[:body],
@@ -101,6 +101,8 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		@root = Binder.where("parent.id" => "0", :owner => current_teacher.id)
+
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
 		if !binder_routing_ok?(@binder, params[:action])
@@ -111,16 +113,6 @@ class BindersController < ApplicationController
 		redirect_to "/403.html" and return if @access == 0
 
 		#TODO: Verify permissions before rendering view
-
-		# @croc = false
-
-		# @croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
-
-		# @croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
-
-		#redirect_to @binder.current_version.data and return if @binder.format == 2
-
-		#redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
@@ -180,20 +172,6 @@ class BindersController < ApplicationController
 			redirect_to "/404.html" and return
 		rescue Mongoid::Errors::DocumentNotFound
 			redirect_to "/404.html" and return
-
-	end
-
-	def showcroc
-
-		@binder = Binder.find(params[:id])
-
-		#@uuid = @binder.versions.last.croc_uuid
-
-		#@session = sessiongen(@binder.versions.last.croc_uuid)["session"]
-
-		#@status = docstatus(@uuid)
-
-		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
 
 	end
 
@@ -276,7 +254,7 @@ class BindersController < ApplicationController
 
 				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
-					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..55],
+					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..50],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
 											:fname				=> current_teacher.fname,
@@ -411,7 +389,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:title				=> params[:newtitle][0..55],
+		@binder.update_attributes(	:title				=> params[:newtitle][0..50],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
 
@@ -486,7 +464,7 @@ class BindersController < ApplicationController
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
-																				File.extname(params[:file].original_filename)).strip[0..55],
+																				File.extname(params[:file].original_filename)).strip[0..50],
 										:owner				=> current_teacher.id,
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,

@@ -12,6 +12,10 @@
 					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
 					:target => "_blank") %></center>
 
+<% elsif @binder.current_version.embed %>
+
+	<%= @binder.current_version.data.html_safe %>
+
 <% else %>
 
 	<div class="embedlink">

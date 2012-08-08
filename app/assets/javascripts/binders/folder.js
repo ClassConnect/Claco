@@ -37,7 +37,10 @@ $(document).on('pjax:start', function() {
 
 }).on('pjax:end',   function() {
   destroyAsyc();
-  editInit();
+  // if we have edit permissions, enable editing functionality
+  if (isEditable === true) {
+    editInit();
+  }
 });
 
 

@@ -572,8 +572,10 @@ class BindersController < ApplicationController
 
 					GC.start
 
-					Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
-					Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
+					#Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
+					#Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
+
+					Binder.gen_thumbnails(@binder.id)
 
 					# DELAYTAG
 					Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])

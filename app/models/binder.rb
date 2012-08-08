@@ -1,6 +1,10 @@
 class Binder
 	include Mongoid::Document
 
+	class FilelessIO < StringIO
+		attr_accessor :original_filename
+	end
+
 	#validates :title, :presence => true
 
 	# validate embedded document with parent document
@@ -87,9 +91,13 @@ class Binder
 
 		#Rails.logger.debug "Thumbimbids array: #{binder.thumbimgids.to_s}"
 
-		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if !binder.thumbimgids[0].empty?
-		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
-		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
+		# retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if !binder.thumbimgids[0].empty?
+		# retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
+		# retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
+
+		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !binder.thumbimgids[0].empty?
+		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !binder.thumbimgids[1].empty?
+		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !binder.thumbimgids[2].empty?
 
 		#Rails.logger.debug "Return array: #{retarr.to_s}"
 
@@ -111,7 +119,7 @@ class Binder
 
 		children = binder.children
 
-		subtree = children.map { |c| c.subtree }.flatten if children.any?
+		subtree = children.map { |c| c.subtree }.flatten if (children.nil? || children.any?)
 
 		imageset_loc = [[],[],[],[]]
 
@@ -384,11 +392,1029 @@ class Binder
 
 	def self.gen_thumbnails(id)
 
+		# FORMAT FOR UPLOADING TO CARRIERWAVE:
+
 		# u = ImageUploader.new
 
 		# open(url) do |f|
 		# 	u.store!(f)
 		# end
+
+		# BINDER MODEL FORMAT:
+
+		# # this hash is updated when the image is retrieved, almost always asynchronously
+		# # the :imgfile uploader cannot be reliably queried to determine if a file exists or not
+		# field :imgstatus, 	:type => Hash, 	:default => { 	:imageable => 		true,		
+		# 													:imgfile => 		{ :retrieved => false },
+		# 												 	:img_contentview => { :generated => false },
+		# 												 	:img_thumb_lg => 	{ :generated => false },
+		# 													:img_thumb_sm => 	{ :generated => false } }
+
+		# # the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
+		# mount_uploader :imgfile, 		ImageUploader
+		# mount_uploader :img_contentview,ImageUploader
+		# mount_uploader :img_thumb_lg, 	ImageUploader
+		# mount_uploader :img_thumb_sm, 	ImageUploader
+
+		# RAilS 3 FILE UPLOAD
+
+		# class FilelessIO < StringIO
+		#     attr_accessor :original_filename
+		# end
+
+		# io = FilelessIO.new(Base64.decode64(encoded_img))
+		# io.original_filename = "foobar.png"
+
+		# p.image_file = io
+		# p.save
+
+		binder = Binder.find(id.to_s)
+
+		origimg = Magick::ImageList.new
+
+		# retrieve fullsize image from S3 store, read into an ImageList object
+		open(binder.current_version.imgfile.url.to_s) do |f|
+			origimg.from_blob(f.read)
+		end
+
+
+
+		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+		if !(origimg.columns.to_i < CV_WIDTH)
+			io_cv = FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob)
+			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+		else
+			io_cv = FilelessIO.new(origimg.to_blob)
+		end
+
+
+
+		Rails.logger.debug "origimg width: #{origimg.columns}"
+		Rails.logger.debug "origimg height: #{origimg.rows}"
+
+
+		img = origimg.edge(4)
+
+        xcount = 0
+        ycount = 0
+        xsum = 0
+        ysum = 0
+        xsqr = 0
+        ysqr = 0
+        xcube = 0
+        ycube = 0
+
+        width = img.columns
+        height = img.rows
+
+        imgview = img.view(0,0,width,height)
+
+        height.times do |y|
+          #puts "new row"
+          #img.columns.times do |x|
+          width.times do |x|
+            #if img.view(0,0,width,height)[y][x].red == 0
+            pixel = imgview[y][x]
+            #pixel2 = imgview2[y][x]
+            #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+              #str = str + '0'
+            #else
+            #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+            if pixel.red > 100 || pixel.green > 100 || pixel.blue > 100
+              xcount += 1
+              ycount += 1
+              xsum += x
+              ysum += y
+              xsqr += x**2
+              ysqr += y**2
+              xcube += x**3
+              ycube += y**3
+              #str = str + '1'
+            end
+          end
+          #puts str
+          #str = ""
+        end
+
+        xcentroid = Float(xsum)/Float(xcount)
+        ycentroid = Float(ysum)/Float(ycount)
+
+        # Unused
+        xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
+        yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
+
+        # Unused
+        xsigma = Math.sqrt(xvariance)
+        ysigma = Math.sqrt(yvariance)
+
+        Rails.logger.debug "xcentroid #{xcentroid}"
+        Rails.logger.debug "ycentroid #{ycentroid}"
+        Rails.logger.debug "xsigma: #{xsigma}"
+        Rails.logger.debug "ysigma: #{ysigma}"
+
+        xEX3 = Float(xcube)/Float(xcount)
+        yEX3 = Float(ycube)/Float(ycount)
+
+        xskew =  Float(xEX3 - (3 * xcentroid  * xvariance)  - (xcentroid)**3)  / Float(xsigma**3)
+        yskew =  Float(yEX3 - (3 * ycentroid  * yvariance)  - (ycentroid)**3)  / Float(ysigma**3)
+
+        Rails.logger.debug "xskew: #{xskew}"
+        Rails.logger.debug "yskew: #{yskew}"
+
+		topcount = 0
+        topsum = 0
+        topsqr = 0
+        topcube = 0
+        bottomcount = 0
+        bottomsum = 0
+        bottomsqr = 0
+        bottomcube = 0
+        leftcount = 0
+        leftsum = 0
+        leftsqr = 0
+        leftcube = 0
+        rightcount = 0
+        rightsum = 0
+        rightsqr = 0
+        rightcube = 0
+
+        #img.rows.times do |y|
+        height.times do |y|
+          #puts "new row"
+          #img.columns.times do |x|
+          width.times do |x|
+            #if img.view(0,0,width,height)[y][x].red == 0
+            pixel = imgview[y][x]
+            #pixel2 = imgview2[y][x]
+            #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+              #str = str + '0'
+            #else
+            #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+            if pixel.red > 1000 || pixel.green > 1000 || pixel.blue > 1000
+              if x < xcentroid
+                leftcount += 1
+                leftsum += x
+                leftsqr += x**2
+                leftcube += x**3
+              else
+                rightcount += 1
+                rightsum += x
+                rightsqr += x**2
+                rightcube += x**3
+              end
+
+              if y < ycentroid
+                topcount += 1
+                topsum += y
+                topsqr += y**2
+                topcube += y**3
+              else
+                bottomcount += 1
+                bottomsum += y
+                bottomsqr += y**2
+                bottomcube += y**3
+              end
+            end
+          end
+        end
+
+        topcentroid = Float(topsum)/Float(topcount)
+        bottomcentroid = Float(bottomsum)/Float(bottomcount)
+        leftcentroid = Float(leftsum)/Float(leftcount)
+        rightcentroid = Float(rightsum)/Float(rightcount)
+
+        topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
+        bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
+        leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
+        rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
+
+        topsigma = Math.sqrt(topvariance)
+        bottomsigma = Math.sqrt(bottomvariance)
+        leftsigma = Math.sqrt(leftvariance)
+        rightsigma = Math.sqrt(rightvariance)
+
+        topEX3 = Float(topcube)/Float(topcount)
+        bottomEX3 = Float(bottomcube)/Float(bottomcount)
+        leftEX3 = Float(leftcube)/Float(leftcount)
+        rightEX3 = Float(rightcube)/Float(rightcount)
+
+        topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
+        bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
+        leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
+        rightskew =   Float(rightEX3 -  (3 * rightcentroid    * rightvariance)  - (rightcentroid)**3)   / Float(rightsigma**3)
+
+        Rails.logger.debug "topskew:    #{topskew.to_s}"
+        Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
+        Rails.logger.debug "leftskew:   #{leftskew.to_s}"
+        Rails.logger.debug "rightskew:  #{rightskew.to_s}"
+
+        topedge = Integer(topcentroid - topsigma)
+        bottomedge = Integer(bottomcentroid + bottomsigma)
+        leftedge = Integer(leftcentroid - leftsigma)
+        rightedge = Integer(rightcentroid + rightsigma)
+
+
+
+
+
+        # cropping
+
+        xskew = -1.0 if xskew < -1.0
+        xskew = 1.0 if xskew > 1.0
+        yskew = -1.0 if yskew < -1.0
+        yskew = 1.0 if yskew > 1.0
+
+        if xskew > 0
+        	xadj = (rightedge-width)*xskew
+        else
+        	xadj = (0-leftedge)*xskew
+        end
+
+        if yskew > 0
+        	yadj = (bottomedge-height)*yskew
+        else
+        	yadj = (0-topedge)*yskew
+        end
+
+        Rails.logger.debug "xadj: #{xadj}"
+        Rails.logger.debug "yadj: #{yadj}"
+
+
+        ######################## SURROUNDING CODE WORKS ^^^^ ######################################
+
+        thumb_width = rightedge-leftedge
+        thumb_height = bottomedge-topedge
+
+        if Float(thumb_height)/Float(thumb_width) < LTHUMB_H/LTHUMB_W
+          # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
+          y = Integer(thumb_height-(LTHUMB_H*thumb_width)/LTHUMB_W)/2
+
+          topedge += y
+          bottomedge -= y
+
+        else
+          # smartselect aspect ratio is taller than thumbnail aspect ratio, crop down horizontally
+          x = Integer(thumb_width-(LTHUMB_W*thumb_height)/LTHUMB_H)/2
+
+          leftedge += x
+          rightedge -= x
+
+        end
+
+        ######################## SURROUNDING CODE WORKS vvvv ######################################
+
+        #origimg = origimg.crop(xcentroid-xsigma+xadj,ycentroid-ysigma+yadj,2*xsigma,2*ysigma)
+
+        #origimg = origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge))
+
+        io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(180,92).to_blob)
+
+        topedge = Integer(topcentroid - topsigma)
+        bottomedge = Integer(bottomcentroid + bottomsigma)
+        leftedge = Integer(leftcentroid - leftsigma)
+        rightedge = Integer(rightcentroid + rightsigma)
+
+        if Float(thumb_height)/Float(thumb_width) < STHUMB_H/STHUMB_W
+          # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
+          y = Integer(thumb_height-(STHUMB_H*thumb_width)/STHUMB_W)/2
+
+          topedge += y
+          bottomedge -= y
+
+        else
+          # smartselect aspect ratio is taller than thumbnail aspect ratio, crop down horizontally
+          x = Integer(thumb_width-(STHUMB_W*thumb_height)/STHUMB_H)/2
+
+          leftedge += x
+          rightedge -= x
+
+        end
+
+        io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(49,46).to_blob)
+
+		#io_lg = FilelessIO.new(origimg.scale(180.0/Float(origimg.columns)).to_blob)
+        #io_sm = FilelessIO.new(origimg.scale(49.0/Float(origimg.columns)).to_blob)
+
+        io_cv.original_filename = "contentview"
+        io_lg.original_filename = "thumb_lg"
+        io_sm.original_filename = "thumb_sm"
+
+        stathash = binder.current_version.imgstatus
+		stathash['img_contentview']['generated'] = true
+		stathash['img_thumb_lg']['generated'] = true
+		stathash['img_thumb_sm']['generated'] = true
+
+		binder.current_version.update_attributes(	:img_contentview => io_cv,
+													:img_thumb_lg => io_lg,
+													:img_thumb_sm => io_sm,
+													:imgstatus => stathash)
+
+		return
+
+		##############################################
+
+		# WQRKING SET
+
+		binder = Binder.find(id.to_s)
+
+		origimg = Magick::ImageList.new
+
+		# retrieve fullsize image from S3 store, read into an ImageList object
+		open(binder.current_version.imgfile.url.to_s) do |f|
+			origimg.from_blob(f.read)
+		end
+
+
+
+		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+		if !(origimg.columns.to_i < CV_WIDTH)
+			io_cv = FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob)
+			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+		else
+			io_cv = FilelessIO.new(origimg.to_blob)
+		end
+
+
+
+		Rails.logger.debug "origimg width: #{origimg.columns}"
+		Rails.logger.debug "origimg height: #{origimg.rows}"
+
+
+
+        io_lg = FilelessIO.new(origimg.resize_to_fill(180,92).to_blob)
+        io_sm = FilelessIO.new(origimg.resize_to_fill(49,46).to_blob)
+
+		#io_lg = FilelessIO.new(origimg.to_blob)
+        #io_sm = FilelessIO.new(origimg.to_blob)
+
+
+        io_cv.original_filename = "contentview"
+        io_lg.original_filename = "thumb_lg"
+        io_sm.original_filename = "thumb_sm"
+
+        stathash = binder.current_version.imgstatus
+		stathash['img_contentview']['generated'] = true
+		stathash['img_thumb_lg']['generated'] = true
+		stathash['img_thumb_sm']['generated'] = true
+
+		binder.current_version.update_attributes(	:img_contentview => io_cv,
+													:img_thumb_lg => io_lg,
+													:img_thumb_sm => io_sm,
+													:imgstatus => stathash)
+
+		return
+
+
+		#origimg.resize_to_fit!(600,600)
+
+		# io_cv = FilelessIO.new(origimg.to_blob)
+
+		###############################################################################
+
+        img = origimg.edge(4)
+
+        xcount = 0
+        ycount = 0
+        xsum = 0
+        ysum = 0
+        xsqr = 0
+        ysqr = 0
+        xcube = 0
+        ycube = 0
+
+        width = img.columns
+        height = img.rows
+
+        imgview = img.view(0,0,width,height)
+
+        height.times do |y|
+          #puts "new row"
+          #img.columns.times do |x|
+          width.times do |x|
+            #if img.view(0,0,width,height)[y][x].red == 0
+            pixel = imgview[y][x]
+            #pixel2 = imgview2[y][x]
+            #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+              #str = str + '0'
+            #else
+            #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+            if pixel.red > 100 || pixel.green > 100 || pixel.blue > 100
+              xcount += 1
+              ycount += 1
+              xsum += x
+              ysum += y
+              xsqr += x**2
+              ysqr += y**2
+              xcube += x**3
+              ycube += y**3
+              #str = str + '1'
+            end
+          end
+          #puts str
+          #str = ""
+        end
+
+        xcentroid = Float(xsum)/Float(xcount)
+        ycentroid = Float(ysum)/Float(ycount)
+
+        # Unused
+        xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
+        yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
+
+        # Unused
+        xsigma = Math.sqrt(xvariance)
+        ysigma = Math.sqrt(yvariance)
+
+        xEX3 = Float(xcube)/Float(xcount)
+        yEX3 = Float(ycube)/Float(ycount)
+
+        xskew =  Float(xEX3 - (3 * xcentroid  * xvariance)  - (xcentroid)**3)  / Float(xsigma**3)
+        yskew =  Float(yEX3 - (3 * ycentroid  * yvariance)  - (ycentroid)**3)  / Float(ysigma**3)
+
+        Rails.logger.debug "xskew: #{xskew}"
+        Rails.logger.debug "yskew: #{yskew}"
+
+        topcount = 0
+        topsum = 0
+        topsqr = 0
+        topcube = 0
+        bottomcount = 0
+        bottomsum = 0
+        bottomsqr = 0
+        bottomcube = 0
+        leftcount = 0
+        leftsum = 0
+        leftsqr = 0
+        leftcube = 0
+        rightcount = 0
+        rightsum = 0
+        rightsqr = 0
+        rightcube = 0
+
+        #img.rows.times do |y|
+        height.times do |y|
+          #puts "new row"
+          #img.columns.times do |x|
+          width.times do |x|
+            #if img.view(0,0,width,height)[y][x].red == 0
+            pixel = imgview[y][x]
+            #pixel2 = imgview2[y][x]
+            #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+              #str = str + '0'
+            #else
+            #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+            if pixel.red > 1000 || pixel.green > 1000 || pixel.blue > 1000
+              if x < xcentroid
+                leftcount += 1
+                leftsum += x
+                leftsqr += x**2
+                leftcube += x**3
+              else
+                rightcount += 1
+                rightsum += x
+                rightsqr += x**2
+                rightcube += x**3
+              end
+
+              if y < ycentroid
+                topcount += 1
+                topsum += y
+                topsqr += y**2
+                topcube += y**3
+              else
+                bottomcount += 1
+                bottomsum += y
+                bottomsqr += y**2
+                bottomcube += y**3
+              end
+            end
+          end
+        end
+
+        topcentroid = Float(topsum)/Float(topcount)
+        bottomcentroid = Float(bottomsum)/Float(bottomcount)
+        leftcentroid = Float(leftsum)/Float(leftcount)
+        rightcentroid = Float(rightsum)/Float(rightcount)
+
+        topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
+        bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
+        leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
+        rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
+
+        topsigma = Math.sqrt(topvariance)
+        bottomsigma = Math.sqrt(bottomvariance)
+        leftsigma = Math.sqrt(leftvariance)
+        rightsigma = Math.sqrt(rightvariance)
+
+        topEX3 = Float(topcube)/Float(topcount)
+        bottomEX3 = Float(bottomcube)/Float(bottomcount)
+        leftEX3 = Float(leftcube)/Float(leftcount)
+        rightEX3 = Float(rightcube)/Float(rightcount)
+
+        topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
+        bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
+        leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
+        rightskew =   Float(rightEX3 -  (3 * rightcentroid    * rightvariance)  - (rightcentroid)**3)   / Float(rightsigma**3)
+
+        Rails.logger.debug "topskew:    #{topskew.to_s}"
+        Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
+        Rails.logger.debug "leftskew:   #{leftskew.to_s}"
+        Rails.logger.debug "rightskew:  #{rightskew.to_s}"
+
+        topedge = Integer(topcentroid - topsigma)
+        bottomedge = Integer(bottomcentroid + bottomsigma)
+        leftedge = Integer(leftcentroid - leftsigma)
+        rightedge = Integer(rightcentroid + rightsigma)
+
+        Rails.logger.debug "91/180 ratio: #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
+
+        #if false
+        if Float(bottomedge-topedge)/Float(rightedge-leftedge) < 92.0/180.0
+          # smartselect aspect ratio is wider than thumbnail aspect ratio, expand vertically
+          y = Integer((92.0*width)/180.0 - height)
+
+          if height - (bottomedge-topedge) < y
+            # now correct for the insufficient size
+            x_corr = Integer(width-((Float(height)/Float((bottomedge-topedge)+y)*Float(rightedge-leftedge)))/2.0)
+            Rails.logger.debug "x_corr: #{x_corr}"
+            leftedge += x_corr
+            rightedge -= x_corr
+            # cannot fully expand to desired aspect ratio
+            topedge = 0
+            bottomedge = height
+          else
+            # sufficient space to expand
+            if topedge < y/2
+              # too close to top of image
+              y -= topedge
+              topedge = 0
+              bottomedge += y
+            elsif (height-bottomedge) < y/2
+              # too close to bottom of image
+              y -= (height-bottomedge)
+              bottomedge = height
+              topedge -= y
+            else
+              topedge -= y/2
+              bottomedge += y/2
+            end
+          end
+        else
+          # smartselect aspect ratio is taller than thumbnail aspect ratio, expand horizontally
+          x = Integer((180.0*height)/92.0 - width)
+
+          if width - (rightedge-leftedge) < x
+
+	        Rails.logger.debug "topedge:    #{topedge}"
+	        Rails.logger.debug "leftedge:   #{leftedge}"
+	        Rails.logger.debug "bottomedge: #{bottomedge}"
+	        Rails.logger.debug "rightedge:  #{rightedge}"
+
+            # now correct for the insufficient size
+            # y_corr = Integer(((bottomedge-topedge)-((Float(width)/Float((rightedge-leftedge)+x))*(bottomedge-topedge)))/2.0) #Integer(height-((Float(width)/Float((rightedge-leftedge)+x)*Float(bottomedge-topedge)))/2.0)
+            # Rails.logger.debug "ratio: #{Integer(((bottomedge-topedge)-((Float(width)/Float((rightedge-leftedge)+x))*(bottomedge-topedge)))/2.0)}"
+            # Rails.logger.debug "y_corr: #{y_corr}"
+            # topedge += y_corr #(bottomedge-topedge)-((Float(width)/Float((rightedge-leftedge)+x))*(bottomedge-topedge))/2.0 #y_corr
+            # bottomedge -= y_corr #(bottomedge-topedge)-((Float(width)/Float((rightedge-leftedge)+x))*(bottomedge-topedge))/2.0 #y_corr
+
+            #y_corr = Integer(((bottomedge-topedge)-(width*(92.0/180.0)))/2.0)
+
+            # cannot fully expand to desired aspect ratio
+            leftedge = 0
+            rightedge = width
+
+            #Rails.logger
+            Rails.logger.debug "newheight: #{Integer((rightedge-leftedge)*(92.0/180.0))}"
+            Rails.logger.debug "width: #{width}"
+
+            # works!!!
+            #bottomedge = topedge + Integer((rightedge-leftedge)*(92.0/180.0))
+
+            yscale = (Float(bottomedge-topedge))/Float((width)*(92.0/180.0))
+
+            Rails.logger.debug "yscale : #{yscale}"
+
+            bottomedge += (bottomedge-ycentroid)*yscale
+            topedge -= (ycentroid-topedge)*yscale
+
+            Rails.logger.debug "topedge: #{topedge}"
+            Rails.logger.debug "bottomdege : #{bottomedge}"
+
+			#Rails.logger.debug "y_corr: #{y_corr}"
+
+            #topedge += y_corr
+            #bottomedge -= y_corr
+
+
+          else
+            # sufficient space to expand
+            if leftedge < x/2
+              # too close to left of image
+              x -= leftedge
+              leftedge = 0
+              rightedge += x
+            elsif (width-rightedge) < x/2
+              # too close to right of image
+              x -= (width-rightedge)
+              rightedge = width
+              leftedge -= x
+            else
+              leftedge -= x/2
+              rightedge += x/2
+            end
+          end
+        end
+    	#end
+
+        Rails.logger.debug "topedge:    #{topedge}"
+        Rails.logger.debug "leftedge:   #{leftedge}"
+        Rails.logger.debug "bottomedge: #{bottomedge}"
+        Rails.logger.debug "rightedge:  #{rightedge}"
+
+        origimg = origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))
+
+        #origimg.scale!(Float(180.0)/Float(width))
+
+        #if Float(bottomedge-topedge)/Float(rightedge-leftedge) < 91.0/180.0
+        	# too wide, fit vertically
+
+        io_lg = FilelessIO.new(origimg.scale(Float(180.0)/Float(width)).to_blob)
+        io_sm = FilelessIO.new(origimg.scale(Float(49.0)/Float(width)).to_blob)
+
+		#io_lg = FilelessIO.new(origimg.to_blob)
+        #io_sm = FilelessIO.new(origimg.to_blob)
+
+
+        io_cv.original_filename = "contentview"
+        io_lg.original_filename = "thumb_lg"
+        io_sm.original_filename = "thumb_sm"
+
+        stathash = binder.current_version.imgstatus
+		stathash['img_contentview']['generated'] = true
+		stathash['img_thumb_lg']['generated'] = true
+		stathash['img_thumb_sm']['generated'] = true
+
+		binder.current_version.update_attributes(	:img_contentview => io_cv,
+													:img_thumb_lg => io_lg,
+													:img_thumb_sm => io_sm,
+													:imgstatus => stathash)
+
+		###############################################################################
+
+		return
+
+		# process image
+		img = origimg.edge(1)
+
+        xcount = 0
+        ycount = 0
+        xsum = 0
+        ysum = 0
+        xsqr = 0
+        ysqr = 0
+        xcube = 0
+        ycube = 0
+
+        width = img.columns
+        height = img.rows
+
+        imgview = img.view(0,0,width,height)
+
+        height.times do |y|
+          #puts "new row"
+          #img.columns.times do |x|
+          width.times do |x|
+            #if img.view(0,0,width,height)[y][x].red == 0
+            pixel = imgview[y][x]
+            #pixel2 = imgview2[y][x]
+            #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+              #str = str + '0'
+            #else
+            #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+            if pixel.red > EDGEPIX_THRESH_PRIMARY || pixel.green > EDGEPIX_THRESH_PRIMARY || pixel.blue > EDGEPIX_THRESH_PRIMARY
+              xcount += 1
+              ycount += 1
+              xsum += x
+              ysum += y
+              xsqr += x**2
+              ysqr += y**2
+              xcube += x**3
+              ycube += y**3
+              #str = str + '1'
+            end
+          end
+          #puts str
+          #str = ""
+        end
+
+        xcentroid = Float(xsum)/Float(xcount)
+        ycentroid = Float(ysum)/Float(ycount)
+
+        Rails.logger.debug "xcentroid: #{xcentroid}"
+        Rails.logger.debug "ycentroid: #{ycentroid}"
+
+        # Unused
+        xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
+        yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
+
+        # Unused
+        xsigma = Math.sqrt(xvariance)
+        ysigma = Math.sqrt(yvariance)
+
+        xEX3 = Float(xcube)/Float(xcount)
+        yEX3 = Float(ycube)/Float(ycount)
+
+        xskew =  Float(xEX3 - (3 * xcentroid  * xvariance)  - (xcentroid)**3)  / Float(xsigma**3)
+        yskew =  Float(yEX3 - (3 * ycentroid  * yvariance)  - (ycentroid)**3)  / Float(ysigma**3)
+
+        Rails.logger.debug "xskew: #{xskew}"
+        Rails.logger.debug "yskew: #{yskew}"
+
+        topcount = 0
+        topsum = 0
+        topsqr = 0
+        topcube = 0
+        bottomcount = 0
+        bottomsum = 0
+        bottomsqr = 0
+        bottomcube = 0
+        leftcount = 0
+        leftsum = 0
+        leftsqr = 0
+        leftcube = 0
+        rightcount = 0
+        rightsum = 0
+        rightsqr = 0
+        rightcube = 0
+
+        #img.rows.times do |y|
+        height.times do |y|
+          #puts "new row"
+          #img.columns.times do |x|
+          width.times do |x|
+            #if img.view(0,0,width,height)[y][x].red == 0
+            pixel = imgview[y][x]
+            #pixel2 = imgview2[y][x]
+            #if pixel.red == 0 && pixel.green == 0 && pixel.blue == 0
+              #str = str + '0'
+            #else
+            #if pixel.red > 32768 || pixel.green > 32768 || pixel.blue > 32768
+            if pixel.red > EDGEPIX_THRESH_SECONDARY || pixel.green > EDGEPIX_THRESH_SECONDARY || pixel.blue > EDGEPIX_THRESH_SECONDARY
+              if x < xcentroid
+                leftcount += 1
+                leftsum += x
+                leftsqr += x**2
+                leftcube += x**3
+              else
+                rightcount += 1
+                rightsum += x
+                rightsqr += x**2
+                rightcube += x**3
+              end
+
+              if y < ycentroid
+                topcount += 1
+                topsum += y
+                topsqr += y**2
+                topcube += y**3
+              else
+                bottomcount += 1
+                bottomsum += y
+                bottomsqr += y**2
+                bottomcube += y**3
+              end
+            end
+          end
+        end
+
+        topcentroid = Float(topsum)/Float(topcount)
+        bottomcentroid = Float(bottomsum)/Float(bottomcount)
+        leftcentroid = Float(leftsum)/Float(leftcount)
+        rightcentroid = Float(rightsum)/Float(rightcount)
+
+        Rails.logger.debug "topcentroid:    #{topcentroid}"
+        Rails.logger.debug "leftcentroid:   #{leftcentroid}"
+        Rails.logger.debug "bottomcentroid: #{bottomcentroid}"
+        Rails.logger.debug "rightcentroid:  #{rightcentroid}"
+
+        topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
+        bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
+        leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
+        rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
+
+        topsigma = Math.sqrt(topvariance)
+        bottomsigma = Math.sqrt(bottomvariance)
+        leftsigma = Math.sqrt(leftvariance)
+        rightsigma = Math.sqrt(rightvariance)
+
+        Rails.logger.debug "topsigma:    #{topsigma}"
+        Rails.logger.debug "leftsigma:   #{leftsigma}"
+        Rails.logger.debug "bottomsigma: #{bottomsigma}"
+        Rails.logger.debug "rightsigma:  #{rightsigma}"
+
+        topEX3 = Float(topcube)/Float(topcount)
+        bottomEX3 = Float(bottomcube)/Float(bottomcount)
+        leftEX3 = Float(leftcube)/Float(leftcount)
+        rightEX3 = Float(rightcube)/Float(rightcount)
+
+        topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
+        bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
+        leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
+        rightskew =   Float(rightEX3 -  (3 * rightcentroid   * rightvariance)   - (rightcentroid)**3)   / Float(rightsigma**3)
+
+        Rails.logger.debug "topskew:    #{topskew.to_s}"
+        Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
+        Rails.logger.debug "leftskew:   #{leftskew.to_s}"
+        Rails.logger.debug "rightskew:  #{rightskew.to_s}"
+
+        topedge = Integer(topcentroid - topsigma)
+        bottomedge = Integer(bottomcentroid + bottomsigma)
+        leftedge = Integer(leftcentroid - leftsigma)
+        rightedge = Integer(rightcentroid + rightsigma)
+
+        #Rails.logger.debug "91/180 ratio: #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
+
+        Rails.logger.debug "Before adjustment:"
+        Rails.logger.debug "topedge:    #{topedge}"
+        Rails.logger.debug "leftedge:   #{leftedge}"
+        Rails.logger.debug "bottomedge: #{bottomedge}"
+        Rails.logger.debug "rightedge:  #{rightedge}"
+
+        Rails.logger.debug ""
+        Rails.logger.debug "Float(bottomedge-topedge)/Float(rightedge-leftedge): #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
+        Rails.logger.debug "LTHUMB_H/LTHUMB_W: #{LTHUMB_H/LTHUMB_W}"
+
+        if Float(bottomedge-topedge)/Float(rightedge-leftedge) < LTHUMB_H/LTHUMB_W
+          # smartselect aspect ratio is wider than thumbnail aspect ratio, expand vertically
+          Rails.logger.debug "Thumbnail is not tall enough, increase height"
+          y = Integer((LTHUMB_H*width)/LTHUMB_W - height)
+
+          Rails.logger.debug "y: #{y}"
+          Rails.logger.debug "height: #{height}"
+
+          if height - (bottomedge-topedge) < y
+            # cannot fully expand to desired aspect ratio
+            topedge = 0
+            bottomedge = height
+          else
+            # sufficient space to expand
+            if topedge < y/2
+              # too close to top of image
+              y -= topedge
+              topedge = 0
+              bottomedge += y
+            elsif (height-bottomedge) < y/2
+              # too close to bottom of image
+              y -= (height-bottomedge)
+              bottomedge = height
+              topedge -= y
+            else
+              topedge -= y/2
+              bottomedge += y/2
+            end
+          end
+        else
+          # smartselect aspect ratio is taller than thumbnail aspect ratio, expand horizontally
+          Rails.logger.debug "Thumbnail is not wide enough, increase width"
+          
+          x = Integer((LTHUMB_W*height)/LTHUMB_H - width)
+
+          Rails.logger.debug "x: #{x}"
+          Rails.logger.debug "width: #{width}"
+
+          if width - (rightedge-leftedge) < x
+            # cannot fully expand to desired aspect ratio
+            leftedge = 0
+            rightedge = width
+          else
+            # sufficient space to expand
+            if leftedge < x/2
+              # too close to left of image
+              x -= leftedge
+              leftedge = 0
+              rightedge += x
+            elsif (width-rightedge) < x/2
+              # too close to right of image
+              x -= (width-rightedge)
+              rightedge = width
+              leftedge -= x
+            else
+              leftedge -= x/2
+              rightedge += x/2
+            end
+          end
+        end
+
+        Rails.logger.debug "After adjustment:"
+        Rails.logger.debug "topedge:    #{topedge}"
+        Rails.logger.debug "leftedge:   #{leftedge}"
+        Rails.logger.debug "bottomedge: #{bottomedge}"
+        Rails.logger.debug "rightedge:  #{rightedge}"
+
+        # Rails.logger.debug "lg leftedge:   #{leftedge}"
+        # Rails.logger.debug "lg topedge:    #{topedge}"
+        # Rails.logger.debug "lg rightedge:  #{rightedge}"
+        # Rails.logger.debug "lg bottomedge: #{bottomedge}"
+
+        #thumb_lg = origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))
+
+        tempimg = origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))
+
+        Rails.logger.debug "tempimg dims (col,row): #{tempimg.columns},#{tempimg.rows}"
+
+        #tempimg = tempimg.resize_to_fill(LTHUMB_W,LTHUMB_H)
+        tempimg = tempimg.resize_to_fill(LTHUMB_W)
+
+		Rails.logger.debug "NEW tempimg dims (col,row): #{tempimg.columns},#{tempimg.rows}"
+
+        io_lg = FilelessIO.new(tempimg.to_blob)
+
+        topedge = Integer(topcentroid - topsigma)
+        bottomedge = Integer(bottomcentroid + bottomsigma)
+        leftedge = Integer(leftcentroid - leftsigma)
+        rightedge = Integer(rightcentroid + rightsigma)
+
+        #Rails.logger.debug "91/180 ratio: #{Float(bottomedge-topedge)/Float(rightedge-leftedge)}"
+
+        if Float(bottomedge-topedge)/Float(rightedge-leftedge) < STHUMB_H/STHUMB_W
+          # smartselect aspect ratio is wider than thumbnail aspect ratio, expand vertically
+          y = Integer((STHUMB_H*width)/STHUMB_W - height)
+
+          if height - (bottomedge-topedge) < y
+            # cannot fully expand to desired aspect ratio
+            topedge = 0
+            bottomedge = height
+          else
+            # sufficient space to expand
+            if topedge < y/2
+              # too close to top of image
+              y -= topedge
+              topedge = 0
+              bottomedge += y
+            elsif (height-bottomedge) < y/2
+              # too close to bottom of image
+              y -= (height-bottomedge)
+              bottomedge = height
+              topedge -= y
+            else
+              topedge -= y/2
+              bottomedge += y/2
+            end
+          end
+        else
+          # smartselect aspect ratio is taller than thumbnail aspect ratio, expand horizontally
+          x = Integer((STHUMB_W*height)/STHUMB_H - width)
+
+          if width - (rightedge-leftedge) < x
+            # cannot fully expand to desired aspect ratio
+            leftedge = 0
+            rightedge = width
+          else
+            # sufficient space to expand
+            if leftedge < x/2
+              # too close to left of image
+              x -= leftedge
+              leftedge = 0
+              rightedge += x
+            elsif (width-rightedge) < x/2
+              # too close to right of image
+              x -= (width-rightedge)
+              rightedge = width
+              leftedge -= x
+            else
+              leftedge -= x/2
+              rightedge += x/2
+            end
+          end
+        end
+
+		#thumb_sm = origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))
+
+		io_sm = FilelessIO.new((origimg.crop(leftedge,topedge,(rightedge-leftedge),(bottomedge-topedge))).resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
+
+        #origimg.resize_to_fill!(180,92)
+
+        #io_cv = FilelessIO.new(contentview.to_blob)
+        #io_lg = FilelessIO.new(thumb_lg.to_blob)
+        #io_sm = FilelessIO.new(thumb_sm.to_blob)
+
+        #io.original_filename = binder.current_version.imgfile.original_filename.to_s
+        io_cv.original_filename = "contentview"
+        io_lg.original_filename = "thumb_lg"
+        io_sm.original_filename = "thumb_sm"
+
+        stathash = binder.current_version.imgstatus
+		stathash['img_contentview']['generated'] = true
+		stathash['img_thumb_lg']['generated'] = true
+		stathash['img_thumb_sm']['generated'] = true
+
+		binder.current_version.update_attributes(	:img_contentview => io_cv,
+													:img_thumb_lg => io_lg,
+													:img_thumb_sm => io_sm,
+													:imgstatus => stathash)
+
+		#Rails.logger.debug "New Thumb Location: #{binder.current_version.img_thumb_lg.url}"
+
 
 	end
 
@@ -576,15 +1602,17 @@ class Version
 
 	# this hash is updated when the image is retrieved, almost always asynchronously
 	# the :imgfile uploader cannot be reliably queried to determine if a file exists or not
-	field :imgstatus, 	:type => Hash, 	:default => { 	:imageable => 	true,		
-														:imgfile => 	{ :retrieved => false },
-													 	:imgthumb_lg => { :retrieved => false },
-														:imgthumb_sm => { :retrieved => false } }
+	field :imgstatus, 	:type => Hash, 	:default => { 	:imageable => 		true,		
+														:imgfile => 		{ :retrieved => false },
+													 	:img_contentview => { :generated => false },
+													 	:img_thumb_lg => 	{ :generated => false },
+														:img_thumb_sm => 	{ :generated => false } }
 
 	# the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
 	mount_uploader :imgfile, 		ImageUploader
-	#mount_uploader :imgthumb_lg, 	ImageUploader
-	#mount_uploader :imgthumb_sm, 	ImageUploader
+	mount_uploader :img_contentview,ImageUploader
+	mount_uploader :img_thumb_lg, 	ImageUploader
+	mount_uploader :img_thumb_sm, 	ImageUploader
 
 	embedded_in :binder
 

@@ -17,54 +17,54 @@ class ImageUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
 
-  version :contentview do
-    process resize_to_fit: [700, nil]
+ #  version :contentview do
+ #    process resize_to_fit: [700, nil]
 
-  end
+ #  end
 
-  # version :thumb_lg do
-  #     #process :resize_and_pad => [180,91,'black','Center']
-  #     process :testproc
-  # end
-  #version
-  #process :resize_to_fill => [600,600]
+ #  # version :thumb_lg do
+ #  #     #process :resize_and_pad => [180,91,'black','Center']
+ #  #     process :testproc
+ #  # end
+ #  #version
+ #  #process :resize_to_fill => [600,600]
 
-  #process :smart_thumbnail
+ #  #process :smart_thumbnail
 
-  # version :thumb_sm do
-  #   #process :resize_to_fill => [45,45]
-  #   process :resize_and_pad => [45,45,'black']#,'Center']
-  # end
+ #  # version :thumb_sm do
+ #  #   #process :resize_to_fill => [45,45]
+ #  #   process :resize_and_pad => [45,45,'black']#,'Center']
+ #  # end
 
-  # def testproc
+ #  # def testproc
 
-  #   manipulate! do |img|
-  #     img = img.sepiatone
-  #   end
+ #  #   manipulate! do |img|
+ #  #     img = img.sepiatone
+ #  #   end
 
-  # end
+ #  # end
 
-  version :smart_thumb do
-    process :resize_to_fit => [600,600]
-    process :smart_thumbnail
-    #process :resize_and_pad => [180,91,'black']
-  end
+ #  version :smart_thumb do
+ #    process :resize_to_fit => [600,600]
+ #    process :smart_thumbnail
+ #    #process :resize_and_pad => [180,91,'black']
+ #  end
 
- #include CarrierWave::RMagick
+ # # #include CarrierWave::RMagick
 
-  version :thumb_lg, :from_version => :smart_thumb do
-    #include CarrierWave::RMagick
-    #process :smart_thumbnail => [[180,91]]
-    #process :resize_and_pad => [180,91,'black']
-    process :resize_to_fill => [180,91]
-  end
+ #  version :thumb_lg, :from_version => :smart_thumb do
+ #    #include CarrierWave::RMagick
+ #    #process :smart_thumbnail => [[180,91]]
+ #    #process :resize_and_pad => [180,91,'black']
+ #    process :resize_to_fill => [180,91]
+ #  end
 
-  version :thumb_sm, :from_version => :smart_thumb do
-    #include CarrierWave::RMagick
-    #process :resize_to_fill => [45,45]
-    #process :resize_and_pad => [45,45,'black']#,'Center']
-    process :resize_to_fill => [45,45]
-  end
+ #  version :thumb_sm, :from_version => :smart_thumb do
+ #    #include CarrierWave::RMagick
+ #    #process :resize_to_fill => [45,45]
+ #    #process :resize_and_pad => [45,45,'black']#,'Center']
+ #    process :resize_to_fill => [45,45]
+ #  end
 
 
   # def smart_thumbnail(dims = ["",""])
@@ -75,11 +75,11 @@ class ImageUploader < CarrierWave::Uploader::Base
 
 
   def store_dir
-    if model.nil?
-      return "testdir"
-    else
+    #if model.nil?
+    #  return "testdir"
+    #else
       Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
-    end
+    #end
   end
 
   def fog_directory
@@ -102,7 +102,7 @@ protected
     #Rails.logger.debug "Thumbnailgen: #{model.inspect.to_s}"
     #Rails.logger.debug "Thumbnailgen: #{model[:thumbnailgen].to_s}"
 
-    return if model.nil?
+    #return if model.nil?
 
     case model[:thumbnailgen].to_i
     when 0#(0..1)

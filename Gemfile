@@ -51,7 +51,9 @@ gem 'rack-pjax'
 gem 'delayed_job'
 gem 'delayed_job_mongoid'
 gem 'daemons'
-#gem 'open-uri'
+
+
+
 
 #gem 'rest-open-uri'
 #gem 'open-uri'

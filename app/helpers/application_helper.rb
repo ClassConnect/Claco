@@ -263,7 +263,7 @@ module ApplicationHelper
 		elsif binder.current_version.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
 			#return "<no image>"
 			return asset_path("stockfilethumbs/wideblankpaper.png")
-		elsif binder.current_version.imgfile.thumb_lg.url.nil? || binder.current_version.imgfile.thumb_lg.url.to_s.empty?
+		elsif binder.current_version.img_thumb_lg.nil? || binder.current_version.img_thumb_lg.url.to_s.to_s.empty?
 			return asset_path("stockfilethumbs/wideblankpaper.png")
 		else
 			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;')# + 
@@ -279,7 +279,9 @@ module ApplicationHelper
 			# when 3
 			# 	return "#{binder.current_version.imgfile.doc_thumb_lg.url}"
 			# end
-			return "#{binder.current_version.imgfile.thumb_lg.url}"
+
+			#return "#{binder.current_version.imgfile.thumb_lg.url}"
+			return binder.current_version.img_thumb_lg.url.to_s
 		end
 
 

@@ -460,7 +460,6 @@ class Binder
 		end
 
         origimg.format = "png"
-        #filled_sm.format = "png"
 
         io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
@@ -493,41 +492,27 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
-		# origimg.resize_and_pad(LTHUMB_W,LTHUMB_H,'black')
+		#origimg.format = "png"
 
-		# resize_and_pad code:
+        new_img_lg = Magick::ImageList.new
+        new_img_sm = Magick::ImageList.new
+        #border_lg = Magick::ImageList.new
+        #border_sm = Magick::ImageList.new
+        new_img_lg << Magick::Image.new(LTHUMB_W,LTHUMB_H)
+        new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
+       # border_lg << Magick::Image.new(origimg.columns+2,origimg.rows+2)
+        #border_sm << Magick::Image.new()
+        filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color('#EEEEEE'))
+        filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color('#EEEEEE'))
 
-        # img.resize_to_fit!(width, height)
-        # new_img = ::Magick::Image.new(width, height)
-        # if background == :transparent
-        #   filled = new_img.matte_floodfill(1, 1)
-        # else
-        #   filled = new_img.color_floodfill(1, 1, ::Magick::Pixel.from_color(background))
-        # end
-        # destroy_image(new_img)
-        # filled.composite!(img, gravity, ::Magick::OverCompositeOp)
-        # destroy_image(img)
-        # filled = yield(filled) if block_given?
-        # filled
-
-        #origimg.resize_to_fit!(LTHUMB_W,LTHUMB_H)
-        new_img = Magick::ImageList.new#(LTHUMB_W,LTHUMB_H)
-        new_img << Magick::Image.new(LTHUMB_W,LTHUMB_H)
-        filled_lg = new_img.first.color_floodfill(1,1,Magick::Pixel.from_color('black'))
-        #filled_sm = new_img.first.color_floodfill(1,1,Magick::Pixel.from_color('black'))
-        #destroy_image(new_img)
-        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W,LTHUMB_H),Magick::CenterGravity,Magick::OverCompositeOp)
-        #filled_sm.composite!(origimg.resize_to_fit(STHUMB_W,STHUMB_H),Magick::CenterGravity,Magick::OverCompositeOp)
-
-        #flist = Magick::ImageList.new
-
-        #flist << filled
+        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,'#CCCCCC'),Magick::CenterGravity,Magick::OverCompositeOp)
+        filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,'#CCCCCC'),Magick::CenterGravity,Magick::OverCompositeOp)
 
         filled_lg.format = "png"
-        #filled_sm.format = "png"
+        filled_sm.format = "png"
 
         io_lg = FilelessIO.new(filled_lg.to_blob)
-        io_sm = FilelessIO.new(filled_lg.resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
+        io_sm = FilelessIO.new(filled_sm.to_blob)#resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
 
         # set filenames of pseudoIO objects
         io_lg.original_filename = "thumb_lg"

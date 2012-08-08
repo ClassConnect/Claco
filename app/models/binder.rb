@@ -20,7 +20,7 @@ class Binder
 	field :fname, :type => String
 	field :lname, :type => String
 	field :title, :type => String#File/directory name
-	field :body, :type => String #Directory annotation
+	field :body, :type => String, :default => "" #Directory annotation
 	field :type, :type => Integer # 1 = Directory, 2 = File, 3 = Lesson
 
 	field :format, :type => Integer, :default => 0 #Only used if type = 2, 1 = File, 2 = Content(link)
@@ -51,6 +51,8 @@ class Binder
 	field :folders, :type => Integer, :default => 0
 	field :children, :type => Integer, :default => 0
 	field :total_size, :type => Integer, :default => 0
+	field :pub_size, :type => Integer, :default => 0
+	field :priv_size, :type => Integer, :default => 0
 	field :fork_total, :type => Integer, :default => 0
 
 	#Social
@@ -358,29 +360,19 @@ class Binder
 		return 0 if parents.first["id"] == "-1"
 
 		#Parent permissions always take precedence
-		parent_permissions.each do |p|
+		parent_permissions.each {|p| return p["auth_level"] if p["shared_id"] == id && p["type"] == 1} if id != 0
 
-			#Check what type of permission it is: 1 = person
-			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
+		permissions.each {|p| return p["auth_level"] if p["shared_id"] == id && p["type"] == 1} if id != 0
 
-			#2 is reserved for classes
+		if !permissions.find{|p| p["type"] == 3}.nil?
 
-			#3 = Public and always read-only
-			return p["auth_level"] if p["type"] == 3
-
+			return 1 if permissions.find{|p| p["type"] == 3}["auth_level"] == 1
+		
 		end
 
-		permissions.each do |p|
+		if !parent_permissions.find{|p| p["type"] == 3}.nil?
 
-			#Check what type of permission it is: 1 = person
-			return p["auth_level"] if p["shared_id"] == id && p["type"] == 1
-
-			#2 is reserved for classes
-
-			#3 = Public and always read-only
-			return p["auth_level"] if p["type"] == 3
-
-			#4 is reserved for networks
+			return 1 if parent_permissions.find{|p| p["type"] == 3}["auth_level"] == 1
 
 		end
 
@@ -998,40 +990,32 @@ class Version
 
 	end
 
-	def get_html
+	def get_croc_session
 
-		if embed
+		return CROC_VALID_FILE_FORMATS.include?(ext.downcase) ? JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response })["session"] : ""
 
-			return data
+	end
 
-		end
+	def croc?
 
-		if self.binder.format == 2
+		return CROC_VALID_FILE_FORMATS.include? ext.downcase if !ext.nil?
 
-			parsed_url = URI.parse(data)
+		return false
 
-			if parsed_url.host.include? "youtube.com" #data should be a valid URI since it was added with Addressable::URI.heuristic_parse
+	end
 
-				return "<iframe title=\"YouTube video player\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/#{CGI.parse(parsed_url.query)["v"].first}?modestbranding=1\" frameborder=\"0\" allowfullscreen></iframe>"
+	def youtube?
 
-			end
+		uri = URI.parse(data)
 
-		end
+		return uri.host.nil? ? false : uri.host.include?("youtube.com") && uri.path.include?("watch")
 
-		if self.binder.format == 1
+		rescue URI::InvalidURIError
+			return false
+	end
 
-			# if Crocodoc.check_format_validity(ext)
-			if CROC_VALID_FILE_FORMATS.include? ext.downcase
-
-				# url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
-				url = "https://crocodoc.com/view/" + (JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => croc_uuid){ |response, request, result| response }))["session"]
-				return '<iframe id="crocFrame" style="width: 700px; height: 600px;" src="' + url + '" ></iframe>'
-
-			end
-		end
-
-		return ""
-
+	def img?
+		return imgclass == 0
 	end
 
 end

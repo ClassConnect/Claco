@@ -290,6 +290,24 @@ module ApplicationHelper
 
 	end
 
+	def get_contype_icon(binder)
+
+		if binder.current_version.croc?
+			return asset_path("binders/types/file.png")
+		elsif binder.current_version.youtube?
+			return asset_path("binders/types/video.png")
+		elsif binder.current_version.img?
+			return asset_path("binders/types/pic.png")
+		elsif binder.type == 1
+			return asset_path("binders/types/folder.png")
+		elsif binder.format == 2
+			return asset_path("binders/types/web.png")
+		else
+			return asset_path("binders/types/file.png")
+		end
+			
+
+	end
 
 	def get_username(teacher_id)
 

@@ -14,7 +14,7 @@
   <div id="list-pane">
     <% if params[:action] == "show" %>
 
-      <%= javascript_tag "isEditable = #{@binder.get_access(current_teacher.id.to_s) > 0 ? "true" : "false"};" %>
+      <%= javascript_tag "isEditable = #{teacher_signed_in? ? @binder.get_access(current_teacher.id.to_s) == 2 : "false"};" %>
 
       <%= render 'layouts/embed' if @binder.type == 2%>
 
@@ -42,7 +42,7 @@
 
             <div style="float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'checked="checked"' if @binder.is_pub? %>/></div>
             <div class="inner">
-            Share 
+            Public 
             </div>
 
           </div>
@@ -230,6 +230,9 @@
         </div>
 
 
+
+
+
       </div>
 
 
@@ -272,7 +275,7 @@
     <form action="#" class="bodcon">
       <div class="conitem">
         <input name="weblink" class="weblink" style="width:300px" type="text" placeholder="http:// or <embed>" />
-        <input name="webtitle" maxlength="55" class="webtitle" style="width:300px" type="text" placeholder="Title of the web page" />
+        <input name="webtitle" maxlength="50" class="webtitle" style="width:300px" type="text" placeholder="Title of the web page" />
 
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the web page"></textarea>
@@ -301,7 +304,7 @@
 
     <form action="#" class="bodcon">
       <div class="conitem">
-        <input name="foldertitle" maxlength="55" class="firstfocus webtitle" style="width:300px" type="text" placeholder="Title of the new folder" />
+        <input name="foldertitle" maxlength="50" class="firstfocus webtitle" style="width:300px" type="text" placeholder="Title of the new folder" />
 
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the folder"></textarea>
@@ -356,7 +359,7 @@
 
 		<form action="#" class="bodcon">
 		  <div class="conitem">
-		    <input name="newtitle" maxlength="55" class="firstfocus rename-title" style="width:260px" type="text" />
+		    <input name="newtitle" maxlength="50" class="firstfocus rename-title" style="width:260px" type="text" />
 		    <input name="conid" class="conid" type="hidden" />
 
 		  </div>
@@ -420,8 +423,9 @@
 
           <div class="pickerpane">
 
+            <% if !@root.nil? %>
 
-            <% Binder.where("parent.id" => "0", :owner => current_teacher.id).each do |binder| %>
+            <% @root.each do |binder| %>
 
 
               <% if binder.parent["id"] == "0" %>
@@ -441,6 +445,7 @@
 
               <% end %>
 
+            <% end %>
             <% end %>
 
 
@@ -483,8 +488,8 @@
 
           <div class="pickerpane">
 
-
-            <% Binder.where("parent.id" => "0", :owner => current_teacher.id).each do |binder| %>
+            <% if !@root.nil? %>
+            <% @root.each do |binder| %>
 
             <div class="bndr">
 
@@ -500,7 +505,7 @@
             </div>
 
             <% end %>
-
+            <% end %>
 
           </div>
         </div>

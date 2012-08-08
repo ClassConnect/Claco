@@ -1,14 +1,36 @@
-<% if !@binder.current_version.get_html.empty? %>
-	
-	<%= @binder.current_version.get_html.html_safe %>
+<% if @binder.current_version.croc? %>
+
+	<iframe id="crocFrame" width="700" height="600" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe>
+
+<% elsif @binder.current_version.youtube? %>
+
+	<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= CGI.parse(URI.parse(@binder.current_version.data).query)["v"].first %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>
+
+<% elsif @binder.current_version.img? %>
+
+	<center><%= link_to(	image_tag(@binder.current_version.imgfile.contentview.url, :class => "embeddrop"),
+					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
+					:target => "_blank") %></center>
+
+<% elsif @binder.current_version.embed %>
+
+	<%= @binder.current_version.data.html_safe %>
 
 <% else %>
 
-	<%= link_to(image_tag(@binder.current_version.img_contentview.url), @binder.current_version.data, :target => "_blank") %>
+<a href="<%= @binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data %>" target="_blank">
+	<div class="embedlink">
+		<div class="linkboxer">
+			<button target="_blank" class="btn btn-primary" style="font-size:18px; padding:15px; font-weight:bolder;">Go to this website!</button>
+		</div>
+
+		<div class="whitelay"></div>
+
+	<%= image_tag(@binder.current_version.imgfile.contentview.url) %>
+	</div>
+</a>
 
 <% end %>
-
-<br /><br />
 
 <% if !@binder.current_version.embed %>
 	<% if @binder.format == 1 %>
@@ -21,5 +43,3 @@
 
 	<% end %>
 <% end %>
-
-<br /><br /><br />

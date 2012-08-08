@@ -12,6 +12,7 @@ isDropped = false;
 noteClick = false;
 noteInit = false;
 scrollBottom = false;
+permissionFail = false;
 
 $(document).ready(function() {
 
@@ -36,7 +37,10 @@ $(document).on('pjax:start', function() {
 
 }).on('pjax:end',   function() {
   destroyAsyc();
-  editInit();
+  // if we have edit permissions, enable editing functionality
+  if (isEditable === true) {
+    editInit();
+  }
 });
 
 
@@ -59,6 +63,21 @@ function editInit() {
   noteInit = false;
   dontPjax = false;
 
+
+  // CONTENT SPECIFIC FUNCTIONS GO HERE!
+  // if this is a website, fade in the overlay and stuff on hover
+  if ($('.embedlink').length) {
+    $('.embedlink').hover(
+      function () {
+        $('.linkboxer, .whitelay').fadeIn(300);
+      },
+      function () {
+        $('.linkboxer, .whitelay').fadeOut(300);
+      }
+    );
+  }
+
+
   // click on box, redirect
   $('.content-item').click(function() {
 
@@ -68,6 +87,8 @@ function editInit() {
         container: '[data-pjax-container]'
       });
 
+    } else {
+      dontPjax = false;
     }
 
   });
@@ -92,6 +113,12 @@ function editInit() {
         $(".noShare").css('opacity', 0).slideDown(50).animate({ opacity: 1 },{ queue: false, duration: 50});
       }
 
+
+      if (permissionFail === true) {
+        permissionFail = false;
+        return false;
+      }
+      
       pubshare = { enabled: value };
 
       $.ajax({
@@ -101,6 +128,7 @@ function editInit() {
         success: function(data) {
           // if the data isn't success (aka "1")
           if (data != '1') {
+            permissionFail = true;
             $('.pub_on').click();
             alert(data);
           }
@@ -134,6 +162,8 @@ function editInit() {
 
   // init our folder autocomplete
   initAutoTagger('#folder-tags');
+  // init our sharing actions
+  //initAutoSharer('#folder-sharing');
 
 
   $('#addtags-btn').click(function() {
@@ -206,6 +236,85 @@ function editInit() {
 
 
   });
+
+
+
+
+
+
+/*
+  $('#addshares-btn').click(function() {
+    container = $(this).parent().parent().parent();
+
+    if (container.hasClass('act-live')) {
+
+      //tagdata = tagsToJSON('#folder-sharing');
+      
+      $.ajax({
+        url: location.protocol+'//'+location.host+location.pathname + '/sharing',
+        data: '',
+        type: 'post',
+        success: function(data) {
+          // do nothing
+        }
+      });
+
+      container.removeClass('act-live');
+      $(this).removeClass('btn-primary savebtn').html('Add New');
+
+
+      // how should we close this?
+      if ($('.sharelist li').length > 0) {
+        // we're doing a custom close up
+        $('.share-group').each(function(index) {
+            if ($(this).find('.sharelist li').length == 0) {
+              $(this).css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
+            }
+        });
+
+
+        $('.shareenter').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
+
+
+      } else {
+        container.find('.content-fill').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
+        container.find('.forshare').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+      }
+      
+
+
+
+    } else {
+      container.addClass('act-live');
+      $(this).addClass('btn-primary savebtn').html('&nbsp;&nbsp;Save&nbsp;&nbsp;');
+
+
+      // how should we open this?
+      if ($('.sharelist li').length > 0) {
+        // we're doing a custom open up
+        $('.share-group').each(function(index) {
+            if ($(this).find('.sharelist li').length == 0) {
+              $(this).css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+            }
+        });
+
+        $('.shareenter').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+
+
+      } else {
+        container.find('.forshare').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
+      container.find('.content-fill').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
+      }
+
+      //setTimeout(function() {$("#tag-adder").focus();},150);
+
+      //$('#tag-adder').focus();
+    }
+
+
+  });
+*/
+
 
 
   // if we click the notepad, open the editor
@@ -312,7 +421,7 @@ function editInit() {
         hovBool = true;
 
          // insert new div element
-        $('.ui-sortable-helper').after('<div class="dropper-tog"><div class="folder-preview">' + $('.ui-sortable-helper').find('.folder-preview').html() + '</div><div class="big-text">move to folder</div><div class="tricontain"><div class="fattie"></div><div class="pointy"></div></div></div>');
+        $('.ui-sortable-helper').after('<div class="dropper-tog"><div class="folder-preview" style="margin-top:-10px; margin-left:-10px">' + $('.ui-sortable-helper').find('.folder-preview').html() + '</div><div class="big-text">move to folder</div><div class="tricontain"><div class="fattie"></div><div class="pointy"></div></div></div>');
 
         $('body').bind('mousemove', function(e){
             $('.dropper-tog').css({

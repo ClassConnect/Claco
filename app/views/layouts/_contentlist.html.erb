@@ -14,25 +14,71 @@
             #imgarr[0]
           %>
 
-					<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
+				<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
 
 
-                  <% if binder.type != 1 
-                    # is a file/link 
-                  %> 
+	                <% if binder.type != 1 
+	                    # is a file/link 
+	                 %> 
 
-                    <div class="folder-preview">
-                      <div class="single-hold" style="background-image:url('<%= get_binder_image(binder) %>');">
-                      </div>
-                    </div>
+					<% if get_binder_image(binder) == "<no image>" %>
+
+	                  	<div class="folder-preview">
+		                  	<div class="dyncon">
+
+		                  		<div class="gen-file">
+		                  			<div class="filebox">
+		                  				<div class="filext">
+		                  					binder.current_version.ext
+		                  				</div>
+		                  			</div>
+		                  		</div>
+
+							</div>
+							<div class="contype">
+								<img src="/assets/binders/types/file.png" style="width:24px" />
+							</div>
+						</div>
+
+					<% else %>
+
+						<div class="folder-preview">
+							<div class="single-hold" style="margin-top:-1px;background-image:url('<%= get_binder_image(binder) %>');">
+							</div>
+							<div class="contype">
+								<img src="<%= get_contype_icon(binder) %>" style="width:24px" />
+	                      	</div>
+	                    </div>
+
+                    <% end %>
 
                   <% else 
                     # is a folder
                   %>
 
+                  	<% if binder.children.count == 0%>
+
+						<div class="folder-preview">
+							<div class="dyncon">
+
+								<div class="empty-folder">
+									<div class="nubfol"></div>
+									<div class="mainfol"></div>
+								</div>
+
+							</div>
+						</div>
+
+
+              	  	<% else %>
+
     		            <div class="folder-preview">
     		              <!-- <div class="single-hold" src="<%= imgarr[0].to_s %>" > -->
-                      <div class="single-hold" style="background-image:url('<%= imgarr[0].to_s.empty? ? asset_path("stockfilethumbs/wideemptyfolder.png") : imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
+
+                      <div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s.empty? ? asset_path("stockfilethumbs/wideemptyfolder.png") : imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
+
+                      <!--<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');">-->
+
 
                       	<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
@@ -50,14 +96,41 @@
 	                    <% end %>
 
     		              </div>
+
+    		              <div class="contype">
+	                      	<img src="/assets/binders/types/folder.png" style="width:24px" />
+	                      </div>
     		            </div>
+
+		            <% end %>
 
                   <% end %>
 
+                  	<div class="innerd">
+			            <div class="titler"><%= link_to binder.title[0..50], named_binder_route(binder), :class => "pjax linkster" %></div>
 
-			            <div class="titler"><%= link_to binder.title, named_binder_route(binder), :class => "pjax linkster" %></div>
+			            <div class="reflink">
 
-			            <div class="descarea">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
+			            	<% if binder.type == 1 %>
+
+			            		<img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" /><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+
+			            	<% elsif binder.format == 2  && !binder.current_version.embed %>
+
+			            		<%= URI.parse(binder.current_version.data).host.sub(/www\./, "") %>
+
+		            		<% else %>
+
+								<%= binder.current_version.ext %> &bull; <%= number_to_human_size(binder.total_size) %>
+
+			            	<% end %>
+
+			            </div>
+
+			            <div class="descarea"><%= binder.body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(sanitize(binder.body, :tags => []), :length => 180, :omission => "... <u>see more</u>").html_safe %></div>
+			        </div>
+
+			        <div class="lastupdate">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
 
 			            <div class="drop-tog">
 			            	<div class="btn-group">

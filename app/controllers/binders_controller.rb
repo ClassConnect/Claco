@@ -1,5 +1,4 @@
 class BindersController < ApplicationController
-
 	before_filter :authenticate_teacher!, :except => [:show, :index]
 
 	def index
@@ -57,7 +56,7 @@ class BindersController < ApplicationController
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
 										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].strip[0..55],
+										:title				=> params[:foldertitle].strip[0..50],
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
 										:body				=> params[:body],
@@ -101,26 +100,21 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
+		@root = Binder.where("parent.id" => "0", :owner => @binder.owner)
+
+		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
 
 		if !binder_routing_ok?(@binder, params[:action])
 			error = true
 			redirect_to named_binder_route(@binder, params[:action]) and return
 		end
 
-		redirect_to "/403.html" and return if @access == 0
+		if @access == 0
+			error = true
+			redirect_to "/403.html" and return
+		end
 
 		#TODO: Verify permissions before rendering view
-
-		# @croc = false
-
-		# @croc = Crocodoc.check_format_validity(@binder.current_version.ext) if @binder.type == 2 && @binder.format == 1
-
-		# @croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"] if @croc
-
-		#redirect_to @binder.current_version.data and return if @binder.format == 2
-
-		#redirect_to @binder.current_version.file.url.to_s.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
 
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
@@ -140,8 +134,8 @@ class BindersController < ApplicationController
 
 		@title = "Viewing: #{@binder.title}"
 
-		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children).sort_by {|c| c.order_index}
-		
+		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children.reject {|c| c.get_access == 0}).sort_by {|c| c.order_index}
+
 		error = false
 
 		rescue BSON::InvalidObjectId
@@ -180,20 +174,6 @@ class BindersController < ApplicationController
 			redirect_to "/404.html" and return
 		rescue Mongoid::Errors::DocumentNotFound
 			redirect_to "/404.html" and return
-
-	end
-
-	def showcroc
-
-		@binder = Binder.find(params[:id])
-
-		#@uuid = @binder.versions.last.croc_uuid
-
-		#@session = sessiongen(@binder.versions.last.croc_uuid)["session"]
-
-		#@status = docstatus(@uuid)
-
-		@croc_url = "https://crocodoc.com/view/" + Crocodoc.sessiongen(@binder.current_version.croc_uuid)["session"]
 
 	end
 
@@ -276,7 +256,7 @@ class BindersController < ApplicationController
 
 				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
-					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..55],
+					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..50],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
 											:fname				=> current_teacher.fname,
@@ -423,7 +403,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:title				=> params[:newtitle][0..55],
+		@binder.update_attributes(	:title				=> params[:newtitle][0..50],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
 
@@ -498,7 +478,7 @@ class BindersController < ApplicationController
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
-																				File.extname(params[:file].original_filename)).strip[0..55],
+																				File.extname(params[:file].original_filename)).strip[0..50],
 										:owner				=> current_teacher.id,
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
@@ -687,8 +667,6 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		#logger.debug "FUCKYOU NIGGER"
-
 		if params[:target] != params[:id]
 
 			@binder.sift_siblings()
@@ -814,6 +792,10 @@ class BindersController < ApplicationController
 
 		if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
+			fork = @inherited[:parent].owner != @binder.owner
+
+			@binder.inc(:fork_total, 1) if fork
+
 			@parent_child_count = @inherited[:parent_child_count]
 
 			@ppers = @binder.parent_permissions
@@ -824,6 +806,8 @@ class BindersController < ApplicationController
 										:format				=> @binder.type == 2 ? @binder.format : nil,
 										:files				=> @binder.files,
 										:folders			=> @binder.folders,
+										:forked_from		=> fork ? @binder.id.to_s : nil,
+										:fork_stamp			=> fork ? Time.now.to_i : nil,
 										:total_size			=> @binder.total_size,
 										:order_index		=> @parent_child_count,
 										:parent				=> @parenthash,
@@ -888,6 +872,8 @@ class BindersController < ApplicationController
 					#Swap old folder ids with new folder ids
 					@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
 
+					h.inc(:fork_total, 1) if fork
+
 					@new_node = Binder.new(	:title				=> h.title,
 											:body				=> h.body,
 											:parent				=> @node_parent,
@@ -904,6 +890,8 @@ class BindersController < ApplicationController
 											:format				=> (h.type != 1 ? h.format : nil),
 											:files				=> h.files,
 											:folders			=> h.folders,
+											:forked_from		=> fork ? h.id.to_s : nil,
+											:fork_stamp			=> fork ? Time.now.to_i : nil,
 											:total_size			=> h.total_size)
 
 					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
@@ -962,115 +950,6 @@ class BindersController < ApplicationController
 				format.html {render :text => errors.empty? ? 1 : errors}
 			end
 	end
-
-
-	#Copy Binders to new location
-	# def forkitem
-
-	# 	@binder = Binder.find(params[:id])
-
-	# 	@inherited = inherit_from(params[:binder][:parent])
-
-	# 	@parenthash = @inherited[:parenthash]
-	# 	@parentsarr = @inherited[:parentsarr]
-	# 	@parentperarr = @inherited[:parentperarr]
-
-	# 	@parent_child_count = @inherited[:parent_child_count]
-
-	# 	@new_parent = Binder.new(	:title				=> @binder.title,
-	# 								:body				=> @binder.body,
-	# 								:type				=> @binder.type,
-	# 								:files				=> @binder.files,
-	# 								:folders			=> @binder.folders,
-	# 								:total_size			=> @binder.total_size,
-	# 								:order_index		=> @parent_child_count,
-	# 								:parent				=> @parenthash,
-	# 								:parents			=> @parentsarr,
-	# 								:owner				=> current_teacher.id,
-	# 								:last_update		=> Time.now.to_i,
-	# 								:last_updated_by	=> current_teacher.id,
-	# 								:format				=> @binder.type == 2 ? @binder.format : nil)
-
-
-	# 	@new_parent.versions << Version.new(:owner		=> @binder.current_version.owner,
-	# 											:file_hash	=> @binder.current_version.file_hash,
-	# 											:timestamp	=> @binder.current_version.timestamp,
-	# 											:size		=> @binder.current_version.size,
-	# 											:ext		=> @binder.current_version.ext,
-	# 											:data		=> @binder.current_version.data,
-	# 											:croc_uuid	=> @binder.current_version.croc_uuid,
-	# 											:file		=> @binder.format == 1 ? @binder.current_version.file : nil) if @binder.type == 2
-
-	# 	@new_parent.save
-
-	# 	@hash_index = {params[:id] => @new_parent.id.to_s}
-
-
-	# 	#If directory, deal with the children
-	# 	if @binder.type == 1 #Eventually will apply to type == 3 too
-
-	# 		@index = @binder.parents.length
-
-	# 		#Select old children, order by parents.length
-	# 		@children = @binder.children.sort_by {|binder| binder.parents.length}
-
-	# 		#Spawn new children, These children need to have updated parent ids
-	# 		@children.each do |h|
-
-	# 			@node_parent = {"id"	=> @hash_index[h.parent["id"]],
-	# 							"title"	=> h.parent["title"]}
-
-	# 			@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
-
-	# 			@new_node = Binder.new(	:title				=> h.title,
-	# 									:body				=> h.body,
-	# 									:parent				=> @node_parent,
-	# 									:parents			=> @node_parents,
-	# 									:owner				=> current_teacher.id,
-	# 									:last_update		=> h.last_update,
-	# 									:last_updated_by	=> current_teacher.id,
-	# 									:type				=> h.type,
-	# 									:format				=> (h.type != 1 ? h.format : nil),
-	# 									:forked_from		=> h.current_version.id,
-	# 									:fork_stamp			=> Time.now.to_i)
-
-	# 			@new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-	# 													:file_hash	=> h.current_version.file_hash,
-	# 													:timestamp	=> h.current_version.timestamp,
-	# 													:size		=> h.current_version.size,
-	# 													:ext		=> h.current_version.ext,
-	# 													:data		=> h.current_version.data,
-	# 													:croc_uuid	=> h.current_version.croc_uuid,
-	# 													:file		=> h.format == 1 ? h.current_version.file : nil)
-
-	# 			@new_node.save
-
-	# 			h.inc(:fork_total, 1)
-
-	# 			@hash_index[h.id.to_s] = @new_node.id.to_s
-	# 		end
-
-	# 	end
-
-
-	# 	@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
-
-	# 	@parents.each do |pid|
-	# 		if pid != "0"
-	# 			parent = Binder.find(pid)
-
-	# 			parent.update_attributes(	:files		=> parent.files + @new_parent.files,
-	# 										:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-	# 										:total_size	=> parent.total_size + @new_parent.total_size)
-	# 		end
-	# 	end
-
-	# 	Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@new_parent.id)
-
-	# 	redirect_to named_binder_route(@parent) and return if params[:binder][:parent] != "0"
-
-	# 	redirect_to binders_path
-	# end
 
 	def createversion
 		@binder = Binder.find(params[:id])
@@ -1157,6 +1036,7 @@ class BindersController < ApplicationController
 		@colleagues = Teacher.all.reject {|t| t == current_teacher}
 	end
 
+	#This is so nasty.
 	def setpub
 
 		@binder = Binder.find(params[:id])
@@ -1165,32 +1045,83 @@ class BindersController < ApplicationController
 
 		if @binder.get_access(current_teacher.id.to_s) == 2
 
-			if @binder.permissions.find {|p| p["type"] == 3}.nil?
+			if @binder.parent_permissions.find {|p| p["type"] == 3}.nil?
 
-				@binder.permissions << {:type		=> 3,
-										:auth_level	=> params[:enabled] == "true" ? 1 : 0}
-				@binder.save
+				if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
-			else
-
-				@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
-				@binder.save
-
-			end
-
-			@binder.subtree.each do |h|
-
-				if h.parent_permissions.find {|p| p["type"] == 3}.nil?
-					
-					h.parent_permissions << {	:type		=> 3,
-												:folder_id => params[:id],
-												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
-					h.save
+					@binder.permissions << {:type		=> 3,
+											:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+					@binder.save
 
 				else
 
-					h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
-					h.save
+					@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+					@binder.save
+
+				end
+
+				@binder.subtree.each do |h|
+
+					h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
+
+					if h.parent_permissions.find {|p| p["type"] == 3}.nil?
+						
+						h.parent_permissions << {	:type		=> 3,
+													:folder_id => params[:id],
+													:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+						h.save
+
+					else
+
+						h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+						h.parent_permissions.find {|p| p["type"] == 3}["folder_id"] = params[:id]
+						h.save
+
+					end
+
+				end
+
+			else
+
+				if @binder.parent_permissions.find {|p| p["type"] == 3}["auth_level"] == 1 && params[:enabled] == "false"
+
+					error = "Oops! The parent is currently shared."
+
+				else
+
+					if @binder.permissions.find {|p| p["type"] == 3}.nil?
+
+						@binder.permissions << {:type		=> 3,
+												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+						@binder.save
+
+					else
+
+						@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+						@binder.save
+
+					end
+
+					@binder.subtree.each do |h|
+
+						h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
+
+						if h.parent_permissions.find {|p| p["type"] == 3}.nil?
+							
+							h.parent_permissions << {	:type		=> 3,
+														:folder_id => params[:id],
+														:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+							h.save
+
+						else
+
+							h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
+							h.parent_permissions.find {|p| p["type"] == 3}["folder_id"] = params[:id]
+							h.save
+
+						end
+
+					end
 
 				end
 
@@ -1198,7 +1129,7 @@ class BindersController < ApplicationController
 
 		else
 
-			error = "You are not allowed to change permissions on this item"
+			error = "You are not allowed to change permissions on this item."
 
 		end
 		
@@ -1306,16 +1237,6 @@ class BindersController < ApplicationController
 					@size = @current_parents.size
 					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
 				end
-
-				# @binder.subtree.each do |h|
-				# 	# if the binder is not included, this is not necessary...
-				# 	if h.id != @binder.id				
-				# 	 	@current_parents = h.parents
-				# 	 	@size = @current_parents.size
-				# 		h.update_attributes(	:parent		=> @parenthash,
-				# 								:parents	=> @parentsarr)
-				# 	end
-				# end
 
 			end
 

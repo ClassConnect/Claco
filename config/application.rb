@@ -101,10 +101,12 @@ module Claco
     YamlConfigurator.decode_yaml( log4r_config['log4r_config'] )
     config.logger = Log4r::Logger[Rails.env]
 
+    config.mongoid.logger = Log4r::Logger[Rails.env]
+
     # mongoid logger init calls
     #config.mongoid.logger = Logger.new($stdout, :debug)
 
-    #Mongoid.logger.level = Logger::DEBUG
+    Mongoid.logger.level = Logger::DEBUG
   end
 end
 

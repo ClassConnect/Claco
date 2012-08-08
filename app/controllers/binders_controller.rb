@@ -556,7 +556,11 @@ class BindersController < ApplicationController
 					#Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 
 					# DELAYTAG
-					Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+					# .delay(:queue => 'thumbgen')
+					Binder.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+
+					# delay(:queue => 'thumbgen').
+					Binder.gen_croc_thumbnails(@binder.id)
 
 				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
 					# for now, image will be added as file AND as imgfile
@@ -570,12 +574,12 @@ class BindersController < ApplicationController
 
 					#Binder.generate_folder_thumbnail(@binder.id)
 
-					GC.start
+					#GC.start
 
 					#Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
 					#Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
 
-					Binder.gen_thumbnails(@binder.id)
+					Binder.delay(:queue => 'thumbgen').gen_smart_thumbnails(@binder.id)
 
 					# DELAYTAG
 					Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])

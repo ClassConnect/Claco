@@ -60,6 +60,21 @@ function editInit() {
   noteInit = false;
   dontPjax = false;
 
+
+  // CONTENT SPECIFIC FUNCTIONS GO HERE!
+  // if this is a website, fade in the overlay and stuff on hover
+  if ($('.embedlink').length) {
+    $('.embedlink').hover(
+      function () {
+        $('.linkboxer, .whitelay').fadeIn(300);
+      },
+      function () {
+        $('.linkboxer, .whitelay').fadeOut(300);
+      }
+    );
+  }
+
+
   // click on box, redirect
   $('.content-item').click(function() {
 

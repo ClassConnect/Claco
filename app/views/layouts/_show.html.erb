@@ -423,6 +423,7 @@
 
           <div class="pickerpane">
 
+            <% if !@root.nil? %>
 
             <% @root.each do |binder| %>
 
@@ -444,6 +445,7 @@
 
               <% end %>
 
+            <% end %>
             <% end %>
 
 
@@ -486,7 +488,7 @@
 
           <div class="pickerpane">
 
-
+            <% if !@root.nil? %>
             <% @root.each do |binder| %>
 
             <div class="bndr">
@@ -503,7 +505,7 @@
             </div>
 
             <% end %>
-
+            <% end %>
 
           </div>
         </div>

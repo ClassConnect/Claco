@@ -18,9 +18,17 @@
 
 <% else %>
 
+<a href="<%= @binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data %>" target="_blank">
 	<div class="embedlink">
+		<div class="linkboxer">
+			<button target="_blank" class="btn btn-primary" style="font-size:18px; padding:15px; font-weight:bolder;">Go to this website!</button>
+		</div>
+
+		<div class="whitelay"></div>
+
 	<%= image_tag(@binder.current_version.imgfile.contentview.url) %>
 	</div>
+</a>
 
 <% end %>
 

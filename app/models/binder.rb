@@ -402,9 +402,85 @@ class Binder
 
 	###############################################################################################
 
+	####  #### #     ###  #   # #### ####        # ##### ####
+	#   # #    #    #   #  # #  #    #   #       # #   # #   #
+	#   # #### #    #####   #   #### #   #       # #   # ####
+	#   # #    #    #   #   #   #    #   #   #   # #   # #   #
+	####  #### #### #   #   #   #### ####    ##### ##### ####
+
+	###############################################################################################
+
 	# Delayed Job Methods
 
 	# Do not explicitly call these!  All these methods have very long latency.
+
+	def self.gen_url_thumbnails(id)
+
+		binder = Binder.find(id.to_s)
+
+		origimg = Magick::ImageList.new
+
+		# retrieve fullsize image from S3 store, read into an ImageList object
+		open(binder.current_version.imgfile.url.to_s) do |f|
+			origimg.from_blob(f.read)
+		end
+
+        origimg.format = "png"
+        #filled_sm.format = "png"
+
+        io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::NorthGravity).to_blob)
+        io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob)
+
+        # set filenames of pseudoIO objects
+        io_lg.original_filename = "thumb_lg"
+        io_sm.original_filename = "thumb_sm"
+
+        # set flags in the stathash
+        stathash = binder.current_version.imgstatus
+		stathash['img_thumb_lg']['generated'] = true
+		stathash['img_thumb_sm']['generated'] = true
+
+		# write to DB/S3
+		binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
+													:img_thumb_sm => io_sm,
+													:imgstatus => stathash)
+		GC.start
+
+	end
+
+	def self.gen_video_thumbnails(id)
+
+		binder = Binder.find(id.to_s)
+
+		origimg = Magick::ImageList.new
+
+		# retrieve fullsize image from S3 store, read into an ImageList object
+		open(binder.current_version.imgfile.url.to_s) do |f|
+			origimg.from_blob(f.read)
+		end
+
+        origimg.format = "png"
+        #filled_sm.format = "png"
+
+        io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
+        io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
+
+        # set filenames of pseudoIO objects
+        io_lg.original_filename = "thumb_lg"
+        io_sm.original_filename = "thumb_sm"
+
+        # set flags in the stathash
+        stathash = binder.current_version.imgstatus
+		stathash['img_thumb_lg']['generated'] = true
+		stathash['img_thumb_sm']['generated'] = true
+
+		# write to DB/S3
+		binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
+													:img_thumb_sm => io_sm,
+													:imgstatus => stathash)
+		GC.start
+
+	end
 
 	def self.gen_croc_thumbnails(id)
 

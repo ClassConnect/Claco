@@ -320,11 +320,15 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
 
+							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
 						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
 							# VIMEO
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
+
+							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
 
@@ -332,11 +336,15 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
 
+							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
 						elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
 							# SCHOOLTUBE
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
+
+							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
@@ -344,11 +352,15 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
 
+							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
 						else
 							@binder.versions.last.update_attributes( :thumbnailgen => 2 )
 							# generic URL, grab Url2png
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+
+							Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
 						end
 
 					end
@@ -557,10 +569,10 @@ class BindersController < ApplicationController
 
 					# DELAYTAG
 					# .delay(:queue => 'thumbgen')
-					Binder.get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+					Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 
 					# delay(:queue => 'thumbgen').
-					Binder.gen_croc_thumbnails(@binder.id)
+					Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
 
 				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
 					# for now, image will be added as file AND as imgfile

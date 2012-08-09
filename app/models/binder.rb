@@ -697,7 +697,7 @@ class Binder
         topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
         bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
         leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
-        rightskew =   Float(rightEX3 -  (3 * rightcentroid    * rightvariance)  - (rightcentroid)**3)   / Float(rightsigma**3)
+        rightskew =   Float(rightEX3 -  (3 * rightcentroid   * rightvariance)   - (rightcentroid)**3)   / Float(rightsigma**3)
 
         Rails.logger.debug "topskew:    #{topskew.to_s}"
         Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
@@ -716,16 +716,24 @@ class Binder
 
         # calculate skew shift
 
+        Rails.logger.debug "topedge:    #{topedge.to_s}"
+        Rails.logger.debug "bottomedge: #{bottomedge.to_s}"
+        Rails.logger.debug "leftedge:   #{leftedge.to_s}"
+        Rails.logger.debug "rightedge:  #{rightedge.to_s}"
+
+        Rails.logger.debug "xskew: #{xskew}"
+        Rails.logger.debug "yskew: #{yskew}"
+
         if xskew > 0
-        	xadj = (rightedge-width)*xskew
+        	xadj = Integer((rightedge-width)*xskew)
         else
-        	xadj = (0-leftedge)*xskew
+        	xadj = Integer((0-leftedge)*xskew)
         end
 
         if yskew > 0
-        	yadj = (bottomedge-height)*yskew
+        	yadj = Integer((bottomedge-height)*yskew)
         else
-        	yadj = (0-topedge)*yskew
+        	yadj = Integer((0-topedge)*yskew)
         end
 
         Rails.logger.debug "xadj: #{xadj}"
@@ -735,7 +743,7 @@ class Binder
         thumb_height = bottomedge-topedge
 
         # calculate differential to align aspect ratios
-        if Float(thumb_height)/Float(thumb_width) < LTHUMB_H/LTHUMB_W
+        if Float(thumb_height)/Float(thumb_width) > Float(LTHUMB_H)/Float(LTHUMB_W)
           # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
           y = Integer(thumb_height-(LTHUMB_H*thumb_width)/LTHUMB_W)/2
 
@@ -751,15 +759,23 @@ class Binder
 
         end
 
+       	#thumb_width = rightedge-leftedge
+        #thumb_height = bottomedge-topedge
+
         # generate LG pseudoIO object to write to S3
         # correct for problems with rmagick's resize_to_fill
-        if (rightedge-leftedge) < (bottomedge-topedge)
+        #if (thumb_width) < (thumb_height)
         	# tall image
-        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
-        else
+        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
+        #else
         	# wide image
-        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
-        end
+        	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
+
+        	#Rails.logger.debug "XXXXXXX Width:  #{rightedge-leftedge}"
+        	#Rails.logger.debug "YYYYYYY Height: #{bottomedge-topedge}"
+
+        	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
+        #end
 
         # reset edge data for small thumb generation
         topedge = Integer(topcentroid - topsigma)
@@ -768,7 +784,7 @@ class Binder
         rightedge = Integer(rightcentroid + rightsigma)
 
         # calculate differential to align aspect ratios
-        if Float(thumb_height)/Float(thumb_width) < STHUMB_H/STHUMB_W
+        if Float(thumb_height)/Float(thumb_width) > STHUMB_H/STHUMB_W
           # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
           y = Integer(thumb_height-(STHUMB_H*thumb_width)/STHUMB_W)/2
 
@@ -784,8 +800,18 @@ class Binder
 
         end
 
+        #thumb_width = rightedge-leftedge
+        #thumb_height = bottomedge-topedge
+
         # generate SM pseudoIO object to write to S3
-        io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(STHUMB_W,STHUMB_H).to_blob)
+        # correct for problems with rmagick's resize_to_fill
+       #if (thumb_width) > (thumb_height)
+        	# tall image
+        	io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
+        #else
+        	# wide image
+        	#io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(STHUMB_W,STHUMB_H).to_blob)
+        #end
 
         # set filenames of pseudoIO objects
         io_cv.original_filename = "contentview.png"
@@ -812,7 +838,7 @@ class Binder
 	def self.get_croc_thumbnail(id,url)
 
 		# loop until Crocodoc has finished processing the file, or timeout is reached
-		timeout = 150 # in tenths of a second
+		timeout = 50 # in tenths of a second
 		#while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
 
 		Rails.logger.debug "url: #{url.to_s}"
@@ -821,7 +847,11 @@ class Binder
 		while RestClient.get(url) {|response, request, result| response.code }.to_i >= 400
 			sleep 0.1
 			timeout -= 1
-			raise "Crocodoc thumbnail fetch timed out" and return if timeout == 0
+			if timeout==0
+				# image fetch timed out
+				Binder.delay(:queue => 'mulligan', :priority => 1, run_at: 15.minutes.from_now).get_croc_thumbnail(id,url)
+				raise "Crocodoc thumbnail fetch timed out" and return
+			end
 		end
 
 		target = find(id)

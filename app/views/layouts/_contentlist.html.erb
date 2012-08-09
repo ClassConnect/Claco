@@ -32,7 +32,8 @@
 		                  		<div class="gen-file">
 		                  			<div class="filebox">
 		                  				<div class="filext">
-		                  					<%= binder.current_version.ext.sub('.','') %>
+		                  					<%= binder.current_version.ext.sub('.','') if binder.format == 1 %>
+		                  					<%= "www" if binder.format == 2 %>
 		                  				</div>
 		                  			</div>
 		                  		</div>

@@ -870,12 +870,7 @@ class Binder
 			vimeo_id = -1
 
 			# pull out vimeo video ID
-			url.path.split('/').each do |f|
-				if f.to_i.to_s.length==8
-					vimeo_id = f.to_i
-					break
-				end
-			end
+			vimeo_id = url.path.split('/').last
 
 			if vimeo_id==-1
 				raise "Vimeo video ID not found in URL" and return
@@ -1010,6 +1005,7 @@ class Version
 
 	end
 
+	#TODO: There needs to be a better way for content type than these boolean functions...
 	def croc?
 
 		return CROC_VALID_FILE_FORMATS.include? ext.downcase if !ext.nil?
@@ -1022,10 +1018,53 @@ class Version
 
 		uri = URI.parse(data)
 
-		return uri.host.nil? ? false : uri.host.include?("youtube.com") && uri.path.include?("watch")
+		return uri.host.nil? ? false : uri.host.include?('youtube.com') && uri.path.include?('/watch')
 
 		rescue URI::InvalidURIError
 			return false
+	end
+
+	def educreations?
+
+		uri = URI.parse(data)
+
+		return uri.host.nil? ? false : uri.host.include?('educreations.com') && uri.path.include?('lesson/view')
+
+		rescue URI::InvalidURIError
+			return false
+	end
+
+	def vimeo?
+
+		uri = URI.parse(data)
+
+		return uri.host.nil? ? false : uri.host.include?('vimeo.com') && uri.path.to_s.length > 0
+
+		rescue URI::InvalidURIError
+			return false
+
+	end
+
+	def schooltube?
+
+		uri = URI.parse(data)
+
+		return uri.host.nil? ? false : uri.host.include?('schooltube.com') && uri.path.to_s.length > 0
+
+		rescue URI::InvalidURIError
+			return false
+
+	end
+
+	def showme?
+
+		uri = URI.parse(data)
+
+		return uri.host.nil? ? false : uri.host.include?('showme.com') && uri.path.include?('/sh')
+
+		rescue URI::InvalidURIError
+			return false
+
 	end
 
 	def img?

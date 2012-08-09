@@ -296,7 +296,7 @@ module ApplicationHelper
 
 		if binder.current_version.croc?
 			return asset_path("binders/types/file.png")
-		elsif binder.current_version.youtube?
+		elsif binder.current_version.youtube? || binder.current_version.educreations? || binder.current_version.vimeo? || binder.current_version.schooltube? || binder.current_version.showme?
 			return asset_path("binders/types/video.png")
 		elsif binder.current_version.img?
 			return asset_path("binders/types/pic.png")

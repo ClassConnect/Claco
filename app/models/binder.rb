@@ -417,23 +417,37 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
+
+
         origimg.format = "png"
         #filled_sm.format = "png"
+
+		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+		if !(origimg.columns.to_i < CV_WIDTH)
+			io_cv = FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob)
+			# shrink image to be reasonably processed (this is what the thumb algos will use)
+			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+		else
+			io_cv = FilelessIO.new(origimg.to_blob)
+		end
 
         io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::NorthGravity).to_blob)
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob)
 
         # set filenames of pseudoIO objects
+        io_cv.original_filename = "contentview"
         io_lg.original_filename = "thumb_lg"
         io_sm.original_filename = "thumb_sm"
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
+		stathash['img_contentview']['generated'] = true
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
 		# write to DB/S3
-		binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
+		binder.current_version.update_attributes(	:img_contentview => io_cv,
+													:img_thumb_lg => io_lg,
 													:img_thumb_sm => io_sm,
 													:imgstatus => stathash)
 		GC.start

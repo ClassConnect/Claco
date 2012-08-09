@@ -1007,27 +1007,13 @@ class Version
 
 	def get_youtube_id
 
-		uri = URI.parse(data)
-
-		if uri.host.include?('youtube.com') && uri.path.include?('/watch')
-			return CGI.parse(uri.query)['v'].first
-		elsif uri.host.include?('youtu.be') && uri.path.length > 1
-			return uri.path.split('/').last
-		else
-			return nil
-		end
+		return CGI.parse(URI.parse(data).query)['v'].first if youtube?
 
 	end
 
 	def get_educreations_id
 
-		uri = URI.parse(data)
-
-		if uri.host.include?('educreations.com') && uri.path.include?('lesson/view')
-			return uri.path.split("/").last if educreations?
-		elsif uri.host.include?('edcr8.co') && uri.path.length > 1
-			return URI.parse(RestClient.get(data){|r1,r2,r3| r1.headers}[:location]).path.split('/').last
-		end
+		return URI.parse(data).path.split("/").last if educreations?
 
 	end
 
@@ -1062,7 +1048,7 @@ class Version
 
 		uri = URI.parse(data)
 
-		return uri.host.nil? ? false : (uri.host.include?('youtube.com') && uri.path.include?('/watch')) || (uri.host.include?('youtu.be') && uri.path.length > 1)
+		return uri.host.nil? ? false : (uri.host.include?('youtube.com') && uri.path.include?('/watch'))
 
 		rescue URI::InvalidURIError
 			return false
@@ -1073,7 +1059,7 @@ class Version
 
 		uri = URI.parse(data)
 
-		return uri.host.nil? ? false : (uri.host.include?('educreations.com') && uri.path.include?('lesson/view')) || (uri.host.include?('edcr8.co') && uri.path.length > 1)
+		return uri.host.nil? ? false : (uri.host.include?('educreations.com') && uri.path.include?('lesson/view'))
 
 		rescue URI::InvalidURIError
 			return false

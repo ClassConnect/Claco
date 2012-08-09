@@ -227,7 +227,7 @@ class BindersController < ApplicationController
 			embed = false
 			url = false
 
-			doc = Nokogiri::HTML(params[:weblink])			
+			doc = Nokogiri::HTML(params[:weblink])
 
 			if !doc.at("iframe").nil?
 
@@ -275,7 +275,9 @@ class BindersController < ApplicationController
 											:type				=> 2,
 											:format				=> 2)
 
-					@binder.versions << Version.new(:data		=> url ? Addressable::URI.heuristic_parse(params[:weblink]).to_s : params[:weblink],
+					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
+
+					@binder.versions << Version.new(:data		=> url ? link : params[:weblink],
 													:thumbnailgen => 1, #video
 													:embed		=> embed,
 													:timestamp	=> Time.now.to_i,
@@ -288,34 +290,24 @@ class BindersController < ApplicationController
 
 					if url
 
-						uri = URI.parse(params[:weblink])
+						uri = URI.parse(link)
 
 						stathash = @binder.current_version.imgstatus
 						stathash[:imgfile][:retrieved] = true
-
 
 						if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 
 							# YOUTUBE
 							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(params[:weblink]))
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-						elsif (uri.host.include? 'youtu.be') && uri.path.length > 0
-
-							# YOUTUBE
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_short_youtube_url(params[:weblink]))
-
-							Binder.delay(:queue => 'thumbten').gen_video_thumbnails(@binder.id)
-
 
 						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
 							# VIMEO
 							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'vimeo'})
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -323,15 +315,7 @@ class BindersController < ApplicationController
 
 							# EDUCREATIONS
 							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
-
-							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-						elsif (uri.host.to_s.include? 'edcr8.co') && (uri.path.to_s.length > 0)
-
-							# EDUCREATIONS
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_short_educreations_url(params[:weblink]))
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -339,7 +323,7 @@ class BindersController < ApplicationController
 
 							# SCHOOLTUBE
 							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'schooltube'}) 
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -347,7 +331,7 @@ class BindersController < ApplicationController
 
 							# SHOWME
 							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,params[:weblink],{:site => 'showme'})
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -355,7 +339,7 @@ class BindersController < ApplicationController
 							@binder.versions.last.update_attributes( :thumbnailgen => 2 )
 							# generic URL, grab Url2png
 							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(params[:weblink]))
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
 
 							Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
 						end
@@ -1332,6 +1316,18 @@ class BindersController < ApplicationController
 
 	module Url
 		extend self
+		
+		def follow(url, hop = 0)
+		
+			return nil if hop == 5
+
+			r = RestClient.get(url){|r1,r2,r3| r1}
+
+			return follow(r.headers[:location], hop + 1) if r.code > 300 && r.code != 304
+
+			return url if r.code == 200 || r.code == 304
+
+		end
 
 		def extract_youtube_extension(url)
 

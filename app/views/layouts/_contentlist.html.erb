@@ -57,8 +57,9 @@
                     # is a folder
                   %>
 
-                  	<% if binder.thumbimgids.reject{""}.empty?
-                  	#binder.children.count == 0 ||  %>
+                  	<% if binder.thumbimgids.reject{|f| f==""}.empty?
+                  	#binder.children.count == 0 ||  
+                  	%>
 
 						<div class="folder-preview">
 							<div class="dyncon">

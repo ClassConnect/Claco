@@ -752,7 +752,7 @@ class Binder
         end
 
         # generate LG pseudoIO object to write to S3
-        io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
+        io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
 
         # reset edge data for small thumb generation
         topedge = Integer(topcentroid - topsigma)

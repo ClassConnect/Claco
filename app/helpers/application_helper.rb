@@ -252,19 +252,21 @@ module ApplicationHelper
 
 
 		if binder.versions.nil?
-			#return "<no image>"
-			return asset_path("stockfilethumbs/wideblankpaper.png")
+			return "<no image>"
+			#return asset_path("stockfilethumbs/wideblankpaper.png")
 		elsif binder.current_version.nil?
-			#return "<no image>"
-			return asset_path("stockfilethumbs/wideblankpaper.png")
+			return "<no image>"
+			#return asset_path("stockfilethumbs/wideblankpaper.png")
 		elsif binder.current_version.imgstatus['imageable'] == false
 			#return "[#{binder.current_version.ext.upcase}]"
-			return asset_path("stockfilethumbs/wideblankpaper.png")
+			return "<no image>"
+			#return asset_path("stockfilethumbs/wideblankpaper.png")
 		elsif binder.current_version.imgstatus['imgfile']['retrieved'] == false#?['imagefile']['retrieved']?
-			#return "<no image>"
-			return asset_path("stockfilethumbs/wideblankpaper.png")
+			return "<no image>"
+			#return asset_path("stockfilethumbs/wideblankpaper.png")
 		elsif binder.current_version.img_thumb_lg.nil? || binder.current_version.img_thumb_lg.url.to_s.to_s.empty?
-			return asset_path("stockfilethumbs/wideblankpaper.png")
+			return "<no image>"
+			#return asset_path("stockfilethumbs/wideblankpaper.png")
 		else
 			#return image_tag( "#{binder.versions.last.imgfile}", options ) + raw('&nbsp;')# + 
 			#return	image_tag( "#{binder.versions.last.imgfile.thumb_lg}",options) + raw('&nbsp;') + 

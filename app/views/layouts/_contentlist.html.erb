@@ -1,4 +1,4 @@
-		<div class="content-list">
+<div class="content-list">
 
 
 	     <% if @children.empty? %>
@@ -24,19 +24,19 @@
 					<% if get_binder_image(binder) == "<no image>" %>
 
 	                  	<div class="folder-preview">
+							<div class="contype">
+								<img src="/assets/binders/types/file.png" style="width:24px" />
+							</div>
 		                  	<div class="dyncon">
 
 		                  		<div class="gen-file">
 		                  			<div class="filebox">
 		                  				<div class="filext">
-		                  					binder.current_version.ext
+		                  					<%= binder.current_version.ext.sub('.','') %>
 		                  				</div>
 		                  			</div>
 		                  		</div>
 
-							</div>
-							<div class="contype">
-								<img src="/assets/binders/types/file.png" style="width:24px" />
 							</div>
 						</div>
 
@@ -73,12 +73,10 @@
               	  	<% else %>
 
     		            <div class="folder-preview">
-    		              <!-- <div class="single-hold" src="<%= imgarr[0].to_s %>" > -->
 
-                      <div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s.empty? ? asset_path("stockfilethumbs/wideemptyfolder.png") : imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
+    		            
 
-                      <!--<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');">-->
-
+                      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
 
                       	<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
@@ -159,9 +157,10 @@
 
 
 
-					
+
 				<% end %>
 			<% end %>
 
 
 		</div>
+

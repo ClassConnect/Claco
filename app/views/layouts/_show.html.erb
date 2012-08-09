@@ -425,6 +425,7 @@
 
             <% if !@root.nil? %>
             <% @root.each do |binder| %>
+            <% Rails.logger.debug "ROOT" %>
 
 
               <% if binder.parent["id"] == "0" %>
@@ -489,6 +490,7 @@
 
             <% if !@root.nil? %>
             <% @root.each do |binder| %>
+            <% Rails.logger.debug "ROOT" %>
 
             <div class="bndr">
 

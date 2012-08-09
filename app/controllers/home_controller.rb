@@ -7,10 +7,21 @@ class HomeController < ApplicationController
 	end
 
 	def fetchtitle
-		title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze(" ")
+		
+		f = Nokogiri::HTML(params[:url]).at('iframe')
+
+		if f.nil?
+
+			title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze(' ')
+
+		else
+
+			title = Nokogiri::HTML(RestClient.get(f['src'])).title.strip.squeeze(' ')
+
+		end
 
 		rescue
-			
+
 		ensure
 			respond_to do |format|
 				format.html {render :text => title || " "}

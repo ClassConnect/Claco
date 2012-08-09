@@ -226,25 +226,57 @@ class BindersController < ApplicationController
 
 			embed = false
 			url = false
+			embedtourl = false
 
 			doc = Nokogiri::HTML(params[:weblink])
 
-			if !doc.at("iframe").nil?
+			if !doc.at('iframe').nil?
 
-				embed = true
+				uri = URI.parse(doc.at('iframe')['src'])
 
-			elsif !doc.at("embed").nil?
+				if uri.host.include?('youtube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.youtube.com/watch?v=#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
+
+					embedtourl = true
+					uri = "http://www.educreations.com/lesson/view/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
+
+					embedtourl = true
+					uri = "http://vimeo.com/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('schooltube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.schooltube.com/video/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('showme.com') && uri.path.include?('sma/embed')
+
+					embedtourl = true
+					uri = "http://www.showme.com/sh/?h=#{CGI.parse(uri.query)['s'].first}"
+
+				else
+
+					embed = true
+
+				end
+
+			elsif !doc.at('embed').nil?
 
 				embed = true
 
 			end
 
-			if !embed
+			if !embed && !embedtourl
 				RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
 				url = true
 			end
 
-			if url || embed
+			if url || embed || embedtourl
 
 				@inherited = inherit_from(params[:id])
 
@@ -276,8 +308,9 @@ class BindersController < ApplicationController
 											:format				=> 2)
 
 					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)) if embedtourl
 
-					@binder.versions << Version.new(:data		=> url ? link : params[:weblink],
+					@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
 													:thumbnailgen => 1, #video
 													:embed		=> embed,
 													:timestamp	=> Time.now.to_i,
@@ -288,7 +321,7 @@ class BindersController < ApplicationController
 
 					@binder.save
 
-					if url
+					if url || embedtourl
 
 						uri = URI.parse(link)
 
@@ -378,7 +411,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid input data"
+			errors << "Invalid URL"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
@@ -1323,7 +1356,7 @@ class BindersController < ApplicationController
 
 			r = RestClient.get(url){|r1,r2,r3| r1}
 
-			return follow(r.headers[:location], hop + 1) if r.code > 300 && r.code != 304
+			return follow(r.headers[:location], hop + 1) if r.code > 300 && r.code != 304 && r.code < 400
 
 			return url if r.code == 200 || r.code == 304
 

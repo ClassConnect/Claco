@@ -1005,6 +1005,50 @@ class Version
 
 	end
 
+	def get_youtube_id
+
+		uri = URI.parse(data)
+
+		if uri.host.include?('youtube.com') && uri.path.include?('/watch')
+			return CGI.parse(uri.query)['v'].first
+		elsif uri.host.include?('youtu.be') && uri.path.length > 1
+			return uri.path.split('/').last
+		else
+			return nil
+		end
+
+	end
+
+	def get_educreations_id
+
+		uri = URI.parse(data)
+
+		if uri.host.include?('educreations.com') && uri.path.include?('lesson/view')
+			return uri.path.split("/").last if educreations?
+		elsif uri.host.include?('edcr8.co') && uri.path.length > 1
+			return URI.parse(RestClient.get(data){|r1,r2,r3| r1.headers}[:location]).path.split('/').last
+		end
+
+	end
+
+	def get_vimeo_id
+
+		return URI.parse(data).path.split("/").last if vimeo?
+
+	end
+
+	def get_schooltube_id
+
+		return URI.parse(data).path.split("/")[2] if schooltube?
+
+	end
+
+	def get_showme_id
+
+		return CGI.parse(URI.parse(data).query)["h"].first if showme?
+
+	end
+
 	#TODO: There needs to be a better way for content type than these boolean functions...
 	def croc?
 
@@ -1018,20 +1062,22 @@ class Version
 
 		uri = URI.parse(data)
 
-		return uri.host.nil? ? false : uri.host.include?('youtube.com') && uri.path.include?('/watch')
+		return uri.host.nil? ? false : (uri.host.include?('youtube.com') && uri.path.include?('/watch')) || (uri.host.include?('youtu.be') && uri.path.length > 1)
 
 		rescue URI::InvalidURIError
 			return false
+
 	end
 
 	def educreations?
 
 		uri = URI.parse(data)
 
-		return uri.host.nil? ? false : uri.host.include?('educreations.com') && uri.path.include?('lesson/view')
+		return uri.host.nil? ? false : (uri.host.include?('educreations.com') && uri.path.include?('lesson/view')) || (uri.host.include?('edcr8.co') && uri.path.length > 1)
 
 		rescue URI::InvalidURIError
 			return false
+
 	end
 
 	def vimeo?

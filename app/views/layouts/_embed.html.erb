@@ -4,23 +4,23 @@
 
 <% elsif @binder.current_version.youtube? %>
 
-	<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= CGI.parse(URI.parse(@binder.current_version.data).query)["v"].first %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>
+	<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= @binder.current_version.get_youtube_id %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>
 
 <% elsif @binder.current_version.educreations? %>
 
-	<iframe width="480" height="300" src="http://www.educreations.com/lesson/embed/<%= URI.parse(@binder.current_version.data).path.split("/").last %>/" frameborder="0" allowfullscreen></iframe>
+	<center><iframe width="480" height="300" src="http://www.educreations.com/lesson/embed/<%= @binder.current_version.get_educreations_id %>/" frameborder="0" allowfullscreen></iframe></center>
 
 <% elsif @binder.current_version.vimeo? %>
 
-	<iframe src="http://player.vimeo.com/video/<%= URI.parse(@binder.current_version.data).path.split("/").last %>" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+	<center><iframe src="http://player.vimeo.com/video/<%= @binder.current_version.get_vimeo_id %>" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></center>
 
 <% elsif @binder.current_version.schooltube? %>
 
-	<iframe width="500" height="375" src="http://www.schooltube.com/embed/<%= URI.parse(@binder.current_version.data).path.split("/")[2] %>" frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe>
+	<center><iframe width="500" height="375" src="http://www.schooltube.com/embed/<%= @binder.current_version.get_schooltube_id %>" frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe></center>
 
 <% elsif @binder.current_version.showme? %>
 
-	<iframe src="http://www.showme.com/sma/embed/?s=<%= CGI.parse(URI.parse(@binder.current_version.data).query)["h"].first %>&w=580&h=434" width="580" height="434" ></iframe>
+	<center><iframe src="http://www.showme.com/sma/embed/?s=<%= @binder.current_version.get_showme_id %>&w=580&h=434" width="580" height="434" ></iframe></center>
 
 <% elsif @binder.current_version.img? %>
 

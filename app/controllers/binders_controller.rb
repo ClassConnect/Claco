@@ -302,6 +302,15 @@ class BindersController < ApplicationController
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
+						elsif (uri.host.include? 'youtu.be') && uri.path.length > 0
+
+							# YOUTUBE
+							# DELAYTAG
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_short_youtube_url(params[:weblink]))
+
+							Binder.delay(:queue => 'thumbten').gen_video_thumbnails(@binder.id)
+
+
 						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
 							# VIMEO
@@ -315,6 +324,14 @@ class BindersController < ApplicationController
 							# EDUCREATIONS
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(params[:weblink]))
+
+							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+						elsif (uri.host.to_s.include? 'edcr8.co') && (uri.path.to_s.length > 0)
+
+							# EDUCREATIONS
+							# DELAYTAG
+							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_short_educreations_url(params[:weblink]))
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -1326,6 +1343,12 @@ class BindersController < ApplicationController
 			return YOUTUBE_IMG_URL + CGI.parse(URI.parse(url).query)['v'].first.to_s + YOUTUBE_IMG_FILE
 
 		end
+		
+		def get_short_youtube_url(url)
+
+			return YOUTUBE_IMG_URL + URI.parse(url).path.split('/').last + YOUTUBE_IMG_FILE
+
+		end
 
 		def get_educreations_url(url)
 
@@ -1349,6 +1372,10 @@ class BindersController < ApplicationController
 
 			return "http://media.educreations.com/recordings/#{imgkey}/#{educr_id}/thumbnail.280x175.png"
 
+		end
+
+		def get_short_educreations_url(url)
+			return get_educreations_url(RestClient.get('http://edcr8.co/GGOJbO'){|r1,r2,r3| r1.headers}[:location])
 		end
 
 		def get_url2png_url(url,options = {})

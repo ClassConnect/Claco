@@ -389,12 +389,32 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id.to_s,
-									:body				=> params[:text].gsub(/<br>/, "<br/>"))
+		errors = []
+
+		if params[:text] != "Type a note..."
+
+			if teacher_signed_in? && @binder.get_access(current_teacher.id.to_s) == 2
+
+				@binder.update_attributes(	:last_update		=> Time.now.to_i,
+											:last_updated_by	=> current_teacher.id.to_s,
+											:body				=> params[:text].gsub(/<br>/, "<br/>"))
+
+			else
+
+				errors << "You are not allowed to do that"
+
+			end
+
+		else
+
+			@binder.update_attributes(	:last_update		=> Time.now.to_i,
+										:last_updated_by	=> current_teacher.id.to_s,
+										:body				=> "")
+
+		end
 
 		respond_to do |format|
-			format.html {render :text => "1"}
+			format.html {render :text => errors.empty? ? "1" : errors}
 		end
 	end
 

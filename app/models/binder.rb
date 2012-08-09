@@ -435,9 +435,9 @@ class Binder
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_cv.original_filename = "contentview"
-        io_lg.original_filename = "thumb_lg"
-        io_sm.original_filename = "thumb_sm"
+        io_cv.original_filename = "contentview.png"
+        io_lg.original_filename = "thumb_lg.png"
+        io_sm.original_filename = "thumb_sm.png"
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -471,8 +471,8 @@ class Binder
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_lg.original_filename = "thumb_lg"
-        io_sm.original_filename = "thumb_sm"
+        io_lg.original_filename = "thumb_lg.png"
+        io_sm.original_filename = "thumb_sm.png"
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -521,8 +521,8 @@ class Binder
         io_sm = FilelessIO.new(filled_sm.to_blob)#resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
 
         # set filenames of pseudoIO objects
-        io_lg.original_filename = "thumb_lg"
-        io_sm.original_filename = "thumb_sm"
+        io_lg.original_filename = "thumb_lg.png"
+        io_sm.original_filename = "thumb_sm.png"
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -781,9 +781,9 @@ class Binder
         io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(STHUMB_W,STHUMB_H).to_blob)
 
         # set filenames of pseudoIO objects
-        io_cv.original_filename = "contentview"
-        io_lg.original_filename = "thumb_lg"
-        io_sm.original_filename = "thumb_sm"
+        io_cv.original_filename = "contentview.png"
+        io_lg.original_filename = "thumb_lg.png"
+        io_sm.original_filename = "thumb_sm.png"
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus

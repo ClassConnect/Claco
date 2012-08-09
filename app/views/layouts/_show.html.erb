@@ -35,7 +35,7 @@
 
 	<div id="left-sidebar">
 
-    <% if params[:action] == "show" %>
+    <% if params[:action] == "show" && teacher_signed_in? && current_teacher.id.to_s == @binder.owner %>
 
         <div class="conbox">
           <div class="headstrip" style="margin-bottom:10px">

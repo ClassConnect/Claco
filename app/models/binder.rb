@@ -752,7 +752,14 @@ class Binder
         end
 
         # generate LG pseudoIO object to write to S3
-        io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
+        # correct for problems with rmagick's resize_to_fill
+        if (rightedge-leftedge) < (bottomedge-topedge)
+        	# tall image
+        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
+        else
+        	# wide image
+        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
+        end
 
         # reset edge data for small thumb generation
         topedge = Integer(topcentroid - topsigma)

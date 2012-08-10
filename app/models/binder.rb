@@ -417,9 +417,7 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
-
-
-        origimg.format = "png"
+        origimg.format = BLOB_FILETYPE
         #filled_sm.format = "png"
 
 		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
@@ -435,9 +433,9 @@ class Binder
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_cv.original_filename = "contentview.png"
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_cv.original_filename = CV_FILENAME
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -465,14 +463,14 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
-        origimg.format = "png"
+        origimg.format = BLOB_FILETYPE
 
         io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -508,21 +506,25 @@ class Binder
         new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
        # border_lg << Magick::Image.new(origimg.columns+2,origimg.rows+2)
         #border_sm << Magick::Image.new()
-        filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color('#EEEEEE'))
-        filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color('#EEEEEE'))
+        filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
 
-        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,'#CCCCCC'),Magick::CenterGravity,Magick::OverCompositeOp)
-        filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,'#CCCCCC'),Magick::CenterGravity,Magick::OverCompositeOp)
+        # IMPORTANT!!!!!!
+        # Swap the lines below to make the background transparent
+        filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+        #filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
 
-        filled_lg.format = "png"
-        filled_sm.format = "png"
+        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+        filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+
+        filled_lg.format = BLOB_FILETYPE
+        filled_sm.format = BLOB_FILETYPE
 
         io_lg = FilelessIO.new(filled_lg.to_blob)
         io_sm = FilelessIO.new(filled_sm.to_blob)#resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
 
         # set filenames of pseudoIO objects
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -697,7 +699,7 @@ class Binder
         topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
         bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
         leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
-        rightskew =   Float(rightEX3 -  (3 * rightcentroid    * rightvariance)  - (rightcentroid)**3)   / Float(rightsigma**3)
+        rightskew =   Float(rightEX3 -  (3 * rightcentroid   * rightvariance)   - (rightcentroid)**3)   / Float(rightsigma**3)
 
         Rails.logger.debug "topskew:    #{topskew.to_s}"
         Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
@@ -715,17 +717,16 @@ class Binder
         yskew = 1.0 if yskew > 1.0
 
         # calculate skew shift
-
         if xskew > 0
-        	xadj = (rightedge-width)*xskew
+        	xadj = Integer((rightedge-width)*xskew)
         else
-        	xadj = (0-leftedge)*xskew
+        	xadj = Integer((0-leftedge)*xskew)
         end
 
         if yskew > 0
-        	yadj = (bottomedge-height)*yskew
+        	yadj = Integer((bottomedge-height)*yskew)
         else
-        	yadj = (0-topedge)*yskew
+        	yadj = Integer((0-topedge)*yskew)
         end
 
         Rails.logger.debug "xadj: #{xadj}"
@@ -735,7 +736,7 @@ class Binder
         thumb_height = bottomedge-topedge
 
         # calculate differential to align aspect ratios
-        if Float(thumb_height)/Float(thumb_width) < LTHUMB_H/LTHUMB_W
+        if Float(thumb_height)/Float(thumb_width) > Float(LTHUMB_H)/Float(LTHUMB_W)
           # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
           y = Integer(thumb_height-(LTHUMB_H*thumb_width)/LTHUMB_W)/2
 
@@ -751,15 +752,7 @@ class Binder
 
         end
 
-        # generate LG pseudoIO object to write to S3
-        # correct for problems with rmagick's resize_to_fill
-        if (rightedge-leftedge) < (bottomedge-topedge)
-        	# tall image
-        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
-        else
-        	# wide image
-        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
-        end
+    	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
 
         # reset edge data for small thumb generation
         topedge = Integer(topcentroid - topsigma)
@@ -767,8 +760,11 @@ class Binder
         leftedge = Integer(leftcentroid - leftsigma)
         rightedge = Integer(rightcentroid + rightsigma)
 
+        thumb_width = rightedge-leftedge
+        thumb_height = bottomedge-topedge
+
         # calculate differential to align aspect ratios
-        if Float(thumb_height)/Float(thumb_width) < STHUMB_H/STHUMB_W
+        if Float(thumb_height)/Float(thumb_width) > STHUMB_H/STHUMB_W
           # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
           y = Integer(thumb_height-(STHUMB_H*thumb_width)/STHUMB_W)/2
 
@@ -784,13 +780,12 @@ class Binder
 
         end
 
-        # generate SM pseudoIO object to write to S3
-        io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(STHUMB_W,STHUMB_H).to_blob)
+    	io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_cv.original_filename = "contentview.png"
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_cv.original_filename = CV_FILENAME
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -812,7 +807,7 @@ class Binder
 	def self.get_croc_thumbnail(id,url)
 
 		# loop until Crocodoc has finished processing the file, or timeout is reached
-		timeout = 150 # in tenths of a second
+		timeout = 50 # in tenths of a second
 		#while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
 
 		Rails.logger.debug "url: #{url.to_s}"
@@ -821,7 +816,11 @@ class Binder
 		while RestClient.get(url) {|response, request, result| response.code }.to_i >= 400
 			sleep 0.1
 			timeout -= 1
-			raise "Crocodoc thumbnail fetch timed out" and return if timeout == 0
+			if timeout==0
+				# image fetch timed out
+				Binder.delay(:queue => 'mulligan', :priority => 1, run_at: 15.minutes.from_now).get_croc_thumbnail(id,url)
+				raise "Crocodoc thumbnail fetch timed out" and return
+			end
 		end
 
 		target = find(id)

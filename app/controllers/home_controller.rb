@@ -24,7 +24,7 @@ class HomeController < ApplicationController
 
 		ensure
 			respond_to do |format|
-				format.html {render :text => title[0..50] || " "}
+				format.html {render :text => title[0..49] || " "}
 			end
 	end
 

@@ -892,7 +892,17 @@ class Binder
 
 			response = RestClient.get(url.to_s){ |resp, request, result| resp }
 
-			api_url = response.to_s.scan(/poster="(.*_lg.jpg)/).first.first
+			doc = Nokogiri::HTML(response)
+
+			if doc.at('iframe').nil?
+
+				api_url = response.to_s.scan(/poster="(.*.jpg)/).first.first
+
+			else
+
+				api_url = Nokogiri::HTML(RestClient.get(doc.at('iframe')['src'])).at('video')['poster']
+
+			end
 
 		elsif options[:site]=='showme'
 

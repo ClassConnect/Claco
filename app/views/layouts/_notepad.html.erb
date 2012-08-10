@@ -2,7 +2,7 @@
 				<%= image_tag("pin.png", :class => 'pinim') %>
           <div class="inner">
 
-            <div class="real-text"><%= @binder.body.html_safe if !@binder.body.blank? %></div>
+            <div class="real-text"><%= @binder.body.html_safe if !@binder.body.blank? %><%= '<span style="color:#777;font-style:italic">Click to add a note...</span>'.html_safe if @binder.body.blank? %></div>
 
 
 

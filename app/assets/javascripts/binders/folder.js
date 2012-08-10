@@ -69,10 +69,10 @@ function editInit() {
   if ($('.embedlink').length) {
     $('.embedlink').hover(
       function () {
-        $('.linkboxer, .whitelay').fadeIn(300);
+        $('.linkboxer, .whitelay').stop(true, true).fadeIn(300);
       },
       function () {
-        $('.linkboxer, .whitelay').fadeOut(300);
+        $('.linkboxer, .whitelay').stop(true, true).fadeOut(300);
       }
     );
   }
@@ -345,7 +345,13 @@ function editInit() {
   // we're performing a save
   $(".save-wysi").click(function() {
       editor.composer.element.blur();
+
       $('.real-text').html($(editor.composer.element).html());
+
+      if ($(editor.composer.element).html() == 'Type a note...') {
+        $('.real-text').html('<span style="color:#777;font-style:italic">Click to add a note...</span>');
+      }
+
       $('.wysi-edit').hide();
       $('.real-text').show();
       noteClick = true;

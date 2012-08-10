@@ -72,3 +72,13 @@ LTHUMB_H = 92.0
 # Small thumbnail dimensions
 STHUMB_W = 49.0
 STHUMB_H = 46.0
+
+# blob filedata
+BLOB_FILETYPE = "png"
+CV_FILENAME = "contentview.png"
+LTHUMB_FILENAME = "thumb_lg.png"
+STHUMB_FILENAME = "thumb_sm.png"
+
+# crocodoc thumbs
+CROC_BACKGROUND_COLOR = "#EEEEEE"
+CROC_BORDER_COLOR = "#CCCCCC"

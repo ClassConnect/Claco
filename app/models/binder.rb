@@ -417,9 +417,7 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
-
-
-        origimg.format = "png"
+        origimg.format = BLOB_FILETYPE
         #filled_sm.format = "png"
 
 		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
@@ -435,9 +433,9 @@ class Binder
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_cv.original_filename = "contentview.png"
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_cv.original_filename = CV_FILENAME
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -465,14 +463,14 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
-        origimg.format = "png"
+        origimg.format = BLOB_FILETYPE
 
         io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
         io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -508,21 +506,25 @@ class Binder
         new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
        # border_lg << Magick::Image.new(origimg.columns+2,origimg.rows+2)
         #border_sm << Magick::Image.new()
-        filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color('#EEEEEE'))
-        filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color('#EEEEEE'))
+        filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
 
-        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,'#CCCCCC'),Magick::CenterGravity,Magick::OverCompositeOp)
-        filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,'#CCCCCC'),Magick::CenterGravity,Magick::OverCompositeOp)
+        # IMPORTANT!!!!!!
+        # Swap the lines below to make the background transparent
+        filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+        #filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
 
-        filled_lg.format = "png"
-        filled_sm.format = "png"
+        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+        filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+
+        filled_lg.format = BLOB_FILETYPE
+        filled_sm.format = BLOB_FILETYPE
 
         io_lg = FilelessIO.new(filled_lg.to_blob)
         io_sm = FilelessIO.new(filled_sm.to_blob)#resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
 
         # set filenames of pseudoIO objects
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus
@@ -715,15 +717,6 @@ class Binder
         yskew = 1.0 if yskew > 1.0
 
         # calculate skew shift
-
-        Rails.logger.debug "topedge:    #{topedge.to_s}"
-        Rails.logger.debug "bottomedge: #{bottomedge.to_s}"
-        Rails.logger.debug "leftedge:   #{leftedge.to_s}"
-        Rails.logger.debug "rightedge:  #{rightedge.to_s}"
-
-        Rails.logger.debug "xskew: #{xskew}"
-        Rails.logger.debug "yskew: #{yskew}"
-
         if xskew > 0
         	xadj = Integer((rightedge-width)*xskew)
         else
@@ -759,29 +752,16 @@ class Binder
 
         end
 
-       	#thumb_width = rightedge-leftedge
-        #thumb_height = bottomedge-topedge
-
-        # generate LG pseudoIO object to write to S3
-        # correct for problems with rmagick's resize_to_fill
-        #if (thumb_width) < (thumb_height)
-        	# tall image
-        	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
-        #else
-        	# wide image
-        	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
-
-        	#Rails.logger.debug "XXXXXXX Width:  #{rightedge-leftedge}"
-        	#Rails.logger.debug "YYYYYYY Height: #{bottomedge-topedge}"
-
-        	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(LTHUMB_W,LTHUMB_H).to_blob)
-        #end
+    	io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
 
         # reset edge data for small thumb generation
         topedge = Integer(topcentroid - topsigma)
         bottomedge = Integer(bottomcentroid + bottomsigma)
         leftedge = Integer(leftcentroid - leftsigma)
         rightedge = Integer(rightcentroid + rightsigma)
+
+        thumb_width = rightedge-leftedge
+        thumb_height = bottomedge-topedge
 
         # calculate differential to align aspect ratios
         if Float(thumb_height)/Float(thumb_width) > STHUMB_H/STHUMB_W
@@ -800,23 +780,12 @@ class Binder
 
         end
 
-        #thumb_width = rightedge-leftedge
-        #thumb_height = bottomedge-topedge
-
-        # generate SM pseudoIO object to write to S3
-        # correct for problems with rmagick's resize_to_fill
-       #if (thumb_width) > (thumb_height)
-        	# tall image
-        	io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
-        #else
-        	# wide image
-        	#io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).resize(STHUMB_W,STHUMB_H).to_blob)
-        #end
+    	io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
 
         # set filenames of pseudoIO objects
-        io_cv.original_filename = "contentview.png"
-        io_lg.original_filename = "thumb_lg.png"
-        io_sm.original_filename = "thumb_sm.png"
+        io_cv.original_filename = CV_FILENAME
+        io_lg.original_filename = LTHUMB_FILENAME
+        io_sm.original_filename = STHUMB_FILENAME
 
         # set flags in the stathash
         stathash = binder.current_version.imgstatus

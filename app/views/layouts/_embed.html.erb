@@ -32,7 +32,7 @@
 
 	<%= @binder.current_version.data.html_safe %>
 
-<% else %>
+<% elsif @binder.format == 2 %>
 
 <a href="<%= @binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data %>" target="_blank">
 	<div class="embedlink">

@@ -510,8 +510,8 @@ class Binder
 
         # IMPORTANT!!!!!!
         # Swap the lines below to make the background transparent
-        filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
-        #filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+        #filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+        filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
 
         filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
         filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)

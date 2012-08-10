@@ -10,7 +10,7 @@ PATH_THUMBNAIL = "/download/thumbnail"
 PATH_STATUS = "/document/status"
 PATH_SESSION = "/session/create"
 
-CROC_VALID_FILE_FORMATS = ['.doc','.docx','.pdf','.ppt','.pptx']
+CROC_VALID_FILE_FORMATS = ['.doc','.docx','.pdf','.ppt','.pptx','.xls','xls','.xlsx','xlsx']
 
 CROC_API_OPTIONS = {
 	# Your API token
@@ -49,7 +49,7 @@ YOUTUBE_IMG_FILE = "/0.jpg"
 
 # SUPPORTED DOCUMENTS 
 
-CLACO_SUPPORTED_THUMBNAIL_FILETYPES = %w[doc .doc docx .docx ppt .ppt pptx .pptx pdf .pdf jpg .jpg jpeg .jpeg png .png gif .gif]
+CLACO_SUPPORTED_THUMBNAIL_FILETYPES = %w[doc .doc docx .docx ppt .ppt pptx .pptx pdf .pdf jpg .jpg jpeg .jpeg png .png gif .gif xls .xls xlsx .xlsx]
 CLACO_VALID_IMAGE_FILETYPES = %w[jpg .jpg jpeg .jpeg png .png gif .gif]
 
 

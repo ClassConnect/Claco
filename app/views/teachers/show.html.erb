@@ -4,9 +4,11 @@
 <p><%= "#{ @teacher.full_name }" %></p>
 <p><%=  #!@teacher.info.avatar.path.to_s.empty? ? image_tag(@teacher.info.avatar, :width => "200") : "<no profile picture>" 
 %></p>
-<p><%= get_teacher_avatar(@teacher,{:width => 200, :border => 1}) %></p>
-<p><%= get_teacher_avatar(@teacher,{:border => 1, :thumb_lg => ''}) %></p>
-<p><%= get_teacher_avatar(@teacher,{:border => 1, :thumb_sm => ''}) %></p>
+
+<img src="<%=	@teacher.info.avatar.url.to_s %>" />
+<img src="<%= @teacher.info.avatar.thumb_lg.to_s %>" />
+<img src="<%= @teacher.info.avatar.thumb_sm.to_s %>" />
+
 <% if !@teacher.info.nil? %>
 <p><%= "Bio: #{@teacher.info.bio}" if !@teacher.info.bio.empty? %></p>
 <p><%= "Website: #{@teacher.info.website}" if !@teacher.info.website.empty? %></p>
@@ -42,7 +44,8 @@
 			<% @colleagues.each do |colleague| %>
 			<tr>
 				<td>
-					<%= get_teacher_avatar(colleague, {:height => 60, :border => 1}) %>
+					<%= # deprecated
+					get_teacher_avatar(colleague, {:height => 60, :border => 1}) %>
 				</td>
 				<td>
 					<p>
@@ -103,10 +106,4 @@
 		<br />
 	<% end %>
 <% end %>
-
-<% if false %>
-	<hr />
-	<p>Feed:</p>
-<% end %>
-
 

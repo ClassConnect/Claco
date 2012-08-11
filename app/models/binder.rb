@@ -46,6 +46,25 @@ class Binder
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
+	# categorized by last update type
+	# 0 - creation
+	# 1 - update data
+	# 2 - new/modified version
+	# 3 - rename
+	# 4 - created/modified tags
+	# 5 - move
+	# 6 - copy
+	# 7 - delete
+	# 8 - permission modification
+	# 9 - reordered
+	# 10- downloaded
+	# 11- forked
+
+	field :download_count, :type => Integer, :default => 0
+
+	field :last_action_update, :type => Array, :default => [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+	field :last_action_owner, :type => Array, :default 	=> [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+
 	#Counts
 	field :files, :type => Integer, :default => 0
 	field :folders, :type => Integer, :default => 0
@@ -394,11 +413,13 @@ class Binder
 
 	###############################################################################################
 
-	####  #### #     ###  #   # #### ####        # ##### ####
-	#   # #    #    #   #  # #  #    #   #       # #   # #   #
-	#   # #### #    #####   #   #### #   #       # #   # ####
-	#   # #    #    #   #   #   #    #   #   #   # #   # #   #
-	####  #### #### #   #   #   #### ####    ##### ##### ####
+	            ####   ##### #       ##   #     # ##### ####          # ##### ####
+	            #   #  #     #      #  #   #   #  #     #   #         # #   # #   #
+	            #    # #     #     #    #   # #   #     #    #        # #   # #   #
+	            #    # ##### #     ######    #    ##### #    #        # #   # ####
+	            #    # #     #     #    #    #    #     #    #        # #   # #   #
+	            #   #  #     #     #    #    #    #     #   #     #   # #   # #   #
+	            ####   ##### ##### #    #    #    ##### ####       ###  ##### ####
 
 	###############################################################################################
 
@@ -1154,6 +1175,9 @@ class Tag
 
 			# the union of parent_tags and node_tags from the parent node is the new parent tag set
 			self.parent_tags = (arr_to_set(parent_binder.tag.parent_tags) | arr_to_set(parent_binder.tag.node_tags)).to_a
+
+			#self.binder.update_attributes( 	:last_update		=> Time.now.to_i,
+			#								:last_updated_by	=> current_teacher.id.to_s)
 
 			self.save
 		end

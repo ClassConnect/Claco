@@ -132,6 +132,7 @@ Claco::Application.routes.draw do
 	get		'/:username/portfolio(/:root)/:title/:id/croc'					=> 'binders#showcroc',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#get		'/assets'														=> 'binders#catcherr'
+	get		'/seedbinder'													=> 'binders#seedbinder'
 
 	#Soulmate
 	mount Soulmate::Server, :at => "/sm"

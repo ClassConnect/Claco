@@ -5,6 +5,8 @@
 <p><%=  #!@teacher.info.avatar.path.to_s.empty? ? image_tag(@teacher.info.avatar, :width => "200") : "<no profile picture>" 
 %></p>
 <p><%= get_teacher_avatar(@teacher,{:width => 200, :border => 1}) %></p>
+<p><%= get_teacher_avatar(@teacher,{:border => 1, :thumb_lg => ''}) %></p>
+<p><%= get_teacher_avatar(@teacher,{:border => 1, :thumb_sm => ''}) %></p>
 <% if !@teacher.info.nil? %>
 <p><%= "Bio: #{@teacher.info.bio}" if !@teacher.info.bio.empty? %></p>
 <p><%= "Website: #{@teacher.info.website}" if !@teacher.info.website.empty? %></p>

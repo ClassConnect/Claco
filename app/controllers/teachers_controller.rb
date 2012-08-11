@@ -38,6 +38,9 @@ class TeachersController < ApplicationController
 
 	#/editinfo
 	def editinfo
+
+		Rails.logger.debug "Reached #editinfo"
+
 		@title = "Edit your information"
 
 		current_teacher.info = Info.new if !current_teacher.info
@@ -56,6 +59,7 @@ class TeachersController < ApplicationController
 
 		#TODO Make sure htmlcode is not allowed in @info.bio
 
+		Rails.logger.debug "Reached #updateinfo"
 
 		current_teacher.info = Info.new if !current_teacher.info
 

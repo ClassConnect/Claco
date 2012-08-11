@@ -166,9 +166,15 @@ class BindersController < ApplicationController
 
 		redirect_to "/403.html" and return if @access == 0
 
-		#TODO: Verify permissions before rendering view
+		# INCREMENT DOWNLOAD COUNT
 
-		redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return if @binder.format == 1
+		#TODO: Verify permissions before rendering view
+		if @binder.format == 1
+			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1,
+										:last_action_update[10] => Time.now.to_i,
+										:last_action_owner[10] => current_teacher.id.to_s )
+			redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return 
+		end
 
 		rescue BSON::InvalidObjectId
 			redirect_to "/404.html" and return
@@ -1325,6 +1331,14 @@ class BindersController < ApplicationController
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
 			end
+
+	end
+
+	def seedbinder
+
+		Binder.seedbinder(current_teacher.to_s) if !current_teacher.nil?
+
+		redirect_to "/teachers"
 
 	end
 

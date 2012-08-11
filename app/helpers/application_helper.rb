@@ -240,10 +240,25 @@ module ApplicationHelper
 	# returns an image tag with the inserted options
 	def get_teacher_avatar(teacher,options = {})
 
-		if teacher.info.nil? || teacher.info.avatar.size==0
-			return "<no profile picture>"
+		return "<no profile picture>" if (teacher.info.nil? || teacher.info.avatar.nil?)#.size==0
+
+		if options[:thumb_lg]
+			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
+			#	return "<no profile picture>"
+			#else
+				return image_tag( "#{teacher.info.avatar.thumb_lg.url}", options )
+			#end
+		elsif options[:thumb_sm]
+			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
+			#else
+				return image_tag( "#{teacher.info.avatar.thumb_sm.url}", options )
+			#end
 		else
-			return image_tag( "#{teacher.info.avatar}", options )
+			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
+			#	return "<no profile picture>"
+			#else
+				return image_tag( "#{teacher.info.avatar.url}", options )
+			#end
 		end
 
 	end

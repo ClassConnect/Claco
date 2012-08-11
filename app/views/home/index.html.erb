@@ -6,3 +6,36 @@
 	<%= link_to tags_path, tags_path %><br />
 	<%= link_to "Conversations", conversations_path %>
 <% end %>
+
+<br />
+<br />
+<br />
+<%= @testvar.to_s %>
+<br />
+<br />
+<br />
+<% @feed.each do |f| %>
+	<%= f.title.to_s %><br />
+<% end %>
+<br />
+<br />
+<br />
+
+<% if current_teacher.nil? %>
+	Not logged in!
+<% else %>
+	Logged in!
+<% end %>
+
+<div style="border:2px solid black;width:300px;" >
+	SHIT
+</div>
+<div style="border:2px solid black;width:300px;" >
+	SHIT
+</div>
+<div style="border:2px solid black;width:300px;" >
+	SHIT
+</div>
+<div style="border:2px solid black;width:300px;" >
+	SHIT
+</div>

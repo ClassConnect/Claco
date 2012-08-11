@@ -1,6 +1,10 @@
 class BindersController < ApplicationController
 	before_filter :authenticate_teacher!, :except => [:show, :index]
 
+	class FilelessIO < StringIO
+		attr_accessor :original_filename
+	end
+
 	def index
 		@owner = Teacher.where(:username => params[:username]).first || Teacher.find(params[:username])
 
@@ -549,9 +553,6 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id.to_s,
 										#:body				=> params[:binder][:body],
 										:total_size			=> params[:file].size,
-										#:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
-										#													:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-										#													:auth_level	=> params[:auth_level]}] : []),
 										:order_index 		=> @parent_child_count,
 										:parent_permissions	=> @parentperarr,
 										:files				=> 1,
@@ -635,6 +636,24 @@ class BindersController < ApplicationController
 
 					# DELAYTAG
 					Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
+				elsif @binder.current_version.ext.downcase == ".notebook"
+
+					zip = Zip::ZipFile.open(params[:file].path)
+
+					if !zip.find_entry('preview.png').nil?
+
+						png = FilelessIO.new(zip.read('preview.png'))
+
+						png.original_filename = 'preview.png'
+
+						stathash = @binder.current_version.imgstatus
+						stathash[:imgfile][:retrieved] = true
+
+						@binder.current_version.update_attributes(:imgfile => png)
+
+						Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+					end
 
 				end
 			else

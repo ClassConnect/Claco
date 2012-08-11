@@ -2,7 +2,7 @@ Claco::Application.routes.draw do
 	devise_for :teachers
 
 	as :teacher do
-		get '/login' => 'devise/sessions#new', :as => 'new_teacher_session'
+		get '/login'														=> 'devise/sessions#new',			:as => 'new_teacher_session'
 	end
 
 	#Root to home

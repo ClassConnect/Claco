@@ -10,6 +10,7 @@ require "rails/test_unit/railtie"
 require "addressable/uri"
 
 require 'digest/md5'
+require 'zip/zip'
 
 
 require 'log4r'

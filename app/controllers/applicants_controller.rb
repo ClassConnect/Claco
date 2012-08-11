@@ -1,4 +1,5 @@
 class ApplicantsController < ApplicationController
+	before_filter :authenticate_teacher!, :except => [:apply, :create]
 
 	def apply
 

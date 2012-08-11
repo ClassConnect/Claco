@@ -56,7 +56,7 @@ class BindersController < ApplicationController
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,
 										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].strip[0..50],
+										:title				=> params[:foldertitle].strip[0..49],
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
 										:body				=> params[:body],
@@ -294,7 +294,7 @@ class BindersController < ApplicationController
 
 				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
-					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..50],
+					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
 											:fname				=> current_teacher.fname,
@@ -463,7 +463,7 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@binder.update_attributes(	:title				=> params[:newtitle][0..50],
+		@binder.update_attributes(	:title				=> params[:newtitle][0..49],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
 
@@ -475,9 +475,9 @@ class BindersController < ApplicationController
 
 		@children.each do |h|
 
-			h.parent["title"] = params[:newtitle][0..60] if h.parent["id"] == params[:id]
+			h.parent["title"] = params[:newtitle][0..49] if h.parent["id"] == params[:id]
 
-			h.parents[@index]["title"] = params[:newtitle][0..60]
+			h.parents[@index]["title"] = params[:newtitle][0..49]
 
 			h.save
 
@@ -538,7 +538,7 @@ class BindersController < ApplicationController
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
-																				File.extname(params[:file].original_filename)).strip[0..50],
+																				File.extname(params[:file].original_filename)).strip[0..49],
 										:owner				=> current_teacher.id,
 										:fname				=> current_teacher.fname,
 										:lname				=> current_teacher.lname,

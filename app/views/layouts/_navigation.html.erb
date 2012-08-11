@@ -3,14 +3,46 @@
 <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
+
           <a class="brand" href="#"><%= image_tag("logo.png") %></a>
           <div class="nav-collapse">
 
+
+          
+
+            <ul class="nav nav-pills pull-right" style="margin-left:0px">
+              <li id="menuopttog" class="dropdown">
+
+                <div id="meoptmenu" data-toggle="dropdown">
+                  <div class="droparr">
+                  </div>
+                </div>
+
+
+                <ul class="dropdown-menu" style="margin-top:2px;margin-right:-6px">
+                  <li>
+                    <a href="#">Edit Profile</a>
+                  </li>
+
+                  <li>
+                    <a href="#">Logout</a>
+                  </li>
+
+                </ul>
+              </li>
+            </ul>
+
+            <div class="menusplitter"></div>
+
+            <a href="#">
+            <div id="namester">
+                <img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg" class="myprofpic" />
+                <div class="fname">Eric Simons</div>
+            </div>
+            </a>
+
+
+            <!--
             <ul class="nav nav-pills pull-right">
               <li class="dropdown">
 
@@ -38,6 +70,7 @@
                 </ul>
               </li>
             </ul>
+          -->
 
 
           </div><!--/.nav-collapse -->

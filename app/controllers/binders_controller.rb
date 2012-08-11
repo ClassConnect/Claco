@@ -248,7 +248,7 @@ class BindersController < ApplicationController
 				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
 
 					embedtourl = true
-					uri = "http://www.educreations.com/lesson/view/#{uri.path.split('/').last}"
+					uri = "http://www.educreations.com/lesson/view/claco/#{uri.path.split('/').last}"
 
 				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
 
@@ -314,7 +314,7 @@ class BindersController < ApplicationController
 											:format				=> 2)
 
 					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
-					link = Addressable::URI.heuristic_parse(Url.follow(uri)) if embedtourl
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
 
 					@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
 													:thumbnailgen => 1, #video
@@ -1125,7 +1125,7 @@ class BindersController < ApplicationController
 					h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
 
 					if h.parent_permissions.find {|p| p["type"] == 3}.nil?
-						
+
 						h.parent_permissions << {	:type		=> 3,
 													:folder_id => params[:id],
 													:auth_level	=> params[:enabled] == "true" ? 1 : 0}

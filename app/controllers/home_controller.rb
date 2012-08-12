@@ -11,8 +11,8 @@ class HomeController < ApplicationController
 		# => not owned by the current teacher
 		# => not deleted
 		#
-		@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
-
+		#@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
+        @feed = []
 		#Binder.where( "parent.id" => { '$gt' }  )
 		#Binder.all.ne( parent.id: [0,-1] )
 

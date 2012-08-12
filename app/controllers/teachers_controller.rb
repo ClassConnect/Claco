@@ -16,6 +16,8 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.find(params[:id])
 
+        @teacher.info = Info.new
+
 		@title = "#{ @teacher.full_name }'s Profile"
 
 		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)

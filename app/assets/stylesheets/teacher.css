@@ -88,7 +88,7 @@
 
 .profile-info-section .profile-left-push {
   margin-top: 16px;
-  width: 430px;
+  width: 400px;
 }
 
 .profile-info-section p {
@@ -201,4 +201,10 @@ ul.nav-tabs.onProfile li.active a {
 
 .profile-content {
   padding: 20px 0;
+}
+
+
+
+.actbtn {
+  font-weight:bolder;
 }

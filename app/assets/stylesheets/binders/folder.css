@@ -1,5 +1,5 @@
 .content-header {
-  margin-top:-67px;
+  
 }
 
 .content-header .con-inner {
@@ -228,14 +228,18 @@
   overflow:hidden;
 }
 
-#left-sidebar .act-live {
+#left-sidebar .whitester {
   -moz-box-shadow:0 1px 3px rgba(34,25,25,0.3);
   -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.3);
-  box-shadow: 0 1px 3px rgba(34,25,25,0.3);
+  box-shadow: 0 0px 3px rgba(34,25,25,0.3);
 
-  background:#ffffff;
+  background: rgba(255, 255, 255, 0.50);
 
   border: 1px solid transparent;
+}
+
+#left-sidebar .act-live {
+  background: rgba(255, 255, 255, 1);
 }
 
 #left-sidebar .conbox .headstrip{

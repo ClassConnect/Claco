@@ -38,7 +38,7 @@
   opacity: 0.75;
   filter: alpha(opacity=75);
 }
-#meoptmenu:hover .droparr {
+#menuopttog:hover .droparr {
   opacity: 1;
   filter: alpha(opacity=100);
 }

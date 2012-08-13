@@ -79,7 +79,7 @@ class BindersController < ApplicationController
 
 				Mongo.log(	current_teacher.id.to_s,
 							__method__.to_s,
-							"binders",
+							params[:controller].to_s,
 							new_binder.id.to_s,
 							params)
 
@@ -185,7 +185,7 @@ class BindersController < ApplicationController
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@binder.current_version.id.to_s,
 						params)
 
@@ -351,7 +351,7 @@ class BindersController < ApplicationController
 
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
-								"binders",
+								params[:controller].to_s,
 								@binder.current_version.id.to_s,
 								params)
 
@@ -461,7 +461,7 @@ class BindersController < ApplicationController
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
-					"binders",
+					params[:controller].to_s,
 					@binder.id.to_s,
 					params)
 
@@ -499,7 +499,7 @@ class BindersController < ApplicationController
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
-					"binders",
+					params[:controller].to_s,
 					@binder.id.to_s,
 					params)
 
@@ -538,7 +538,7 @@ class BindersController < ApplicationController
 
 		src = Mongo.log(current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@binder.id.to_s,
 						params)
 
@@ -552,7 +552,7 @@ class BindersController < ApplicationController
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						h.id.to_s,
 						params,
 						{ :src => src })
@@ -589,12 +589,15 @@ class BindersController < ApplicationController
 
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 			
+			altparams = params.clone
+
+			altparams[:file] = altparams[:file].original_filename
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@binder.id.to_s,
-						params)
+						altparams)
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
 																				File.extname(params[:file].original_filename)).strip[0..49],
@@ -780,13 +783,13 @@ class BindersController < ApplicationController
 				if src.nil?
 					src = Mongo.log(current_teacher.id.to_s,
 									__method__.to_s,
-									"binders",
+									params[:controller].to_s,
 									c.id.to_s,
 									params)
 				else
 					Mongo.log(current_teacher.id.to_s,
 									__method__.to_s,
-									"binders",
+									params[:controller].to_s,
 									c.id.to_s,
 									params,
 									{ :src => src })
@@ -823,7 +826,7 @@ class BindersController < ApplicationController
 
 			src = Mongo.log(current_teacher.id.to_s,
 							__method__.to_s,
-							"binders",
+							params[:controller].to_s,
 							@binder.id.to_s,
 							params)
 
@@ -884,7 +887,7 @@ class BindersController < ApplicationController
 
 						Mongo.log(	current_teacher.id.to_s,
 									__method__.to_s,
-									"binders",
+									params[:controller].to_s,
 									h.id.to_s,
 									params,
 									{ :src => src })
@@ -951,7 +954,7 @@ class BindersController < ApplicationController
 
 		src = Mongo.log(current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@binder.id.to_s,
 						params)
 
@@ -1010,7 +1013,7 @@ class BindersController < ApplicationController
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@new_parent.id.to_s,
 						params,
 						{ :copy => @binder.id.to_s, :src => src })
@@ -1040,7 +1043,7 @@ class BindersController < ApplicationController
 
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
-								"binders",
+								params[:controller].to_s,
 								h.id.to_s,
 								params,
 								{ :src => src })
@@ -1098,7 +1101,7 @@ class BindersController < ApplicationController
 
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
-								"binders",
+								params[:controller].to_s,
 								@new_node.id.to_s,
 								params,
 								{ :copy => h.id.to_s, :src => src })
@@ -1173,7 +1176,7 @@ class BindersController < ApplicationController
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
-					"binders",
+					params[:controller].to_s,
 					@binder.current_version.id.to_s,
 					params)
 
@@ -1252,7 +1255,7 @@ class BindersController < ApplicationController
 
 				src = Mongo.log(current_teacher.id.to_s,
 								__method__.to_s,
-								"binders",
+								params[:controller].to_s,
 								@binder.id.to_s,
 								params)
 
@@ -1293,7 +1296,7 @@ class BindersController < ApplicationController
 
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
-								"binders",
+								params[:controller].to_s,
 								h.id.to_s,
 								params,
 								{ :src => src,  })
@@ -1309,7 +1312,7 @@ class BindersController < ApplicationController
 
 					src = Mongo.log(current_teacher.id.to_s,
 									__method__.to_s,
-									"binders",
+									params[:controller].to_s,
 									@binder.id.to_s,
 									params)
 
@@ -1347,7 +1350,7 @@ class BindersController < ApplicationController
 
 						Mongo.log(	current_teacher.id.to_s,
 									__method__.to_s,
-									"binders",
+									params[:controller].to_s,
 									h.id.to_s,
 									params,
 									{ :src => src })
@@ -1382,7 +1385,7 @@ class BindersController < ApplicationController
 
 		src = Mongo.log(current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@binder.id.to_s,
 						params)
 
@@ -1406,7 +1409,7 @@ class BindersController < ApplicationController
 																					:folder_id => params[:id]}) 
 				Mongo.log(	current_teacher.id.to_s,
 							__method__.to_s,
-							"binders",
+							params[:controller].to_s,
 							c.id.to_s,
 							params,
 							{ :src => src })
@@ -1422,7 +1425,7 @@ class BindersController < ApplicationController
 
 		src = Mongo.log(current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						@binder.id.to_s,
 						params)
 
@@ -1438,7 +1441,7 @@ class BindersController < ApplicationController
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
-						"binders",
+						params[:controller].to_s,
 						c.id.to_s,
 						params,
 						{ :src => src })
@@ -1472,7 +1475,7 @@ class BindersController < ApplicationController
 
 			src = Mongo.log(current_teacher.id.to_s,
 							__method__.to_s,
-							"binders",
+							params[:controller].to_s,
 							@binder.id.to_s,
 							params)
 
@@ -1506,7 +1509,7 @@ class BindersController < ApplicationController
 
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
-								"binders",
+								params[:controller].to_s,
 								@binder.id.to_s,
 								params,
 								{ :src => src })

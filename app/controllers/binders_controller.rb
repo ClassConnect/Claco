@@ -597,7 +597,7 @@ class BindersController < ApplicationController
 
 					Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 
-					@binder.versions.last.update_attributes( :thumbnailgen => 3 )
+					@binder.current_version.update_attributes( :thumbnailgen => 3 )
 
 					filedata = Crocodoc.upload(@binder.current_version.file.url)
 						
@@ -652,7 +652,7 @@ class BindersController < ApplicationController
 
 						@binder.current_version.update_attributes(:imgfile => png)
 
-						Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+						Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
 					end
 
 				end
@@ -1374,12 +1374,6 @@ class BindersController < ApplicationController
 	# 							#
 	#############################
 
-	# def get_youtube_url(url)
-
-	# 	return "http://img.youtube.com/vi/#{CGI.parse(URI.parse(url).query)['v'].first.to_s}/0.jpg"
-
-	# end
-
 	module Url
 		extend self
 		
@@ -1395,20 +1389,9 @@ class BindersController < ApplicationController
 
 		end
 
-		def extract_youtube_extension(url)
-
-			return CGI.parse(URI.parse(url).query)['v'].first.to_s
-		end
-
 		def get_youtube_url(url)
 
 			return YOUTUBE_IMG_URL + CGI.parse(URI.parse(url).query)['v'].first.to_s + YOUTUBE_IMG_FILE
-
-		end
-		
-		def get_short_youtube_url(url)
-
-			return YOUTUBE_IMG_URL + URI.parse(url).path.split('/').last + YOUTUBE_IMG_FILE
 
 		end
 
@@ -1436,10 +1419,6 @@ class BindersController < ApplicationController
 
 		end
 
-		def get_short_educreations_url(url)
-			return get_educreations_url(RestClient.get('http://edcr8.co/GGOJbO'){|r1,r2,r3| r1.headers}[:location])
-		end
-
 		def get_url2png_url(url,options = {})
 
 			if options.empty?
@@ -1448,12 +1427,12 @@ class BindersController < ApplicationController
 				bounds = options[:bounds].to_s
 			end
 
-			sec_hash = Digest::MD5.hexdigest(URL2PNG_PRIVATE_KEY + '+' + url).to_s
+			sec_hash = Digest::MD5.hexdigest(URL2PNG_PRIVATE_KEY + '+' + URI.encode(url)).to_s
 
 			Rails.logger.debug "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{url}"
 
 			#return RestClient.get(URL2PNG_API_URL + URL2PNG_API_KEY + '/' + sec_hash + '/' + bounds + '/' + url)
-			return "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{url}"
+			return "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{URI.encode(url)}"
 
 		end
 

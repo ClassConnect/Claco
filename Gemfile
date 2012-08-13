@@ -53,7 +53,7 @@ gem 'delayed_job'
 gem 'delayed_job_mongoid'
 gem 'daemons'
 
-
+gem 'thin'
 
 
 #gem 'rest-open-uri'

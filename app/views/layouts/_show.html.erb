@@ -20,25 +20,20 @@
 
       <%= render 'layouts/notepad' %>
 
-
 		<% end %>
-
 
     <%= render 'layouts/contentlist' if params[:action] == "index" || @binder.type == 1 %>
 
-
-
 	</div>
-
 
 	<div id="left-sidebar">
 
     <% if params[:action] == "show" && teacher_signed_in? && current_teacher.id.to_s == @binder.owner %>
 
-        <div class="conbox">
+        <div class="conbox whitester">
           <div class="headstrip" style="margin-bottom:10px">
 
-            <div style="float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'checked="checked"' if @binder.is_pub? %>/></div>
+            <div style="float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
             <div class="inner">
             Public 
             </div>
@@ -92,7 +87,7 @@
 
 
         
-        <div id="folder-tags" class="conbox">
+        <div id="folder-tags" class="conbox whitester">
           <div class="headstrip">
             <div class="inner">
             Tags 

@@ -95,7 +95,7 @@ function editInit() {
 
 
   // set all of the items that won't activate pjax on click
-  $('.drop-tog, .linkster').click(function() {
+  $('.drop-tog, .linkster, .lastupdate').click(function() {
     dontPjax = true;
   });
 

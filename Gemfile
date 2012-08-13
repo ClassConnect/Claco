@@ -47,12 +47,13 @@ gem 'log4r', '1.1.9'
 
 gem 'rest-client'
 gem 'rack-pjax'
+gem 'rubyzip'
 
 gem 'delayed_job'
 gem 'delayed_job_mongoid'
 gem 'daemons'
 
-
+gem 'thin'
 
 
 #gem 'rest-open-uri'

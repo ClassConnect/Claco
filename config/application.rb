@@ -10,6 +10,7 @@ require "rails/test_unit/railtie"
 require "addressable/uri"
 
 require 'digest/md5'
+require 'zip/zip'
 
 
 require 'log4r'
@@ -97,16 +98,18 @@ module Claco
     config.assets.version = '1.0'
 
     # assign log4r's logger as rails' logger.
-    log4r_config= YAML.load_file(File.join(File.dirname(__FILE__),"log4r.yml"))
-    YamlConfigurator.decode_yaml( log4r_config['log4r_config'] )
-    config.logger = Log4r::Logger[Rails.env]
+    if Rails.env == "development"
+        log4r_config= YAML.load_file(File.join(File.dirname(__FILE__),"log4r.yml"))
+        YamlConfigurator.decode_yaml( log4r_config['log4r_config'] )
+        config.logger = Log4r::Logger[Rails.env]
 
-    config.mongoid.logger = Log4r::Logger[Rails.env]
+        config.mongoid.logger = Log4r::Logger[Rails.env]
 
-    # mongoid logger init calls
-    #config.mongoid.logger = Logger.new($stdout, :debug)
+        # mongoid logger init calls
+        #config.mongoid.logger = Logger.new($stdout, :debug)
 
-    Mongoid.logger.level = Logger::DEBUG
+        Mongoid.logger.level = Logger::DEBUG
+    end
   end
 end
 

@@ -1,0 +1,33 @@
+<h2>app/views/applicants/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<h1>Apply to Claco!!!!!!!</h1>
+
+<% if !@app.errors.empty? %>
+	<ul>
+	<% @app.errors.each do |err, msg| %>
+		<li><%= "#{err} #{msg}" %></li>
+	<% end %>
+	</ul>
+<% end %>
+
+<%= form_for @app do |f| %>
+
+	<p><%= f.label :fname, "First name" %><br />
+	<%= f.text_field :fname %></p>
+
+	<p><%= f.label :lname, "Last name" %><br />
+	<%= f.text_field :lname %></p>
+
+	<p><%= f.label :email, "Email" %><br />
+	<%= f.email_field :email %></p>
+
+	<p><%= f.label :body, "Why you want to be on Claco" %><br />
+	<%= f.text_area :body %></p>
+
+	<p><%= f.label :file %><br />
+	<%= f.file_field :file %></p>
+
+	<%= f.submit "Apply" %>
+
+<% end %>

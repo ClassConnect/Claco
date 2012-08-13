@@ -399,6 +399,14 @@ class Binder
 
 	end
 
+	def inherited_pub?
+
+		return false if parent_permissions.empty?
+
+		return parent_permissions.find {|p| p["type"] == 3}["auth_level"] == 1
+
+	end
+
 	def is_pub?
 
 		return get_access == 1

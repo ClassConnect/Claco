@@ -1,0 +1,21 @@
+<h2>app/views/applicants/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<table>
+<tr>
+<td>First Name</td>
+<td>Last Name</td>
+<td>Email</td>
+<td>Application</td>
+<td>Timestamp</td>
+</tr>
+<% @apps.each do |app| %>
+<tr>
+<td><%= app.fname %></td>
+<td><%= app.lname %></td>
+<td><%= app.email %></td>
+<td><%= app.body %></td>
+<td><%= app.timestamp %></td>
+</tr>
+<% end %>
+</table>

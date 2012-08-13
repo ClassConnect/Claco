@@ -1,6 +1,10 @@
 Claco::Application.routes.draw do
 	devise_for :teachers
 
+	as :teacher do
+		get '/login'														=> 'devise/sessions#new',			:as => 'new_teacher_session'
+	end
+
 	#Root to home
 	root	:to																=> 'home#index'
 	get		'/homebase'														=> 'home#index'
@@ -42,6 +46,15 @@ Claco::Application.routes.draw do
 	resources :teachers, :only => [:show, :index]
 
 	post	'utils/fetchtitle'												=> 'home#fetchtitle'
+
+	#####################
+	# APPLICANT ROUTING #
+	#####################
+
+	get		'/apply'														=> 'applicants#apply'
+	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
+	get		'/viewapps'														=> 'applicants#viewapps'
+
 
 	###################
 	# MESSAGE ROUTING #

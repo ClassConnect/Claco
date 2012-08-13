@@ -1,6 +1,10 @@
 class BindersController < ApplicationController
 	before_filter :authenticate_teacher!, :except => [:show, :index]
 
+	class FilelessIO < StringIO
+		attr_accessor :original_filename
+	end
+
 	def index
 		@owner = Teacher.where(:username => params[:username]).first || Teacher.find(params[:username])
 
@@ -261,7 +265,7 @@ class BindersController < ApplicationController
 				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
 
 					embedtourl = true
-					uri = "http://www.educreations.com/lesson/view/#{uri.path.split('/').last}"
+					uri = "http://www.educreations.com/lesson/view/claco/#{uri.path.split('/').last}"
 
 				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
 
@@ -332,7 +336,7 @@ class BindersController < ApplicationController
 					#Mongo.method_index(__method__)
 
 					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
-					link = Addressable::URI.heuristic_parse(Url.follow(uri)) if embedtourl
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
 
 					@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
 													:thumbnailgen => 1, #video
@@ -604,9 +608,6 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id.to_s,
 										#:body				=> params[:binder][:body],
 										:total_size			=> params[:file].size,
-										#:permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
-										#													:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-										#													:auth_level	=> params[:auth_level]}] : []),
 										:order_index 		=> @parent_child_count,
 										:parent_permissions	=> @parentperarr,
 										:files				=> 1,
@@ -628,7 +629,7 @@ class BindersController < ApplicationController
 			#temp.file = params[:binder][:versions][:file]
 	 
 			#logger.debug(params[:binder][:versions][:file].class)
-"binders"
+
 			@binder.versions << Version.new(:file		=> params[:file],
 											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:file].path).to_s),
 											:ext		=> File.extname(params[:file].original_filename),
@@ -651,7 +652,7 @@ class BindersController < ApplicationController
 
 					Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 
-					@binder.versions.last.update_attributes( :thumbnailgen => 3 )
+					@binder.current_version.update_attributes( :thumbnailgen => 3 )
 
 					filedata = Crocodoc.upload(@binder.current_version.file.url)
 						
@@ -690,6 +691,24 @@ class BindersController < ApplicationController
 
 					# DELAYTAG
 					Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
+				elsif @binder.current_version.ext.downcase == ".notebook"
+
+					zip = Zip::ZipFile.open(params[:file].path)
+
+					if !zip.find_entry('preview.png').nil?
+
+						png = FilelessIO.new(zip.read('preview.png'))
+
+						png.original_filename = 'preview.png'
+
+						stathash = @binder.current_version.imgstatus
+						stathash[:imgfile][:retrieved] = true
+
+						@binder.current_version.update_attributes(:imgfile => png)
+
+						Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
+					end
 
 				end
 			else
@@ -1641,20 +1660,9 @@ class BindersController < ApplicationController
 
 		end
 
-		def extract_youtube_extension(url)
-
-			return CGI.parse(URI.parse(url).query)['v'].first.to_s
-		end
-
 		def get_youtube_url(url)
 
 			return YOUTUBE_IMG_URL + CGI.parse(URI.parse(url).query)['v'].first.to_s + YOUTUBE_IMG_FILE
-
-		end
-		
-		def get_short_youtube_url(url)
-
-			return YOUTUBE_IMG_URL + URI.parse(url).path.split('/').last + YOUTUBE_IMG_FILE
 
 		end
 
@@ -1682,10 +1690,6 @@ class BindersController < ApplicationController
 
 		end
 
-		def get_short_educreations_url(url)
-			return get_educreations_url(RestClient.get('http://edcr8.co/GGOJbO'){|r1,r2,r3| r1.headers}[:location])
-		end
-
 		def get_url2png_url(url,options = {})
 
 			if options.empty?
@@ -1694,12 +1698,12 @@ class BindersController < ApplicationController
 				bounds = options[:bounds].to_s
 			end
 
-			sec_hash = Digest::MD5.hexdigest(URL2PNG_PRIVATE_KEY + '+' + url).to_s
+			sec_hash = Digest::MD5.hexdigest(URL2PNG_PRIVATE_KEY + '+' + URI.encode(url)).to_s
 
 			Rails.logger.debug "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{url}"
 
 			#return RestClient.get(URL2PNG_API_URL + URL2PNG_API_KEY + '/' + sec_hash + '/' + bounds + '/' + url)
-			return "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{url}"
+			return "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{URI.encode(url)}"
 
 		end
 

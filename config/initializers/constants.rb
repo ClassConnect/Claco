@@ -82,3 +82,7 @@ STHUMB_FILENAME = "thumb_sm.png"
 # crocodoc thumbs
 CROC_BACKGROUND_COLOR = "#EEEEEE"
 CROC_BORDER_COLOR = "#CCCCCC"
+
+# Teachers
+AVATAR_LDIM = 100
+AVATAR_SDIM = 24

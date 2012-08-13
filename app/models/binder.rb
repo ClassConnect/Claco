@@ -81,7 +81,7 @@ class Binder
 	# [Large, Small1, Small2] - strings
 	field :thumbimgids, :type => Array, :default => ["","",""]
 
-	field :debug_data, :type => Array, :default => []
+	#field :debug_data, :type => Array, :default => []
 
 	#TODO: Add indexing functions that allow binders to be put in a user-defined order via dragon drop
 
@@ -175,7 +175,7 @@ class Binder
 
 		# variable number of pictures retrieved locally, now expand scope to all descendant binders
 		if binder.thumbimgids.size < 3
-			if subtree.any?
+			if !subtree.nil? && subtree.any?
 				subtree.each do |s|
 					if s.type != 1
 						# array values arranged by class

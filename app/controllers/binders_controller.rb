@@ -69,7 +69,15 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id.to_s,
 										:type				=> 1)
 
+				Rails.logger.debug "METHOD got here! #{__method__}"
+
 				new_binder.save
+
+				Mongo.log(	current_teacher.id.to_s,
+							__method__.to_s,
+							"binders",
+							new_binder.id.to_s,
+							params)
 
 				new_binder.create_binder_tags(params,current_teacher.id)
 
@@ -127,7 +135,7 @@ class BindersController < ApplicationController
 		if @tagset.any?
 			@tagset.each do |tag|
 				@tags[tag['type']] << tag
-			end
+			end		
 		end
 
 		#Rails.logger.debug @tags
@@ -170,9 +178,14 @@ class BindersController < ApplicationController
 
 		#TODO: Verify permissions before rendering view
 		if @binder.format == 1
-			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1,
-										:last_action_update[10] => Time.now.to_i,
-										:last_action_owner[10] => current_teacher.id.to_s )
+
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@binder.current_version.id.to_s,
+						params)
+
+			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1)
 			redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return 
 		end
 
@@ -313,6 +326,11 @@ class BindersController < ApplicationController
 											:type				=> 2,
 											:format				=> 2)
 
+
+
+
+					#Mongo.method_index(__method__)
+
 					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
 					link = Addressable::URI.heuristic_parse(Url.follow(uri)) if embedtourl
 
@@ -326,6 +344,12 @@ class BindersController < ApplicationController
 					#@binder.create_binder_tags(params,current_teacher.id)
 
 					@binder.save
+
+					Mongo.log(	current_teacher.id.to_s,
+								__method__.to_s,
+								"binders",
+								@binder.current_version.id.to_s,
+								params)
 
 					if url || embedtourl
 
@@ -431,6 +455,12 @@ class BindersController < ApplicationController
 
 		errors = []
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					"binders",
+					@binder.id.to_s,
+					params)
+
 		if params[:text] != "Type a note..."
 
 			if teacher_signed_in? && @binder.get_access(current_teacher.id.to_s) == 2
@@ -462,6 +492,12 @@ class BindersController < ApplicationController
 	def rename
 
 		@binder = Binder.find(params[:id])
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					"binders",
+					@binder.id.to_s,
+					params)
 
 		@binder.update_attributes(	:title				=> params[:newtitle][0..49],
 									:last_update		=> Time.now.to_i,
@@ -496,6 +532,12 @@ class BindersController < ApplicationController
 		Rails.logger.debug params.to_s
 		Rails.logger.debug params["standards"].to_s
 
+		src = Mongo.log(current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@binder.id.to_s,
+						params)
+
 		@binder.tag.update_node_tags(params,current_teacher.id)
 
 		@binder.children.sort_by {|binder| binder.parents.length}.each do |h|
@@ -504,6 +546,12 @@ class BindersController < ApplicationController
 
 			h.update_parent_tags()
 
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						h.id.to_s,
+						params,
+						{ :src => src })
 			#h.save
 
 		end
@@ -536,6 +584,13 @@ class BindersController < ApplicationController
 			#@filedata = 6
 
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
+			
+
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@binder.id.to_s,
+						params)
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
 																				File.extname(params[:file].original_filename)).strip[0..49],
@@ -573,7 +628,7 @@ class BindersController < ApplicationController
 			#temp.file = params[:binder][:versions][:file]
 	 
 			#logger.debug(params[:binder][:versions][:file].class)
-
+"binders"
 			@binder.versions << Version.new(:file		=> params[:file],
 											:file_hash	=> Digest::MD5.hexdigest(File.read(params[:file].path).to_s),
 											:ext		=> File.extname(params[:file].original_filename),
@@ -701,7 +756,25 @@ class BindersController < ApplicationController
 
 		if @ok
 
-			@children.each {|c| c.update_attributes(:order_index => params[:data].index(c.id.to_s))}
+			@children.each do |c| 
+
+				if src.nil?
+					src = Mongo.log(current_teacher.id.to_s,
+									__method__.to_s,
+									"binders",
+									c.id.to_s,
+									params)
+				else
+					Mongo.log(current_teacher.id.to_s,
+									__method__.to_s,
+									"binders",
+									c.id.to_s,
+									params,
+									{ :src => src })
+				end
+
+				c.update_attributes(:order_index => params[:data].index(c.id.to_s))
+			end
 
 		else
 
@@ -728,6 +801,12 @@ class BindersController < ApplicationController
 		@binder = Binder.find(params[:id])
 
 		if params[:target] != params[:id]
+
+			src = Mongo.log(current_teacher.id.to_s,
+							__method__.to_s,
+							"binders",
+							@binder.id.to_s,
+							params)
 
 			@binder.sift_siblings()
 
@@ -783,6 +862,13 @@ class BindersController < ApplicationController
 					@children = @binder.subtree
 
 					@children.each do |h|
+
+						Mongo.log(	current_teacher.id.to_s,
+									__method__.to_s,
+									"binders",
+									h.id.to_s,
+									params,
+									{ :src => src })
 
 						@current_parents = h.parents
 
@@ -844,6 +930,12 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		src = Mongo.log(current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@binder.id.to_s,
+						params)
+
 		@inherited = inherit_from(params[:folid])
 
 		@parenthash = @inherited[:parenthash]
@@ -897,6 +989,13 @@ class BindersController < ApplicationController
 
 			#TODO: copy related images?
 
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@new_parent.id.to_s,
+						params,
+						{ :copy => @binder.id.to_s, :src => src })
+
 			@new_parent.save
 
 
@@ -919,6 +1018,13 @@ class BindersController < ApplicationController
 
 				#Spawn new children, These children need to have updated parent ids
 				@children.each do |h|
+
+					Mongo.log(	current_teacher.id.to_s,
+								__method__.to_s,
+								"binders",
+								h.id.to_s,
+								params,
+								{ :src => src })
 
 					@node_parent = {"id"	=> @hash_index[h.parent["id"]],
 									"title"	=> h.parent["title"]}
@@ -964,11 +1070,19 @@ class BindersController < ApplicationController
 					# 									:imgfile	=> h.current_version.imgfile,
 					# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
+					
 					@new_node.versions << h.current_version
 
 					#TODO: copy related images?
 
 					@new_node.save
+
+					Mongo.log(	current_teacher.id.to_s,
+								__method__.to_s,
+								"binders",
+								@new_node.id.to_s,
+								params,
+								{ :copy => h.id.to_s, :src => src })
 
 					@new_node.tag = Tag.new(:node_tags => h.tag.node_tags)
 
@@ -1034,12 +1148,22 @@ class BindersController < ApplicationController
 										:timestamp	=> Time.now.to_i,
 										:active		=> true)
 
+		
+
 		@binder.save
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					"binders",
+					@binder.current_version.id.to_s,
+					params)
 
 		if Crocodoc.check_format_validity(@binder.current_version.ext)
 			filedata = Crocodoc.upload(@binder.current_version.file.current_path)
 				
 			filedata = filedata["uuid"] if !filedata.nil?
+
+			# create thumbnail!!!!
 		end
 
 		@binder.current_version.update_attributes(:croc_uuid => filedata)
@@ -1107,6 +1231,12 @@ class BindersController < ApplicationController
 
 			if @binder.parent_permissions.find {|p| p["type"] == 3}.nil?
 
+				src = Mongo.log(current_teacher.id.to_s,
+								__method__.to_s,
+								"binders",
+								@binder.id.to_s,
+								params)
+
 				if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
 					@binder.permissions << {:type		=> 3,
@@ -1124,11 +1254,14 @@ class BindersController < ApplicationController
 
 					h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
 
+
 					if h.parent_permissions.find {|p| p["type"] == 3}.nil?
-						
+
 						h.parent_permissions << {	:type		=> 3,
 													:folder_id => params[:id],
 													:auth_level	=> params[:enabled] == "true" ? 1 : 0}
+
+
 						h.save
 
 					else
@@ -1139,6 +1272,12 @@ class BindersController < ApplicationController
 
 					end
 
+					Mongo.log(	current_teacher.id.to_s,
+								__method__.to_s,
+								"binders",
+								h.id.to_s,
+								params,
+								{ :src => src,  })
 				end
 
 			else
@@ -1148,6 +1287,12 @@ class BindersController < ApplicationController
 					error = "Oops! The parent is currently shared."
 
 				else
+
+					src = Mongo.log(current_teacher.id.to_s,
+									__method__.to_s,
+									"binders",
+									@binder.id.to_s,
+									params)
 
 					if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
@@ -1181,6 +1326,13 @@ class BindersController < ApplicationController
 
 						end
 
+						Mongo.log(	current_teacher.id.to_s,
+									__method__.to_s,
+									"binders",
+									h.id.to_s,
+									params,
+									{ :src => src })
+
 					end
 
 				end
@@ -1209,6 +1361,12 @@ class BindersController < ApplicationController
 
 		@new = false
 
+		src = Mongo.log(current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@binder.id.to_s,
+						params)
+
 		@binder.permissions.each {|p| @new = true if p["shared_id"] == params[:shared_id]}
 
 		@binder.parent_permissions.each {|pp| @new = true if pp["shared_id"] == params[:shared_id]} 
@@ -1219,16 +1377,35 @@ class BindersController < ApplicationController
 
 		@binder.save
 
-		@binder.subtree.each {|c| c.update_attributes(:parent_permissions => c.parent_permissions << {	:type => params[:type],
-																										:shared_id => params[:shared_id],
-																										:auth_level => params[:auth_level],
-																										:folder_id => params[:id]})} if !@new
+		@binder.subtree.each do |c| 
+
+			if !@new
+
+				c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
+																					:shared_id => params[:shared_id],
+																					:auth_level => params[:auth_level],
+																					:folder_id => params[:id]}) 
+				Mongo.log(	current_teacher.id.to_s,
+							__method__.to_s,
+							"binders",
+							c.id.to_s,
+							params,
+							{ :src => src })
+
+			end
+		end
 
 		redirect_to named_binder_route(@binder, "permissions")
 	end
 
 	def destroypermission
 		@binder = Binder.find(params[:id])
+
+		src = Mongo.log(current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						@binder.id.to_s,
+						params)
 
 		pper = @binder.permissions[params[:pid].to_i]
 
@@ -1239,6 +1416,14 @@ class BindersController < ApplicationController
 		@binder.subtree.each do |c|
 			c.parent_permissions.delete(pper)
 			c.save
+
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						"binders",
+						c.id.to_s,
+						params,
+						{ :src => src })
+
 		end
 
 		@binder.save
@@ -1265,6 +1450,12 @@ class BindersController < ApplicationController
 		errors = []
 
 		if @binder.get_access(current_teacher.id.to_s == 2)
+
+			src = Mongo.log(current_teacher.id.to_s,
+							__method__.to_s,
+							"binders",
+							@binder.id.to_s,
+							params)
 
 			# preserve parent ID before writing over
 			@parentid = @binder.parent["id"]
@@ -1293,6 +1484,14 @@ class BindersController < ApplicationController
 			if @binder.type == 1 #Eventually will apply to type == 3 too
 
 				@binder.subtree.each do |h|
+
+					Mongo.log(	current_teacher.id.to_s,
+								__method__.to_s,
+								"binders",
+								@binder.id.to_s,
+								params,
+								{ :src => src })
+
 					@current_parents = h.parents
 					@size = @current_parents.size
 					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
@@ -1349,17 +1548,83 @@ class BindersController < ApplicationController
 
 	end
 
-	#############################
-	# 							#
-	# 	 CONTROLLER HELPERS: 	#
-	# 							#
-	#############################
+	###############################################################################################
+
+							#    #  ##### #     #####  ##### #####   #### 
+							#    #  #     #     #    # #     #    # #    #
+							#    #  #     #     #    # #     #    # # 
+							######  ####  #     #####  ####  #####   ####
+							#    #  #     #     #      #     #  #        #
+							#    #  #     #     #      #     #   #  #    #
+							#    #  ##### ##### #      ##### #    #  ####
+
+	###############################################################################################
 
 	# def get_youtube_url(url)
 
 	# 	return "http://img.youtube.com/vi/#{CGI.parse(URI.parse(url).query)['v'].first.to_s}/0.jpg"
 
 	# end
+
+	module Mongo
+		extend self
+
+		def log(ownerid,method,model,modelid,params,data = {})
+
+			log = Log.new( 	:ownerid => ownerid.to_s,
+							:timestamp => Time.now.to_i,
+							:method => method.to_s,
+							:model => model.to_s,
+							:modelid => modelid.to_s,
+							:params => params,
+							:data => data)
+
+			log.save
+
+			return log.id.to_s
+
+		end
+
+		# this method is unused
+		def method_index(method)
+
+			# categorized by last update type
+			# 0 - creation
+			# 1 - update data
+			# 2 - new/modified version
+			# 3 - rename
+			# 4 - created/modified tags
+			# 5 - move
+			# 6 - copy
+			# 7 - delete
+			# 8 - permission modification
+			# 9 - reordered
+			# 10- downloaded
+			# 11- forked
+
+			#Rails.logger.debug "Method: #{method.to_s}"
+
+			method = method.to_s
+
+			return 0 if ( method=="createcontent" || method=="createfile" || method=="create" )
+			return 1 if ( method=="update" )
+			return 2 if ( method=="createversion" )
+			return 3 if ( method=="rename" )
+			return 4 if ( method=="updatetags" )
+			return 5 if ( method=="moveitem" )
+			return 6 if ( method=="copyitem" )
+			return 7 if ( method=="delete" )
+			return 8 if ( method=="setpub" || method=="createpermission" || method=="destroypermission" )
+			return 9 if ( method=="reorder" )
+			return 10 if ( method=="download" )
+			#return 11 if ( method== )			
+
+			# if this point is reached, the method is unknown
+			raise "Method not recognized!"
+
+		end
+
+	end
 
 	module Url
 		extend self

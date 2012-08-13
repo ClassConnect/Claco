@@ -17,11 +17,11 @@ class AvatarUploader < CarrierWave::Uploader::Base
   storage :fog
 
   version :thumb_lg do
-    process resize_to_fill: [100,100]
+    process resize_to_fill: [AVATAR_LDIM,AVATAR_LDIM]
   end
 
   version :thumb_sm do
-    process resize_to_fill: [24,24]
+    process resize_to_fill: [AVATAR_SDIM,AVATAR_SDIM]
   end
 
 

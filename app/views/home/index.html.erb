@@ -1,33 +1,147 @@
+<% if signed_in? %>
+
 <% content_for :headcon do %>
 	<% javascript_include_tag "wy/advanced" %>
 	<%= stylesheet_link_tag    "home/main", :media => "all" %>
 <% end %>
-<% if signed_in? %>
+
 <div class="container">
 
-	<div id="paneleft">
-		<%= link_to "Portfolio", binders_path(current_teacher.username || current_teacher.id) %><br />
-		<%= link_to teachers_path, teachers_path %><br />
+	<div id="paneright">
+		<div class="announcer">
+			<%= image_tag('common/plane.png', :style => "margin: -2px 3px 0 0") %>
+			What's happening now
+		</div>
+
+		<div class="whitebox">
+
+			<div style="margin-top:-15px"></div>
+
+
+
+
+
+			<div class="newsitem">
+				<div class="imgarea">
+					<a href="#">
+						<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">
+					</a>
+				</div>
+
+
+				<div class="feedcontent">
+					<div class="thetitle">
+						<a href="#">Eric Simons</a> added new content to <a href="#">Dynamic Earth Systems</a> just a moment ago.
+					</div>
+
+
+					<a href="#" class="conlink">
+						<div class="thecontent">
+								<div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div>
+
+								<div class="txtcon">
+									<div class="contitle">
+										Curiosity Landing Pictures (NASA Exclusive)
+									</div>
+
+									<div class="condesc">
+										The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u>
+									</div>
+								</div>
+
+							<div style="clear:both"></div>
+						</div>
+					</a>
+
+				</div>
+
+
+				<div style="clear:both"></div>
+			</div>
+
+
+
+
+
+
+			<div class="newsitem">
+				<div class="imgarea">
+					<a href="#">
+						<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">
+					</a>
+				</div>
+
+
+				<div class="feedcontent">
+					<div class="thetitle">
+						<a href="#">Eric Simons</a> created <a href="#">Dynamic Earth Systems</a> two minutes ago.
+					</div>
+
+
+					<a href="#" class="conlink">
+						<div class="thecontent">
+
+								<div class="txtcon">
+									<div class="condesc">
+										The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u>
+									</div>
+								</div>
+
+							<div style="clear:both"></div>
+						</div>
+					</a>
+
+				</div>
+
+
+				<div style="clear:both"></div>
+			</div>
+
+
+
+
+
+
+
+		</div>
+
+
+
 	</div>
 
 
 
-	<div id="paneright">
+	<div id="paneleft">
 		<div class="announcer">Your Binders</div>
 
-		<div class="whitebox linker">
-			<div class="binder_attr">></div>
-			<div class="binder_name"><a href="#">Algebra 101</a></div>
+		<div class="whitebox">
+			<a href="http://localhost:5000/saget/portfolio/Math/5022b77d39fe361c75000003">
+				<div class="bindir">
+					<div class="binder_attr">></div>
+					<div class="binder_name">Algebra 101</div>
+				</div>
+			</a>
+
+			<a href="http://localhost:5000/saget/portfolio/Math/5022b77d39fe361c75000003">
+				<div class="bindir">
+					<div class="binder_attr">></div>
+					<div class="binder_name">Maths</div>
+				</div>
+			</a>
+			
 		</div>
 
-		<div class="whitebox linker">
-			<div class="binder_name"><a href="#">English 401</a></div>
-		</div>
+		<button class="btn" style="font-weight:bolder; font-size:14px; padding: 7px 20px; margin-left:25px">
+			<%= image_tag('common/plus.png', :style => "float:left;margin-right:5px; margin-top:1px") %>
+			Create a new binder
+		</button>
 
 	</div>
 
 
 </div>
+
+
 <% end %>
 
 

@@ -186,7 +186,7 @@ class BindersController < ApplicationController
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
 						params[:controller].to_s,
-						@binder.current_version.id.to_s,
+						@binder.id.to_s,
 						params)
 
 			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1)
@@ -352,7 +352,7 @@ class BindersController < ApplicationController
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
 								params[:controller].to_s,
-								@binder.current_version.id.to_s,
+								@binder.id.to_s,
 								params)
 
 					if url || embedtourl
@@ -1179,7 +1179,7 @@ class BindersController < ApplicationController
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
-					@binder.current_version.id.to_s,
+					@binder.id.to_s,
 					params)
 
 		if Crocodoc.check_format_validity(@binder.current_version.ext)

@@ -245,6 +245,8 @@ class Info
 	field :city
 	field :state 
 	field :country
+	field :twitterhandle
+	field :facebookurl
 	#field :profile_picture, 	:type => String, :default => ""
 
 	#field :debug_data,			:type => Array, :default => []

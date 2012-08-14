@@ -46,7 +46,13 @@ class TeachersController < ApplicationController
 			logs.each do |f|
 
 				# push onto the feed if the node is not deleted
-				@feed << f if Binder.find(f.modelid.to_s).parents[0]!={ "id" => "-1", "title" => "" }
+				binder = Binder.find(f.modelid.to_s)
+
+				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.get_access(current_teacher.id.to_s) > 0
+
+					@feed << f
+
+				end
 
 				# exit the loop if the maximum amount has been found
 				break if @feed.size == 10
@@ -99,7 +105,33 @@ class TeachersController < ApplicationController
 
 		current_teacher.info = Info.new if !current_teacher.info
 
-		current_teacher.info.update_info_fields(params)
+		#current_teacher.info.save
+
+		#current_teacher.info.update_info_fields(params)
+
+		# if params[:info][:avatar].nil?
+
+		# 	Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
+
+		# 	current_teacher.update_attributes( :bio => params[:info][:bio],
+		# 							:website => params[:info][:website] )
+		# 							# new attributes
+		# else
+
+		# 	Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
+
+		Rails.logger.debug "params: #{params.to_s}"
+
+		current_teacher.info.update_attributes(	:bio 				=> params[:info][:bio],
+												# new attributes
+												:avatar 			=> params[:info][:avatar],
+												:size 				=> params[:info][:avatar].size,
+												:ext 				=> File.extname(params[:info][:avatar].original_filename),
+												:data 				=> params[:info][:avatar].path,
+												#:avatar_width		=> avatar[:width],
+												#:avatar_height		=> avatar[:height],
+												:website 			=> params[:info][:website])
+		# end
 
 		# override carrierwave uploader field
 		if !params[:info][:avatar].nil?

@@ -46,7 +46,13 @@ class TeachersController < ApplicationController
 			logs.each do |f|
 
 				# push onto the feed if the node is not deleted
-				@feed << f if Binder.find(f.modelid.to_s).parents[0]!={ "id" => "-1", "title" => "" }
+				binder = Binder.find(f.modelid.to_s)
+
+				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.get_access(current_teacher.id.to_s) > 0
+
+					@feed << f
+
+				end
 
 				# exit the loop if the maximum amount has been found
 				break if @feed.size == 10

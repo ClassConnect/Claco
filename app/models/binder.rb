@@ -63,7 +63,7 @@ class Binder
 	field :download_count, :type => Integer, :default => 0
 
 	#field :last_action_update, :type => Array, :default => [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
-	#field :last_action_owner, :type => Array, :default 	=> [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
+	#55field :last_action_owner, :type => Array, :default 	=> [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
 
 	#Counts
 	field :files, :type => Integer, :default => 0

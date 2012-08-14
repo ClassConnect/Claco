@@ -1,8 +1,5 @@
-<h3>Binders#<%= params[:action] %></h3>
-<p>app/views/binders/<%= params[:action] %>.html.erb</p>
-<p>Currently In: <%= link_to "Trash", trash_path %> </p>
+<% content_for :headcon do %>
+	<% stylesheet_link_tag 'binders/folder' %>
+<% end %>
 
 <%= render 'layouts/show' %>
-
-<br />
-<%= link_to "Home", binders_path %>

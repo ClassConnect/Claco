@@ -22,7 +22,7 @@
 
 		<% end %>
 
-    <%= render 'layouts/contentlist' if params[:action] == "index" || @binder.type == 1 %>
+    <%= render 'layouts/contentlist' if params[:action] == "index" || params[:action] == "trash" || @binder.type == 1 %>
 
 	</div>
 

@@ -1233,16 +1233,16 @@ class BindersController < ApplicationController
 	end
 
 	#Only owner can set permissions
-	def permissions
-		@binder = Binder.find(params[:id])
+	# def permissions
+	# 	@binder = Binder.find(params[:id])
 
-		redirect_to "/403.html" and return if current_teacher.id.to_s != @binder.owner
+	# 	redirect_to "/403.html" and return if current_teacher.id.to_s != @binder.owner
 
-		@title = "Permissions for #{@binder.title}"
+	# 	@title = "Permissions for #{@binder.title}"
 
-		#To be replaced with current_teacher.colleagues
-		@colleagues = Teacher.all.reject {|t| t == current_teacher}
-	end
+	# 	#To be replaced with current_teacher.colleagues
+	# 	@colleagues = Teacher.all.reject {|t| t == current_teacher}
+	# end
 
 	#This is so nasty.
 	def setpub
@@ -1380,89 +1380,93 @@ class BindersController < ApplicationController
 
 	end
 
-	def createpermission
-		@binder = Binder.find(params[:id])
+	# def createpermission
+	# 	@binder = Binder.find(params[:id])
 
-		@new = false
+	# 	@new = false
 
-		src = Mongo.log(current_teacher.id.to_s,
-						__method__.to_s,
-						params[:controller].to_s,
-						@binder.id.to_s,
-						params)
+	# 	src = Mongo.log(current_teacher.id.to_s,
+	# 					__method__.to_s,
+	# 					params[:controller].to_s,
+	# 					@binder.id.to_s,
+	# 					params)
 
-		@binder.permissions.each {|p| @new = true if p["shared_id"] == params[:shared_id]}
+	# 	@binder.permissions.each {|p| @new = true if p["shared_id"] == params[:shared_id]}
 
-		@binder.parent_permissions.each {|pp| @new = true if pp["shared_id"] == params[:shared_id]} 
+	# 	@binder.parent_permissions.each {|pp| @new = true if pp["shared_id"] == params[:shared_id]} 
 
-		@binder.permissions << {:type		=> params[:type],
-								:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-								:auth_level	=> params[:auth_level]} if !@new
+	# 	@binder.permissions << {:type		=> params[:type],
+	# 							:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
+	# 							:auth_level	=> params[:auth_level]} if !@new
 
-		@binder.save
+	# 	@binder.save
 
-		@binder.subtree.each do |c| 
+	# 	@binder.subtree.each do |c| 
 
-			if !@new
+	# 		if !@new
 
-				c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
-																					:shared_id => params[:shared_id],
-																					:auth_level => params[:auth_level],
-																					:folder_id => params[:id]}) 
-				Mongo.log(	current_teacher.id.to_s,
-							__method__.to_s,
-							params[:controller].to_s,
-							c.id.to_s,
-							params,
-							{ :src => src })
+	# 			c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
+	# 																				:shared_id => params[:shared_id],
+	# 																				:auth_level => params[:auth_level],
+	# 																				:folder_id => params[:id]}) 
+	# 			Mongo.log(	current_teacher.id.to_s,
+	# 						__method__.to_s,
+	# 						params[:controller].to_s,
+	# 						c.id.to_s,
+	# 						params,
+	# 						{ :src => src })
 
-			end
-		end
+	# 		end
+	# 	end
 
-		redirect_to named_binder_route(@binder, "permissions")
-	end
+	# 	redirect_to named_binder_route(@binder, "permissions")
+	# end
 
-	def destroypermission
-		@binder = Binder.find(params[:id])
+	# def destroypermission
+	# 	@binder = Binder.find(params[:id])
 
-		src = Mongo.log(current_teacher.id.to_s,
-						__method__.to_s,
-						params[:controller].to_s,
-						@binder.id.to_s,
-						params)
+	# 	src = Mongo.log(current_teacher.id.to_s,
+	# 					__method__.to_s,
+	# 					params[:controller].to_s,
+	# 					@binder.id.to_s,
+	# 					params)
 
-		pper = @binder.permissions[params[:pid].to_i]
+	# 	pper = @binder.permissions[params[:pid].to_i]
 
-		pper["folder_id"] = params[:id]
+	# 	pper["folder_id"] = params[:id]
 
-		@binder.permissions.delete_at(params[:pid].to_i)
+	# 	@binder.permissions.delete_at(params[:pid].to_i)
 
-		@binder.subtree.each do |c|
-			c.parent_permissions.delete(pper)
-			c.save
+	# 	@binder.subtree.each do |c|
+	# 		c.parent_permissions.delete(pper)
+	# 		c.save
 
-			Mongo.log(	current_teacher.id.to_s,
-						__method__.to_s,
-						params[:controller].to_s,
-						c.id.to_s,
-						params,
-						{ :src => src })
+	# 		Mongo.log(	current_teacher.id.to_s,
+	# 					__method__.to_s,
+	# 					params[:controller].to_s,
+	# 					c.id.to_s,
+	# 					params,
+	# 					{ :src => src })
 
-		end
+	# 	end
 
-		@binder.save
+	# 	@binder.save
 
-		#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(params[:id])
-		#Binder.generate_folder_thumbnail(params[:id])
-		Binder.generate_folder_thumbnail(@binder.parent['id'])
+	# 	#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(params[:id])
+	# 	#Binder.generate_folder_thumbnail(params[:id])
+	# 	Binder.generate_folder_thumbnail(@binder.parent['id'])
 
-		redirect_to named_binder_route(@binder, "permissions")
-	end
+	# 	redirect_to named_binder_route(@binder, "permissions")
+	# end
 
 	def trash
 		@children = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
 
-		redirect_to "/403.html" and return if params[:username] != current_teacher.username
+		@tagset = []
+
+		@tags = [[],[],[],[]]
+
+		#redirect_to "/403.html" and return if params[:username] != current_teacher.username
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
 	end

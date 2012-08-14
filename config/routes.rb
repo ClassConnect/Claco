@@ -1,8 +1,10 @@
 Claco::Application.routes.draw do
-	devise_for :teachers
+	devise_for :teachers, :skip => [:sessions]
 
 	as :teacher do
-		get '/login'														=> 'devise/sessions#new',			:as => 'new_teacher_session'
+		get 'login' => 'devise/sessions#new', :as => :new_teacher_session
+		post 'login' => 'devise/sessions#create', :as => :teacher_session
+		delete 'logout' => 'devise/sessions#destroy', :as => :destroy_teacher_session
 	end
 
 	#Root to home
@@ -15,7 +17,7 @@ Claco::Application.routes.draw do
 	post	'/updateinfo'													=> "teachers#updateinfo"
 
 	#Profile Page
-	get		'/teachers/:id'													=> 'teachers#show'
+	get		'/:username'													=> 'teachers#show'
 
 	#Edit Tags Form/Process
 	get		'/tags'															=> "teachers#tags"
@@ -92,7 +94,7 @@ Claco::Application.routes.draw do
 	post	'/:username/portfolio/newfile'									=> 'binders#createfile'
 
 	#Trash folder
-	get		'/:username/trash'												=> 'binders#trash',					:as => 'trash'
+	get		'/trash'														=> 'binders#trash',					:as => 'trash'
 
 	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
@@ -106,40 +108,31 @@ Claco::Application.routes.draw do
 	post	'/:username/portfolio(/:root)/:title/:id/createcontent'			=> 'binders#createcontent',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Move
-	#get		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#move',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Copy
-	#get		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copy',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
-	#Fork (Snap)
-	#get		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#fork',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	put		'/:username/portfolio(/:root)/:title/:id/fork'					=> 'binders#forkitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-
 	#Versioning
-	#get		'/:username/portfolio(/:root)/:title/:id/versions'				=> 'binders#versions',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	#get		'/:username/portfolio(/:root)/:title/:id/swap'					=> 'binders#swap',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	#get		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#newversion',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#createversion',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Permissions
-	#get		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#permissions',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions"), :constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	post	'/:username/portfolio(/:root)/:title/:id/setpub'				=> 'binders#setpub',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Edit
-	#get		'/:username/portfolio(/:root)/:title/:id/edit'					=> 'binders#edit',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	put		'/:username/portfolio(/:root)/:title/:id/rename'				=> 'binders#rename',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	post	'/:username/portfolio(/:root)/:title/:id/tags'					=> 'binders#updatetags',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Show
 	get		'/:username/portfolio(/:root)/:title/:id/download'				=> 'binders#download',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	
+	#Update :body
+	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
 	#Temporary crocodoc view
 	get		'/:username/portfolio(/:root)/:title/:id/croc'					=> 'binders#showcroc',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}

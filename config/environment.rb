@@ -4,6 +4,8 @@ require File.expand_path('../application', __FILE__)
 # Initialize the rails application
 Claco::Application.initialize!
 
+$stdout.sync = true
+
 #Mongoid.logger = Logger.new(STDOUT)
 #Rails.logger = Logger.new(STDOUT)
 

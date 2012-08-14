@@ -21,7 +21,7 @@ class Teacher
 	# :token_authenticatable, :confirmable,
 	# :lockable, :timeoutable and :omniauthable
 	devise :database_authenticatable, :registerable,
-	 :recoverable, :rememberable, :trackable, :validatable
+	 :recoverable, :rememberable, :trackable, :validatable, :authentication_keys => [:login]
 
 	## Database authenticatable
 	field :email,              :type => String, :null => false, :default => "", :unique => true
@@ -63,6 +63,10 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login
+	
+	attr_accessor :login
+
 	## Token authenticatable
 	# field :authentication_token, :type => String
 
@@ -98,6 +102,15 @@ class Teacher
 
 	def colleague_status(id)
 		return self.relationships.find_or_initialize_by(:user_id => id).colleague_status
+	end
+
+	def self.find_first_by_auth_conditions(warden_conditions)
+		conditions = warden_conditions.dup
+		if login = conditions.delete(:login)
+			self.any_of({ :username =>  /^#{Regexp.escape(login)}$/i }, { :email =>  /^#{Regexp.escape(login)}$/i }).first
+		else
+			super
+		end
 	end
 
 end

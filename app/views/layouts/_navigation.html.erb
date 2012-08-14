@@ -8,7 +8,7 @@
           <div class="nav-collapse">
 
 
-          
+          <% if signed_in? %>
 
             <ul class="nav nav-pills pull-right" style="margin-left:0px">
               <li id="menuopttog" class="dropdown">
@@ -25,7 +25,7 @@
                   </li>
 
                   <li>
-                    <a href="#">Logout</a>
+                    <%= link_to "Logout", destroy_teacher_session_path, :method => :delete %>
                   </li>
 
                 </ul>
@@ -42,18 +42,23 @@
             </a>
 
 
-            <!--
+          <% else %>
+
             <ul class="nav nav-pills pull-right">
               <li class="dropdown">
 
                 <button id="top-notch-btn" data-toggle="dropdown" class="btn">Sign in</button>
                 <ul class="dropdown-menu noclose">
-                  <input type="text" class="span3 login-focus" placeholder="Username / Email">
-                  <input type="password" class="span3" placeholder="Password">
-                  <div style="font-size:10px; float:left; margin-top:8px">
-                    <a href="#">Forgot your password?</a>
-                  </div>
-                  <button type="submit" class="btn" style="float:right">Sign in</button>
+                  <%= form_for("teacher", :url => teacher_session_path) do |f| %>
+                    <%= f.text_field :login, :class => "span3 login-focus", :placeholder => "Username / Email" %>
+                    
+                    <%= f.password_field :password, :class => "span3", :placeholder => "Password" %>
+                    
+                    <div style="font-size:10px; float:left; margin-top:8px">
+                      <a href="<%= new_password_path('teacher') %>">Forgot your password?</a>
+                    </div>
+                    <button type="submit" class="btn" style="float:right">Sign in</button>
+                  <% end %>
 
                   <div style="clear:both"></div>
 
@@ -70,7 +75,8 @@
                 </ul>
               </li>
             </ul>
-          -->
+
+          <% end %>
 
 
           </div><!--/.nav-collapse -->

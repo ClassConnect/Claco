@@ -128,7 +128,7 @@
 
 			            </div>
 
-			            <div class="descarea"><%= binder.body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(binder.body), :length => 180, :omission => "... <u>see more</u>").html_safe %></div>
+			            <div class="descarea"><%= binder.body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(binder.body), :length => 250, :omission => "... <u>see more</u>").html_safe %></div>
 			        </div>
 
 			        <div class="lastupdate">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>

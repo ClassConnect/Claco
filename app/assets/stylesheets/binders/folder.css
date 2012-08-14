@@ -747,7 +747,7 @@
 
 #list-pane .content-list .content-item {
   background: #fff;
-  height: 100px;
+  height: 130px;
   margin-bottom:15px;
   cursor:pointer;
   padding: 0 0 0 0;
@@ -764,7 +764,7 @@
   margin-left:4px;
   float:left;
   width:180px;
-  height:91px;
+  height:121px;
   overflow:hidden;
   background-color:#fff;
   cursor:pointer;
@@ -779,7 +779,7 @@
 .folder-preview .contype{
   padding:1px;
   position:absolute;
-  margin-top:65px;
+  margin-top:95px;
   width:26px;
   height:24px;
   background:#333;
@@ -844,7 +844,7 @@
 
 .folder-preview .single-hold {
   float:left;
-  height: 92px;
+  height: 122px;
   width:180px;
   display:block;
   text-align:center;
@@ -853,6 +853,8 @@
 
    background-repeat:no-repeat;
    background-position:center;
+
+   background-size: 152%;
 }
 
 
@@ -894,7 +896,7 @@
 #list-pane .content-list .content-item .innerd .reflink{
   font-size:11px;
   color:#aaa;
-  margin-top:-2px;
+  margin-top:-1px;
 }
 #list-pane .content-list .content-item .innerd .blanklink{
   height:10px;
@@ -902,9 +904,9 @@
 
 #list-pane .content-list .content-item .innerd .descarea{
   font-size:11px;
-  margin-top:3px;
+  margin-top:7px;
   color:#777;
-  line-height:12px;
+  line-height:14px;
 }
 
 #list-pane .content-list .content-item .lastupdate{
@@ -912,13 +914,13 @@
   float:left;
   position:absolute;
   margin-left:200px;
-  margin-top:78px;
+  margin-top:108px;
   color:#aaa;
 }
 
 #list-pane .content-list .content-item .drop-tog{
   float:right;
-  margin-top:30px;
+  margin-top:45px;
   margin-right:15px;
 }
 
@@ -994,8 +996,8 @@
   position:absolute;
 
   background: #fff;
-  height: 85px;
-  margin-top:-110px;
+  height: 115px;
+  margin-top:-140px;
   margin-left:-200px;
   width:350px;
   cursor:pointer;
@@ -1016,7 +1018,7 @@
 }
 
 .dropper-tog .big-text {
-  margin-top:8px;
+  margin-top:24px;
   font-size:24px;
   font-weight:bolder;
   width:100px;
@@ -1027,17 +1029,17 @@
 
 @-webkit-keyframes bounce {
    from {
-      margin-top: 10px;
+      padding-top: 10px;
    }
    to {
-      margin-top: 0px;
+      padding-top: 0px;
    }
 }
 
 .dropper-tog .tricontain {
   float:right;
   margin-right:15px;
-  margin-top:7px;
+  margin-top:20px;
 
   -webkit-animation-name: bounce;
    -webkit-animation-duration: 0.7s;
@@ -1065,8 +1067,8 @@
 
 .placeBorder {
   position:absolute;
-  margin-top:-115px;
-  height: 77px;
+  margin-top:-145px;
+  height: 107px;
   width:673px;
   margin-bottom:15px;
   padding:15px 15px 0 15px;

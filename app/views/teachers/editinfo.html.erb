@@ -21,6 +21,10 @@
 			<!-- render 'shared/error_messages' -->
 			<%= render 'shared/error_messages', object: f.object %>
 
+			<%= #get_teacher_avatar(current_teacher,{:height => 200, :border => 1}) 
+			%>
+
+			<!--<img src=<%= current_teacher.info.avatar %> />-->
 
 			<div class="secter" style="margin-top:0px">
 				Profile Picture

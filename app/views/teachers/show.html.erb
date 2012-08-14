@@ -104,7 +104,29 @@
 </div>
 
 <div class="container profile-content">
-  Feed goes here, lulz
+  <!--Feed goes here, lulz-->
+<% #if @binder_create.any? 
+%>
+	<% #@binder_create.each do |f| 
+	%>
+		<%= #f.inspect.to_s 
+		%>
+		<br />
+	<% #end 
+	%>
+<% #end 
+%>
+HERE
+<% @feed.each do |f| %>
+	<%= f[:owner].fname.to_s %>&nbsp;
+	<%= f[:owner].lname.to_s %>&nbsp;,&nbsp;
+	<%= f[:binder].title.to_s %>&nbsp;,&nbsp;
+	<%= f[:log].method.to_s %>&nbsp;,&nbsp;
+	<%= #Time.at(f[:log].timestamp).to_datetime 
+	%><%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago
+	<br />
+<% end %>
+
 </div>
 
 <% if false %>

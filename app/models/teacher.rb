@@ -216,7 +216,7 @@ end
 
 class Info
 	include Mongoid::Document
-	include ActiveModel::Validations
+	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 
 	#require 'carrierwave/processing/mini_magick'
@@ -237,11 +237,14 @@ class Info
 	field :size, 				:type => Integer, :default => 0
 	field :ext, 				:type => String, :default => ""
 	field :data, 				:type => String, :default => "" #URL, path to file
-	field :avatar_width,		:type => Integer, :default => 0
-	field :avatar_height,		:type => Integer, :default => 0
+	#field :avatar_width,		:type => Integer, :default => 0
+	#field :avatar_height,		:type => Integer, :default => 0
 
 	field :bio, 				:type => String, :default => ""
 	field :website, 			:type => String, :default => ""
+	field :city
+	field :state 
+	field :country
 	#field :profile_picture, 	:type => String, :default => ""
 
 	#field :debug_data,			:type => Array, :default => []
@@ -257,14 +260,25 @@ class Info
 
 		#avatar = MiniMagick::Image.open(params[:info][:avatar].path)
 
-		self.update_attributes(	:bio 				=> params[:info][:bio],
-								:avatar 			=> params[:info][:avatar],
-								:size 				=> params[:info][:avatar].size,
-								:ext 				=> File.extname(params[:info][:avatar].original_filename),
-								:data 				=> params[:info][:avatar].path,
-								#:avatar_width		=> avatar[:width],
-								#:avatar_height		=> avatar[:height],
-								:website 			=> params[:info][:website])
+		if params[:info][:avatar].nil?
+
+			Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
+
+			self.update_attributes( :bio => params[:info][:bio],
+									:website => params[:info][:website] )
+		else
+
+		Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
+
+			self.update_attributes(	:bio 				=> params[:info][:bio],
+									:avatar 			=> params[:info][:avatar],
+									:size 				=> params[:info][:avatar].size,
+									:ext 				=> File.extname(params[:info][:avatar].original_filename),
+									:data 				=> params[:info][:avatar].path,
+									#:avatar_width		=> avatar[:width],
+									#:avatar_height		=> avatar[:height],
+									:website 			=> params[:info][:website])
+		end
 
 	end
 end

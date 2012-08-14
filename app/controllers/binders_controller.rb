@@ -589,8 +589,8 @@ class BindersController < ApplicationController
 
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 			
+			# override carrierwave uploader field
 			altparams = params.clone
-
 			altparams[:file] = altparams[:file].original_filename
 
 			Mongo.log(	current_teacher.id.to_s,
@@ -777,6 +777,8 @@ class BindersController < ApplicationController
 		end
 
 		if @ok
+
+			src = ""
 
 			@children.each do |c| 
 

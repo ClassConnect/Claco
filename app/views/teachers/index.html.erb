@@ -4,7 +4,7 @@
 <p><b>You: <%=link_to current_teacher.email, current_teacher %></b></p>
 <br />
 <br />
-<% if false #@teachers.size > 1 
+<% if @teachers.size > 1 #false
 	%>
 <p>Other teachers:</p>
 	<table>
@@ -17,7 +17,9 @@
 		<% if teacher.id != current_teacher.id  %>
 		<tr>
 			<td>
-				<%= get_teacher_avatar(teacher,{:height => 60, :border => 1}) %>
+				<%= #get_teacher_avatar(teacher,{:height => 60, :border => 1}) 
+				%>
+				<img src=<%= current_teacher.info.avatar.url.to_s %> />
 			</td>
 			<td>
 				<p><%= "#{teacher.full_name}: "%>
@@ -32,6 +34,12 @@
 		<% end %>
 		<% end %>
 	</table>
+<% end %>
+
+<% if @feed.any? %>
+	<% @feed.each do |f| %>
+		<%= f.inspect.to_s %><br />
+	<% end %>
 <% end %>
 
 <% if false %> 

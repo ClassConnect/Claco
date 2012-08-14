@@ -92,7 +92,7 @@ Claco::Application.routes.draw do
 	post	'/:username/portfolio/newfile'									=> 'binders#createfile'
 
 	#Trash folder
-	get		'/:username/trash'												=> 'binders#trash',					:as => 'trash'
+	get		'/trash'														=> 'binders#trash',					:as => 'trash'
 
 	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 

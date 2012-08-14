@@ -1460,7 +1460,11 @@ class BindersController < ApplicationController
 	def trash
 		@children = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
 
-		redirect_to "/403.html" and return if params[:username] != current_teacher.username
+		@tagset = []
+
+		@tags = [[],[],[],[]]
+
+		#redirect_to "/403.html" and return if params[:username] != current_teacher.username
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
 	end

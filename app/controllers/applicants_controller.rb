@@ -23,4 +23,10 @@ class ApplicantsController < ApplicationController
 
 	end
 
+	def show
+
+		@app = Applicant.find(params[:id])
+
+	end
+
 end

@@ -8,6 +8,7 @@
 <td>Email</td>
 <td>Application</td>
 <td>Timestamp</td>
+<td>Status</td>
 </tr>
 <% @apps.each do |app| %>
 <tr>
@@ -16,6 +17,7 @@
 <td><%= app.email %></td>
 <td><%= app.body %></td>
 <td><%= app.timestamp %></td>
+<td><%= app.status %></td>
 </tr>
 <% end %>
 </table>

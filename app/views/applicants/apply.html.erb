@@ -6,12 +6,15 @@
 <% if !@app.errors.empty? %>
 	<ul>
 	<% @app.errors.each do |err, msg| %>
-		<li><%= "#{err} #{msg}" %></li>
+		<li><%= "#{msg}" %></li>
 	<% end %>
 	</ul>
 <% end %>
 
 <%= form_for @app do |f| %>
+
+	<p><%= f.label :title, "Title" %><br />
+	<%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] )) %></p>
 
 	<p><%= f.label :fname, "First name" %><br />
 	<%= f.text_field :fname %></p>

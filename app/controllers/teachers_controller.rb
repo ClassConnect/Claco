@@ -14,7 +14,7 @@ class TeachersController < ApplicationController
 	#/teachers/:id
 	#Teacher Profiles
 	def show
-		@teacher = Teacher.find(params[:id])
+		@teacher = Teacher.where(:username => params[:username]).first
 
         @teacher.info = Info.new
 

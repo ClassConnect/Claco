@@ -9,7 +9,10 @@ class Log
 	field :model
 	field :modelid
 	field :params, :type => Hash
+	
 	# non-standard optional data hash
+	# :copy - this is a copy, and was copied from the binder ID specified by :copy
+	# :src - this log is part of a logset, src is the ID of the 'parent' log
 	field :data, :type => Hash, :default => {}
 
 end

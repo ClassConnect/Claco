@@ -7,8 +7,12 @@ class TeachersController < ApplicationController
 		@title = "Teacher Listing"
 		@teachers = Teacher.all
 
+		#@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
+
+		#@feed = Log.where( :ownerid.ne => current_teacher.id.to_s).in( method: ["create","createfile","createcontent"] ).desc(:timestamp).limit(10)
+
 		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!
-		@parsed_json = JSON.parse(File.read("app/assets/json/standards.json"))
+		#@parsed_json = JSON.parse(File.read("app/assets/json/standards.json"))
 	end
 
 	#/teachers/:id
@@ -32,6 +36,32 @@ class TeachersController < ApplicationController
 
 		#Create info entry for teacher if not yet created
 		#@teacher.info = Info.new if !@teacher.info
+
+		@feed = []
+
+		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
+		Log.where( :ownerid.ne => current_teacher.id.to_s).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp).each do |f|
+
+			# push onto the feed if the node is not deleted
+			@feed << f if Binder.find(f.modelid.to_s).parents[0]!={ "id" => "-1", "title" => "" }
+
+			# exit the loop if the maximum amount has been found
+			break if @feed.size == 10
+
+			#@feed[f.method.to_s] << f
+
+		end
+
+		# the array should already be sorted
+		# .sort_by { |e| -e.timestamp }
+		@feed = @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } }
+
+		#feed.map { |f| f.modelid.to_s } if feed.any?
+
+		#Rails.logger.debug "feed: #{feed.map { |f| f.modelid.to_s }.to_s} "
+
+		#@binder_create = Binder.where( 	:owner.ne => current_teacher.id.to_s, 
+		#								"parents.id" => { "$ne" => "-1"}).in( _id: feed.map { |f| f.modelid.to_s } )
 
 		# fetch root level directories that are owned by the teacher
 		@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
@@ -65,7 +95,19 @@ class TeachersController < ApplicationController
 
 		current_teacher.info = Info.new if !current_teacher.info
 
-		current_teacher.info.update_info_fields(params);
+		current_teacher.info.update_info_fields(params)
+
+		# override carrierwave uploader field
+		if !params[:info][:avatar].nil?
+			altparams = params.clone
+			altparams[:info][:avatar] = params[:info][:avatar].original_filename
+		end
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					altparams.nil? ? params : altparams)
 
 		if current_teacher.info.errors.empty?
 			# no errors, return to the main profile page
@@ -89,6 +131,12 @@ class TeachersController < ApplicationController
 
 		current_teacher.tag.update_tag_fields(params)
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					params)
+
 		redirect_to tags_path
 	end
 
@@ -102,6 +150,13 @@ class TeachersController < ApplicationController
 		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
 
 		@relationship.subscribe()
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@teacher.id.to_s,
+					params,
+					{ :relationship => @relationship.id.to_s })
 
 		redirect_to teacher_path(@teacher)
 	end
@@ -129,6 +184,14 @@ class TeachersController < ApplicationController
 			# some colleague action is pending, merely unsubscribe from the other teacher
 			@relationship.unsubscribe()
 		end
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@teacher.id.to_s,
+					params,
+					{ 	:relationship => @relationship.id.to_s, 
+						:affected_relationship => @affected_relationship.id.to_s })
 
 		redirect_to teacher_path(@teacher)
 
@@ -196,6 +259,14 @@ class TeachersController < ApplicationController
 			@affected_relationship.set_colleague_status(3)
 		end
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@teacher.id.to_s,
+					params,
+					{ 	:relationship => @relationship.id.to_s, 
+						:affected_relationship => @affected_relationship.id.to_s })
+
 		redirect_to teacher_path(@teacher)
 
 	end
@@ -239,6 +310,14 @@ class TeachersController < ApplicationController
 
 #			@affected_relationship.delete
 		end
+ 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@teacher.id.to_s,
+					params,
+					{ 	:relationship => @relationship.id.to_s, 
+						:affected_relationship => @affected_relationship.id.to_s })
 
 		redirect_to teacher_path(@teacher)
 
@@ -281,4 +360,35 @@ class TeachersController < ApplicationController
 
 	end
 
+	###############################################################################################
+
+							#    #  ##### #     #####  ##### #####   #### 
+							#    #  #     #     #    # #     #    # #    #
+							#    #  #     #     #    # #     #    # # 
+							######  ####  #     #####  ####  #####   ####
+							#    #  #     #     #      #     #  #        #
+							#    #  #     #     #      #     #   #  #    #
+							#    #  ##### ##### #      ##### #    #  ####
+
+	###############################################################################################
+
+	module Mongo
+		extend self
+
+		def log(ownerid,method,model,modelid,params,data = {})
+
+			log = Log.new( 	:ownerid => ownerid.to_s,
+							:timestamp => Time.now.to_i,
+							:method => method.to_s,
+							:model => model.to_s,
+							:modelid => modelid.to_s,
+							:params => params,
+							:data => data)
+
+			log.save
+
+			return log.id.to_s
+
+		end
+	end
 end

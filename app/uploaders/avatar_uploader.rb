@@ -28,7 +28,12 @@ class AvatarUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
-    Digest::MD5.hexdigest(model.teacher.id.to_s + model.size.to_s + model.data)
+
+    Rails.logger.debug "teacherid #{model.teacher.id.to_s}"
+    Rails.logger.debug "model.size.to_s #{model.size.to_s}"
+    Rails.logger.debug "model.data.to_s #{model.data.to_s}"
+
+    Digest::MD5.hexdigest(model.teacher.id.to_s + model.size.to_s + model.data.to_s)
   end
 
   def fog_directory

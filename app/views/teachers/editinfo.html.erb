@@ -1,33 +1,176 @@
 <% content_for :headcon do %>
+	<%= javascript_include_tag "editinfo/main" %>
 	<%= stylesheet_link_tag    "editinfo", :media => "all" %>
 <% end %>
+
 
 <div class="container">
 
 	<div class="mainbox">
-		<%= current_teacher.full_name %>
-		<br />
-		<br />
 
-		<%= form_for current_teacher.info, :url => updateinfo_path do |f| %>
+		<ul class="nav nav-tabs" id="myTab">
+		  <li class="active"><a href="#personal">Personal Info</a></li>
+		  <li><a href="#password">Change Password</a></li>
+		</ul>
+		 
+		<div class="tab-content">
+		  <div class="tab-pane active" id="personal">
+
+		  	<%= form_for current_teacher.info, :url => updateinfo_path do |f| %>
 
 			<!-- render 'shared/error_messages' -->
 			<%= render 'shared/error_messages', object: f.object %>
 
-			<%= get_teacher_avatar(current_teacher,{:height => 200, :border => 1}) %>
 
-		  	<div><%= f.label :avatar, "Profile Picture:" %><br />
+			<div class="secter" style="margin-top:0px">
+				Profile Picture
+			</div>
+
+			<div class="imgbox">
+				<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_n.jpg" class="imger" />
+
+
+			</div>
+
+
+		  	<div style="margin-top:30px;color:#444;font-style:italic">Update your profile picture<br />
 		  	<%= f.file_field :avatar %></div>
 
-			<div><%= f.label :bio, "Bio" %><br />
-			<%= f.text_area :bio %></div>
+		  	<div style="clear:both"></div>
 
-			<div><%= f.label :website, "Website" %> <br />
-			<%= f.text_field :website %></div>
 
-			<div><%= f.submit "Update" %></div>
 
-		<% end %>
+
+
+		  	<div class="secter">
+				Name
+			</div>
+
+			<div>
+				<input type="text" placeholder="First name" class="nametext" /> <input type="text" placeholder="Last name" class="nametext" />
+			</div>
+
+
+
+
+
+			<div class="secter">
+				Location
+			</div>
+
+			<div>
+		
+
+			<input type="text" id="city" placeholder="Enter your city name" />
+
+			<div class="fulldiv" style="display:none">
+				<a href="#" onclick="$(this).parent().hide(); $('#city').val('').show().focus(); return false" class="fullnameswap">Change location</a><br />
+
+				<input type="text" id="fulllocation" readonly />
+			</div>
+
+			</div>
+
+
+
+
+		  	<div class="secter">
+				Personal Bio
+			</div>
+
+			<div>
+				<textarea class="biotext" placeholder="Why you teach, how long you've been teaching, etc"></textarea>
+			</div>
+
+
+
+
+			<div class="secter">
+				Website / Social Networks
+			</div>
+
+			<div>
+				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %><input type="text" placeholder="Personal website (or blog)" /><br />
+
+				<%= image_tag('settings/twitter.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
+				<input type="text" placeholder="Twitter username" /><br />
+
+				<%= image_tag('settings/facebook.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
+				<input type="text" placeholder="Facebook username" />
+			</div>
+
+
+
+
+
+
+			<div style="margin-top:20px">
+				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Update Personal Info</button>
+			</div>
+
+			<% end %>
+
+		  </div>
+
+
+
+
+
+
+
+
+
+
+
+		  <div class="tab-pane" id="password">
+
+		  	<div class="secter">
+				Choose a new password for your account
+			</div>
+
+			<div>
+				<input type="password" placeholder="New password" />
+			</div>
+
+			<div>
+				<input type="password" placeholder="Confirm password" />
+			</div>
+
+
+			<div style="margin-top:20px">
+				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Change your password</button>
+			</div>
+
+
+
+
+		  </div>
+
+
+
+
+
+		</div>
+
 
 	</div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+$('#myTab a').click(function (e) {
+  e.preventDefault();
+  $(this).tab('show');
+})
+</script>

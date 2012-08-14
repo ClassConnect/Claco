@@ -38,11 +38,12 @@ class TeachersController < ApplicationController
 		#@teacher.info = Info.new if !@teacher.info
 
 		@feed = []
+		temp = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders").in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
-		#if logs.any?
+		if logs.any?
 			logs.each do |f|
 
 				# push onto the feed if the node is not deleted
@@ -50,9 +51,52 @@ class TeachersController < ApplicationController
 
 				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.get_access(current_teacher.id.to_s) > 0
 
-					@feed << f
+					#Rails.logger.debug "feed log: #{f.params.to_s}"
+
+					#timestamp << f.timestamp
+
+					#f.delete(:timestamp)
+
+					
+
+					#if @feed.any? && !(@feed.map { |g| g.clone.delete("timestamp") }.include? f.clone.delete("timestamp"))
+
+					# field :ownerid
+					# field :timestamp, :type => Integer
+					# # method and model are potentially redundant or unneeded fields
+					# # model is a lowercase string of the model name
+					# field :method
+					# field :controller
+					# field :modelid
+					# field :params, :type => Hash
+
+					# # non-standard optional data hash
+					# # :copy - this is a copy, and was copied from the binder ID specified by :copy
+					# # :src - this log is part of a logset, src is the ID of the 'parent' log
+					# field :data, :type => Hash, :default => {}
+
+					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
+						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : ( true ) )
+
+					#temp << f
+
+					#if temp.map { |g| g.delete(:timestamp) }.uniq.size == temp.size
+				
+						@feed << f
+
+					#temp <<
+
+					#Rails.logger.debug "FEED: #{@feed.map { |h| h.delete("timestamp") }}"	
+
+					end
+
+					#temp = @feed.clone
+
+					#end
 
 				end
+
+				#@feed.uniq!
 
 				# exit the loop if the maximum amount has been found
 				break if @feed.size == 10
@@ -60,7 +104,7 @@ class TeachersController < ApplicationController
 				#@feed[f.method.to_s] << f
 			end
 
-		#end
+		end
 
 		# the array should already be sorted
 		# .sort_by { |e| -e.timestamp }

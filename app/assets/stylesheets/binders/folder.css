@@ -859,24 +859,28 @@
 
 
 
-.folder-preview .thumb-wrap {
-  float:right;
-}
-
-
 .folder-preview .thumb1 {
-  margin-top:1px;
+  position:absolute;
+  margin-top:80px;
+  margin-left:-65px;
   height:45px;
   width:49px;
-  float:right;
-  border-bottom:1px solid #fff;
-  border-left:1px solid #fff;
+  border-top:1px solid #fff;
+  border-right:1px solid #fff;
 }
 
 .folder-preview .thumb2 {
+  position:absolute;
+  margin-top:80px;
+  margin-left:-15px;
   height:45px;
   width:49px;
-  float:right;
+  border-right:1px solid #000;
+}
+
+.folder-preview .thumb3 {
+  height:45px;
+  width:49px;
   border-left:1px solid #fff;
 }
 

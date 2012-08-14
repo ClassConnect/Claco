@@ -40,21 +40,25 @@ class TeachersController < ApplicationController
 		@feed = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		Log.where( :ownerid.ne => current_teacher.id.to_s).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp).each do |f|
+		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders").in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
-			# push onto the feed if the node is not deleted
-			@feed << f if Binder.find(f.modelid.to_s).parents[0]!={ "id" => "-1", "title" => "" }
+		#if logs.any?
+			logs.each do |f|
 
-			# exit the loop if the maximum amount has been found
-			break if @feed.size == 10
+				# push onto the feed if the node is not deleted
+				@feed << f if Binder.find(f.modelid.to_s).parents[0]!={ "id" => "-1", "title" => "" }
 
-			#@feed[f.method.to_s] << f
+				# exit the loop if the maximum amount has been found
+				break if @feed.size == 10
 
-		end
+				#@feed[f.method.to_s] << f
+			end
+
+		#end
 
 		# the array should already be sorted
 		# .sort_by { |e| -e.timestamp }
-		@feed = @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } }
+		@feed = @feed.any? ? @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
 
 		#feed.map { |f| f.modelid.to_s } if feed.any?
 

@@ -56,7 +56,7 @@ CLACO_VALID_IMAGE_FILETYPES = %w[jpg .jpg jpeg .jpeg png .png gif .gif]
 # THUMBNAIL GENERATION
  
 # Size to scale down the full image before smart thumbnail generation
-IMGSCALE = 600
+IMGSCALE = 800
 
 # Threshold for edge detection image
 EDGEPIX_THRESH_PRIMARY = 100
@@ -67,11 +67,11 @@ CV_WIDTH = 700
 
 # Large thumbnail dimensions
 LTHUMB_W = 180.0
-LTHUMB_H = 92.0
+LTHUMB_H = 122.0
 
 # Small thumbnail dimensions
-STHUMB_W = 49.0
-STHUMB_H = 46.0
+STHUMB_W = 59.0
+STHUMB_H = 50.0
 
 # blob filedata
 BLOB_FILETYPE = "png"

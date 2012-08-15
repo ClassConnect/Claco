@@ -30,7 +30,11 @@ class BindersController < ApplicationController
 
 		if params[:foldertitle].strip.length > 0
 
-			@inherited = inherit_from(params[:id])
+			if params[:id].nil?
+				@inherited = inherit_from("0")
+			else
+				@inherited = inherit_from(params[:id])
+			end
 
 			@parenthash = @inherited[:parenthash]
 			@parentsarr = @inherited[:parentsarr]
@@ -40,7 +44,7 @@ class BindersController < ApplicationController
 
 			@parent_child_count = @inherited[:parent_child_count]
 
-			if @parent.get_access(current_teacher.id) == 2
+			if @parent == "0" || @parent.get_access(current_teacher.id) == 2
 
 				#Update parents' folder counts
 				if @parentsarr.size > 1
@@ -103,7 +107,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors}
+				format.html {render :text => errors.empty? ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : errors}
 			end
 
 	end
@@ -443,9 +447,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue
+		rescue Exception => ex
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid URL"
+			errors << "Invalid URL #{ex} #{ex.backtrace}"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
@@ -1561,13 +1565,13 @@ class BindersController < ApplicationController
 
 	end
 
-	def seedbinder
+	# def seedbinder
 
-		Binder.seedbinder(current_teacher.to_s) if !current_teacher.nil?
+	# 	Binder.seedbinder(current_teacher.to_s) if !current_teacher.nil?
 
-		redirect_to "/teachers"
+	# 	redirect_to root_path
 
-	end
+	# end
 
 	def catcherr
 
@@ -1815,6 +1819,7 @@ class BindersController < ApplicationController
 		parenthash = {}
 		parentsarr = []
 		parentperarr = []
+		parent_child_count = 0
 
 		if parentid.to_s == "0"
 
@@ -1823,9 +1828,13 @@ class BindersController < ApplicationController
 
 			parentsarr = [parenthash]
 
+			parent = "0"
+
 		else
 
 			parent = Binder.find(parentid)
+
+			parent_child_count = parent.children.count
 
 			parenthash = {	:id		=> parentid,
 							:title	=> parent.title}
@@ -1858,7 +1867,7 @@ class BindersController < ApplicationController
 				:parentsarr => parentsarr,
 				:parentperarr => parentperarr, 
 				:parent => parent, 
-				:parent_child_count => parent.children.count}
+				:parent_child_count => parent_child_count}
 
 	end
 

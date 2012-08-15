@@ -45,7 +45,7 @@ URL2PNG_DEFAULT_BOUNDS = 's800x600-d3'
 # YOUTUBE
 
 YOUTUBE_IMG_URL = "http://img.youtube.com/vi/"
-YOUTUBE_IMG_FILE = "/maxresdefault.jpg"
+YOUTUBE_IMG_FILE = "/0.jpg"
 
 # SUPPORTED DOCUMENTS 
 

@@ -17,22 +17,47 @@
     <div class="profile-header-bar-push">
       <h2 class="pull-left"><strong><%= @teacher.full_name %></strong> (<%= @teacher.username %>)</h2>
       <div class="pull-right">
+        <% if !@is_self %>
+
+        <% if !current_teacher.subscribed_to?(@teacher.id) %>
         <a id="subbtn" class="btn btn-medium btn-primary actbtn">
           <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
           <span class="upme">Subscribe</span>
         </a>
+        <% else %>
+        <a id="subbtn" class="btn btn-medium btn-danger actbtn">
+          <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
+          <span class="upme">Unsubscribe</span>
+        </a>
+        <% end %>
+
+        <% if false %>
+        <% if current_teacher.colleague_status(@teacher.id) == 0 %>
         <a id="collbtn" class="btn btn-medium">
           <%= image_tag("profile/colleague.png", :style => "float:left;height:16px;margin:1px 5px 0 0") %>
           <span class="upme">Add Colleague</span>
         </a>
+        <% else %>
+        <a id="collbtn" class="btn btn-medium" disabled>
+          <%= image_tag("profile/colleague.png", :style => "float:left;height:16px;margin:1px 5px 0 0") %>
+          <span class="upme">Request Sent</span>
+        </a>
+        <% end %>
+        <% end %>
 
         <!--
         <a id="messbtn" class="btn btn-medium">
           <%= image_tag("profile/message.png", :style => "float:left;height:14px;margin:2px 5px 0 0") %>
           Message
         </a>
-      -->
+        -->
+      <% else %>
 
+        <a href="/editinfo" class="btn btn-medium actbtn">
+          <span class="upme">Edit Info</span>
+        </a>
+
+      <% end %>
       </div>
     </div>
   </div>
@@ -42,29 +67,29 @@
   <div class="container">
     <div class="pull-left profile-left-push">
       <p>
-        <%= current_teacher.info.bio %>
+        <%= @teacher.info.bio %>
       </p>
       <ul class="profile-info-items">
-        <% if !current_teacher.info.twitterhandle.empty? %>
+        <% if !@teacher.info.twitterhandle.empty? %>
         <li>
-          <a href="<%= current_teacher.info.twitterhandle %>" target="_blank">
+          <a href="<%= @teacher.info.twitterhandle %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
             KleinEric
           </a>
         </li>
         <% end %>
-        <% if !current_teacher.info.website.empty? %>
+        <% if !@teacher.info.website.empty? %>
         <li>
-          <a href="<%= current_teacher.info.website %>" target="_blank">
+          <a href="<%= @teacher.info.website %>" target="_blank">
             <span class="webIcon"><%= image_tag("settings/website.png", :style => "margin-top:-4px") %></span>
-            <%= current_teacher.info.website %>
+            <%= @teacher.info.website %>
           </a>
         </li>
         <% end %>
-        <% if !current_teacher.info.fulllocation.empty? %>
+        <% if @teacher.info.fulllocation != ", , " %>
         <li>
           <span class="locationIcon"><%= image_tag("profile/point.png", :style => "margin-top:-4px") %></span>
-          Lives in <%= current_teacher.info.fulllocation %>
+          Lives in <%= @teacher.info.fulllocation %>
           </span>
         </li>
         <% end %>

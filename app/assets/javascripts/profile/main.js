@@ -43,17 +43,17 @@ $(document).ready(function() {
 		}
 
 		$.ajax({
-	        url: location.protocol+'//'+location.host+location.pathname + '/' + subtype,
-	        data: 'xyz',
-	        type: 'post',
-	        success: function(data) {
-	          // if the data isn't success (aka "1")
-	          if (data != '1') {
-	            alert(data);
-	          }
+            url: location.protocol+'//'+location.host+location.pathname + '/' + subtype,
+            data: '',
+            type: 'put',
+            success: function(data) {
+              // if the data isn't success (aka "1")
+              if (data != '1') {
+                alert(data);
+              }
 
-	        }
-	    });
+			}
+		});
 	});
 
 
@@ -64,17 +64,17 @@ $(document).ready(function() {
 			$(this).find('.upme').text(' Request sent ');
 
 			$.ajax({
-		        url: location.protocol+'//'+location.host+location.pathname + '/URLHERE',
-		        data: 'xyz',
-		        type: 'post',
-		        success: function(data) {
-		          // if the data isn't success (aka "1")
-		          if (data != '1') {
-		            alert(data);
-		          }
+                url: location.protocol+'//'+location.host+location.pathname + '/add',
+                data: '',
+                type: 'put',
+                success: function(data) {
+                  // if the data isn't success (aka "1")
+                  if (data != '1') {
+                    alert(data);
+                  }
 
-		        }
-		    });
+				}
+			});
 
 
 		}

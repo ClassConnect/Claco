@@ -14,7 +14,7 @@
             #imgarr[0]
           %>
 
-				<div id="<%= binder.id %>" class="content-item<%= ' droppable' if binder.type == 1 %>">
+				<div id="<%= binder.id %>" class="content-item<%= ' folder-item droppable' if binder.type == 1 %>">
 
 
 	                <% if binder.type != 1 
@@ -57,11 +57,13 @@
                     # is a folder
                   %>
 
+
+                  	<div class="folder-preview">
+                  	
                   	<% if binder.thumbimgids.reject{|f| f==""}.empty?
                   	#binder.children.count == 0 ||  
                   	%>
 
-						<div class="folder-preview">
 							<div class="dyncon">
 
 								<div class="empty-folder">
@@ -70,36 +72,64 @@
 								</div>
 
 							</div>
-						</div>
 
 
               	  	<% else %>
 
-    		            <div class="folder-preview">
-
     		            
 
-                      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
+	                      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');<%= raw("background-position: -25px;") if !imgarr[2].to_s.empty? %>">
 
-                      	<% if !imgarr[1].nil? && !imgarr[1].empty? %>
+	    		             </div>
+
+	    		          <div class="contype">
+	                      	<img src="/assets/binders/types/folder.png" style="width:24px" />
+	                      </div>
+
+
+    		        <% end %>
+
+    		    </div> <!-- end of fold prevew -->
+
+
+    		            <% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
 	                          <img class="thumb1" src="<%= imgarr[1].to_s %>" />
 
-	                          <% if !imgarr[2].nil? && !imgarr[2].empty? %>
+	                    <% else %>
 
-
-		                          <img class="thumb2" src="<%= imgarr[2].to_s %>" />
-
-		                          <img class="thumb3" src="<%= imgarr[2].to_s %>" />
-		                      <% end %>
+	                    	<img class="thumb1" src="/assets/common/nothumb.png" />
 
 	                    <% end %>
 
-    		              </div>
 
-    		            </div>
+	                    <% if !imgarr[2].nil? && !imgarr[2].empty? %>
 
-		            <% end %>
+
+		                    <img class="thumb2" src="<%= imgarr[2].to_s %>" />
+
+		                <% else %>
+
+	                    	<img class="thumb2" src="/assets/common/nothumb.png" />
+
+	                    <% end %>
+
+
+
+
+	                    <% if !imgarr[3].nil? && !imgarr[3].empty? %>
+
+
+		                    <img class="thumb3" src="<%= imgarr[3].to_s %>" />
+
+		                <% else %>
+
+	                    	<img class="thumb3" src="/assets/common/nothumb.png" />
+
+	                    <% end %>
+
+
+
 
                   <% end %>
 

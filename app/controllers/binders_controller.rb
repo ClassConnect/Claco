@@ -1834,9 +1834,22 @@ class BindersController < ApplicationController
 
 			parentperarr = parent.parent_permissions
 
-			parent.permissions.each do |p|
-				p["folder_id"] = parentid
-				parentperarr << p
+			if !parentperarr.find{|p| p["type"] == 3}.nil? && !parent.permissions.find{|p| p["type"] == 3}.nil?
+
+				parentperarr.delete(parentperarr.find{|p| p["type"] == 3})
+
+				parent.permissions.each do |p|
+					p["folder_id"] = parentid
+					parentperarr << p
+				end
+
+			else
+
+				parent.permissions.each do |p|
+					p["folder_id"] = parentid
+					parentperarr << p
+				end
+
 			end
 
 		end

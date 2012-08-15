@@ -20,7 +20,7 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => params[:username]).first
 
-        @teacher.info = Info.new
+        @teacher.info = Info.new if @teacher.info.nil?
 
 		@title = "#{ @teacher.full_name }'s Profile"
 
@@ -135,18 +135,6 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		#@teacher = current_teacher
-
-		#@info = @teacher.info
-
-		#@info = current_teacher.newinfo
-
-		#info = params[:info]
-
-		#TODO Make sure htmlcode is not allowed in @info.bio
-
-		Rails.logger.debug "Reached #updateinfo"
-
 		current_teacher.info = Info.new if !current_teacher.info
 
 		#current_teacher.info.save
@@ -164,37 +152,46 @@ class TeachersController < ApplicationController
 
 		# 	Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
 
-		Rails.logger.debug "params: #{params.to_s}"
+		# Rails.logger.debug "params: #{params.to_s}"
 
-		current_teacher.info.update_attributes(	:bio 				=> params[:info][:bio],
-												# new attributes
-												:avatar 			=> params[:info][:avatar],
-												:size 				=> params[:info][:avatar].size,
-												:ext 				=> File.extname(params[:info][:avatar].original_filename),
-												:data 				=> params[:info][:avatar].path,
-												#:avatar_width		=> avatar[:width],
-												#:avatar_height		=> avatar[:height],
-												:website 			=> params[:info][:website])
+		# current_teacher.info.update_attributes(	:bio 				=> params[:info][:bio],
+		# 										# new attributes
+		# 										:avatar 			=> params[:info][:avatar],
+		# 										:size 				=> params[:info][:avatar].size,
+		# 										:ext 				=> File.extname(params[:info][:avatar].original_filename),
+		# 										:data 				=> params[:info][:avatar].path,
+		# 										#:avatar_width		=> avatar[:width],
+		# 										#:avatar_height		=> avatar[:height],
+		# 										:website 			=> params[:info][:website])
+
+
+		current_teacher.update_attributes(params[:teacher])
+
+
+		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],
+												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,
+												:facebookurl	=> Addressable::URI.heuristic_parse(params[:info][:facebookurl]).to_s,
+												:twitterhandle	=> Addressable::URI.heuristic_parse(params[:info][:twitterhandle]).to_s,
+												:bio			=> params[:info][:bio],
+												:city			=> params[:info][:fulllocation].split(', ').first || "",
+												:state			=> params[:info][:fulllocation].split(', ').second || "",
+												:country		=> params[:info][:fulllocation].split(', ').third || "")
+		# if !params[:info][:avatar].empty?
+		# 	params[:info][:avatar] = params[:info][:avatar].original_filename
 		# end
-
-		# override carrierwave uploader field
-		if !params[:info][:avatar].nil?
-			altparams = params.clone
-			altparams[:info][:avatar] = params[:info][:avatar].original_filename
-		end
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					current_teacher.id.to_s,
-					altparams.nil? ? params : altparams)
+					params.to_s)
+					# altparams.nil? ? params : altparams)
 
-		if current_teacher.info.errors.empty?
-			# no errors, return to the main profile page
-			redirect_to teacher_path(current_teacher)
+		if current_teacher.info.errors.empty? && current_teacher.errors.empty?
+			redirect_to "/#{current_teacher.username}"
 		else
 			# remain on current page, display errors
-			render 'editinfo'
+			render "editinfo"
 		end
 
 	end

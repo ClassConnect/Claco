@@ -109,20 +109,20 @@ class Binder
 	# end
 
 
-	def self.seedbinder(id)
+	# def self.seedbinder(id)
 
-		a = Binder.new
+	# 	a = Binder.new
 
-		a.update_attributes( 	:owner => id.to_s,
-								:parent => { :id => "0", :title => "" },
-								:parents => [{ :id => "0", :title => "" }],
-								:title => "seed binder",
-								:type => 1,
-								:last_update => Time.now)
+	# 	a.update_attributes( 	:owner => id.to_s,
+	# 							:parent => { :id => "0", :title => "" },
+	# 							:parents => [{ :id => "0", :title => "" }],
+	# 							:title => "seed binder",
+	# 							:type => 1,
+	# 							:last_update => Time.now)
 
-		a.save
+	# 	a.save
 
-	end
+	# end
 
 	# returns array of URLs of images, in order of size
 	def self.get_folder_array(id)
@@ -278,11 +278,11 @@ class Binder
 	# updates all data within the Tag class
 	def create_binder_tags(params,teacher_id)
 
-		new_binder_parent = Binder.find(params[:id]) if params[:id] != "0"
+		new_binder_parent = Binder.find(params[:id]) if !params[:id].nil?
 
 		self.tag = Tag.new
 
-		self.tag.set_parent_tags(params,new_binder_parent) if params[:id] != "0"
+		self.tag.set_parent_tags(params,new_binder_parent) if !params[:id].nil?
 
 		# self.tag.set_node_tags(params,new_binder_parent,teacher_id)
 

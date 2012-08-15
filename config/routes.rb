@@ -1,4 +1,9 @@
 Claco::Application.routes.draw do
+
+	##################
+	# DEVISE ROUTING #
+	##################
+
 	devise_for :teachers, :skip => [:sessions, :registration]
 
 	as :teacher do
@@ -12,54 +17,64 @@ Claco::Application.routes.draw do
 
 	end
 
+
+	#############
+	# HOME PAGE #
+	#############
+
 	#Root to home
 	root	:to																=> 'home#index'
 	get		'/homebase'														=> 'home#index'
+
+
+	##################
+	# TEACHER ROUTING#
+	##################
 
 	#Edit Info Form/Process
 	get		'/editinfo'														=> "teachers#editinfo"
 	put		'/editinfo'														=> "teachers#updatepass"
 	post	'/updateinfo'													=> "teachers#updateinfo"
 
-	#Profile Page
-	get		'/:username'													=> 'teachers#show'
+	#Subscribe/unsubscribe
+	put		'/:username/subscribe'											=> 'teachers#sub'
+	put		'/:username/unsubscribe'										=> 'teachers#unsub'
 
+	#Add :username as colleague
+	put		'/:username/add'												=> 'teachers#add'
 
-
-
-
-	#Edit Tags Form/Process
-	get		'/tags'															=> "teachers#tags"
-	put		'/updatetags'													=> "teachers#updatetags"
+	# #Edit Tags Form/Process
+	# get		'/tags'															=> "teachers#tags"
+	# put		'/updatetags'													=> "teachers#updatetags"
 
 	#Subscribe to :id
-	put		'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
-	post	'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
+	# put		'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
+	# post	'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
 
-	#Unsubscribed to :id
-	put		'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
-	post	'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
+	# #Unsubscribed to :id
+	# put		'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
+	# post	'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
 
-	#Add :id as colleague
-	put		'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
-	post	'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
+	# #Add :id as colleague
+	# put		'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
+	# post	'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
 
-	#Remove :id as colleague
-	put		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-	post	'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-	get		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
+	# #Remove :id as colleague
+	# put		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
+	# post	'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
+	# get		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
 
-	#subscriptions
-	get		'/subs'															=> 'teachers#subs'
+	# subscriptions
+	# get		'/subs'															=> 'teachers#subs'
 
-	get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',			:as => 'show_binder'
-
-
+	# get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',			:as => 'show_binder'
 
 
 
 
-	resources :teachers, :only => [:show, :index]
+
+
+	# resources :teachers, :only => [:show, :index]
 
 	post	'utils/fetchtitle'												=> 'home#fetchtitle'
 
@@ -88,6 +103,7 @@ Claco::Application.routes.draw do
 	get		'/conversations/:id/add'										=> 'conversations#newmessage',		:as => 'add_message'
 	put		'/conversations/:id/add'										=> 'conversations#createmessage'
 
+
 	##################
 	# BINDER ROUTING #
 	##################
@@ -99,18 +115,11 @@ Claco::Application.routes.draw do
 	get		'/:username/portfolio/new'										=> 'binders#new',					:as => 'new_binder'
 	post	'/:username/portfolio'											=> 'binders#create'
 	
-	#Adding Content
-	get		'/:username/portfolio/newcontent'								=> 'binders#newcontent',			:as => 'new_binder_content'
-	post	'/:username/portfolio/newcontent'								=> 'binders#createcontent'
-
-	#Uploading File
-	get		'/:username/portfolio/newfile'									=> 'binders#newfile',				:as => 'new_binder_file'
-	post	'/:username/portfolio/newfile'									=> 'binders#createfile'
-
 	#Trash folder
 	get		'/trash'														=> 'binders#trash',					:as => 'trash'
 
 	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+
 
 	################################################
 	# Paths handled by named_binder_route function #
@@ -148,12 +157,12 @@ Claco::Application.routes.draw do
 	#Update :body
 	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
 
-	#Temporary crocodoc view
-	get		'/:username/portfolio(/:root)/:title/:id/croc'					=> 'binders#showcroc',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-
 	#get		'/assets'														=> 'binders#catcherr'
 	get		'/seedbinder'													=> 'binders#seedbinder'
 
+	#Profile Page
+	get		'/:username'													=> 'teachers#show'
+	
 	#Soulmate
 	mount Soulmate::Server, :at => "/sm"
 

@@ -20,6 +20,8 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => params[:username]).first
 
+		@is_self = current_teacher.username.downcase == params[:username].downcase
+
         @teacher.info = Info.new if @teacher.info.nil?
 
 		@title = "#{ @teacher.full_name }'s Profile"
@@ -204,14 +206,15 @@ class TeachersController < ApplicationController
 		redirect_to tags_path
 	end
 
-	#GET /confsub/:id <- To be changed to PUT/POST
-	def confsub
+	def sub
 
-		@teacher = Teacher.find(params[:id])
+		errors = []
 
-		@title = "You are now subscribed to #{ @teacher.full_name }"
+		@teacher = Teacher.where(:username => params[:username]).first
 
-		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
+		@title = "You are now subscribed to #{@teacher.full_name}"
+
+		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id.to_s)
 
 		@relationship.subscribe()
 
@@ -222,19 +225,27 @@ class TeachersController < ApplicationController
 					params,
 					{ :relationship => @relationship.id.to_s })
 
-		redirect_to teacher_path(@teacher)
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors}
+			end
 	end
 
-	#GET /confunsub/:id
-	def confunsub
+	def unsub
 
-		@teacher = Teacher.find(params[:id])
+		errors = []
 
-		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
+		@teacher = Teacher.where(:username => params[:username]).first
+
+		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
 		@affected_relationship = @teacher.relationship_by_teacher_id(current_teacher.id)
 
-		redirect_to teacher_path(params[:id]) if !@relationship.subscribed
+		errors << "Invalid Request" if !@relationship.subscribed
 
 		if @relationship.colleague_status == 0
 			# both teachers are not colleagues
@@ -257,19 +268,26 @@ class TeachersController < ApplicationController
 					{ 	:relationship => @relationship.id.to_s, 
 						:affected_relationship => @affected_relationship.id.to_s })
 
-		redirect_to teacher_path(@teacher)
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors.first}
+			end
 
 	end
 
-	#/subs
-	def subs
+	# #/subs
+	# def subs
 
-		@title = "#{ current_teacher.full_name }'s Subscriptions"
+	# 	@title = "#{ current_teacher.full_name }'s Subscriptions"
 
-		@subs = current_teacher.relationships.find(:subscribed => false)
-		#@subs = current_teacher.relationships.find_unsubscribed
+	# 	@subs = current_teacher.relationships.find(:subscribed => false)
+	# 	#@subs = current_teacher.relationships.find_unsubscribed
 
-	end
+	# end
 
 	#Relationships Schema:
 	#
@@ -292,16 +310,18 @@ class TeachersController < ApplicationController
 
 
 	#GET /confadd/:id <= To be changed to PUT/POST
-	def confadd
+	def add
+
+		errors = []
 
 		#Teacher to be added
-		@teacher = Teacher.find(params[:id])
+		@teacher = Teacher.where(:username => params[:username]).first
 
 		@title = "Add #{ @teacher.full_name } as a Colleague"
 
 		#current_teacher.add_colleague(params)
 
-		@relationship = current_teacher.relationship_by_teacher_id(params[:id])
+		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
 		if @relationship.colleague_status == 0 #Then the colleague_status for @teacher should also be 0
 
@@ -331,7 +351,14 @@ class TeachersController < ApplicationController
 					{ 	:relationship => @relationship.id.to_s, 
 						:affected_relationship => @affected_relationship.id.to_s })
 
-		redirect_to teacher_path(@teacher)
+		rescue BSON::InvalidObjectId
+			errors << "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			errors << "Invalid Request"
+		ensure
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors.first}
+			end
 
 	end
 

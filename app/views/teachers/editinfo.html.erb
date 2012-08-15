@@ -49,7 +49,7 @@
 			</div>
 
 			<div>
-				<%= f.select(:title, options_for_select([["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]], :selected => current_teacher.title), {},:style => 'width: 60px') %>
+				<%= f.select(:title, options_for_select([["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]], :selected => current_teacher.title), {}, :style => 'width: 60px') %>
 				<%= f.text_field :fname, :placeholder => "First name", :class => "nametext" %>
 				<%= f.text_field :lname, :placeholder => "Last name", :class => "nametext" %>
 			</div>

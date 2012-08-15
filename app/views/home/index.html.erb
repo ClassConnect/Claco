@@ -7,6 +7,8 @@
     <%= stylesheet_link_tag    "widgets/icheck", :media => "all" %>
 <% end %>
 
+<%= javascript_tag "username = \"#{current_teacher.username}\"" %>
+
 <div class="container">
 
 	<div id="paneright">
@@ -415,7 +417,7 @@
 
     <form action="#" class="bodcon">
       <div class="conitem">
-        <input name="bindertitle" maxlength="50" class="firstfocus" style="width:300px" type="text" placeholder="Title of the new binder" />
+        <input name="foldertitle" maxlength="50" class="firstfocus" style="width:300px" type="text" placeholder="Title of the new binder" />
 
         <a href="#" style="font-size:11px; margin-left:5px" onClick="$(this).parent().find('.webdesc').show().focus();$(this).hide();return false">Add a description</a>
         <textarea name="body" class="input-xlarge webdesc" rows="3" style="width:300px;display:none" placeholder="Description of the binder"></textarea>
@@ -435,75 +437,8 @@
     </form>
   </div>
 
-
-
 <% else %>
 
 <%= render 'home/public' %>
 
 <% end %>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-
-<h3>Home</h3>
-<p>app/views/home/index.html.erb</p>
-<% if signed_in? %>
-	<%= link_to teachers_path, teachers_path %><br />
-	<%= link_to "Portfolio", binders_path(current_teacher.username || current_teacher.id) %><br />
-	<%= link_to tags_path, tags_path %><br />
-	<%= link_to "Conversations", conversations_path %>
-<% end %>
-
-<br />
-<br />
-<br />
-<%= @testvar.to_s %>
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-
-<% if teacher_signed_in? %>
-	Not logged in!
-<% else %>
-	Logged in!
-<% end %>
-
-<div style="border:2px solid black;width:300px;" >
-	SHIT
-</div>
-<div style="border:2px solid black;width:300px;" >
-	SHIT
-</div>
-<div style="border:2px solid black;width:300px;" >
-	SHIT
-</div>
-<div style="border:2px solid black;width:300px;" >
-	SHIT
-</div>
-
--->

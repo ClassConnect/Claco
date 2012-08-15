@@ -3,7 +3,7 @@
 # CROCODOC
 
 CROC_API_URL = "https://crocodoc.com/api/v2"
-CROC_API_TOKEN = "3QsGvCVcSyYuN9HM2edPh4ZD"
+CROC_API_TOKEN = "ROB4kYhQb0Nard6KtHZxTVC8"  #old API token: "3QsGvCVcSyYuN9HM2edPh4ZD"
 
 PATH_UPLOAD	   = "/document/upload"
 PATH_THUMBNAIL = "/download/thumbnail"	
@@ -14,7 +14,7 @@ CROC_VALID_FILE_FORMATS = ['.doc','.docx','.pdf','.ppt','.pptx','.xls','xls','.x
 
 CROC_API_OPTIONS = {
 	# Your API token
-	:token => "3QsGvCVcSyYuN9HM2edPh4ZD",
+	:token => "ROB4kYhQb0Nard6KtHZxTVC8",  #old API token: "3QsGvCVcSyYuN9HM2edPh4ZD",
 
 	# When uploading in async mode, a response is returned before conversion begins.
 	:async => false,

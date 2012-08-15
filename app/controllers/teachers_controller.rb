@@ -76,7 +76,7 @@ class TeachersController < ApplicationController
 					# field :data, :type => Hash, :default => {}
 
 					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
-						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : ( true ) )
+						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
 
 					#temp << f
 

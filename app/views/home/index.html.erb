@@ -39,7 +39,7 @@
 							<div class="imgarea">
 								<a href="#">
 									<!--<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">-->
-									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s %>>
+									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s if !f[:owner].info.nil? && !f[:owner].info.avatar.nil? %>>
 								</a>
 							</div>
 
@@ -238,7 +238,7 @@
 									<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> shared <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 								</div>
 
-
+								<% if f[:binder].type != 1 %>
 								<a href="<%= named_binder_route(f[:binder]) %>" class="conlink">
 									<div class="thecontent">
 											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
@@ -269,6 +269,7 @@
 										<div style="clear:both"></div>
 									</div>
 								</a>
+								<% end %>
 
 							</div>
 

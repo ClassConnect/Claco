@@ -1,4 +1,5 @@
 <% content_for :headcon do %>
+  <%= javascript_include_tag "profile/main" %>
   <%= stylesheet_link_tag "teacher", :media => "all" %>
 <% end %>
 
@@ -16,9 +17,22 @@
     <div class="profile-header-bar-push">
       <h2 class="pull-left"><strong><%= @teacher.full_name %></strong> (<%= @teacher.username %>)</h2>
       <div class="pull-right">
-        <a class="btn btn-medium btn-primary actbtn">Subscribe</a>
-        <a class="btn btn-medium">Add Colleague</a>
-        <a class="btn btn-medium">Message</a>
+        <a id="subbtn" class="btn btn-medium btn-primary actbtn">
+          <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
+          <span class="upme">Subscribe</span>
+        </a>
+        <a id="collbtn" class="btn btn-medium">
+          <%= image_tag("profile/colleague.png", :style => "float:left;height:16px;margin:1px 5px 0 0") %>
+          <span class="upme">Add Colleague</span>
+        </a>
+
+        <!--
+        <a id="messbtn" class="btn btn-medium">
+          <%= image_tag("profile/message.png", :style => "float:left;height:14px;margin:2px 5px 0 0") %>
+          Message
+        </a>
+      -->
+
       </div>
     </div>
   </div>
@@ -32,13 +46,19 @@
       </p>
       <ul class="profile-info-items">
         <li>
-          <a href="http://twitter.com/kleinerin">
-            <span class="twitterIcon"></span>
+          <a href="http://twitter.com/kleinerin" target="_blank">
+            <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
             KleinEric
           </a>
         </li>
         <li>
-          <span class="locationIcon"></span>
+          <a href="http://www.kleinspiration.com" target="_blank">
+            <span class="webIcon"><%= image_tag("settings/website.png", :style => "margin-top:-4px") %></span>
+            kleinspiration.com
+          </a>
+        </li>
+        <li>
+          <span class="locationIcon"><%= image_tag("profile/point.png", :style => "margin-top:-4px") %></span>
           Lives in Chicago, Illinois
           </span>
         </li>

@@ -66,6 +66,7 @@
   font-weight: 500;
   color: #333;
   margin-right: 4px;
+  font-weight:bolder;
 }
 
 .profile-header-bar .profile-header-bar-push {
@@ -104,6 +105,8 @@ ul.profile-info-items {
 ul.profile-info-items li {
   float: left;
   margin-right: 12px;
+  font-size:12px;
+  color:#666;
 }
 
 ul.profile-info-items a {

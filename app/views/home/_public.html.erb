@@ -1,0 +1,47 @@
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "home/public", :media => "all" %>
+<% end %>
+
+<div class="whiteback">
+	<div class="container">
+		<div class="tagline">
+			A home for the world's greatest educators.
+		</div>
+
+
+		<div class="vanitybox">
+			<img src="/assets/public/jennie.jpeg" style="float:left" />
+
+			<img src="/assets/public/nasa.jpg" class="smaller" />
+
+			<img src="/assets/public/erin.jpg" class="smaller" />
+
+		</div>
+
+		<div class="applybox">
+			<div style="color:#666;font-size:16px; margin-bottom:20px">
+				Find and build curriculum with great educators<br />just like you.
+			</div>
+
+			<a href="/apply" id="apply-btn" class="btn">Request a beta invite</a>
+		</div>
+
+	</div>
+</div>
+
+
+
+<div class="seenon">
+	<div class="container">
+		<div style="margin-left:150px;font-weight:bolder;font-size:14px;margin-top:-5px;margin-bottom:5px">
+			As seen on...
+		</div>
+		<center>
+		<%= image_tag("public/abc.png", :style => "height:50px") %>
+		<%= image_tag("public/cnn.png", :style => "height:40px") %>
+		<%= image_tag("public/nbc.png", :style => "height:55px; margin-top:-5px") %>
+		<%= image_tag("public/fast.png", :style => "height:60px") %>
+		<%= image_tag("public/usatoday.png", :style => "height:50px; margin-right:0px") %>
+		</center>
+	</div>
+</div>

@@ -111,12 +111,12 @@
 <div class="container">
   <ul class="nav-tabs onProfile">
     <li class="active">
-      <a href="/teachers/teacherid">
+      <a href="#binders">
         Portfolio
       </a>
     </li>
     <li>
-      <a href="/teachers/teacherid">
+      <a href="#activity">
         Activity 
       </a>
     </li>
@@ -132,12 +132,15 @@
 		<%= #f.inspect.to_s 
 		%>
 
+    <div id="binders" class="tabswap">
     <%= render 'layouts/binderlist' %>
+    </div>
 
 	<% #end 
 	%>
 <% #end 
 %>
+<div id="activity" class="tabswap" style="display:none">
 HERE
 <% @feed.each do |f| %>
 	<%= f[:owner].fname.to_s %>&nbsp;
@@ -147,6 +150,7 @@ HERE
 	<%= #Time.at(f[:log].timestamp).to_datetime 
 	%><%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago
 	<br />
+</div>
 <% end %>
 
 </div>

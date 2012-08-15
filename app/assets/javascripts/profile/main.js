@@ -2,6 +2,14 @@ dontmove = false;
 
 $(document).ready(function() {
 
+
+	$('.nav-tabs a').click(function() {
+		$(".tabswap").hide();
+		$($(this).attr("href")).show();
+		$('.active').removeClass('active');
+		$(this).parent().addClass('active');
+	});
+
 	// click on box, redirect
   $('.content-item').click(function() {
 

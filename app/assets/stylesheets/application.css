@@ -10,6 +10,10 @@
  *
  *= require_self
 */
+footer {
+  color:#666;
+}
+
 .menusplitter {
   width:1px;
   height:30px;

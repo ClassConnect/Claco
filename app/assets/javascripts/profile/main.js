@@ -1,4 +1,23 @@
+dontmove = false;
+
 $(document).ready(function() {
+
+	// click on box, redirect
+  $('.content-item').click(function() {
+
+  	if (dontmove === false) {
+  		document.location = $(this).find('.titler a').attr("href");
+  	}
+
+  });
+
+
+  // set all of the items that won't activate pjax on click
+  $('.drop-tog, .linkster, .lastupdate').click(function() {
+    dontmove = true;
+  });
+
+
 
 	$('#subbtn').click(function() {
 		var subtype = ' ';

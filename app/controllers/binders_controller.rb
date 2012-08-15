@@ -447,9 +447,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue
+		rescue Exception => ex
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid URL"
+			errors << "Invalid URL #{ex} #{ex.backtrace}"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors}
@@ -1834,7 +1834,7 @@ class BindersController < ApplicationController
 
 			parent = Binder.find(parentid)
 
-			parent_child_count = parent.childrent.count
+			parent_child_count = parent.children.count
 
 			parenthash = {	:id		=> parentid,
 							:title	=> parent.title}

@@ -20,6 +20,10 @@ class AvatarUploader < CarrierWave::Uploader::Base
     process resize_to_fill: [AVATAR_LDIM,AVATAR_LDIM]
   end
 
+  version :thumb_md do
+    process resize_to_fill: [AVATAR_MDIM,AVATAR_MDIM]
+  end
+
   version :thumb_sm do
     process resize_to_fill: [AVATAR_SDIM,AVATAR_SDIM]
   end

@@ -38,7 +38,6 @@ class TeachersController < ApplicationController
 		#@teacher.info = Info.new if !@teacher.info
 
 		@feed = []
-		temp = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)

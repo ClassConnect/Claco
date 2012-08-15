@@ -14,6 +14,8 @@ class HomeController < ApplicationController
 		#@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
 		@feed = []
 
+		if signed_in?
+
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
@@ -41,6 +43,8 @@ class HomeController < ApplicationController
 		# the array should already be sorted
 		# .sort_by { |e| -e.timestamp }
 		@feed = @feed.any? ? @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
+
+		end
 
 		#Binder.where( "parent.id" => { '$gt' }  )
 		#Binder.all.ne( parent.id: [0,-1] )

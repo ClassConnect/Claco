@@ -24,6 +24,10 @@ Claco::Application.routes.draw do
 	#Profile Page
 	get		'/:username'													=> 'teachers#show'
 
+
+
+
+
 	#Edit Tags Form/Process
 	get		'/tags'															=> "teachers#tags"
 	put		'/updatetags'													=> "teachers#updatetags"
@@ -49,6 +53,11 @@ Claco::Application.routes.draw do
 	get		'/subs'															=> 'teachers#subs'
 
 	get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',			:as => 'show_binder'
+
+
+
+
+
 
 	resources :teachers, :only => [:show, :index]
 

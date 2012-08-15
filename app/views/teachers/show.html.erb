@@ -45,23 +45,29 @@
         <%= current_teacher.info.bio %>
       </p>
       <ul class="profile-info-items">
+        <% if !current_teacher.info.twitterhandle.empty? %>
         <li>
-          <a href="http://twitter.com/kleinerin" target="_blank">
+          <a href="<%= current_teacher.info.twitterhandle %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
             KleinEric
           </a>
         </li>
+        <% end %>
+        <% if !current_teacher.info.website.empty? %>
         <li>
-          <a href="http://www.kleinspiration.com" target="_blank">
+          <a href="<%= current_teacher.info.website %>" target="_blank">
             <span class="webIcon"><%= image_tag("settings/website.png", :style => "margin-top:-4px") %></span>
-            kleinspiration.com
+            <%= current_teacher.info.website %>
           </a>
         </li>
+        <% end %>
+        <% if !current_teacher.info.fulllocation.empty? %>
         <li>
           <span class="locationIcon"><%= image_tag("profile/point.png", :style => "margin-top:-4px") %></span>
-          Lives in Chicago, Illinois
+          Lives in <%= current_teacher.info.fulllocation %>
           </span>
         </li>
+        <% end %>
       </ul>
     </div>
     <div class="pull-right profile-module">

@@ -1,10 +1,15 @@
 Claco::Application.routes.draw do
-	devise_for :teachers, :skip => [:sessions]
+	devise_for :teachers, :skip => [:sessions, :registration]
 
 	as :teacher do
-		get 'login' => 'devise/sessions#new', :as => :new_teacher_session
-		post 'login' => 'devise/sessions#create', :as => :teacher_session
-		delete 'logout' => 'devise/sessions#destroy', :as => :destroy_teacher_session
+
+		get		'/login'			=> 'devise/sessions#new',			:as => :new_teacher_session
+		post	'/login'			=> 'devise/sessions#create',		:as => :teacher_session
+		delete	'/logout'			=> 'devise/sessions#destroy',		:as => :destroy_teacher_session
+
+		post	'/account'			=> 'devise/registrations#create',	:as => :teacher_registration
+		get		'/sign_up'			=> 'devise/registrations#new',		:as => :new_teacher_registration
+
 	end
 
 	#Root to home
@@ -13,7 +18,7 @@ Claco::Application.routes.draw do
 
 	#Edit Info Form/Process
 	get		'/editinfo'														=> "teachers#editinfo"
-	put		'/updateinfo'													=> "teachers#updateinfo"
+	put		'/editinfo'														=> "teachers#updatepass"
 	post	'/updateinfo'													=> "teachers#updateinfo"
 
 	#Profile Page

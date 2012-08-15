@@ -124,8 +124,6 @@ class TeachersController < ApplicationController
 	#/editinfo
 	def editinfo
 
-		Rails.logger.debug "Reached #editinfo"
-
 		@title = "Edit your information"
 
 		current_teacher.info = Info.new if !current_teacher.info
@@ -134,35 +132,7 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		current_teacher.info = Info.new if !current_teacher.info
-
-		#current_teacher.info.save
-
-		#current_teacher.info.update_info_fields(params)
-
-		# if params[:info][:avatar].nil?
-
-		# 	Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
-
-		# 	current_teacher.update_attributes( :bio => params[:info][:bio],
-		# 							:website => params[:info][:website] )
-		# 							# new attributes
-		# else
-
-		# 	Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
-
-		# Rails.logger.debug "params: #{params.to_s}"
-
-		# current_teacher.info.update_attributes(	:bio 				=> params[:info][:bio],
-		# 										# new attributes
-		# 										:avatar 			=> params[:info][:avatar],
-		# 										:size 				=> params[:info][:avatar].size,
-		# 										:ext 				=> File.extname(params[:info][:avatar].original_filename),
-		# 										:data 				=> params[:info][:avatar].path,
-		# 										#:avatar_width		=> avatar[:width],
-		# 										#:avatar_height		=> avatar[:height],
-		# 										:website 			=> params[:info][:website])
-
+		current_teacher.info = Info.new if current_teacher.info.nil?
 
 		current_teacher.update_attributes(params[:teacher])
 
@@ -191,6 +161,24 @@ class TeachersController < ApplicationController
 		else
 			# remain on current page, display errors
 			render "editinfo"
+		end
+
+	end
+
+	def updatepass
+
+		@teacher = current_teacher
+
+		if @teacher.update_attributes(params[:teacher])
+
+			sign_in @teacher, :bypass => true
+
+			redirect_to root_path
+
+		else
+
+			render "editinfo"
+
 		end
 
 	end

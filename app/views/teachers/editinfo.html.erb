@@ -49,6 +49,7 @@
 			</div>
 
 			<div>
+				<%= f.select(:title, options_for_select([["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]], :selected => current_teacher.title), {},:style => 'width: 60px') %>
 				<%= f.text_field :fname, :placeholder => "First name", :class => "nametext" %>
 				<%= f.text_field :lname, :placeholder => "Last name", :class => "nametext" %>
 			</div>
@@ -134,12 +135,14 @@
 				Choose a new password for your account
 			</div>
 
+			<%= form_for current_teacher, :url => editinfo_path, :method => :put do |f| %>
+
 			<div>
-				<input type="password" placeholder="New password" />
+				<%= f.password_field :password, :placeholder => "New password", :autocomplete => "off"%>
 			</div>
 
 			<div>
-				<input type="password" placeholder="Confirm password" />
+				<%= f.password_field :password_confirmation, :placeholder => "Confirm password" %>
 			</div>
 
 
@@ -147,7 +150,7 @@
 				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Change your password</button>
 			</div>
 
-
+			<% end %>
 
 
 		  </div>

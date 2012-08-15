@@ -115,20 +115,15 @@
 		<div class="announcer">Your Binders</div>
 
 		<div class="whitebox">
-			<a href="http://localhost:5000/saget/portfolio/Math/5022b77d39fe361c75000003">
+			<% Binder.where(:owner => current_teacher.id, "parent.id" => "0").each do |binder| %>
+			<a href="<%= named_binder_route(binder) %>">
 				<div class="bindir">
 					<div class="binder_attr">></div>
-					<div class="binder_name">Algebra 101</div>
+					<div class="binder_name"><%= binder.title %></div>
 				</div>
 			</a>
+			<% end %>
 
-			<a href="http://localhost:5000/saget/portfolio/Math/5022b77d39fe361c75000003">
-				<div class="bindir">
-					<div class="binder_attr">></div>
-					<div class="binder_name">Maths</div>
-				</div>
-			</a>
-			
 		</div>
 
 		<button class="btn" style="font-weight:bolder; font-size:14px; padding: 7px 20px; margin-left:25px">

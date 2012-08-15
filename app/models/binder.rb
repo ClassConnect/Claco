@@ -3,6 +3,11 @@ class Binder
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
+
+		def set_filename(name = "")
+			@original_filename = name
+			return self
+		end
 	end
 
 	#validates :title, :presence => true
@@ -448,41 +453,72 @@ class Binder
 		end
 
         origimg.format = BLOB_FILETYPE
-        #filled_sm.format = "png"
 
 		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
 		if !(origimg.columns.to_i < CV_WIDTH)
-			io_cv = FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob)
+
+			binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
+
 			# shrink image to be reasonably processed (this is what the thumb algos will use)
-			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
 		else
-			io_cv = FilelessIO.new(origimg.to_blob)
+
+			binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
+
 		end
 
-        io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::NorthGravity).to_blob)
-        io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob)
+		GC.start
 
-        # set filenames of pseudoIO objects
-        io_cv.original_filename = CV_FILENAME
-        io_lg.original_filename = LTHUMB_FILENAME
-        io_sm.original_filename = STHUMB_FILENAME
+		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::NorthGravity).to_blob).set_filename(LTHUMB_FILENAME))
 
-        # set flags in the stathash
-        stathash = binder.current_version.imgstatus
+		GC.start
+
+		stathash = binder.current_version.imgstatus
 		stathash['img_contentview']['generated'] = true
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
-		# write to DB/S3
-		binder.current_version.update_attributes(	:img_contentview => io_cv,
-													:img_thumb_lg => io_lg,
-													:img_thumb_sm => io_sm,
+		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob).set_filename(STHUMB_FILENAME),
 													:imgstatus => stathash)
+
+		origimg.destroy!
+
 		GC.start
+
+
 
 	end
 
 	def self.gen_video_thumbnails(id)
+
+		# binder = Binder.find(id.to_s)
+
+		# origimg = Magick::ImageList.new
+
+		# # retrieve fullsize image from S3 store, read into an ImageList object
+		# open(binder.current_version.imgfile.url.to_s) do |f|
+		# 	origimg.from_blob(f.read)
+		# end
+
+  #       origimg.format = BLOB_FILETYPE
+
+  #       io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
+  #       io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
+
+  #       # set filenames of pseudoIO objects
+  #       io_lg.original_filename = LTHUMB_FILENAME
+  #       io_sm.original_filename = STHUMB_FILENAME
+
+  #       # set flags in the stathash
+  #       stathash = binder.current_version.imgstatus
+		# stathash['img_thumb_lg']['generated'] = true
+		# stathash['img_thumb_sm']['generated'] = true
+
+		# # write to DB/S3
+		# binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
+		# 											:img_thumb_sm => io_sm,
+		# 											:imgstatus => stathash)
+		# GC.start
 
 		binder = Binder.find(id.to_s)
 
@@ -495,27 +531,79 @@ class Binder
 
         origimg.format = BLOB_FILETYPE
 
-        io_lg = FilelessIO.new(origimg.resize_to_fill(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
-        io_sm = FilelessIO.new(origimg.resize_to_fill(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
+		if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
+			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+		end
 
-        # set filenames of pseudoIO objects
-        io_lg.original_filename = LTHUMB_FILENAME
-        io_sm.original_filename = STHUMB_FILENAME
+		GC.start
 
-        # set flags in the stathash
-        stathash = binder.current_version.imgstatus
+		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+
+		GC.start
+
+		stathash = binder.current_version.imgstatus
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
-		# write to DB/S3
-		binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
-													:img_thumb_sm => io_sm,
+		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
 													:imgstatus => stathash)
-		GC.start
 
+		origimg.destroy!
+
+		GC.start
 	end
 
 	def self.gen_croc_thumbnails(id)
+
+		# binder = Binder.find(id.to_s)
+
+		# origimg = Magick::ImageList.new
+
+		# # retrieve fullsize image from S3 store, read into an ImageList object
+		# open(binder.current_version.imgfile.url.to_s) do |f|
+		# 	origimg.from_blob(f.read)
+		# end
+
+		# #origimg.format = "png"
+
+  #       new_img_lg = Magick::ImageList.new
+  #       new_img_sm = Magick::ImageList.new
+  #       #border_lg = Magick::ImageList.new
+  #       #border_sm = Magick::ImageList.new
+  #       new_img_lg << Magick::Image.new(LTHUMB_W,LTHUMB_H)
+  #       new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
+  #      # border_lg << Magick::Image.new(origimg.columns+2,origimg.rows+2)
+  #       #border_sm << Magick::Image.new()
+  #       filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+
+  #       # IMPORTANT!!!!!!
+  #       # Swap the lines below to make the background transparent
+  #       #filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+  #       filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+
+  #       filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+  #       filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+
+  #       filled_lg.format = BLOB_FILETYPE
+  #       filled_sm.format = BLOB_FILETYPE
+
+  #       io_lg = FilelessIO.new(filled_lg.to_blob)
+  #       io_sm = FilelessIO.new(filled_sm.to_blob)#resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
+
+  #       # set filenames of pseudoIO objects
+  #       io_lg.original_filename = LTHUMB_FILENAME
+  #       io_sm.original_filename = STHUMB_FILENAME
+
+  #       # set flags in the stathash
+  #       stathash = binder.current_version.imgstatus
+		# stathash['img_thumb_lg']['generated'] = true
+		# stathash['img_thumb_sm']['generated'] = true
+
+		# # write to DB/S3
+		# binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
+		# 											:img_thumb_sm => io_sm,
+		# 											:imgstatus => stathash)
+		# GC.start
 
 		binder = Binder.find(id.to_s)
 
@@ -526,47 +614,45 @@ class Binder
 			origimg.from_blob(f.read)
 		end
 
-		#origimg.format = "png"
+        origimg.format = BLOB_FILETYPE
 
-        new_img_lg = Magick::ImageList.new
-        new_img_sm = Magick::ImageList.new
-        #border_lg = Magick::ImageList.new
-        #border_sm = Magick::ImageList.new
-        new_img_lg << Magick::Image.new(LTHUMB_W,LTHUMB_H)
-        new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
-       # border_lg << Magick::Image.new(origimg.columns+2,origimg.rows+2)
-        #border_sm << Magick::Image.new()
-        filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+		if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
+			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+		end
 
-        # IMPORTANT!!!!!!
-        # Swap the lines below to make the background transparent
-        #filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
-        filled_sm = new_img_sm.first.matte_floodfill(1,1)#.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+		GC.start
 
-        filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
-        filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+		new_img_lg = Magick::ImageList.new
+		new_img_lg << Magick::Image.new(LTHUMB_W,LTHUMB_H)
+		filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+		filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+		filled_lg.format = BLOB_FILETYPE
 
-        filled_lg.format = BLOB_FILETYPE
-        filled_sm.format = BLOB_FILETYPE
+		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(filled_lg.to_blob).set_filename(LTHUMB_FILENAME))
 
-        io_lg = FilelessIO.new(filled_lg.to_blob)
-        io_sm = FilelessIO.new(filled_sm.to_blob)#resize_to_fill(STHUMB_W,STHUMB_H).to_blob)
+		new_img_lg.destroy!
+		filled_lg.destroy!
 
-        # set filenames of pseudoIO objects
-        io_lg.original_filename = LTHUMB_FILENAME
-        io_sm.original_filename = STHUMB_FILENAME
+		GC.start
 
-        # set flags in the stathash
-        stathash = binder.current_version.imgstatus
+		new_img_sm = Magick::ImageList.new
+		new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
+		filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+		filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+		filled_sm.format = BLOB_FILETYPE
+
+		stathash = binder.current_version.imgstatus
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
-		# write to DB/S3
-		binder.current_version.update_attributes(	:img_thumb_lg => io_lg,
-													:img_thumb_sm => io_sm,
+		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(filled_sm.to_blob).set_filename(STHUMB_FILENAME),
 													:imgstatus => stathash)
-		GC.start
 
+		new_img_sm.destroy!
+		filled_sm.destroy!
+		origimg.destroy!
+
+		GC.start
 
 	end
 

@@ -31,12 +31,6 @@
 				%><%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago
 				<br />
 				-->
-
-				<% 
-				case f[:log].method.to_s
-
-					when "create" %>
-
 						<div class="newsitem">
 							<div class="imgarea">
 								<a href="#">
@@ -45,6 +39,10 @@
 								</a>
 							</div>
 
+					<% 
+					case f[:log].method.to_s
+
+						when "create" %>
 
 							<div class="feedcontent">
 								<div class="thetitle">
@@ -70,20 +68,7 @@
 
 							</div>
 
-
-							<div style="clear:both"></div>
-						</div>
-
 					<% when "createfile" %>
-
-						<div class="newsitem">
-							<div class="imgarea">
-								<a href="#">
-									<!--<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">-->
-									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s %>>
-								</a>
-							</div>
-
 
 							<div class="feedcontent">
 								<div class="thetitle">
@@ -118,20 +103,7 @@
 
 							</div>
 
-
-							<div style="clear:both"></div>
-						</div>
-
 					<% when "createcontent" %>
-
-						<div class="newsitem">
-							<div class="imgarea">
-								<a href="#">
-									<!--<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">-->
-									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s %>>
-								</a>
-							</div>
-
 
 							<div class="feedcontent">
 								<div class="thetitle">
@@ -166,38 +138,33 @@
 
 							</div>
 
-
-							<div style="clear:both"></div>
-						</div>
-
 					<% when "update" %>
-
-						<div class="newsitem">
-							<div class="imgarea">
-								<a href="#">
-									<!--<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">-->
-									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s %>>
-								</a>
-							</div>
-
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<a href="#"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="#"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+									<a href="#"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="#"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 								</div>
 
+								<% #imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 
+								%>
 
 								<a href="#" class="conlink">
 									<div class="thecontent">
 											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
-											<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>')"></div>
+											<% if f[:binder].type==1 %>
+												<% imgarr = Binder.get_folder_array(f[:binder].id.to_s) %>
+												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>')"></div>
+											<% else %>
+												<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
+													<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>')"></div>
+												<% end %>
 											<% end %>
 
 											<div class="txtcon">
 												<div class="contitle">
 													<!--Curiosity Landing Pictures (NASA Exclusive)-->
-													<%= f[:binder].title %>
+													<%= #f[:binder].title 
+													%>
 												</div>
 
 												<% if !f[:binder].body.empty? %>
@@ -213,39 +180,32 @@
 								</a>
 
 							</div>
-
-
-							<div style="clear:both"></div>
-						</div>
 
 					<% when "updatetags" %>
 
-						<div class="newsitem">
-							<div class="imgarea">
-								<a href="#">
-									<!--<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">-->
-									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s %>>
-								</a>
-							</div>
-
-
 							<div class="feedcontent">
 								<div class="thetitle">
-									<a href="#"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> changed the tags for <a href="#"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+									<a href="#"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> changed the tags for <a href="#"><%= f[:binder].title  %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 								</div>
 
 
 								<a href="#" class="conlink">
 									<div class="thecontent">
 											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
-											<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>')"></div>
+											<% if f[:binder].type==1 %>
+												<% imgarr = Binder.get_folder_array(f[:binder].id.to_s) %>
+												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>')"></div>
+											<% else %>
+												<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
+													<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>')"></div>
+												<% end %>
 											<% end %>
 
 											<div class="txtcon">
 												<div class="contitle">
 													<!--Curiosity Landing Pictures (NASA Exclusive)-->
-													<%= f[:binder].title %>
+													<%= #f[:binder].title 
+													%>
 												</div>
 
 												<% if !f[:binder].body.empty? %>
@@ -262,47 +222,41 @@
 
 							</div>
 
-
-							<div style="clear:both"></div>
-						</div>
 
 					<% when "setpub" %>
 
-						<div class="newsitem">
-							<div class="imgarea">
-								<a href="#">
-									<!--<img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash2/273743_100002541791520_1077070822_q.jpg">-->
-									<img src=<%= f[:owner].info.avatar.thumb_md.url.to_s %>>
-								</a>
-							</div>
-
-
 							<div class="feedcontent">
 								<div class="thetitle">
-									<a href="#"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> shared <a href="#"><%= f[:binder].parents[1].nil? ? f[:binder].title : f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+									<a href="#"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> shared <a href="#"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 								</div>
 
 
 								<a href="#" class="conlink">
 									<div class="thecontent">
 											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
-											<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>')"></div>
+											<% if f[:binder].type==1 %>
+												<% imgarr = Binder.get_folder_array(f[:binder].id.to_s) %>
+												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>')"></div>
+											<% else %>
+												<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
+													<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>')"></div>
+												<% end %>
 											<% end %>
 
+											<% if !f[:binder].body.empty? %>
 											<div class="txtcon">
 												<div class="contitle">
 													<!--Curiosity Landing Pictures (NASA Exclusive)-->
-													<%= f[:binder].title %>
+													<%= #f[:binder].title 
+													%>
 												</div>
 
-												<% if !f[:binder].body.empty? %>
 												<div class="condesc">
 													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
 													<%= f[:binder].body %>
 												</div>
-												<% end %>
 											</div>
+											<% end %>
 
 										<div style="clear:both"></div>
 									</div>
@@ -310,14 +264,14 @@
 
 							</div>
 
-
-							<div style="clear:both"></div>
-						</div>
 
 					<% else %>
 						ERROR!<br />
 
 				<% end %>
+
+							<div style="clear:both"></div>
+						</div>
 
 			<% end %>
 

@@ -79,7 +79,7 @@ class Binder
 	field :comments, :type => Array
 
 	# [Large, Small1, Small2] - strings
-	field :thumbimgids, :type => Array, :default => ["","",""]
+	field :thumbimgids, :type => Array, :default => ["","","",""]
 
 	#field :debug_data, :type => Array, :default => []
 
@@ -132,9 +132,10 @@ class Binder
 		# retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
 		# retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
 
-		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !binder.thumbimgids[0].empty?
-		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !binder.thumbimgids[1].empty?
-		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !binder.thumbimgids[2].empty?
+		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
+		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
+		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
+		retarr << Binder.find(binder.thumbimgids[3].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
 
 		#Rails.logger.debug "Return array: #{retarr.to_s}"
 
@@ -168,13 +169,13 @@ class Binder
 					imageset_loc[c.current_version.imgclass.to_i] << c.id if c.current_version.imgclass.to_i != 4
 				end
 			end
-			[3,imageset_loc.flatten.size].min.times do |i|
+			[4,imageset_loc.flatten.size].min.times do |i|
 				binder.thumbimgids << imageset_loc.flatten[i].to_s
 			end
 		end
 
 		# variable number of pictures retrieved locally, now expand scope to all descendant binders
-		if binder.thumbimgids.size < 3
+		if binder.thumbimgids.size < 4
 			if !subtree.nil? && subtree.any?
 				subtree.each do |s|
 					if s.type != 1
@@ -183,14 +184,14 @@ class Binder
 					end
 				end
 			end
-			(3 - binder.thumbimgids.size).times do |i|
+			(4 - binder.thumbimgids.size).times do |i|
 				binder.thumbimgids << imageset.flatten[i].to_s
 			end
 			#end
 		end
 
 		# fill up extra space so there are always 3 entries
-		(3 - binder.thumbimgids.size).times do |i|
+		(4 - binder.thumbimgids.size).times do |i|
 			binder.thumbimgids << ""
 		end
 

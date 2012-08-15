@@ -1,19 +1,3 @@
-# custom validation classes
-# class InfoValidator < ActiveModel::Validator
-
-# 	#image_regex = [a-z\d\-.]+\.(jpg|jpeg|png|gif)
-# 	image_regex = /(.*?)\.(jpg|jpeg|png|gif)/
-
-# 	def validate(record)
-# 		if !record.profile_picture.blank?
-# 			unless record.profile_picture =~ /(.*?)\.(jpg|jpeg|png|gif)/
-# 				record.errors[:profile_picture] << "is an invalid file format"
-# 			end
-# 		end
-# 	end
-# end
-
-# model classes
 class Teacher
 	include Mongoid::Document
 
@@ -63,7 +47,10 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname
+
+	validates_presence_of :fname, :message => "Please enter a first name."
+	validates_presence_of :lname, :message => "Please enter a last name."
 	
 	attr_accessor :login
 
@@ -241,12 +228,12 @@ class Info
 	#field :avatar_height,		:type => Integer, :default => 0
 
 	field :bio, 				:type => String, :default => ""
-	field :website, 			:type => String, :default => ""
-	field :city
-	field :state 
-	field :country
-	field :twitterhandle
-	field :facebookurl
+	field :website,				:type => String, :default => ""
+	field :city,				:type => String, :default => ""
+	field :state,				:type => String, :default => ""
+	field :country,				:type => String, :default => ""
+	field :twitterhandle,		:type => String, :default => ""
+	field :facebookurl,			:type => String, :default => ""
 	#field :profile_picture, 	:type => String, :default => ""
 
 	#field :debug_data,			:type => Array, :default => []
@@ -255,32 +242,36 @@ class Info
 
 	# Class Methods
 
-	def update_info_fields(params)
-
-		#self.debug_data = []
-		#.save
-
-		#avatar = MiniMagick::Image.open(params[:info][:avatar].path)
-
-		if params[:info][:avatar].nil?
-
-			Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
-
-			self.update_attributes( :bio => params[:info][:bio],
-									:website => params[:info][:website] )
-		else
-
-		Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
-
-			self.update_attributes(	:bio 				=> params[:info][:bio],
-									:avatar 			=> params[:info][:avatar],
-									:size 				=> params[:info][:avatar].size,
-									:ext 				=> File.extname(params[:info][:avatar].original_filename),
-									:data 				=> params[:info][:avatar].path,
-									#:avatar_width		=> avatar[:width],
-									#:avatar_height		=> avatar[:height],
-									:website 			=> params[:info][:website])
-		end
-
+	def fulllocation
+		"#{city}, #{state}, #{country}"
 	end
+
+	# def update_info_fields(params)
+
+	# 	#self.debug_data = []
+	# 	#.save
+
+	# 	#avatar = MiniMagick::Image.open(params[:info][:avatar].path)
+
+	# 	if params[:info][:avatar].nil?
+
+	# 		Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
+
+	# 		self.update_attributes( :bio => params[:info][:bio],
+	# 								:website => params[:info][:website] )
+	# 	else
+
+	# 	Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
+
+	# 		self.update_attributes(	:bio 				=> params[:info][:bio],
+	# 								:avatar 			=> params[:info][:avatar],
+	# 								:size 				=> params[:info][:avatar].size,
+	# 								:ext 				=> File.extname(params[:info][:avatar].original_filename),
+	# 								:data 				=> params[:info][:avatar].path,
+	# 								#:avatar_width		=> avatar[:width],
+	# 								#:avatar_height		=> avatar[:height],
+	# 								:website 			=> params[:info][:website])
+	# 	end
+
+	# end
 end

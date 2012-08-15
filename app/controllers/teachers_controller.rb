@@ -132,7 +132,7 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		current_teacher.info = Info.new if !current_teacher.info
+		current_teacher.info = Info.new if current_teacher.info.nil?
 
 		current_teacher.update_attributes(params[:teacher])
 

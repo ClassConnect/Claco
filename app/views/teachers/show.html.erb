@@ -77,7 +77,7 @@
         <li>
           <a href="<%= @teacher.info.twitterhandle %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
-            KleinEric
+            <%= URI.parse(@teacher.info.twitterhandle).path.split('/').last %>
           </a>
         </li>
         <% end %>
@@ -85,7 +85,7 @@
         <li>
           <a href="<%= @teacher.info.website %>" target="_blank">
             <span class="webIcon"><%= image_tag("settings/website.png", :style => "margin-top:-4px") %></span>
-            <%= @teacher.info.website %>
+            <%= URI.parse(@teacher.info.website).host.sub(/www\./, "") %>
           </a>
         </li>
         <% end %>

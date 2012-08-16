@@ -43,6 +43,11 @@
         </div>
 
       </div>
+
+      <% else %>
+
+        <%= link_to "← Back to folder", named_binder_route(@binder.parent["id"]), :class => "pjax", :style => "float:right;font-size:16px" %>
+
       <% end %>
     </div>
   </div>

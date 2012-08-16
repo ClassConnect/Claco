@@ -149,6 +149,7 @@
 								<% #imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 
 								%>
 
+								<% if (!f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:binder].type != 1 || !f[:binder].body.empty? %>
 								<a href="<%= named_binder_route(f[:binder]) %>" class="conlink">
 									<div class="thecontent">
 											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
@@ -181,6 +182,7 @@
 										<div style="clear:both"></div>
 									</div>
 								</a>
+								<% end %>
 
 							</div>
 

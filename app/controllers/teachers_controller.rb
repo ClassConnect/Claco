@@ -20,7 +20,7 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
-		redirect_to "/404.html" and return if @teacher.nil?
+		render "public/404.html", :status => 404 and return if @teacher.nil?
 
 		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 

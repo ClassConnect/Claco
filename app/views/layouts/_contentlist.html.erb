@@ -2,7 +2,10 @@
 
 
 	     <% if @children.empty? %>
-				Empty
+				<div class="emptyfolder">
+					We couldn't find anything here...yet!
+				</div>
+
 			<% else %>
 				<% @children.each do |binder| %>
 

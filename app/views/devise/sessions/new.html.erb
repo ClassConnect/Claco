@@ -1,17 +1,30 @@
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "devise/newuser", :media => "all" %>
+<% end %>
+
+
+<div class="container">
+<div class="formbox">
+
 <h2>Sign in</h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
-  <div><%= f.label :login %><br />
-  <%= f.text_field :login %></div>
+  <div style="margin-top:10px">
+  	<input type="text" name="login" placeholder="Username / Email" />
+  </div>
 
-  <div><%= f.label :password %><br />
-  <%= f.password_field :password %></div>
+  <div>
+  	<input type="text" name="password" placeholder="Password" />
+  </div>
 
   <% if devise_mapping.rememberable? -%>
-    <div><%= f.check_box :remember_me %> <%= f.label :remember_me %></div>
+    <div><%= f.check_box :remember_me, :style => "float:left;margin-right:5px" %> <%= f.label :remember_me %></div>
   <% end -%>
 
-  <div><%= f.submit "Sign in" %></div>
+  <div><%= f.submit "Sign in", :class => "btn btn-primary", :style => "font-weight:bolder" %></div>
 <% end %>
 
-<%= render :partial => "devise/shared/links" %>
+<br />
+<a href="<%= new_password_path('teacher') %>">Forgot your password?</a>
+</div>
+</div>

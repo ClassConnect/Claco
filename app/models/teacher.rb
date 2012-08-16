@@ -56,6 +56,7 @@ class Teacher
 	
 	validate :username_blacklist
 
+	validates_format_of :username, without: /\s/, :message => "can't have spaces."
 	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters", :unless => Proc.new {|user| user.allow_short_username == true}
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."

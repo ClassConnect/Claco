@@ -1589,3 +1589,19 @@ a.fork {
 
   display: inline-block;
 }
+
+
+
+
+
+
+
+
+.emptyfolder {
+  text-align:center;
+  color:#777;
+  font-weight:bolder;
+  font-size:18px;
+  text-shadow: 0px 1px 1px #fff;
+  margin-top:40px;
+}

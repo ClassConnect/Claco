@@ -1,36 +1,69 @@
-<h2>app/views/applicants/<%= params[:action] %></h2>
-<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "devise/newuser", :media => "all" %>
+    <%= javascript_include_tag "editinfo/apply" %>
+<% end %>
 
-<h1>Apply to Claco!!!!!!!</h1>
+<div class="container">
+<div class="formbox">
 
-<% if !@app.errors.empty? %>
-	<ul>
-	<% @app.errors.each do |err, msg| %>
-		<li><%= "#{msg}" %></li>
+
+
+
+
+	<h2>It's time to unite.</h2>
+
+	<div style="color:#999;margin-bottom:15px;line-height:15px">
+		The best educators are scattered around the world with no<br />way to find and collaborate with each other. <strong>Until now.</strong>
+	</div>
+
+
+<div class="errornote">
+	<% if !@app.errors.empty? %>
+		<ul>
+		<% @app.errors.each do |err, msg| %>
+			<li><%= "#{msg}" %></li>
+		<% end %>
+		</ul>
 	<% end %>
-	</ul>
-<% end %>
+</div>
 
-<%= form_for @app do |f| %>
 
-	<p><%= f.label :title, "Title" %><br />
-	<%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] )) %></p>
 
-	<p><%= f.label :fname, "First name" %><br />
-	<%= f.text_field :fname %></p>
+		<%= form_for @app do |f| %>
+		<table border="0">
+		<tr>
+			<td class="labeler">Email</td>
+			<td class="firstfocus"><%= f.text_field :email %></td>
+		</tr>
+		<tr>
+			<td class="labeler">Title</td>
+			<td><%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] )) %></td>
+		</tr>
+		<tr>
+			<td class="labeler">First Name</td>
+			<td><%= f.text_field :fname %></td>
+		</tr>
+		<tr>
+			<td class="labeler">Last Name</td>
+			<td><%= f.text_field :lname %></td>
+		</tr>
+		<tr>
+			<td class="labeler">About You</td>
+			<td><textarea name="body" style="height:100px" placeholder="How many years you have taught, your website / blog, links to example resources, etc"></textarea></td>
+		</tr>
+	</table>
 
-	<p><%= f.label :lname, "Last name" %><br />
-	<%= f.text_field :lname %></p>
 
-	<p><%= f.label :email, "Email" %><br />
-	<%= f.email_field :email %></p>
+	<button type="submit" class="btn btn-primary btn-large" style="font-weight:bolder; margin-top:10px; margin-left:117px; width:220px">
+		Request an invite
+	</button>
 
-	<p><%= f.label :body, "Why you want to be on Claco" %><br />
-	<%= f.text_area :body %></p>
+	<% end %>
 
-	<p><%= f.label :file %><br />
-	<%= f.file_field :file %></p>
 
-	<%= f.submit "Apply" %>
 
-<% end %>
+
+
+
+</div>
+</div>

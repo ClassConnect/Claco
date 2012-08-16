@@ -35,6 +35,9 @@ class Teacher
 	# field :unlock_token,    :type => String # Only if unlock strategy is :email or :both
 	# field :locked_at,       :type => Time
 
+	#Exclusive beta signup code used to sign up
+	field :code, :type => String
+
 	field :title, :type => String
 	field :fname, :type => String
 	field :lname, :type => String

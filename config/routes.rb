@@ -12,8 +12,8 @@ Claco::Application.routes.draw do
 		post	'/login'			=> 'devise/sessions#create',		:as => :teacher_session
 		delete	'/logout'			=> 'devise/sessions#destroy',		:as => :destroy_teacher_session
 
-		post	'/account'			=> 'devise/registrations#create',	:as => :teacher_registration
-		get		'/sign_up'			=> 'devise/registrations#new',		:as => :new_teacher_registration
+		post	'/account'			=> 'registrations#create',			:as => :teacher_registration
+		get		'/join'				=> 'registrations#new',				:as => :new_teacher_registration
 
 		post	'/password'			=> 'passwords#create',				:as => :teacher_password
 		get		'/password/new'		=> 'passwords#new',					:as => :new_teacher_password
@@ -43,40 +43,6 @@ Claco::Application.routes.draw do
 	#Subscribe/unsubscribe
 	put		'/:username/subscribe'											=> 'teachers#sub'
 	put		'/:username/unsubscribe'										=> 'teachers#unsub'
-
-	#Add :username as colleague
-	put		'/:username/add'												=> 'teachers#add'
-
-	# #Edit Tags Form/Process
-	# get		'/tags'															=> "teachers#tags"
-	# put		'/updatetags'													=> "teachers#updatetags"
-
-	#Subscribe to :id
-	# put		'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
-	# post	'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
-
-	# #Unsubscribed to :id
-	# put		'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
-	# post	'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
-
-	# #Add :id as colleague
-	# put		'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
-	# post	'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
-
-	# #Remove :id as colleague
-	# put		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-	# post	'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-	# get		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-
-	# subscriptions
-	# get		'/subs'															=> 'teachers#subs'
-
-	# get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',			:as => 'show_binder'
-
-
-
-
-
 
 	# resources :teachers, :only => [:show, :index]
 
@@ -122,7 +88,7 @@ Claco::Application.routes.draw do
 	#Trash folder
 	get		'/trash'														=> 'binders#trash',					:as => 'trash'
 
-	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem',			:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 
 	################################################
@@ -130,42 +96,42 @@ Claco::Application.routes.draw do
 	################################################
 
 	#New
-	post	'/:username/portfolio(/:root)/:title/:id/create'				=> 'binders#create',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	post	'/:username/portfolio(/:root)/:title/:id/createfile'			=> 'binders#createfile',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	post	'/:username/portfolio(/:root)/:title/:id/createcontent'			=> 'binders#createcontent',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	post	'/:username/portfolio(/:root)/:title/:id/create'				=> 'binders#create',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	post	'/:username/portfolio(/:root)/:title/:id/createfile'			=> 'binders#createfile',			:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	post	'/:username/portfolio(/:root)/:title/:id/createcontent'			=> 'binders#createcontent',			:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#Move
-	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	put		'/:username/portfolio(/:root)/:title/:id/move'					=> 'binders#moveitem',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#Copy
-	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	put		'/:username/portfolio(/:root)/:title/:id/copy'					=> 'binders#copyitem',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#Versioning
-	put		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#createversion',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	put		'/:username/portfolio(/:root)/:title/:id/update'				=> 'binders#createversion',			:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#Permissions
-	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission',		:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions"), :constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	post	'/:username/portfolio(/:root)/:title/:id/setpub'				=> 'binders#setpub',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	put		'/:username/portfolio(/:root)/:title/:id/permissions'			=> 'binders#createpermission',		:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> 'binders#destroypermission',		:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'		=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions"), :constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	post	'/:username/portfolio(/:root)/:title/:id/setpub'				=> 'binders#setpub',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#Edit
-	put		'/:username/portfolio(/:root)/:title/:id/rename'				=> 'binders#rename',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	post	'/:username/portfolio(/:root)/:title/:id/tags'					=> 'binders#updatetags',			:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	put		'/:username/portfolio(/:root)/:title/:id/rename'				=> 'binders#rename',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	post	'/:username/portfolio(/:root)/:title/:id/tags'					=> 'binders#updatetags',			:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#Show
-	get		'/:username/portfolio(/:root)/:title/:id/download'				=> 'binders#download',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show',					:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
-	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	get		'/:username/portfolio(/:root)/:title/:id/download'				=> 'binders#download',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	get		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#show',					:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
+	delete	'/:username/portfolio(/:root)/:title/:id'						=> 'binders#destroy',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 	
 	#Update :body
-	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:root => /[^\/]+/, :title => /[^\/]+/}
+	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	#get		'/assets'														=> 'binders#catcherr'
 	get		'/seedbinder'													=> 'binders#seedbinder'
 
 	#Profile Page
-	get		'/:username'													=> 'teachers#show'
+	get		'/:username'													=> 'teachers#show', 				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 	
 	#Soulmate
 	mount Soulmate::Server, :at => "/sm"

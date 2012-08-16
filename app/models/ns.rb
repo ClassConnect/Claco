@@ -3,6 +3,7 @@ class Ns
 
 	field :code, :type => String
 	field :active, :type => Boolean, :default => true
+	field :timestamp, :type => Integer
 
 	def self.seed
 		10000.times do
@@ -10,5 +11,11 @@ class Ns
 			ns.code = Digest::MD5.hexdigest(ns.id.to_s)
 			ns.save
 		end
+	end
+
+	def use
+		self.active = false
+		self.timestamp = Time.now.to_i
+		self.save
 	end
 end

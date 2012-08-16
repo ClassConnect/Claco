@@ -35,7 +35,7 @@
 									<% if @is_self %>
 										You created <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 									<% else %>
-										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> created <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> created <a href="<%= named_binder_route(Binder.find(f[:binder])) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 									<% end %>
 								</div>
 

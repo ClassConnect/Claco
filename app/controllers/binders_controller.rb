@@ -537,8 +537,8 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		Rails.logger.debug params.to_s
-		Rails.logger.debug params["standards"].to_s
+		#Rails.logger.debug params.to_s
+		#Rails.logger.debug params["standards"].to_s
 
 		src = Mongo.log(current_teacher.id.to_s,
 						__method__.to_s,
@@ -552,7 +552,7 @@ class BindersController < ApplicationController
 
 			h.tag = Tag.new if h.tag.nil?
 
-			Rails.logger.debug "child #{h.title}'s tags: #{h.tag.node_tags},#{h.tag.parent_tags}"
+			#Rails.logger.debug "child #{h.title}'s tags: #{h.tag.node_tags},#{h.tag.parent_tags}"
 
 			h.update_parent_tags()
 

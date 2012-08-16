@@ -20,6 +20,8 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => params[:username]).first
 
+		@children = Binder.where( :owner => current_teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } )
+
 		@is_self = current_teacher.username.downcase == params[:username].downcase
 
         @teacher.info = Info.new if @teacher.info.nil?

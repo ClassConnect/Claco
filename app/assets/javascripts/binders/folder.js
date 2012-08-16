@@ -16,6 +16,8 @@ permissionFail = false;
 
 $(document).ready(function() {
 
+  viewInit();
+
   // if we have edit permissions, enable editing functionality
   if (isEditable === true) {
     editInit();
@@ -37,6 +39,8 @@ $(document).on('pjax:start', function() {
 
 }).on('pjax:end',   function() {
   destroyAsyc();
+
+  viewInit();
   // if we have edit permissions, enable editing functionality
   if (isEditable === true) {
     editInit();
@@ -58,12 +62,9 @@ function softRefresh() {
 
 
 
-
-function editInit() {
-  noteInit = false;
+function viewInit() {
   dontPjax = false;
-
-
+  
   // CONTENT SPECIFIC FUNCTIONS GO HERE!
   // if this is a website, fade in the overlay and stuff on hover
   if ($('.embedlink').length) {
@@ -98,6 +99,14 @@ function editInit() {
   $('.drop-tog, .linkster, .lastupdate').click(function() {
     dontPjax = true;
   });
+
+}
+
+
+
+
+function editInit() {
+  noteInit = false;
 
   // show the sharing iphone-esque toggle
   $('.pub_on').iphoneStyle({

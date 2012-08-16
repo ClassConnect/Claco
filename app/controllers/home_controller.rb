@@ -17,7 +17,8 @@ class HomeController < ApplicationController
 		if signed_in?
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+		#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+		logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
 		if logs.any?
 			logs.each do |f|
@@ -35,7 +36,7 @@ class HomeController < ApplicationController
 					end
 				end
 
-				break if @feed.size == 10
+				break if @feed.size == 40
 
 			end
 		end

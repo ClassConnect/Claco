@@ -112,7 +112,7 @@
         Subscriptions 
       </h3>
       <ul class="profile-avatars">
-        <% @subscriptions.each do |sub| %>
+        <% @subscriptions[0..5].each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
               <img src="<%= sub.info.avatar.thumb_md.url %>">
@@ -127,7 +127,7 @@
         Subscribers 
       </h3>
       <ul class="profile-avatars">
-        <% @subscribers.each do |sub| %>
+        <% @subscribers[0..5].each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
               <img src="<%= sub.info.avatar.thumb_md.url %>">

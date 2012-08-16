@@ -31,10 +31,12 @@ class TeachersController < ApplicationController
 		@colleague_requests = current_teacher.relationships.where(:colleague_status => 2).entries
 
 		#@colleagues = current_teacher.relationships.where(:colleague_status => 3).entries
-		@colleagues = (current_teacher.relationships.where(:colleague_status => 3).entries).map { |c| Teacher.find(c["user_id"]) }
+		#@colleagues = (current_teacher.relationships.where(:colleague_status => 3).entries).map { |c| Teacher.find(c["user_id"]) }
 
 		#@subscriptions = current_teacher.relationships.where(:subscribed => true).entries
-		@subscriptions = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| Teacher.find(r["user_id"]) } 
+		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map { |r| Teacher.find(r["user_id"]) } 
+
+		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s)
 
 		#Create info entry for teacher if not yet created
 		#@teacher.info = Info.new if !@teacher.info

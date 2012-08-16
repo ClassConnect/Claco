@@ -62,9 +62,9 @@
 							<div class="feedcontent">
 								<div class="thetitle">
 									<% if @is_self %>
-										You added a file to <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+										You added a file to <a href="<%= f[:binder].parents.size==1 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 									<% else %>
-										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added a file to <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added a file to <a href="<%= f[:binder].parents.size==1 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 									<% end %>
 								</div>
 
@@ -101,9 +101,9 @@
 							<div class="feedcontent">
 								<div class="thetitle">
 									<% if @is_self %>
-										You added content to <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+										You added content to <a href="<%= f[:binder].parents.size==1 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 									<% else %>
-										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added content to <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added content to <a href="<%= f[:binder].parents.size==1 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents[1]["title"] %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 									<% end %>
 								</div>
 

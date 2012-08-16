@@ -20,9 +20,16 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => params[:username]).first
 
-		@children = Binder.where( :owner => current_teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } )
-
 		@is_self = current_teacher.username.downcase == params[:username].downcase
+
+		if @is_self
+			@children = Binder.where( :owner => current_teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } )
+		else
+			@children = []
+			Binder.where( :owner => @teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } ).each do |b|
+				@children << b if b.get_access(current_teacher.id.to_s)
+			end
+		end
 
         @teacher.info = Info.new if @teacher.info.nil?
 

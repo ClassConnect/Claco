@@ -579,51 +579,55 @@ class Binder
 
 	def self.gen_smart_thumbnails(id)
 
-		binder = Binder.find(id.to_s)
+		if false
 
-		origimg = Magick::ImageList.new
+			binder = Binder.find(id.to_s)
 
-		# retrieve fullsize image from S3 store, read into an ImageList object
-		open(binder.current_version.imgfile.url.to_s) do |f|
-			origimg.from_blob(f.read)
-		end
+			origimg = Magick::ImageList.new
 
-        origimg.format = BLOB_FILETYPE
+			# retrieve fullsize image from S3 store, read into an ImageList object
+			open(binder.current_version.imgfile.url.to_s) do |f|
+				origimg.from_blob(f.read)
+			end
 
-		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
-		if !(origimg.columns.to_i < CV_WIDTH)
+	        origimg.format = BLOB_FILETYPE
 
-			binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
+			# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+			if !(origimg.columns.to_i < CV_WIDTH)
 
-			# shrink image to be reasonably processed (this is what the thumb algos will use)
-			#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-		else
+				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
 
-			binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
+				# shrink image to be reasonably processed (this is what the thumb algos will use)
+				#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			else
 
-		end
+				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
 
-		GC.start
+			end
 
-		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+			GC.start
 
-		GC.start
+			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 
-		stathash = binder.current_version.imgstatus
-		stathash['img_contentview']['generated'] = true
-		stathash['img_thumb_lg']['generated'] = true
-		stathash['img_thumb_sm']['generated'] = true
+			GC.start
 
-		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-													:imgstatus => stathash)
+			stathash = binder.current_version.imgstatus
+			stathash['img_contentview']['generated'] = true
+			stathash['img_thumb_lg']['generated'] = true
+			stathash['img_thumb_sm']['generated'] = true
 
-		origimg.destroy!
+			binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+														:imgstatus => stathash)
 
-		GC.start
+			origimg.destroy!
+
+			GC.start
 
 		# actual algorithm, is ignored:
 
-		if false
+		#if false
+		else
+
 			binder = Binder.find(id.to_s)
 
 			origimg = Magick::ImageList.new
@@ -858,29 +862,29 @@ class Binder
 
 	    	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
 
-	    	Rails.logger.debug "Before crop"
-	    	Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
-	    	Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
+	    	#Rails.logger.debug "Before crop"
+	    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
+	    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
 
 
 
 	    	if !(((rightedge-leftedge).to_i<LTHUMB_W.to_i) || ((bottomedge-topedge).to_i<LTHUMB_H.to_i))
 	    		#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 	    	#else
-	    		origimg.crop!(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge))
+	    		origimg.crop!(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge),true)
 
-	    		Rails.logger.debug "After crop, before resize_to_fill"
-		    	Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
-		    	Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
+	    		#Rails.logger.debug "After crop, before resize_to_fill"
+		    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
+		    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
 
 	    		#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))#.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 	    	end
 
 			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))#.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 	    	
-	    	Rails.logger.debug "After resize_to_fill"
-	    	Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
-	    	Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
+	    	#Rails.logger.debug "After resize_to_fill"
+	    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
+	    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
 
 			#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 
@@ -927,8 +931,8 @@ class Binder
 			stathash['img_thumb_lg']['generated'] = true
 			stathash['img_thumb_sm']['generated'] = true
 
-	    	Rails.logger.debug "SWDIMS: #{(rightedge-leftedge).to_i} #{STHUMB_W.to_i}"
-	    	Rails.logger.debug "SHDIMS: #{(bottomedge-topedge).to_i} #{STHUMB_H.to_i}"
+	    	#Rails.logger.debug "SWDIMS: #{(rightedge-leftedge).to_i} #{STHUMB_W.to_i}"
+	    	#Rails.logger.debug "SHDIMS: #{(bottomedge-topedge).to_i} #{STHUMB_H.to_i}"
 
 			# if ((rightedge-leftedge).to_i<STHUMB_W.to_i) || ((bottomedge-topedge).to_i<STHUMB_H.to_i)
 	  #   		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.crop_resized!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),

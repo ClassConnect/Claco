@@ -55,7 +55,7 @@
 									<% 	# /5029db22c3e41e3a470000a3/portfolio/seed+binder/502afef1c3e41e0dcc000004
 										# /:username/portfolio(/:root)/:title/:id
 									%>
-									<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> created <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1].id)) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
+									<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> created <a href="<%= named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago.
 								</div>
 
 								<% if !f[:binder].body.empty? %>

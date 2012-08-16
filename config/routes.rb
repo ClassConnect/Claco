@@ -4,7 +4,7 @@ Claco::Application.routes.draw do
 	# DEVISE ROUTING #
 	##################
 
-	devise_for :teachers, :skip => [:sessions, :registration]
+	devise_for :teachers, :skip => [:sessions, :registrations, :passwords]
 
 	as :teacher do
 
@@ -15,8 +15,12 @@ Claco::Application.routes.draw do
 		post	'/account'			=> 'devise/registrations#create',	:as => :teacher_registration
 		get		'/sign_up'			=> 'devise/registrations#new',		:as => :new_teacher_registration
 
-	end
+		post	'/password'			=> 'passwords#create',				:as => :teacher_password
+		get		'/password/new'		=> 'passwords#new',					:as => :new_teacher_password
+		get		'/password/edit'	=> 'passwords#edit',				:as => :edit_teacher_password
+		put		'/password'			=> 'passwords#update'
 
+	end
 
 	#############
 	# HOME PAGE #

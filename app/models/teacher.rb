@@ -4,8 +4,7 @@ class Teacher
 	# Include default devise modules. Others available are:
 	# :token_authenticatable, :confirmable,
 	# :lockable, :timeoutable and :omniauthable
-	devise :database_authenticatable, :registerable,
-	 :recoverable, :rememberable, :trackable, :validatable, :authentication_keys => [:login]
+	devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable, :authentication_keys => [:login]
 
 	## Database authenticatable
 	field :email,              :type => String, :null => false, :default => "", :unique => true
@@ -89,6 +88,10 @@ class Teacher
 
 	def colleague_status(id)
 		return self.relationships.find_or_initialize_by(:user_id => id).colleague_status
+	end
+
+	def self.get_subscribers
+		Relationship.where(:subscribed => true)
 	end
 
 	def self.find_first_by_auth_conditions(warden_conditions)

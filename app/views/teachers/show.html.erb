@@ -97,43 +97,32 @@
     </div>
     <div class="pull-right profile-module">
       <h3>
-        <strong>40</strong>
+        <strong><%= @subscriptions.count %></strong>
         Subscriptions 
       </h3>
       <ul class="profile-avatars">
-        <li>
-          <a href="#">
-            <img src="">
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <img src="">
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <img src="">
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <img src="">
-          </a>
-        </li>
+        <% @subscriptions.each do |sub| %>
+          <li>
+            <a href="/<%= sub.username %>">
+              <img src="<%= sub.info.avatar.thumb_md.url %>">
+            </a>
+          </li>
+        <% end %>
       </ul>
     </div>
     <div class="pull-right profile-module">
       <h3>
-        <strong>25</strong>
+        <strong><%= @subscribers.count %></strong>
         Subscribers 
       </h3>
       <ul class="profile-avatars">
-        <li>
-          <a href="#">
-            <img src="">
-          </a>
-        </li>
+        <% @subscribers.each do |sub| %>
+          <li>
+            <a href="/<%= sub.username %>">
+              <img src="<%= sub.info.avatar.thumb_md.url %>">
+            </a>
+          </li>
+        <% end %>
       </ul>
     </div>
   </div>

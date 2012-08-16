@@ -39,6 +39,7 @@ gem 'addressable'
 gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem "fog", "~> 1.3.1"
+gem 'sendgrid-rails', '~> 2.0'
 
 gem 'mini_magick'
 gem 'rmagick'

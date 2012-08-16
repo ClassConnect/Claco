@@ -50,6 +50,8 @@ class Teacher
 	embeds_many :relationships#, validate: false
 
 	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title
+	
+	validate :username_blacklist
 
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."
@@ -108,6 +110,22 @@ class Teacher
 
 	def to_param
 		username
+	end
+
+	private
+	@@username_blacklist = nil
+
+	# checks if the username is on a blacklist
+	def username_blacklist
+		unless @@username_blacklist
+			@@username_blacklist = Set.new [] # Put in any additional words in this array
+			Rails.application.routes.routes.each do |r|
+				words = r.path.spec.to_s.gsub(/(\(\.:format\)|[:()])/, "").split('/')
+				words.each {|reserved_word| @@username_blacklist << reserved_word if !reserved_word.empty?}
+			end
+		end
+
+	  errors.add(:username, "is restricted") if @@username_blacklist.include?(username)
 	end
 
 end

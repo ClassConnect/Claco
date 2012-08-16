@@ -1,5 +1,5 @@
 class TeachersController < ApplicationController
-	before_filter :authenticate_teacher!
+	before_filter :authenticate_teacher!, :except => [:show]
 
 	#/teachers
 	#Lists all teachers
@@ -19,6 +19,8 @@ class TeachersController < ApplicationController
 	#Teacher Profiles
 	def show
 		@teacher = Teacher.where(:username => params[:username]).first
+
+		redirect_to "/404.html" and return if @teacher.nil?
 
 		@is_self = current_teacher.username.downcase == params[:username].downcase
 

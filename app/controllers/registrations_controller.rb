@@ -21,7 +21,7 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     build_resource
 
-    if resource.save
+    if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
 
       Ns.where(:code => params[:teacher][:code]).first.use
 
@@ -35,8 +35,13 @@ class RegistrationsController < Devise::RegistrationsController
         respond_with resource, :location => after_inactive_sign_up_path_for(resource)
       end
     else
-      clean_up_passwords resource
-      respond_with resource
+      if Ns.where(:code => params[:teacher][:code]).first.active
+        resource.code = params[:teacher][:code]
+        clean_up_passwords resource
+        respond_with resource
+      else
+        cancel
+      end
     end
   end
 
@@ -81,7 +86,7 @@ class RegistrationsController < Devise::RegistrationsController
   # removing all OAuth session data.
   def cancel
     expire_session_data_after_sign_in!
-    redirect_to new_registration_path(resource_name)
+    redirect_to root_path
   end
 
   protected

@@ -44,40 +44,6 @@ Claco::Application.routes.draw do
 	put		'/:username/subscribe'											=> 'teachers#sub'
 	put		'/:username/unsubscribe'										=> 'teachers#unsub'
 
-	#Add :username as colleague
-	put		'/:username/add'												=> 'teachers#add'
-
-	# #Edit Tags Form/Process
-	# get		'/tags'															=> "teachers#tags"
-	# put		'/updatetags'													=> "teachers#updatetags"
-
-	#Subscribe to :id
-	# put		'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
-	# post	'/confsub/:id'													=> 'teachers#confsub',				:as => 'confsub'
-
-	# #Unsubscribed to :id
-	# put		'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
-	# post	'/confunsub/:id'												=> 'teachers#confunsub',			:as => 'confunsub'
-
-	# #Add :id as colleague
-	# put		'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
-	# post	'/confadd/:id'													=> 'teachers#confadd',				:as => 'confadd'
-
-	# #Remove :id as colleague
-	# put		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-	# post	'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-	# get		'/confremove/:id'												=> 'teachers#confremove',			:as => 'confremove'
-
-	# subscriptions
-	# get		'/subs'															=> 'teachers#subs'
-
-	# get		'/teachers/:id/binder/:binder_id'								=> 'teachers#showbinder',			:as => 'show_binder'
-
-
-
-
-	resources :teachers, :username => /[^\/]+/
-
 	# resources :teachers, :only => [:show, :index]
 
 	post	'utils/fetchtitle'												=> 'home#fetchtitle'

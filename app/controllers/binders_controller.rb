@@ -454,9 +454,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue Exception => ex
+		rescue
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid URL #{ex} #{ex.backtrace}"
+			errors << "Invalid URL"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}

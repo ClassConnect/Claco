@@ -1,6 +1,8 @@
 <% content_for :headcon do %>
   <%= javascript_include_tag "profile/main" %>
   <%= stylesheet_link_tag "teacher", :media => "all" %>
+  <%= javascript_include_tag "home/main" %>
+  <%= stylesheet_link_tag    "home/main", :media => "all" %>
 <% end %>
 
 <div class="container">
@@ -172,18 +174,22 @@
 <% #end 
 %>
 <div id="activity" class="tabswap" style="display:none">
-HERE
-<% @feed.each do |f| %>
-	<%= f[:owner].fname.to_s %>&nbsp;
-	<%= f[:owner].lname.to_s %>&nbsp;,&nbsp;
-	<%= f[:binder].title.to_s %>&nbsp;,&nbsp;
-	<%= f[:log].method.to_s %>&nbsp;,&nbsp;
-	<%= #Time.at(f[:log].timestamp).to_datetime 
-	%><%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago
-	<br />
-</div>
+
+  <%= render 'layouts/feed' %>
+
+<% if false %>
+  <% @feed.each do |f| %>
+  	<%= f[:owner].fname.to_s %>&nbsp;
+  	<%= f[:owner].lname.to_s %>&nbsp;,&nbsp;
+  	<%= f[:binder].title.to_s %>&nbsp;,&nbsp;
+  	<%= f[:log].method.to_s %>&nbsp;,&nbsp;
+  	<%= #Time.at(f[:log].timestamp).to_datetime 
+  	%><%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago
+  	<br />
+  <% end %>
 <% end %>
 
+</div>
 </div>
 
 <% if false %>

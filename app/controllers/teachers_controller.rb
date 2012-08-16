@@ -42,7 +42,11 @@ class TeachersController < ApplicationController
 		@feed = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+		#if @is_self
+			#logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).desc(:timestamp)#.in( method: ["create","createfile","createcontent","update","updatetags","setpub"] )
+		#else
+			logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+		#end
 
 		if logs.any?
 			logs.each do |f|

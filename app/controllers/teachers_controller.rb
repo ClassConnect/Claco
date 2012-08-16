@@ -18,7 +18,7 @@ class TeachersController < ApplicationController
 	#/teachers/:id
 	#Teacher Profiles
 	def show
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		redirect_to "/404.html" and return if @teacher.nil?
 
@@ -227,7 +227,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 
@@ -256,7 +256,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
@@ -332,7 +332,7 @@ class TeachersController < ApplicationController
 		errors = []
 
 		#Teacher to be added
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		@title = "Add #{ @teacher.full_name } as a Colleague"
 

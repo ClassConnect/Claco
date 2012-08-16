@@ -46,7 +46,7 @@
 											<div class="txtcon">
 												<div class="condesc">
 													<!--The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u>-->
-													<%= strip_tags(f[:binder].body) %>
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 												</div>
 											</div>
 
@@ -85,7 +85,7 @@
 												<% if !f[:binder].body.empty? %>
 												<div class="condesc">
 													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
-													<%= strip_tags(f[:binder].body) %>
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 												</div>
 												<% end %>
 											</div>
@@ -124,7 +124,7 @@
 												<% if !f[:binder].body.empty? %>
 												<div class="condesc">
 													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
-													<%= strip_tags(f[:binder].body) %>
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 												</div>
 												<% end %>
 											</div>
@@ -173,7 +173,7 @@
 												<% if !f[:binder].body.empty? %>
 												<div class="condesc">
 													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
-													<%= strip_tags(f[:binder].body) %>
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 												</div>
 												<% end %>
 											</div>
@@ -220,7 +220,7 @@
 												
 												<div class="condesc">
 													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
-													<%= strip_tags(f[:binder].body) %>
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 												</div>
 											</div>
 											<% end %>
@@ -269,7 +269,7 @@
 
 												<div class="condesc">
 													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
-													<%= strip_tags(f[:binder].body) %>
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 												</div>
 											</div>
 											<% end %>

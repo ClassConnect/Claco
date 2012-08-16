@@ -22,7 +22,7 @@
       <div class="pull-right">
         <% if !@is_self %>
 
-        <% if !current_teacher.subscribed_to?(@teacher.id) %>
+        <% if !signed_in? || !current_teacher.subscribed_to?(@teacher.id) %>
         <a id="subbtn" class="btn btn-medium btn-primary actbtn">
           <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
           <span class="upme">Subscribe</span>
@@ -75,9 +75,17 @@
       <ul class="profile-info-items">
         <% if !@teacher.info.twitterhandle.empty? %>
         <li>
-          <a href="<%= @teacher.info.twitterhandle %>" target="_blank">
+          <a href="http://www.twitter.com/<%= @teacher.info.twitterhandle %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
-            <%= URI.parse(@teacher.info.twitterhandle).path.split('/').last %>
+            @<%= @teacher.info.twitterhandle %>
+          </a>
+        </li>
+        <% end %>
+        <% if !@teacher.info.facebookurl.empty? %>
+        <li>
+          <a href="http://www.facebook.com/<%= @teacher.info.facebookurl %>" target="_blank">
+            <span class="twitterIcon"><%= image_tag("settings/facebook.png", :style => "margin-top:-4px") %></span>
+            <%= @teacher.info.facebookurl %>
           </a>
         </li>
         <% end %>
@@ -170,128 +178,5 @@
 
   <%= render 'layouts/feed' %>
 
-<% if false %>
-  <% @feed.each do |f| %>
-  	<%= f[:owner].fname.to_s %>&nbsp;
-  	<%= f[:owner].lname.to_s %>&nbsp;,&nbsp;
-  	<%= f[:binder].title.to_s %>&nbsp;,&nbsp;
-  	<%= f[:log].method.to_s %>&nbsp;,&nbsp;
-  	<%= #Time.at(f[:log].timestamp).to_datetime 
-  	%><%= time_ago_in_words(Time.at(f[:log].timestamp).to_datetime) %> ago
-  	<br />
-  <% end %>
-<% end %>
-
 </div>
 </div>
-
-<% if false %>
-        <h1>Profile Page</h1>
-        <p>app/views/teachers/show.html.erb</p>
-
-        <p><%= "#{ @teacher.full_name }" %></p>
-        <p><%=  #!@teacher.info.avatar.path.to_s.empty? ? image_tag(@teacher.info.avatar, :width => "200") : "<no profile picture>" 
-        %></p>
-
-        <img src="<%=	@teacher.info.avatar.url.to_s %>" />
-        <img src="<%= @teacher.info.avatar.thumb_lg.to_s %>" />
-        <img src="<%= @teacher.info.avatar.thumb_sm.to_s %>" />
-
-        <% if !@teacher.info.nil? %>
-        <p><%= "Bio: #{@teacher.info.bio}" if !@teacher.info.bio.empty? %></p>
-        <p><%= "Website: #{@teacher.info.website}" if !@teacher.info.website.empty? %></p>
-        <% end %>
-
-        <%= link_to "Edit Info", "/editinfo" if current_teacher.id == @teacher.id %>
-
-        <% if current_teacher.id != @teacher.id %>
-            <%= form_for @relationship, :url => get_subscription_path() do |f| %>
-                <%= get_subscription_button(f) %>
-            <% end %>
-            <%= form_for @relationship, :url => get_colleague_path() do |f| %>
-                <%= get_colleague_button(f) %>
-            <% end %>
-        <% else %>
-            <% if @colleague_requests.any? %>
-                <p>You have pending colleague requests!</p>
-                <% @colleague_requests.each do |request| %>
-                    <%= form_for request, :url => confadd_path(request.user_id) do |f| %>
-                        <%= f.submit "Accept colleague request from #{Teacher.find(request.user_id).full_name}", :confirm => "Are you absofuckinlutely positve?" %>
-                    <% end %>
-                <% end %>
-            <% end %>
-            <% if @colleagues.any? %>
-                <hr />
-                <p>You are colleagues with the following teachers:</p>
-                <table>
-                    <tr>
-                        <td colspan = "2">
-                            <hr />
-                        </td>
-                    </tr>
-                    <% @colleagues.each do |colleague| %>
-                    <tr>
-                        <td>
-                            <%= # deprecated
-                            get_teacher_avatar(colleague, {:height => 60, :border => 1}) %>
-                        </td>
-                        <td>
-                            <p>
-                                <%= "#{colleague.full_name} " %>
-                                <%= link_to colleague.email, colleague %>
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan = "2">
-                            <hr />
-                        </td>
-                    </tr>
-                    <% end %>
-                    </tr>
-                </table>
-            <% end %>
-            <br />
-            <% if @subscriptions.any? %>
-                <hr />
-                <p>You are subscribed to the following teachers:</p>
-                <table>
-                    <tr>
-                        <td colspan = "2">
-                            <hr />
-                        </td>
-                    </tr>
-                    <% @subscriptions.each do |subscription| %>
-                    <tr>
-                        <td>
-                            <%= get_teacher_avatar(subscription, {:height => 60, :border => 1}) %>
-                        </td>
-                        <td>
-                            <p>
-                                <%= "#{subscription.full_name}: " %>
-                                <%= link_to subscription.email, subscription %>
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan = "2">
-                            <hr />
-                        </td>
-                    </tr>
-                    <% end %>
-                </table>
-            <% end %>
-        <% end %>
-        <% if @owned_root_binders.any? %>
-
-        <br />
-        <hr />
-            <p><%= "#{ @teacher.full_name }'s binders:" %></p>
-            <p>[Home]</p>
-            <br />
-            <% @owned_root_binders.each do |root_binder| %>
-                &nbsp;&nbsp;&nbsp;[<%= link_to "#{root_binder.title}", "/teachers/#{params[:id]}/binder/#{root_binder.id}" %>]
-                <br />
-            <% end %>
-        <% end %>
-<% end %>

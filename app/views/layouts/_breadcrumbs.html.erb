@@ -27,6 +27,7 @@
       </div>
 
       <% if @binder.type == 1 %>
+      <% if signed_in? && current_teacher.id.to_s == @binder.owner %>
       <div class="buttonbox">
 
         <div class="btn-group">
@@ -43,6 +44,7 @@
         </div>
 
       </div>
+      <% end %>
 
       <% else %>
 

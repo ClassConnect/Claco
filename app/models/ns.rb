@@ -3,6 +3,7 @@ class Ns
 
 	field :code, :type => String
 	field :active, :type => Boolean, :default => true
+	field :given, :type => Boolean, :default => false
 	field :timestamp, :type => Integer
 
 	def self.seed

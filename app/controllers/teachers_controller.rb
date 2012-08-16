@@ -18,18 +18,18 @@ class TeachersController < ApplicationController
 	#/teachers/:id
 	#Teacher Profiles
 	def show
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		redirect_to "/404.html" and return if @teacher.nil?
 
-		@is_self = current_teacher.username.downcase == params[:username].downcase
+		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 
 		if @is_self
 			@children = Binder.where( :owner => current_teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } )
 		else
 			@children = []
 			Binder.where( :owner => @teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } ).each do |b|
-				@children << b if b.get_access(current_teacher.id.to_s)
+				@children << b if b.get_access(signed_in? ? current_teacher.id.to_s : 0)
 			end
 		end
 
@@ -37,9 +37,9 @@ class TeachersController < ApplicationController
 
 		@title = "#{ @teacher.full_name }'s Profile"
 
-		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
+		# @relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
-		@colleague_requests = current_teacher.relationships.where(:colleague_status => 2).entries
+		# @colleague_requests = current_teacher.relationships.where(:colleague_status => 2).entries
 
 		#@colleagues = current_teacher.relationships.where(:colleague_status => 3).entries
 		#@colleagues = (current_teacher.relationships.where(:colleague_status => 3).entries).map { |c| Teacher.find(c["user_id"]) }
@@ -67,7 +67,7 @@ class TeachersController < ApplicationController
 				# push onto the feed if the node is not deleted
 				binder = Binder.find(f.modelid.to_s)
 
-				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.get_access(current_teacher.id.to_s) > 0
+				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.get_access(signed_in? ? current_teacher.id.to_s : 0) > 0
 
 					#Rails.logger.debug "feed log: #{f.params.to_s}"
 
@@ -161,8 +161,8 @@ class TeachersController < ApplicationController
 
 		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],
 												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,
-												:facebookurl	=> Addressable::URI.heuristic_parse(params[:info][:facebookurl]).to_s,
-												:twitterhandle	=> Addressable::URI.heuristic_parse(params[:info][:twitterhandle]).to_s,
+												:facebookurl	=> params[:info][:facebookurl],
+												:twitterhandle	=> params[:info][:twitterhandle].gsub(/@/, ''),
 												:bio			=> params[:info][:bio],
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
@@ -230,7 +230,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 
@@ -259,7 +259,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
@@ -335,7 +335,7 @@ class TeachersController < ApplicationController
 		errors = []
 
 		#Teacher to be added
-		@teacher = Teacher.where(:username => params[:username]).first
+		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
 
 		@title = "Add #{ @teacher.full_name } as a Colleague"
 

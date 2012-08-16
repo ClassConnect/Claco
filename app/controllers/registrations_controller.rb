@@ -23,6 +23,8 @@ class RegistrationsController < Devise::RegistrationsController
   def create
     build_resource
 
+    resource.code = params[:teacher][:code]
+    
     if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
 
       Ns.where(:code => params[:teacher][:code]).first.use

@@ -163,6 +163,7 @@
 
 			        <div class="lastupdate">Last updated by <%= link_to binder.user, "#" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
 
+			        <% if signed_in? && current_teacher.id.to_s == @binder.owner %>
 			            <div class="drop-tog">
 			            	<div class="btn-group">
 
@@ -180,13 +181,10 @@
 					        </div>
 
 			            </div>
+		            <% end %>
 
 
 			        </div>
-
-
-					<%= #get_binder_image(binder,{ :height => 150, :border => 1 }) #{ :border => 1 })
-					%>
 
 
 

@@ -41,7 +41,8 @@ class Teacher
 	field :title, :type => String
 	field :fname, :type => String
 	field :lname, :type => String
-	field :username, :type => String, :default => nil, :allow_nil => true, :unique => true
+	field :username, :type => String, :unique => true
+	field :lower_username, :type => String, :unique => true
 
 	embeds_one :info#, autobuild: true #, validate: false
 
@@ -111,6 +112,15 @@ class Teacher
 	def to_param
 		username
 	end
+
+	before_save do 
+		self.lower_username = self.username.downcase
+	end
+
+	def self.find_for_authentication(conditions) 
+		conditions[:login].downcase!
+		super(conditions)
+	end 
 
 	private
 	@@username_blacklist = nil

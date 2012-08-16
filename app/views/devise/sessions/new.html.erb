@@ -10,11 +10,11 @@
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
   <div style="margin-top:10px">
-  	<input type="text" name="login" placeholder="Username / Email" />
+    <%= f.text_field :login, :placeholder => "Username / Email" %>
   </div>
 
   <div>
-  	<input type="text" name="password" placeholder="Password" />
+    <%= f.password_field :password, :placeholder => "Password" %>
   </div>
 
   <% if devise_mapping.rememberable? -%>

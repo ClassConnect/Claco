@@ -16,7 +16,7 @@
 
       <%= javascript_tag "isEditable = #{teacher_signed_in? ? @binder.get_access(current_teacher.id.to_s) == 2 : "false"};" %>
 
-      <%= render 'layouts/embed' if @binder.type == 2%>
+      <%= render 'layouts/embed' if @binder.type == 2 %>
 
       <%= render 'layouts/notepad' %>
 
@@ -28,12 +28,12 @@
 
 	<div id="left-sidebar">
 
-    <% if params[:action] == "show" && teacher_signed_in? && current_teacher.id.to_s == @binder.owner %>
+    <% if params[:action] == "show" %>
 
         <div class="conbox whitester">
-          <div class="headstrip" style="margin-bottom:10px">
+          <div class="headstrip" style="margin-bottom:10px;">
 
-            <div style="float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
+            <div style="<%= "display:none;" if !signed_in? || (signed_in? ? current_teacher.id.to_s != @binder.owner : false) %>float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
             <div class="inner">
             Public 
             </div>
@@ -56,7 +56,7 @@
                     <img src="/assets/binders/link.png" style="height:14px; margin-top:-4px" />
                   </span>
 
-                  <input type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="http://claco.com/emsimons/portfolio/math/id" readonly />
+                  <input type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="<%= "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>" readonly />
               </div>
 
             </div>
@@ -65,12 +65,12 @@
             <div style="margin: 10px 2px 5px 0;">
 
               <div style="margin: 0 8px 0 15px; height:20px; float:left">
-                <a href="http://pinterest.com/pin/create/button/?url=http%3A%2F%2Fwww.classconnect.com&media=http%3A%2F%2Fwww.classconnect.com" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+                <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
               </div>
 
-              <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=I'm a pioneer! %23UnitedWeTeach&url=http://www.classconnect.com" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>
+              <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=Love this! <%= CGI.escape(@binder.title) %>&url=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>
 
-              <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.claco.com&amp;send=false&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=90&amp;appId=213954741999891" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
+              <iframe src="//www.facebook.com/plugins/like.php?href=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&amp;send=false&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=90&amp;appId=213954741999891" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
 
             </div>
 
@@ -91,10 +91,11 @@
           <div class="headstrip">
             <div class="inner">
             Tags 
-
+              <% if signed_in? && @binder.get_access(current_teacher.id.to_s) == 2 %>
               <button class="btn" id="addtags-btn">
               Add New
               </button>
+              <% end %>
             </div>
           </div>
 

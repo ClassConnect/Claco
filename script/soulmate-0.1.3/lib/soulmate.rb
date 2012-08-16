@@ -24,7 +24,7 @@ module Soulmate
   def redis
     @redis ||= (
       #url = URI(@redis_url || ENV["REDIS_URL"] || "redis://127.0.0.1:6379/0")
-	url = URI(@redis_url || ENV["REDIS_URL"] || "redis://redistogo:622aa4bb5b4d526ce343a8f8a88c908c@scat.redistogo.com:9545/0")
+	url = URI("redis://redistogo:622aa4bb5b4d526ce343a8f8a88c908c@scat.redistogo.com:9545/0")
 
       ::Redis.new({
         :host => url.host,

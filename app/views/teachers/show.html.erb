@@ -156,16 +156,17 @@
 		%>
 
     <div id="binders" class="tabswap">
-    <%= #render 'layouts/binderlist' 
+    <%= render 'layouts/binderlist' 
     %>
-    <%= render 'layouts/contentlist' %>
+    <%= #render 'layouts/contentlist' 
+    %>
     </div>
 
 	<% #end 
 	%>
 <% #end 
 %>
-<div id="activity" class="tabswap" style="display:none">
+<div id="activity" class="tabswap feedwrap" style="display:none">
 
   <%= render 'layouts/feed' %>
 

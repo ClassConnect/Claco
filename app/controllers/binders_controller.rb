@@ -134,7 +134,7 @@ class BindersController < ApplicationController
 
 		if @access == 0
 			error = true
-			redirect_to "/403.html" and return
+			render "public/403.html", :status => 403 and return
 		end
 
 		#TODO: Verify permissions before rendering view
@@ -163,10 +163,10 @@ class BindersController < ApplicationController
 
 		rescue BSON::InvalidObjectId
 			error = true
-			redirect_to "/404.html" and return
+			render "public/404.html", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
 			error = true
-			redirect_to "/404.html" and return
+			render "public/404.html", :status => 404 and return
 		ensure
 			if !error
 				respond_to do |format|
@@ -187,7 +187,7 @@ class BindersController < ApplicationController
 			redirect_to named_binder_route(@binder, params[:action]) and return
 		end
 
-		redirect_to "/403.html" and return if @access == 0
+		render "public/403.html", :status => 403 and return if @access == 0
 
 		# INCREMENT DOWNLOAD COUNT
 
@@ -205,9 +205,9 @@ class BindersController < ApplicationController
 		end
 
 		rescue BSON::InvalidObjectId
-			redirect_to "/404.html" and return
+			render "public/404.html", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
-			redirect_to "/404.html" and return
+			render "public/404.html", :status => 404 and return
 
 	end
 
@@ -454,9 +454,9 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue Exception => ex
+		rescue
 			#Rails.logger.debug "Invalid URL detected"
-			errors << "Invalid URL #{ex} #{ex.backtrace}"
+			errors << "Invalid URL"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
@@ -1249,7 +1249,7 @@ class BindersController < ApplicationController
 	# def permissions
 	# 	@binder = Binder.find(params[:id])
 
-	# 	redirect_to "/403.html" and return if current_teacher.id.to_s != @binder.owner
+	# 	render "public/403.html", :status => 403 and return if current_teacher.id.to_s != @binder.owner
 
 	# 	@title = "Permissions for #{@binder.title}"
 
@@ -1479,7 +1479,7 @@ class BindersController < ApplicationController
 
 		@tags = [[],[],[],[]]
 
-		#redirect_to "/403.html" and return if params[:username] != current_teacher.username
+		#render "public/403.html", :status => 403 and return if params[:username] != current_teacher.username
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
 	end

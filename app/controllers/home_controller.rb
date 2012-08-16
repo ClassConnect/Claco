@@ -38,7 +38,7 @@ class HomeController < ApplicationController
 
 						#Rails.logger.debug "FEEDARR #{@feed}"#.map { |h| f if h.ownerid.to_s==f.ownerid.to_s }}"  
 
-						if c<4
+						if c<8
 
 							#if c==3
 							#	if (@feed[-1].ownerid.to_s == f.ownerid.to_s) && (@feed[-2].ownerid.to_s == f.ownerid.to_s) && (@feed[-3].ownerid.to_s == f.ownerid.to_s)

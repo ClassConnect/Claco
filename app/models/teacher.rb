@@ -54,6 +54,7 @@ class Teacher
 	
 	validate :username_blacklist
 
+	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters"
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."
 	

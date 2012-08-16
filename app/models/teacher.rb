@@ -44,6 +44,8 @@ class Teacher
 	field :username, :type => String, :unique => true
 	field :lower_username, :type => String, :unique => true
 
+	field :allow_short_username, :type => Boolean, :default => false
+
 	embeds_one :info#, autobuild: true #, validate: false
 
 	embeds_one :tag#, autobuild: true #, validate: false
@@ -54,7 +56,7 @@ class Teacher
 	
 	validate :username_blacklist
 
-	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters"
+	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters", :unless => Proc.new {|user| user.allow_short_username == true}
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."
 	

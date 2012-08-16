@@ -59,6 +59,7 @@
 .newsitem .feedcontent .thetitle{
 	font-size:13px;
 	color:#999;
+	width:550px;
 }
 
 .newsitem .feedcontent .thetitle a{

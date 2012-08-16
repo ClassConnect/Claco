@@ -100,7 +100,10 @@ class TeachersController < ApplicationController
 
 					#if temp.map { |g| g.delete(:timestamp) }.uniq.size == temp.size
 				
-						@feed << f
+
+							@feed << f
+
+						#end
 
 					#temp <<
 

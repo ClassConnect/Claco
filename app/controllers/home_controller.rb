@@ -13,6 +13,7 @@ class HomeController < ApplicationController
 		#
 		#@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
 		@feed = []
+		#blacklist = []
 
 		if signed_in?
 
@@ -31,8 +32,29 @@ class HomeController < ApplicationController
 					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
 						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
 				
-						@feed << f
+						#@feed.each do |f|
 
+						c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size #&& Time.now.to_i-f.timestamp.to_i<1.hour 
+
+						#Rails.logger.debug "FEEDARR #{@feed}"#.map { |h| f if h.ownerid.to_s==f.ownerid.to_s }}"  
+
+						if c<4
+
+							#if c==3
+							#	if (@feed[-1].ownerid.to_s == f.ownerid.to_s) && (@feed[-2].ownerid.to_s == f.ownerid.to_s) && (@feed[-3].ownerid.to_s == f.ownerid.to_s)
+							#		f[:full] = true
+							#	end
+							#end
+
+							@feed << f
+						#elsif c==3
+							#blacklist << f.ownerid.to_s
+							#f[:full] = true
+							#@@feed << f
+							#Rails.logger.debug "FULLSYM #{f.inspect.to_s}"
+						#else
+
+						end
 					end
 				end
 

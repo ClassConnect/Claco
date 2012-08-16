@@ -1361,9 +1361,17 @@ class Tag
 		# we only have the ability to alter tags that we have added in the past
 		existing_owned_tags = (self.node_tags|self.parent_tags).delete_if { |tag| tag["owner"]!= teacher_id.to_s }
 
+		#Rails.logger.debug "binder #{self.binder.title}"
+		#Rails.logger.debug "self.node_tags #{self.node_tags}"
+		#Rails.logger.debug "self.parent_tags #{self.parent_tags}"
+		#Rails.logger.debug "existing_owned_tags #{existing_owned_tags.to_a.to_s}"
+		#Rails.logger.debug "param_set #{param_set.to_a.to_s}"
+
 		# now retrieve the unique instances from these sets
 		# a single instance of them means they were either just created, or just deleted
 		changed_tags = param_set^existing_owned_tags
+
+		#Rails.logger.debug "changed_tags #{changed_tags.to_a.to_s}"
 
 		# a set XOR with the changed tags will remove the duplicates, and leave the singletons
 		# this conveniently matches how we want the data to be altered

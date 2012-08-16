@@ -550,7 +550,9 @@ class BindersController < ApplicationController
 
 		@binder.children.sort_by {|binder| binder.parents.length}.each do |h|
 
-			h.tag = Tag.new
+			h.tag = Tag.new if h.tag.nil?
+
+			Rails.logger.debug "child #{h.title}'s tags: #{h.tag.node_tags},#{h.tag.parent_tags}"
 
 			h.update_parent_tags()
 

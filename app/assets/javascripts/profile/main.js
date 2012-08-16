@@ -8,6 +8,7 @@ $(document).ready(function() {
 		$($(this).attr("href")).show();
 		$('.active').removeClass('active');
 		$(this).parent().addClass('active');
+		return false;
 	});
 
 	// click on box, redirect

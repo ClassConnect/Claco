@@ -107,7 +107,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? (@parent == "0" ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : 1) : errors}
+				format.html {render :text => errors.empty? ? (@parent == "0" ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : 1) : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 
 	end
@@ -452,7 +452,7 @@ class BindersController < ApplicationController
 			errors << "Invalid URL #{ex} #{ex.backtrace}"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors}
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 
 	end
@@ -492,7 +492,7 @@ class BindersController < ApplicationController
 		end
 
 		respond_to do |format|
-			format.html {render :text => errors.empty? ? "1" : errors}
+			format.html {render :text => errors.empty? ? "1" : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 		end
 	end
 
@@ -757,7 +757,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors}
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 
 	end
@@ -948,7 +948,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors}
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 
 	end
@@ -1151,7 +1151,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors}
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 	end
 
@@ -1562,7 +1562,7 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		ensure
 			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors}
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 
 	end

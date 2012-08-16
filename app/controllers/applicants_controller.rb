@@ -9,6 +9,8 @@ class ApplicantsController < ApplicationController
 
 	def create
 
+		@title = "Request an invite"
+
 		@app = Applicant.new(params[:applicant])
 
 		@app.update_attributes(:timestamp => Time.now.to_i)

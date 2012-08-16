@@ -68,14 +68,15 @@ class BindersController < ApplicationController
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
 										:body				=> params[:body],
-										# :permissions		=> (params[:accept] == "1" ? [{	:type		=> params[:type],
-										# 													:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-										# 													:auth_level	=> params[:auth_level]}] : []),
+										# :permissions		=> (params[:public] == "on" ? [{:type		=> 3,
+										# 													:auth_level	=> params[:public] == "on" ? 1 : 0}] : []),
 										:order_index		=> @parent_child_count,
 										:parent_permissions	=> @parentperarr,
 										:last_update		=> Time.now.to_i,
 										:last_updated_by	=> current_teacher.id.to_s,
 										:type				=> 1)
+
+				new_binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if @parent == "0"
 
 				Rails.logger.debug "METHOD got here! #{__method__}"
 
@@ -106,8 +107,14 @@ class BindersController < ApplicationController
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
 		ensure
-			respond_to do |format|
-				format.html {render :text => errors.empty? ? (@parent == "0" ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : 1) : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
+			if @parent == "0" || params[:id].nil?
+				respond_to do |format|
+					format.html {render :text => errors.empty? ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : {"success" => 2, "data" => errors.map{|err| "<li>#{err}</li>"}.join.html_safe}.to_json}
+				end
+			else
+				respond_to do |format|
+					format.html {render :text => errors.empty? ?  1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
+				end
 			end
 
 	end

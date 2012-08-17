@@ -95,7 +95,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   def default_url
-    "/assets/images/placer.png"
+    "/assets/placer.png"
   end
 
 protected

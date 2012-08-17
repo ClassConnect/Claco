@@ -22,16 +22,23 @@
       <div class="pull-right">
         <% if !@is_self %>
 
-        <% if !signed_in? || !current_teacher.subscribed_to?(@teacher.id) %>
-        <a id="subbtn" class="btn btn-medium btn-primary actbtn">
-          <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
-          <span class="upme">Subscribe</span>
-        </a>
+        <% if signed_in? %>
+          <% if !current_teacher.subscribed_to?(@teacher.id) %>
+          <a id="subbtn" class="btn btn-medium btn-primary actbtn">
+            <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
+            <span class="upme">Subscribe</span>
+          </a>
+          <% else %>
+          <a id="subbtn" class="btn btn-medium btn-danger actbtn">
+            <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
+            <span class="upme">Unsubscribe</span>
+          </a>
+          <% end %>
         <% else %>
-        <a id="subbtn" class="btn btn-medium btn-danger actbtn">
-          <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
-          <span class="upme">Unsubscribe</span>
-        </a>
+          <a class="btn btn-medium btn-primary actbtn" href="/apply">
+            <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
+            <span class="upme">Subscribe</span>
+          </a>
         <% end %>
 
         <% if false %>

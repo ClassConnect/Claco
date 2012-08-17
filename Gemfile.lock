@@ -104,6 +104,7 @@ GEM
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-ssh (2.5.2)
+    newrelic_rpm (3.4.1)
     nokogiri (1.5.5)
     orm_adapter (0.0.7)
     polyglot (0.3.3)
@@ -212,6 +213,7 @@ DEPENDENCIES
   log4r (= 1.1.9)
   mini_magick
   mongoid (~> 2.4)
+  newrelic_rpm
   rack-contrib
   rack-pjax
   rails (= 3.2.3)

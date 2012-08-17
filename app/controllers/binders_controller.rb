@@ -384,7 +384,7 @@ class BindersController < ApplicationController
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
 
 							# EDUCREATIONS
 							# DELAYTAG
@@ -450,7 +450,6 @@ class BindersController < ApplicationController
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
 		rescue
-			#Rails.logger.debug "Invalid URL detected"
 			errors << "Invalid URL"
 		ensure
 			respond_to do |format|

@@ -94,6 +94,10 @@ class ImageUploader < CarrierWave::Uploader::Base
     "http://img.cla.co"
   end
 
+  def default_url
+    "/assets/images/placeholder.png"
+  end
+
 protected
 
   def smart_thumbnail(dims = ["",""])

@@ -229,7 +229,7 @@ function initAutoTagger(identifier) {
   $(identifier).find('.standards-addfield').autocomplete({
       autoFocus: true,
       delay: 0,
-      source: '/sm/search?types[]=standard&term=',
+      source: 'http://fast-refuge-9353.herokuapp.com/sm/search?types[]=standard&term=',
       select: function( event, ui ) {
         $('.tooltip').remove();
         $(this).val('');

@@ -68,6 +68,19 @@ class Teacher
 
 	# Class Methods
 
+
+	# regenerate all thumbnails for a teacher's content
+	# incomplete method
+	# def self.regen_thumbnails(id)
+
+	# 	Binder.where( :owner => id.to_s ).each do |f|
+
+	# 		f.regen_thumbnails
+
+	# 	end
+
+	# end
+
 	# Mr. John Smith
 	def full_name
 		return "#{title} #{fname} #{lname}"

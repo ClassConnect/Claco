@@ -21,6 +21,8 @@ class HomeController < ApplicationController
 		#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 		logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
+		subs = current_teacher.relationships.where(:subscribed => true).entries#).map { |r| Teacher.find(r["user_id"]) } 
+
 		if logs.any?
 			logs.each do |f|
 
@@ -34,6 +36,16 @@ class HomeController < ApplicationController
 				
 						#@feed.each do |f|
 
+						if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
+							@feed << f
+						else
+							c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size #&& Time.now.to_i-f.timestamp.to_i<1.hour 
+
+							if c<3
+								@feed << f
+							end
+						end
+
 						#c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size #&& Time.now.to_i-f.timestamp.to_i<1.hour 
 
 						#Rails.logger.debug "FEEDARR #{@feed}"#.map { |h| f if h.ownerid.to_s==f.ownerid.to_s }}"  
@@ -46,7 +58,7 @@ class HomeController < ApplicationController
 							#	end
 							#end
 
-							@feed << f
+							#@feed << f
 						#elsif c==3
 							#blacklist << f.ownerid.to_s
 							#f[:full] = true

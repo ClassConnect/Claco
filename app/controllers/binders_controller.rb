@@ -322,6 +322,11 @@ class BindersController < ApplicationController
 
 				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
+					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
+
+					raise "Invalid URL" if (url || embedtourl) && link.empty?
+
 					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
@@ -332,22 +337,12 @@ class BindersController < ApplicationController
 											:last_update		=> Time.now.to_i,
 											:last_updated_by	=> current_teacher.id.to_s,
 											:body				=> params[:body],
-											#:permissions		=> (params[:accept] == "1" ? [{:type => params[:type],
-											#						:shared_id => (params[:type] == "1" ? params[:shared_id] : "0"),
-											#						:auth_level => params[:auth_level]}] : []),
 											:order_index		=> @parent_child_count,
 											:parent_permissions	=> @parentperarr,
 											:files				=> 1,
 											:type				=> 2,
 											:format				=> 2)
 
-
-
-
-					#Mongo.method_index(__method__)
-
-					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
-					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
 
 					@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
 													:thumbnailgen => 1, #video
@@ -389,7 +384,7 @@ class BindersController < ApplicationController
 
 							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 0)
+						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
 
 							# EDUCREATIONS
 							# DELAYTAG
@@ -455,7 +450,6 @@ class BindersController < ApplicationController
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
 		rescue
-			#Rails.logger.debug "Invalid URL detected"
 			errors << "Invalid URL"
 		ensure
 			respond_to do |format|

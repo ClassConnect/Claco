@@ -21,7 +21,7 @@ class HomeController < ApplicationController
 		#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 		logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
-		subs = current_teacher.relationships.where(:subscribed => true).entries#).map { |r| Teacher.find(r["user_id"]) } 
+		subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
 		if logs.any?
 			logs.each do |f|

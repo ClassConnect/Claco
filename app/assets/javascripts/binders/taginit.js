@@ -225,6 +225,7 @@ function initAutoTagger(identifier) {
   ////////////////////////////////////////////////////////////////////////////////////
   //    now lets do subjects
   ////////////////////////////////////////////////////////////////////////////////////
+  focusNow = false;
 
   $(identifier).find('.standards-addfield').autocomplete({
       autoFocus: true,
@@ -244,6 +245,7 @@ function initAutoTagger(identifier) {
         return false;
       },
       focus: function(event, ui) {
+        focusNow = true;
         $('.tooltip').remove();
 
 
@@ -258,8 +260,13 @@ function initAutoTagger(identifier) {
       }
     }).keypress(function(e) {
 
-      
-        $('.tooltip').remove();
+        if (focusNow === true) {
+          focusNow = false;
+
+        } else {
+          $('.tooltip').remove();
+
+        }
       
 
           if (e.keyCode === 13)

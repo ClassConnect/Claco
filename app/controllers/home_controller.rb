@@ -114,31 +114,9 @@ class HomeController < ApplicationController
 
 		response = (JSON.parse(RestClient.get('http://redis.claco.com/sm/search?' + request.query_string))['results']['standard']).each { |result| smushset << { :title => result['data']['label'], :label => result['data']['value'] } }
 
-		#response = JSON.parse(response)['results']['standard']#.map { |r| r }
-
-		#response = 
-
-		#response#.each do |r|
-
-		#end
-
-		#Rails.logger.debug "HEY response: #{response.to_s}"
-
-		
-
-		#response = JSON.parse(response)
-
-		#Rails.logger.debug "response AFTER: #{response.to_s}"
-
 		response.each do |result|
 			smushset << { :title => result['data']['label'], :label => result['data']['value'] }
 		end
-
-		#smushset = JSON.parse(response).each { |result| smushset << { :title => result['data']['label'], :label => result['data']['value'] } }
-
-		#Rails.logger.debug "smushset #{smushset.to_s}"
-
-		#return MultiJson.encode(smushset.uniq)
 
 		rescue
 
@@ -149,29 +127,29 @@ class HomeController < ApplicationController
 			end
 	end
 
-	def autocomplete
+	# def autocomplete
 
-		#@results = RestClient.post('http://localhost:3000/sm/search', :types => 'venue', :term => 'an' ) #'http://localhost:3000/sm/search?types[]=venue&term=an'
+	# 	#@results = RestClient.post('http://localhost:3000/sm/search', :types => 'venue', :term => 'an' ) #'http://localhost:3000/sm/search?types[]=venue&term=an'
 
-		#@results = RestClient.get('http://localhost:3000/sm/search?types[]=venue&term=an')
+	# 	#@results = RestClient.get('http://localhost:3000/sm/search?types[]=venue&term=an')
 
 
 
-		#@results = Soulmate::EmulatedServer.new
+	# 	#@results = Soulmate::EmulatedServer.new
 
-		auto = Soulmate::EmulatedServer.new
+	# 	auto = Soulmate::EmulatedServer.new
 
-		#@results = auto.search({ 'types[]' => 'venue', 'term' => 'an' })
-		@results = JSON.pretty_generate(JSON.parse(auto.search(params)))
+	# 	#@results = auto.search({ 'types[]' => 'venue', 'term' => 'an' })
+	# 	@results = JSON.pretty_generate(JSON.parse(auto.search(params)))
 
-		@test = JSON.pretty_generate(JSON.parse(File.read("app/assets/json/standards.json")))  #URI.encode_www_form({ 'types' => ['venue','other'], 'term' => 'an' })
+	# 	@test = JSON.pretty_generate(JSON.parse(File.read("app/assets/json/standards.json")))  #URI.encode_www_form({ 'types' => ['venue','other'], 'term' => 'an' })
 
-		#mount Soulmate::Server
+	# 	#mount Soulmate::Server
 
-		#@test = Soulmate::Server
+	# 	#@test = Soulmate::Server
 
-		#@results = @test.class
+	# 	#@results = @test.class
 
-	end
+	# end
 
 end

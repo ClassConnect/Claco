@@ -976,7 +976,8 @@ class Binder
 			if timeout==0
 				# image fetch timed out
 				#Binder.delay(:queue => 'mulligan', :priority => 1, run_at: 15.minutes.from_now).get_croc_thumbnail(id,url)
-				raise "Crocodoc thumbnail fetch timed out" and return
+				#raise "Crocodoc thumbnail fetch timed out" and return
+				return
 			end
 		end
 

@@ -10,8 +10,11 @@
 <td>Timestamp</td>
 <td>Status</td>
 </tr>
-<% @apps.each do |app| %>
+<% 
+i=1
+@apps.each do |app| %>
 <tr>
+<td><%= i.to_s %></td><% i += 1 %>
 <td><%= app.fname %></td>
 <td><%= app.lname %></td>
 <td><%= app.email %></td>

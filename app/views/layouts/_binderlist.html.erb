@@ -7,10 +7,27 @@
 		<% imgarr = Binder.get_folder_array(binder.id.to_s) %>
 
 			<div id="<%= binder.id.to_s %>" class="content-item folder-item">
+				<% if binder.thumbimgids.reject{|f| f==""}.empty? %>
+
+          		<div class="folder-preview">
+					<div class="dyncon">
+
+						<div class="empty-folder">
+							<div class="nubfol"></div>
+							<div class="mainfol"></div>
+						</div>
+
+					</div>
+				</div>
+
+				<% else %>
+
 				<div class="folder-preview">
 			        <div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0] %>')"></div>
 
 			    </div> <!-- end of fold prevew -->
+
+			    <% end %>
 
 			    <% if imgarr[1].nil? || imgarr[1].empty? %>
 					<img class="thumby1" src="/assets/common/nothumb.png" style="opacity:0" />

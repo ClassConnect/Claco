@@ -86,7 +86,7 @@
 
 
 
-        
+        <% if signed_in? && @binder.get_access(current_teacher.id.to_s) == 1 && !@tags.flatten.empty? %>
         <div id="folder-tags" class="conbox whitester">
           <div class="headstrip">
             <div class="inner">
@@ -222,6 +222,7 @@
 
           </div>
         </div>
+        <% end %>
 
 
 

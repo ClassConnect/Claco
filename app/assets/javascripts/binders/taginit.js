@@ -262,7 +262,7 @@ function initAutoTagger(identifier) {
         $('.tooltip').remove();
       
 
-          if (e.keyCode === 13) 
+          if (e.keyCode === 13)
           {
 
             // dont post if there is no content

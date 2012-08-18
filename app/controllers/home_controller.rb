@@ -115,7 +115,7 @@ class HomeController < ApplicationController
 
 		ensure
 			respond_to do |format|
-				format.html {render :text => response || ""}
+				format.json {render :text => response || ""}
 			end
 	end
 

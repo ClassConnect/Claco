@@ -112,12 +112,40 @@ class HomeController < ApplicationController
 		
 		smushset = []
 
+		response = (JSON.parse(RestClient.get('http://redis.claco.com/sm/search?' + request.query_string))['results']['standard']).each { |result| smushset << { :title => result['data']['label'], :label => result['data']['value'] } }
+
+		#response = JSON.parse(response)['results']['standard']#.map { |r| r }
+
+		#response = 
+
+		#response#.each do |r|
+
+		#end
+
+		#Rails.logger.debug "HEY response: #{response.to_s}"
+
+		
+
+		#response = JSON.parse(response)
+
+		#Rails.logger.debug "response AFTER: #{response.to_s}"
+
+		response.each do |result|
+			smushset << { :title => result['data']['label'], :label => result['data']['value'] }
+		end
+
+		#smushset = JSON.parse(response).each { |result| smushset << { :title => result['data']['label'], :label => result['data']['value'] } }
+
+		#Rails.logger.debug "smushset #{smushset.to_s}"
+
+		#return MultiJson.encode(smushset.uniq)
+
 		rescue
 
 		ensure
 			respond_to do |format|
 				#format.json {render :text => response || ""}
-				format.json {render :text => MultiJson.encode(((JSON.parse(RestClient.get('http://redis.claco.com/sm/search?' + request.query_string))['results']['standard']).each { |result| smushset << { :title => result['data']['label'], :label => result['data']['value'] } }).uniq.reverse) || ""}
+				format.json {render :text => MultiJson.encode(smushset.uniq.reverse) || ""}
 			end
 	end
 

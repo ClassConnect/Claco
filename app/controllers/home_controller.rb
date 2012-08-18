@@ -109,13 +109,15 @@ class HomeController < ApplicationController
 	end
 
 	def auto
-		response = RestClient.get('http://redis.claco.com/sm/search?' + request.query_string)
+		
+		smushset = []
 
 		rescue
 
 		ensure
 			respond_to do |format|
-				format.json {render :text => response || ""}
+				#format.json {render :text => response || ""}
+				format.json {render :text => MultiJson.encode(((JSON.parse(RestClient.get('http://redis.claco.com/sm/search?' + request.query_string))['results']['standard']).each { |result| smushset << { :title => result['data']['label'], :label => result['data']['value'] } }).uniq.reverse) || ""}
 			end
 	end
 

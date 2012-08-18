@@ -29,7 +29,7 @@ Claco::Application.routes.draw do
 	#Root to home
 	root	:to																=> 'home#index'
 	get		'/homebase'														=> 'home#index'
-
+	get		'/autocomplete'													=> 'home#auto'
 
 	##################
 	# TEACHER ROUTING#

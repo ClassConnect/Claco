@@ -108,6 +108,17 @@ class HomeController < ApplicationController
 			end
 	end
 
+	def auto
+		response = RestClient.get('http://redis.claco.com/sm/search?' + request.query_string)
+
+		rescue
+
+		ensure
+			respond_to do |format|
+				format.html {render :text => response || ""}
+			end
+	end
+
 	def autocomplete
 
 		#@results = RestClient.post('http://localhost:3000/sm/search', :types => 'venue', :term => 'an' ) #'http://localhost:3000/sm/search?types[]=venue&term=an'

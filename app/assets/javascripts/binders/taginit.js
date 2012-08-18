@@ -229,8 +229,7 @@ function initAutoTagger(identifier) {
   $(identifier).find('.standards-addfield').autocomplete({
       autoFocus: true,
       delay: 0,
-      dataType: 'jsonp',
-      source: 'http://redis.claco.com/sm/search?types[]=standard',//&term=',
+      source: '/autocomplete?types[]=standard',
       select: function( event, ui ) {
         $('.tooltip').remove();
         $(this).val('');

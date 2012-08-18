@@ -127,4 +127,10 @@ class HomeController < ApplicationController
 			end
 	end
 
+	def dj
+		respond_to do |format|
+			format.html {render :text => Delayed::Backend::Mongoid::Job.count}
+		end
+	end
+
 end

@@ -36,4 +36,18 @@ $(function() {
 				
 			}
 		});
-	});
+
+
+		$('.biotext').keypress(function(e) {
+		    var tval = $('.biotext').val(),
+		        tlength = tval.length,
+		        set = 190,
+		        remain = parseInt(set - tlength);
+		    $('.remain').text(remain);
+		    if (remain <= 0 && e.which !== 0 && e.charCode !== 0) {
+		        $('.biotext').val((tval).substring(0, tlength - 1))
+		    }
+		});
+
+
+});

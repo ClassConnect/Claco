@@ -991,8 +991,9 @@ class Binder
 													:imgstatus => stathash)
 
 
+		Binder.gen_video_thumbnails(id)
 		#Binder.delay.generate_folder_thumbnail(id)
-		Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
+		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
 
 	end
@@ -1015,8 +1016,9 @@ class Binder
 
 		GC.start
 
+		Binder.gen_video_thumbnails(id)
 		#Binder.delay.generate_folder_thumbnail(id)
-		Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
+		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
 	end
 
@@ -1091,7 +1093,9 @@ class Binder
 
 		#Binder.delay.generate_folder_thumbnail(id)
 		#Binder.generate_folder_thumbnail(id)
-		Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(Binder.find(id).parent['id'])
+		Binder.gen_video_thumbnails(id)
+
+		Binder.generate_folder_thumbnail(Binder.find(id).parent['id'])
 
 	end
 

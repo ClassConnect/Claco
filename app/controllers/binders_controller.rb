@@ -374,7 +374,7 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
 
-							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
@@ -382,7 +382,7 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
 
-							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
 
@@ -390,7 +390,7 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
 
-							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
@@ -398,7 +398,7 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
 
-							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
@@ -406,7 +406,7 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
 
-							Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
 						else
 							@binder.versions.last.update_attributes( :thumbnailgen => 2 )
@@ -414,7 +414,7 @@ class BindersController < ApplicationController
 							# DELAYTAG
 							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
 
-							Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+							#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
 						end
 
 					end

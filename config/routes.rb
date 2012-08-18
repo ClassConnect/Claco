@@ -134,7 +134,7 @@ Claco::Application.routes.draw do
 	get		'/:username'													=> 'teachers#show', 				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 	
 	#Soulmate
-	mount Soulmate::Server, :at => "/sm"
+	# mount Soulmate::Server, :at => "/sm"
 
 
 

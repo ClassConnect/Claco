@@ -958,6 +958,8 @@ class Binder
 			#GC.start
 		end
 
+		Binder.generate_folder_thumbnail(id)
+
 	end
 
 	# this method is fucking sloppy
@@ -991,10 +993,13 @@ class Binder
 													:imgstatus => stathash)
 
 
-		Binder.gen_video_thumbnails(id)
+		Binder.gen_croc_thumbnails(id)
+
+		#Binder.gen_video_thumbnails(id)
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
+		
 
 	end
 
@@ -1016,7 +1021,7 @@ class Binder
 
 		GC.start
 
-		Binder.gen_video_thumbnails(id)
+		Binder.gen_url_thumbnails(id)
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
@@ -1093,7 +1098,7 @@ class Binder
 
 		#Binder.delay.generate_folder_thumbnail(id)
 		#Binder.generate_folder_thumbnail(id)
-		Binder.gen_video_thumbnails(id)
+		Binder.gen_url_thumbnails(id)
 
 		Binder.generate_folder_thumbnail(Binder.find(id).parent['id'])
 

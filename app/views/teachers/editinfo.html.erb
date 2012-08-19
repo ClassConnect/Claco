@@ -31,19 +31,12 @@
 
 		  	<%= form_for current_teacher, :url => updateinfo_path, :html => {:method => :POST, :multipart => true} do |f| %>
 
-			<% #render 'shared/error_messages', object: f.object %>
-
-			<%= #get_teacher_avatar(current_teacher,{:height => 200, :border => 1}) 
-			%>
-
-			<!--<img src=<%= current_teacher.info.avatar %> />-->
-
 			<div class="secter" style="margin-top:0px">
 				Profile Picture
 			</div>
 
 			<div class="imgbox">
-				<img src="<%= current_teacher.info.avatar.url %>" class="imger" />
+				<img src="<%= current_teacher.info.avatar.thumb_lg.url %>" class="imger" />
 			</div>
 
 

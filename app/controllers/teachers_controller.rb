@@ -69,7 +69,7 @@ class TeachersController < ApplicationController
 
 				#  && (current_teacher.id.to_s==f.ownerid.to_s ? true : (binder.get_access(current_teacher.id.to_s) > 0))
 
-				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
+				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
 
 					#Rails.logger.debug "feed log: #{f.params.to_s}"
 

@@ -4,7 +4,7 @@ class ImageUploader < CarrierWave::Uploader::Base
 
   # Include RMagick or MiniMagick support:
   include CarrierWave::RMagick
-  # include CarrierWave::MiniMagick
+  #include CarrierWave::MiniMagick
 
   # Include the Sprockets helpers for Rails 3.1+ asset pipeline compatibility:
   # include Sprockets::Helpers::RailsHelper
@@ -31,10 +31,10 @@ class ImageUploader < CarrierWave::Uploader::Base
 
  #  #process :smart_thumbnail
 
- #  # version :thumb_sm do
- #  #   #process :resize_to_fill => [45,45]
- #  #   process :resize_and_pad => [45,45,'black']#,'Center']
- #  # end
+  version :compressed do
+    #process :resize_to_fill => [45,45]
+    process :resize_to_fit => [700,700]#,'Center']
+  end
 
  #  # def testproc
 

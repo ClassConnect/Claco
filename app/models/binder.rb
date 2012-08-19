@@ -579,49 +579,51 @@ class Binder
 
 	def self.gen_smart_thumbnails(id)
 
+		#include Magick
+
 		if false
 
-			binder = Binder.find(id.to_s)
+			# binder = Binder.find(id.to_s)
 
-			origimg = Magick::ImageList.new
+			# origimg = Magick::ImageList.new
 
-			# retrieve fullsize image from S3 store, read into an ImageList object
-			open(binder.current_version.imgfile.url.to_s) do |f|
-				origimg.from_blob(f.read)
-			end
+			# # retrieve fullsize image from S3 store, read into an ImageList object
+			# open(binder.current_version.imgfile.url.to_s) do |f|
+			# 	origimg.from_blob(f.read)
+			# end
 
-	        origimg.format = BLOB_FILETYPE
+	  #       origimg.format = BLOB_FILETYPE
 
-			# Wrap filestring as pseudo-IO object, compress if width exceeds 700
-			if !(origimg.columns.to_i < CV_WIDTH)
+			# # Wrap filestring as pseudo-IO object, compress if width exceeds 700
+			# if !(origimg.columns.to_i < CV_WIDTH)
 
-				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
+			# 	binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
 
-				# shrink image to be reasonably processed (this is what the thumb algos will use)
-				#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-			else
+			# 	# shrink image to be reasonably processed (this is what the thumb algos will use)
+			# 	#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			# else
 
-				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
+			# 	binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
 
-			end
+			# end
 
-			GC.start
+			# GC.start
 
-			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+			# binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 
-			GC.start
+			# GC.start
 
-			stathash = binder.current_version.imgstatus
-			stathash['img_contentview']['generated'] = true
-			stathash['img_thumb_lg']['generated'] = true
-			stathash['img_thumb_sm']['generated'] = true
+			# stathash = binder.current_version.imgstatus
+			# stathash['img_contentview']['generated'] = true
+			# stathash['img_thumb_lg']['generated'] = true
+			# stathash['img_thumb_sm']['generated'] = true
 
-			binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-														:imgstatus => stathash)
+			# binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+			# 											:imgstatus => stathash)
 
-			origimg.destroy!
+			# origimg.destroy!
 
-			GC.start
+			# GC.start
 
 		# actual algorithm, is ignored:
 
@@ -633,7 +635,7 @@ class Binder
 			origimg = Magick::ImageList.new
 
 			# retrieve fullsize image from S3 store, read into an ImageList object
-			open(binder.current_version.imgfile.url.to_s) do |f|
+			open(binder.current_version.imgfile.compressed.url.to_s) do |f|
 				origimg.from_blob(f.read)
 			end
 

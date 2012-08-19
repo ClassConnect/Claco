@@ -41,7 +41,7 @@ class HomeController < ApplicationController
 						else
 							c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size #&& Time.now.to_i-f.timestamp.to_i<1.hour 
 
-							if c<3
+							if c<5
 								@feed << f
 							end
 						end

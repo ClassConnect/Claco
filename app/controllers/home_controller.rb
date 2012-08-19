@@ -5,7 +5,7 @@ class HomeController < ApplicationController
 		@title = "Home Page"
 		@teachers = Teacher.all
 
-		@testvar = "it worked!"
+		#@testvar = "it worked!"
 
 		# find binders where:
 		# => not owned by the current teacher

@@ -29,7 +29,7 @@ class TeachersController < ApplicationController
 		else
 			@children = []
 			Binder.where( :owner => @teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } ).each do |b|
-				@children << b if b.get_access(signed_in? ? current_teacher.id.to_s : 0)
+				@children << b if b.get_access(signed_in? ? current_teacher.id.to_s : 0) > 0
 			end
 		end
 

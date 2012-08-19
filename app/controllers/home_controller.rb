@@ -29,7 +29,7 @@ class HomeController < ApplicationController
 				# push onto the feed if the node is not deleted
 				binder = Binder.find(f.modelid.to_s)
 
-				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.get_access(current_teacher.id.to_s) > 0
+				if binder.parents[0]!={ "id" => "-1", "title" => "" } && (current_teacher.id.to_s==f.ownerid.to_s ? binder.is_pub? : (binder.get_access(signed_in? ? current_teacher.id.to_s : 0)))
 
 					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
 						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )

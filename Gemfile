@@ -68,6 +68,8 @@ gem 'yajl-ruby'
 
 # Soulmate
 gem 'rack-contrib'
+
+#gem "oink"
 # gem 'soulmate', :require => 'soulmate/server'
 
 # gem 'ruby-debug19', :require => 'ruby-debug'

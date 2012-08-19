@@ -172,6 +172,7 @@ ul.nav-tabs.onProfile {
   padding: 0;
   list-style: none;
   border-bottom: none;
+  width: 575px;
 }
 
 ul.nav-tabs.onProfile li {

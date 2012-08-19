@@ -8,6 +8,8 @@ Claco::Application.routes.draw do
 
 	as :teacher do
 
+		# get		'/auth/:provider'
+
 		get		'/login'			=> 'devise/sessions#new',			:as => :new_teacher_session
 		post	'/login'			=> 'devise/sessions#create',		:as => :teacher_session
 		delete	'/logout'			=> 'devise/sessions#destroy',		:as => :destroy_teacher_session

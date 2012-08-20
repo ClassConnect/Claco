@@ -620,6 +620,7 @@ class Binder
 			GC.start
 
 			stathash = binder.current_version.imgstatus
+			stathash['smart_thumb'] = false
 			stathash['img_contentview']['generated'] = true
 			stathash['img_thumb_lg']['generated'] = true
 			stathash['img_thumb_sm']['generated'] = true

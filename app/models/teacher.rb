@@ -44,6 +44,8 @@ class Teacher
 	field :username, :type => String, :unique => true
 	field :lower_username, :type => String, :unique => true
 
+	field :omnihash, :type => Hash
+
 	field :allow_short_username, :type => Boolean, :default => false
 
 	embeds_one :info#, autobuild: true #, validate: false
@@ -139,12 +141,12 @@ class Teacher
 		super(conditions)
 	end 
 
-	def self.from_omniauth(auth)
-		where(auth.slice(:provider, :uid)).first_or_create do |teacher|
-			teacher.provider = auth.provider
-			teacher.uid = auth.uid
-			teacher.username = auth.info.nickname
-		end
+	def self.from_omniauth(auth, teacher)
+		# where(auth.slice(:provider, :uid)).first_or_create do |teacher|
+			teacher.omnihash["provider"] = auth.provider
+			teacher.omnihash["uid"] = auth.uid
+			teacher.omnihash["username"] = auth.info.nickname
+		# end
 	end
 
 	def self.new_with_session(params, session)

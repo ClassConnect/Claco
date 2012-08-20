@@ -111,6 +111,8 @@
 				<%= image_tag('settings/facebook.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
 				<%= i.text_field :facebookurl, :placeholder => "Facebook username" %>
 				<% end %>
+				<%= link_to "Link your Twitter Account", teacher_omniauth_authorize_path(:twitter) %>
+				<%= link_to "Link your Facebook Account", teacher_omniauth_authorize_path(:facebook) %>
 			</div>
 
 

@@ -146,6 +146,7 @@ class Teacher
 		teacher.omnihash[auth.provider] = {} if teacher.omnihash[auth.provider].nil?
 		teacher.omnihash[auth.provider]["uid"] = auth.uid
 		teacher.omnihash[auth.provider]["username"] = auth.info.nickname
+		teacher
 		# end
 	end
 

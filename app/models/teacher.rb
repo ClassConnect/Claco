@@ -44,7 +44,7 @@ class Teacher
 	field :username, :type => String, :unique => true
 	field :lower_username, :type => String, :unique => true
 
-	field :omnihash, :type => Hash
+	field :omnihash, :type => Hash, :default => {}
 
 	field :allow_short_username, :type => Boolean, :default => false
 

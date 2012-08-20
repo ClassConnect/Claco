@@ -143,22 +143,21 @@ class Teacher
 
 	def self.from_omniauth(auth, teacher)
 		# where(auth.slice(:provider, :uid)).first_or_create do |teacher|
-			teacher.omnihash["provider"] = auth.provider
-			teacher.omnihash["uid"] = auth.uid
-			teacher.omnihash["username"] = auth.info.nickname
+		teacher.omnihash[auth.provider]["uid"] = auth.uid
+		teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 		# end
 	end
 
-	def self.new_with_session(params, session)
-		if session["devise.user_attributes"]
-			new(session["devise.user_attributes"], without_protection: true) do |user|
-				user.attributes = params
-				user.valid?
-			end
-		else
-			super
-		end
-	end
+	# def self.new_with_session(params, session)
+	# 	if session["devise.user_attributes"]
+	# 		new(session["devise.user_attributes"], without_protection: true) do |user|
+	# 			user.attributes = params
+	# 			user.valid?
+	# 		end
+	# 	else
+	# 		super
+	# 	end
+	# end
 
 	private
 	@@username_blacklist = nil

@@ -1,7 +1,7 @@
 class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
 	def all
-		teacher = Teacher.from_omniauth(request.env["omniauth.auth"])
+		teacher = Teacher.from_omniauth(request.env["omniauth.auth"], current_teacher)
 		if teacher.save
 			redirect_to editinfo_path
 		else

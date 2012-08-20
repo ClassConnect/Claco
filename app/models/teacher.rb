@@ -143,6 +143,7 @@ class Teacher
 
 	def self.from_omniauth(auth, teacher)
 		# where(auth.slice(:provider, :uid)).first_or_create do |teacher|
+		teacher.omnihash[auth.provider] = {} if teacher.omnihash[auth.provider].nil?
 		teacher.omnihash[auth.provider]["uid"] = auth.uid
 		teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 		# end

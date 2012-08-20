@@ -122,7 +122,7 @@ class TeachersController < ApplicationController
 				#@feed.uniq!
 
 				# exit the loop if the maximum amount has been found
-				break if @feed.size == 40
+				break if @feed.size == PERSONAL_FEED_LENGTH
 
 				#@feed[f.method.to_s] << f
 			end

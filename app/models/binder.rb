@@ -581,53 +581,64 @@ class Binder
 
 		#include Magick
 
-		if false
+		if true
 
-			# binder = Binder.find(id.to_s)
+			binder = Binder.find(id.to_s)
 
-			# origimg = Magick::ImageList.new
+			#Rails.logger.debug "about to initialize origimg: #{`ps -o rss= -p #{$$}`}"
 
-			# # retrieve fullsize image from S3 store, read into an ImageList object
-			# open(binder.current_version.imgfile.url.to_s) do |f|
-			# 	origimg.from_blob(f.read)
-			# end
+			origimg = Magick::ImageList.new
 
-	  #       origimg.format = BLOB_FILETYPE
+			#Rails.logger.debug "after initializing origimg: #{`ps -o rss= -p #{$$}`}"
 
-			# # Wrap filestring as pseudo-IO object, compress if width exceeds 700
-			# if !(origimg.columns.to_i < CV_WIDTH)
+			# retrieve fullsize image from S3 store, read into an ImageList object
+			open(binder.current_version.imgfile.url.to_s) do |f|
+				origimg.from_blob(f.read)
+			end
 
-			# 	binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
+			#Rails.logger.debug "after reading image from blob: #{`ps -o rss= -p #{$$}`}"
 
-			# 	# shrink image to be reasonably processed (this is what the thumb algos will use)
-			# 	#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-			# else
+	        origimg.format = BLOB_FILETYPE
 
-			# 	binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
+			# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+			if !(origimg.columns.to_i < CV_WIDTH)
 
-			# end
+				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
 
-			# GC.start
+				# shrink image to be reasonably processed (this is what the thumb algos will use)
+				#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			else
 
-			# binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
 
-			# GC.start
+			end
 
-			# stathash = binder.current_version.imgstatus
-			# stathash['img_contentview']['generated'] = true
-			# stathash['img_thumb_lg']['generated'] = true
-			# stathash['img_thumb_sm']['generated'] = true
+			GC.start
 
-			# binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-			# 											:imgstatus => stathash)
+			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 
-			# origimg.destroy!
+			GC.start
 
-			# GC.start
+			stathash = binder.current_version.imgstatus
+			stathash['img_contentview']['generated'] = true
+			stathash['img_thumb_lg']['generated'] = true
+			stathash['img_thumb_sm']['generated'] = true
 
-		# actual algorithm, is ignored:
+			binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+														:imgstatus => stathash)
 
-		#if false
+			#Rails.logger.debug "before destroying origimg: #{`ps -o rss= -p #{$$}`}"
+
+			origimg.destroy!
+
+			#Rails.logger.debug "after destroy img: #{`ps -o rss= -p #{$$}`}"
+
+			GC.start
+
+			#Rails.logger.debug "after garbage collect: #{`ps -o rss= -p #{$$}`}"
+
+		# actual algorithm
+
 		else
 
 			binder = Binder.find(id.to_s)

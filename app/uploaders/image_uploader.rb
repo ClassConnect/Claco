@@ -31,10 +31,10 @@ class ImageUploader < CarrierWave::Uploader::Base
 
  #  #process :smart_thumbnail
 
-  version :compressed do
+  #version :compressed do
     #process :resize_to_fill => [45,45]
-    process :resize_to_fit => [700,700]#,'Center']
-  end
+  #  process :resize_to_fit => [700,700]#,'Center']
+  #end
 
  #  # def testproc
 

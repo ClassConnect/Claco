@@ -4,7 +4,7 @@ Claco::Application.routes.draw do
 	# DEVISE ROUTING #
 	##################
 
-	devise_for :teachers, :skip => [:sessions, :registrations, :passwords]
+	devise_for :teachers, :path => "", :skip => [:sessions, :registrations, :passwords], controllers: {omniauth_callbacks: "omniauth_callbacks"}
 
 	as :teacher do
 
@@ -129,9 +129,6 @@ Claco::Application.routes.draw do
 	
 	#Update :body
 	put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update',				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
-
-	#get		'/assets'														=> 'binders#catcherr'
-	get		'/seedbinder'													=> 'binders#seedbinder'
 
 	#Profile Page
 	get		'/:username'													=> 'teachers#show', 				:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}

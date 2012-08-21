@@ -212,16 +212,25 @@ class Feed
 		feedlength = (feedid==0 ? MAIN_FEED_STORAGE : feedid==1 ? SUBSC_FEED_STORAGE : PERSONAL_FEED_STORAGE)
 
 		# ignore old values if a surplus of new events have occured
-		if newvals.size >= feedlength
-			case feedid
-				when 0
-					self.update_attributes( :main_feed => newvals.first(feedlength) ) and return
-				when 1
-					self.update_attributes( :subsc_feed => newvals.first(feedlength) ) and return
-				when 2
-					self.update_attributes( :personal_feed => newvals.first(feedlength) ) and return
-			end	
-		end
+		# if newvals.size >= feedlength
+
+		# 	newvals.each do |f|
+
+		# 	end
+
+		# 	newvals.first(feedlength)
+
+		# 	case feedid
+		# 		when 0
+		# 			self.update_attributes( :main_feed => newvals.first(feedlength) ) and return
+		# 		when 1
+		# 			self.update_attributes( :subsc_feed => newvals.first(feedlength) ) and return
+		# 		when 2
+		# 			self.update_attributes( :personal_feed => newvals.first(feedlength) ) and return
+		# 	end	
+
+		# 	return 
+		# end
 
 		# retrieve old values
 		case feedid

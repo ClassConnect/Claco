@@ -25,7 +25,15 @@ class Log
 				:controller => self.controller,
 				:modelid => self.modelid,
 				:params => self.params,
-				:data => self.data }
+				:data => self.data,
+				'id' => self.id.to_s,
+				'ownerid' => self.ownerid, 
+				'timestamp' => self.timestamp, 
+				'method' => self.method, 
+				'controller' => self.controller,
+				'modelid' => self.modelid,
+				'params' => self.params,
+				'data' => self.data }
 
 	end
 

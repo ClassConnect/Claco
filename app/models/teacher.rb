@@ -178,17 +178,21 @@ class Feed
 	# passed an array of new log values, and the identifier for which feed to push it on
 	def multipush(newvals,feedid = 0)
 
-		# feed does not change if nothing has happened
-		if newvals.empty?
-			case feedid
-				when 0
-					return self.main_feed#.reverse
-				when 1
-					return self.subsc_feed#.reverse
-				when 2
-					return self.personal_feed#.reverse
-			end
-		end
+		# Rails.logger.debug "Any newvals??? #{newvals.to_s}"
+
+		# # feed does not change if nothing has happened
+		# if newvals.empty?
+		# 	case feedid
+		# 		when 0
+		# 			return self.main_feed.map{ |f| [f,Binder.find(f['modelid'].to_s)] }#.reverse
+		# 		when 1
+		# 			return self.subsc_feed.map{ |f| [f,Binder.find(f['modelid'].to_s)] }#.reverse
+		# 		when 2
+		# 			return self.personal_feed.map{ |f| [f,Binder.find(f['modelid'].to_s)] }#.reverse
+		# 	end
+		# end
+
+		# Rails.logger.debug "No newvals!!!"
 
 		# bail if a nonexistant feed field is specified
 		raise "Invalid feed identifier!" and return if !([0,1,2].include? feedid)
@@ -225,11 +229,14 @@ class Feed
 		feedlength.times do #|f|
 			#f = (newvals.any? ? newvals.pop : oldvals.pop)
 
-			if oldvals.any?
-				f = [oldvals.pop,Binder.find(f[:modelid].to_s)]
+			if oldvals.any? && feedarr.size+newvals.size < feedlength
+				f = oldvals.pop
+				f = [f,Binder.find(f['modelid'].to_s)]
 			else
 				f = newvals.pop
 			end
+
+			Rails.logger.debug "MULTIPUSH: f: #{f.to_s}"
 
 			if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
 				feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)

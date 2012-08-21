@@ -1,5 +1,6 @@
 <% content_for :headcon do %>
 	<%= javascript_include_tag "editinfo/main" %>
+	<%= javascript_include_tag "binders/pretags" %>
 	<%= stylesheet_link_tag    "editinfo", :media => "all" %>
 <% end %>
 
@@ -105,6 +106,25 @@
 
 
 
+
+			<div class="secter">
+				Grades & Subjects
+			</div>
+
+
+			<div>
+				<input type="text" name="grades" id="grades" placeholder="Enter the grade(s) you teach" /><br />
+				<input type="text" name="subjects" id="subjects" placeholder="Enter the subject(s) you teach" />
+			</div>
+
+
+
+
+
+
+
+
+
 			<div class="secter">
 				Location
 			</div>
@@ -168,7 +188,7 @@
 
 		  <div class="tab-pane" id="password">
 
-		  	<div class="secter">
+		  	<div class="secter" style="margin-top:0px">
 				Choose a new password for your account
 			</div>
 

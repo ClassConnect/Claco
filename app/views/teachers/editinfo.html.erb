@@ -72,16 +72,16 @@
 			<div>
 
 				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
-				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %>
+				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %><br />
 
 				<% if !current_teacher.omnihash["twitter"].nil? %>
 					<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
-					<%= text_field_tag "", :value => current_teacher.omnihash["twitter"]["username"] %>
+					<%= text_field_tag("", :value => current_teacher.omnihash["twitter"]["username"], :disabled => true)%><br />
 				<% end %>
 
 				<% if !current_teacher.omnihash["facebook"].nil? %>
 					<%= image_tag('settings/facebook.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
-					<%= text_field_tag "", :value => current_teacher.omnihash["facebook"]["username"] %>					
+					<%= text_field_tag("", :value => current_teacher.omnihash["facebook"]["username"], :disabled => true)%><br />
 				<% end %>
 
 				<% if current_teacher.omnihash["facebook"].nil? || current_teacher.omnihash["twitter"].nil? %>

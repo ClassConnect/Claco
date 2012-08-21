@@ -56,7 +56,7 @@ class HomeController < ApplicationController
 							else
 								c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size
 
-								if c<5
+								if c<6
 									@feed << [f,binder] if @feed.size  < MAIN_FEED_STORAGE
 								end
 							end
@@ -72,12 +72,25 @@ class HomeController < ApplicationController
 
 			@subsc_feed = current_teacher.feed.multipush(@subsc_feed,1)
 
+			teacherhash = {}
+
+			((@feed.map{ |f| f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s })|(@subsc_feed.map{ |g| g[0][:ownerid].nil? ? g[0]['ownerid'].to_s : g[0][:ownerid].to_s })).each do |h|
+				teacherhash[h.to_s] = Teacher.find( h.to_s )
+			end
+
 			# the array should already be sorted
 			# .sort_by { |e| -e.timestamp }								haha, BLT
 			@feed = @feed.any? ? @feed.reverse.map{ |f| { 	:binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
 															:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
-															:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+															#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+															:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(MAIN_FEED_LENGTH) : []
 
+			@subsc_feed = @subsc_feed.any? ? @subsc_feed.reverse.map{ |f| { :binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+																			:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+																			#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+																			:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(SUBSC_FEED_LENGTH) : []
+
+			
 		end
 
 		#Binder.where( "parent.id" => { '$gt' }  )

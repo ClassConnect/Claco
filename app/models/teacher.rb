@@ -242,6 +242,8 @@ class Feed
 				oldvals = self.personal_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
 		end
 
+		newvals = newvals.sort_by { |f| f[1]['timestamp'] }.reverse
+
 		# assume that newvals are sorted in descending order by time
 		feedarr = []
 		

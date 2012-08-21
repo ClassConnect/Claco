@@ -94,7 +94,7 @@
         <li>
           <a href="<%= @teacher.omnihash["facebook"]["profile"] %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/facebook.png", :style => "margin-top:-4px") %></span>
-            <%= @teacher.omnihash["facebook"] %>
+            <%= @teacher.omnihash["facebook"]["username"] %>
           </a>
         </li>
         <% end %>

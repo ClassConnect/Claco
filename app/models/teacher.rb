@@ -44,6 +44,8 @@ class Teacher
 	field :username, :type => String, :unique => true
 	field :lower_username, :type => String, :unique => true
 
+	field :omnihash, :type => Hash, :default => {}
+
 	field :allow_short_username, :type => Boolean, :default => false
 
 	embeds_one :info#, autobuild: true #, validate: false
@@ -140,6 +142,32 @@ class Teacher
 		conditions[:login].downcase!
 		super(conditions)
 	end 
+
+	def self.from_omniauth(auth, teacher)
+		# where(auth.slice(:provider, :uid)).first_or_create do |teacher|
+		teacher.omnihash[auth.provider] = {} if teacher.omnihash[auth.provider].nil?
+		teacher.omnihash[auth.provider]["uid"] = auth.uid
+		if auth.provider == "twitter"
+			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
+			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
+		elsif auth.provider == "facebook"
+			teacher.omnihash[auth.provider]["username"] = auth.info.nickname if !auth.info.nickname.empty?
+			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Facebook
+		end
+		teacher
+		# end
+	end
+
+	# def self.new_with_session(params, session)
+	# 	if session["devise.user_attributes"]
+	# 		new(session["devise.user_attributes"], without_protection: true) do |user|
+	# 			user.attributes = params
+	# 			user.valid?
+	# 		end
+	# 	else
+	# 		super
+	# 	end
+	# end
 
 	private
 	@@username_blacklist = nil
@@ -408,6 +436,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
+	field :location,			:type => Array
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 	#field :profile_picture, 	:type => String, :default => ""
@@ -422,32 +451,4 @@ class Info
 		"#{city}, #{state}, #{country}"
 	end
 
-	# def update_info_fields(params)
-
-	# 	#self.debug_data = []
-	# 	#.save
-
-	# 	#avatar = MiniMagick::Image.open(params[:info][:avatar].path)
-
-	# 	if params[:info][:avatar].nil?
-
-	# 		Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
-
-	# 		self.update_attributes( :bio => params[:info][:bio],
-	# 								:website => params[:info][:website] )
-	# 	else
-
-	# 	Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
-
-	# 		self.update_attributes(	:bio 				=> params[:info][:bio],
-	# 								:avatar 			=> params[:info][:avatar],
-	# 								:size 				=> params[:info][:avatar].size,
-	# 								:ext 				=> File.extname(params[:info][:avatar].original_filename),
-	# 								:data 				=> params[:info][:avatar].path,
-	# 								#:avatar_width		=> avatar[:width],
-	# 								#:avatar_height		=> avatar[:height],
-	# 								:website 			=> params[:info][:website])
-	# 	end
-
-	# end
 end

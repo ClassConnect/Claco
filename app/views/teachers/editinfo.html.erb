@@ -64,6 +64,34 @@
 
 
 
+
+			<div class="secter">
+				Website / Social Networks
+			</div>
+
+			<div>
+
+				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
+				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %>
+
+				<div class="sociallink">
+
+					<button class="zocial twitter" name="buttonredirect" value="twitter" style="font-size:11px">Link your Twitter</button>
+
+					<button class="zocial facebook" name="buttonredirect" value="facebook" style="font-size:11px">Link your Facebook</button>
+
+					<div class="desctext">
+						Add your social networks to your profile! We'll also subscribe you to your friends that are already on Claco.
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+
+
 			<div class="secter">
 				Location
 			</div>
@@ -79,6 +107,12 @@
 				<%= i.text_field "fulllocation", :id => "fulllocation", :value => current_teacher.info.fulllocation, :readonly => true %>
 
 			</div>
+
+
+				<input type="hidden" id="lat" name="lat" />
+				<input type="hidden" id="lng" name="lng" />
+
+
 
 			</div>
 
@@ -97,26 +131,9 @@
 
 
 
-			<div class="secter">
-				Website / Social Networks
-			</div>
-
-			<div>
-				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
-				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %><br />
-
-				<%= image_tag('settings/twitter.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
-				<%= i.text_field :twitterhandle, :placeholder => "Twitter username" %><br />
-
-				<%= image_tag('settings/facebook.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
-				<%= i.text_field :facebookurl, :placeholder => "Facebook username" %>
-				<% end %>
-			</div>
 
 
-
-
-
+			<% end %>
 
 			<div style="margin-top:20px">
 				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Update Personal Info</button>

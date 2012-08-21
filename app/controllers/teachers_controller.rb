@@ -162,12 +162,11 @@ class TeachersController < ApplicationController
 
 		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],
 												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,
-												:facebookurl	=> params[:info][:facebookurl],
-												:twitterhandle	=> params[:info][:twitterhandle].gsub(/@/, ''),
 												:bio			=> params[:info][:bio][0..189],
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
-												:country		=> params[:info][:fulllocation].split(', ').third || "")
+												:country		=> params[:info][:fulllocation].split(', ').third || "",
+												:location		=> [params[:lon], params[:lat]])
 		# if !params[:info][:avatar].empty?
 		# 	params[:info][:avatar] = params[:info][:avatar].original_filename
 		# end
@@ -178,6 +177,8 @@ class TeachersController < ApplicationController
 					current_teacher.id.to_s,
 					params.to_s)
 					# altparams.nil? ? params : altparams)
+		
+		redirect_to teacher_omniauth_authorize_path(params[:buttonredirect]) and return if !params[:buttonredirect].nil?
 
 		if current_teacher.info.errors.empty? && current_teacher.errors.empty?
 			redirect_to "/#{current_teacher.username}"

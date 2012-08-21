@@ -70,6 +70,24 @@
 	width:400px;
 }
 
+.sociallink {
+  width:300px;
+  margin-top:5px;
+  margin-bottom:20px;
+  padding:10px;
+  background:#F6F6F6;
+  border: 1px solid #eee;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+}
+
+.sociallink .desctext {
+  margin-top:8px;
+  font-size:11px;
+  color:#777;
+  line-height:13px;
+}
 
 
 

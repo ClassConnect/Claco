@@ -64,6 +64,34 @@
 
 
 
+
+			<div class="secter">
+				Website / Social Networks
+			</div>
+
+			<div>
+
+				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
+				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %>
+
+				<div class="sociallink">
+
+					<button class="zocial twitter" name="buttonredirect" value="twitter" style="font-size:11px">Link your Twitter</button>
+
+					<button class="zocial facebook" name="buttonredirect" value="facebook" style="font-size:11px">Link your Facebook</button>
+
+					<div class="desctext">
+						Add your social networks to your profile! We'll also subscribe you to your friends that are already on Claco.
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+
+
 			<div class="secter">
 				Location
 			</div>
@@ -103,22 +131,9 @@
 
 
 
-			<div class="secter">
-				Website / Social Networks
-			</div>
-
-			<div>
-				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
-				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %>
-				<% end %>
-				<p><%= link_to "Link your Twitter Account", teacher_omniauth_authorize_path(:twitter), :class => "zocial twitter", :target => "_blank" %></p>
-				<p><%= link_to "Link your Facebook Account", teacher_omniauth_authorize_path(:facebook), :class => "popup zocial facebook", :"data-width" => 600, :"data-height" => 400, :display => "popup" %></p>
-			</div>
 
 
-
-
-
+			<% end %>
 
 			<div style="margin-top:20px">
 				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Update Personal Info</button>

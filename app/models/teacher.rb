@@ -252,7 +252,7 @@ class Feed
 			if oldvals.any? && feedarr.size+newvals.size < feedlength
 				f = oldvals.pop
 				f = [f,Binder.find(f['modelid'].to_s)]
-			else
+			elsif newvals.any?
 				f = newvals.pop
 			end
 

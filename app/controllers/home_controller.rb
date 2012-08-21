@@ -54,11 +54,11 @@ class HomeController < ApplicationController
 								@subsc_feed << [f,binder] if @subsc_feed.size < SUBSC_FEED_STORAGE
 							
 							else
-								c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size
+								#c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size
 
-								if c<6
+								#if c<6
 									@feed << [f,binder] if @feed.size  < MAIN_FEED_STORAGE
-								end
+								#end
 							end
 						end
 					end

@@ -15,4 +15,26 @@ class Log
 	# :src - this log is part of a logset, src is the ID of the 'parent' log
 	field :data, :type => Hash, :default => {}
 
+	# returns hash of object's fields
+	def peel
+
+		return {:id => self.id.to_s,
+				:ownerid => self.ownerid, 
+				:timestamp => self.timestamp, 
+				:method => self.method, 
+				:controller => self.controller,
+				:modelid => self.modelid,
+				:params => self.params,
+				:data => self.data,
+				'id' => self.id.to_s,
+				'ownerid' => self.ownerid, 
+				'timestamp' => self.timestamp, 
+				'method' => self.method, 
+				'controller' => self.controller,
+				'modelid' => self.modelid,
+				'params' => self.params,
+				'data' => self.data }
+
+	end
+
 end

@@ -12,73 +12,85 @@ class HomeController < ApplicationController
 		# => not deleted
 		#
 		#@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
-		@feed = []
+
 		#blacklist = []
 
 		if signed_in?
 
-		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
-		logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+			current_teacher.feed = Feed.new if current_teacher.feed.nil?
 
-		subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+			@feed = []
+			@subsc_feed = []
 
-		if logs.any?
-			logs.each do |f|
+			#@feed = current_teacher.feed.main_feed
+			#@subsc_feed = current_teacher.feed.subsc_feed
 
-				# push onto the feed if the node is not deleted
-				binder = Binder.find(f.modelid.to_s)
+			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
+			#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+			logs = Log.where( :model => "binders", "data.src" => nil, :timestamp.gt => [current_teacher.feed.headtime(0).to_i,current_teacher.feed.headtime(1).to_i].min ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
-				if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?#(current_teacher.id.to_s==f.ownerid.to_s ? binder.is_pub? : (binder.get_access(signed_in? ? current_teacher.id.to_s : 0)))
+			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
-					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
-						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-				
-						#@feed.each do |f|
+			if logs.any?
+				logs.each do |f|
 
-						if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
-							@feed << f
-						else
-							c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size #&& Time.now.to_i-f.timestamp.to_i<1.hour 
+					# push onto the feed if the node is not deleted
+					binder = Binder.find(f.modelid.to_s)
 
-							if c<5
-								@feed << f
+					if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?#(current_teacher.id.to_s==f.ownerid.to_s ? binder.is_pub? : (binder.get_access(signed_in? ? current_teacher.id.to_s : 0)))
+
+						# eliminate redundant entries in feed
+						if !( @feed.map { |g| [g[0].ownerid,g[0].method,g[0].controller,g[0].modelid,g[0].params,g[0].data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
+							( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+
+							# current_teacher is subscribed to the entry's owner, unlimited entries
+							if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
+
+								# migrate individual DB calls here
+								#f = 
+
+								@feed << [f,binder] if @feed.size < MAIN_FEED_STORAGE
+
+								@subsc_feed << [f,binder] if @subsc_feed.size < SUBSC_FEED_STORAGE
+							
+							else
+								c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size
+
+								if c<6
+									@feed << [f,binder] if @feed.size  < MAIN_FEED_STORAGE
+								end
 							end
 						end
-
-						#c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size #&& Time.now.to_i-f.timestamp.to_i<1.hour 
-
-						#Rails.logger.debug "FEEDARR #{@feed}"#.map { |h| f if h.ownerid.to_s==f.ownerid.to_s }}"  
-
-						#if c<8
-
-							#if c==3
-							#	if (@feed[-1].ownerid.to_s == f.ownerid.to_s) && (@feed[-2].ownerid.to_s == f.ownerid.to_s) && (@feed[-3].ownerid.to_s == f.ownerid.to_s)
-							#		f[:full] = true
-							#	end
-							#end
-
-							#@feed << f
-						#elsif c==3
-							#blacklist << f.ownerid.to_s
-							#f[:full] = true
-							#@@feed << f
-							#Rails.logger.debug "FULLSYM #{f.inspect.to_s}"
-						#else
-
-						#end
 					end
+
+					break if (@feed.size == MAIN_FEED_STORAGE) && (@subfeed.size == SUBSC_FEED_STORAGE)
+
 				end
-
-				break if @feed.size == 40
-
 			end
-		end
 
-		# the array should already be sorted
-		# .sort_by { |e| -e.timestamp }
-		@feed = @feed.any? ? @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
+			@feed = current_teacher.feed.multipush(@feed,0)
 
+			@subsc_feed = current_teacher.feed.multipush(@subsc_feed,1)
+
+			teacherhash = {}
+
+			((@feed.map{ |f| f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s })|(@subsc_feed.map{ |g| g[0][:ownerid].nil? ? g[0]['ownerid'].to_s : g[0][:ownerid].to_s })).each do |h|
+				teacherhash[h.to_s] = Teacher.find( h.to_s )
+			end
+
+			# the array should already be sorted
+			# .sort_by { |e| -e.timestamp }								haha, BLT
+			@feed = @feed.any? ? @feed.reverse.map{ |f| { 	:binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+															:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+															#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+															:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(MAIN_FEED_LENGTH) : []
+
+			@subsc_feed = @subsc_feed.any? ? @subsc_feed.reverse.map{ |f| { :binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+																			:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+																			#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+																			:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(SUBSC_FEED_LENGTH) : []
+
+			
 		end
 
 		#Binder.where( "parent.id" => { '$gt' }  )

@@ -52,6 +52,8 @@ class Teacher
 
 	embeds_one :tag#, autobuild: true #, validate: false
 
+	has_one :feed
+
 	embeds_many :relationships#, validate: false
 
 	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title
@@ -183,6 +185,125 @@ class Teacher
 	  errors.add(:username, "is restricted") if @@username_blacklist.include?(username)
 	end
 
+end
+
+class Feed
+	include Mongoid::Document
+
+
+	# elements that appear in this teacher's main feed
+	field :main_feed, :type => Array, :default => []
+
+	# elements that appear in this teacher's subscribed feed
+	field :subsc_feed, :type => Array, :default => []
+
+	# elements that appear in this teacher's profile feed
+	field :personal_feed, :type => Array, :default => []
+
+
+	belongs_to :teacher
+
+	# passed an array of new log values, and the identifier for which feed to push it on
+	def multipush(newvals,feedid = 0)
+
+		# bail if a nonexistant feed field is specified
+		raise "Invalid feed identifier!" and return if !([0,1,2].include? feedid)
+
+		feedlength = (feedid==0 ? MAIN_FEED_STORAGE : feedid==1 ? SUBSC_FEED_STORAGE : PERSONAL_FEED_STORAGE)
+
+		# ignore old values if a surplus of new events have occured
+		if newvals.size >= feedlength
+			case feedid
+				when 0
+					self.update_attributes( :main_feed => newvals.first(feedlength) ) and return
+				when 1
+					self.update_attributes( :subsc_feed => newvals.first(feedlength) ) and return
+				when 2
+					self.update_attributes( :personal_feed => newvals.first(feedlength) ) and return
+			end	
+		end
+
+		# retrieve old values
+		case feedid
+			when 0
+				oldvals = self.main_feed.clone.reverse
+			when 1
+				oldvals = self.subsc_feed.clone.reverse
+			when 2
+				oldvals = self.personal_feed.clone.reverse
+		end
+
+		# assume that newvals are sorted in descending order by time
+		feedarr = []
+		
+		# may need to reverse arrays here...
+
+		feedlength.times do 
+
+			if oldvals.any? && feedarr.size+newvals.size < feedlength
+				f = oldvals.pop
+				f = [f,Binder.find(f['modelid'].to_s)]
+			else
+				f = newvals.pop
+			end
+
+			if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
+				feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
+			end
+
+			break if (newvals.empty?) && (oldvals.empty?)
+
+		end
+
+		#feedarr.reverse!
+
+		case feedid
+			when 0
+				self.update_attributes( :main_feed => feedarr.map{ |f| f[0] })
+			when 1
+				self.update_attributes( :subsc_feed => feedarr.map{ |f| f[0] })
+			when 2
+				self.update_attributes( :personal_feed => feedarr.map{ |f| f[0] })
+		end			
+
+		# return array to be used in the view
+		return feedarr#.reverse
+
+	end
+
+	# returns the timestamp of the head of the queue (most recent time)
+	def headtime(feedid = 0)
+
+		case feedid
+			when 0
+				size = self.main_feed.size
+			when 1
+				size = self.subsc_feed.size
+			when 2
+				size = self.personal_feed.size
+			else
+				raise "Invalid feed identifier!" and return
+		end
+
+		if size < 1
+			return -1
+		else
+			case feedid
+				when 0
+					#return self.main_feed[0].timestamp.to_i
+					#return self.main_feed[0]['timestamp']
+					return self.main_feed.last['timestamp']
+				when 1
+					#return self.subsc_feed[0].timestamp.to_i
+					#return self.subsc_feed[0]['timestamp']
+					return self.subsc_feed.last['timestamp']
+				when 2
+					#return self.personal_feed[0].timestamp.to_i
+					#return self.personal_feed[0]['timestamp']
+					return self.personal_feed.last['timestamp']
+			end
+		end
+	end
 end
 
 class Tag

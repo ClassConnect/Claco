@@ -15,7 +15,9 @@ $(function() {
 						response( $.map( data.geonames, function( item ) {
 							return {
 								label: item.name + (item.adminName1 ? ", " + item.adminName1 : "") + ", " + item.countryName,
-								value: item.name
+								value: item.name,
+								lat: item.lat,
+								lng: item.lng
 							}
 						}));
 					}
@@ -28,6 +30,8 @@ $(function() {
 				$(".fulldiv").show();
 				ui.item ? $("#fulllocation").val(ui.item.label) :
 				$("#fulllocation").val(this.value);
+				$("#lng").val(ui.item.lng);
+				$("#lat").val(ui.item.lat);
 			},
 			open: function() {
 				

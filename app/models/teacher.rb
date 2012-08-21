@@ -256,8 +256,10 @@ class Feed
 				f = newvals.pop
 			end
 
-			if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
-				feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
+			if !f.nil?
+				if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
+					feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
+				end
 			end
 
 			break if (newvals.empty?) && (oldvals.empty?)

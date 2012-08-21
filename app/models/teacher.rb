@@ -179,7 +179,16 @@ class Feed
 	def multipush(newvals,feedid = 0)
 
 		# feed does not change if nothing has happened
-		return if newvals.empty?
+		if newvals.empty?
+			case feedid
+				when 0
+					return self.main_feed#.reverse
+				when 1
+					return self.subsc_feed#.reverse
+				when 2
+					return self.personal_feed#.reverse
+			end
+		end
 
 		# bail if a nonexistant feed field is specified
 		raise "Invalid feed identifier!" and return if !([0,1,2].include? feedid)
@@ -201,11 +210,11 @@ class Feed
 		# retrieve old values
 		case feedid
 			when 0
-				oldvals = self.main_feed.clone
+				oldvals = self.main_feed.clone.reverse
 			when 1
-				oldvals = self.subsc_feed.clone
+				oldvals = self.subsc_feed.clone.reverse
 			when 2
-				oldvals = self.personal_feed.clone
+				oldvals = self.personal_feed.clone.reverse
 		end
 
 		# assume that newvals are sorted in descending order by time
@@ -214,10 +223,14 @@ class Feed
 		# may need to reverse arrays here...
 
 		feedlength.times do #|f|
-			f = (newvals.any? ? newvals.pop : oldvals.pop)
+			#f = (newvals.any? ? newvals.pop : oldvals.pop)
+			f = (oldvals.any? ? oldvals.pop : newvals.pop)
 			feedarr << ((f.class.to_s=="Log") ? f.peel : f) #(newvals.any? ? newvals.pop : oldvals.pop)#.peel
+			#feedarr.push((f.class.to_s=="Log") ? f.peel : f)
 			break if (newvals.empty?) && (oldvals.empty?)
 		end
+
+		#feedarr.reverse!
 
 		case feedid
 			when 0
@@ -229,7 +242,7 @@ class Feed
 		end			
 
 		# return array to be used in the view
-		return feedarr
+		return feedarr#.reverse
 
 	end
 
@@ -253,13 +266,16 @@ class Feed
 			case feedid
 				when 0
 					#return self.main_feed[0].timestamp.to_i
-					return self.main_feed[0]['timestamp']
+					#return self.main_feed[0]['timestamp']
+					return self.main_feed.last['timestamp']
 				when 1
 					#return self.subsc_feed[0].timestamp.to_i
-					return self.subsc_feed[0]['timestamp']
+					#return self.subsc_feed[0]['timestamp']
+					return self.subsc_feed.last['timestamp']
 				when 2
 					#return self.personal_feed[0].timestamp.to_i
-					return self.personal_feed[0]['timestamp']
+					#return self.personal_feed[0]['timestamp']
+					return self.personal_feed.last['timestamp']
 			end
 		end
 	end

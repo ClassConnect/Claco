@@ -27,7 +27,7 @@ class HomeController < ApplicationController
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 			#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
-			logs = Log.where( :model => "binders", "data.src" => nil, :timestamp.gte => [current_teacher.feed.headtime(0).to_i,current_teacher.feed.headtime(1).to_i].min ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+			logs = Log.where( :model => "binders", "data.src" => nil, :timestamp.gt => [current_teacher.feed.headtime(0).to_i,current_teacher.feed.headtime(1).to_i].min ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 
 			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
@@ -72,9 +72,9 @@ class HomeController < ApplicationController
 
 			# the array should already be sorted
 			# .sort_by { |e| -e.timestamp }						haha, BLT
-			@feed = @feed.any? ? @feed.map{ |f| { 	:binder => 	Binder.find( f[:modelid].to_s ),
-													:log => 	Log.find(f[:id].to_s),
-													:owner => 	Teacher.find( f[:ownerid].to_s ) } } : []
+			@feed = @feed.any? ? @feed.reverse.map{ |f| { 	:binder => 	Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+															:log => 	Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+															:owner => 	Teacher.find( f[:ownerid].nil? ? f['ownerid'].to_s : f[:ownerid].to_s) } } : []
 
 		end
 

@@ -177,6 +177,8 @@ class TeachersController < ApplicationController
 					current_teacher.id.to_s,
 					params.to_s)
 					# altparams.nil? ? params : altparams)
+		
+		redirect_to teacher_omniauth_authorize_path(params[:buttonredirect]) and return if !params[:buttonredirect].nil?
 
 		if current_teacher.info.errors.empty? && current_teacher.errors.empty?
 			redirect_to "/#{current_teacher.username}"

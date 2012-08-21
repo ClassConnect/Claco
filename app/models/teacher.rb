@@ -235,11 +235,11 @@ class Feed
 		# retrieve old values
 		case feedid
 			when 0
-				oldvals = self.main_feed.clone.reverse
+				oldvals = self.main_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
 			when 1
-				oldvals = self.subsc_feed.clone.reverse
+				oldvals = self.subsc_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
 			when 2
-				oldvals = self.personal_feed.clone.reverse
+				oldvals = self.personal_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
 		end
 
 		# assume that newvals are sorted in descending order by time

@@ -63,7 +63,7 @@ class HomeController < ApplicationController
 						end
 					end
 
-					break if (@feed.size == MAIN_FEED_STORAGE) && (@subfeed.size == SUBSC_FEED_STORAGE)
+					break if (@feed.size == MAIN_FEED_STORAGE) && (@subsc_feed.size == SUBSC_FEED_STORAGE)
 
 				end
 			end

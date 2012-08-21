@@ -81,22 +81,24 @@
         <%= @teacher.info.bio %>
       </p>
       <ul class="profile-info-items">
-        <% if !@teacher.info.twitterhandle.empty? %>
+        <% if !@teacher.omnihash["twitter"].nil? %>
         <li>
-          <a href="http://www.twitter.com/<%= @teacher.info.twitterhandle %>" target="_blank">
+          <a href="<%= current_teacher.omnihash["twitter"]["profile"] %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
-            @<%= @teacher.info.twitterhandle %>
+            @<%= current_teacher.omnihash["twitter"]["username"] %>
           </a>
         </li>
         <% end %>
-        <% if !@teacher.info.facebookurl.empty? %>
+
+        <% if !@teacher.omnihash["facebook"].nil? %>
         <li>
-          <a href="http://www.facebook.com/<%= @teacher.info.facebookurl %>" target="_blank">
+          <a href="<%= @teacher.omnihash["facebook"]["profile"] %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/facebook.png", :style => "margin-top:-4px") %></span>
-            <%= @teacher.info.facebookurl %>
+            <%= @teacher.omnihash["facebook"] %>
           </a>
         </li>
         <% end %>
+
         <% if !@teacher.info.website.empty? %>
         <li>
           <a href="<%= @teacher.info.website %>" target="_blank">

@@ -145,7 +145,13 @@ class Teacher
 		# where(auth.slice(:provider, :uid)).first_or_create do |teacher|
 		teacher.omnihash[auth.provider] = {} if teacher.omnihash[auth.provider].nil?
 		teacher.omnihash[auth.provider]["uid"] = auth.uid
-		teacher.omnihash[auth.provider]["username"] = auth.info.nickname
+		if auth.provider == "twitter"
+			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
+			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
+		elsif auth.provider == "facebook"
+			teacher.omnihash[auth.provider]["username"] = auth.info.nickname if !auth.info.nickname.empty?
+			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Facebook
+		end
 		teacher
 		# end
 	end
@@ -323,32 +329,4 @@ class Info
 		"#{city}, #{state}, #{country}"
 	end
 
-	# def update_info_fields(params)
-
-	# 	#self.debug_data = []
-	# 	#.save
-
-	# 	#avatar = MiniMagick::Image.open(params[:info][:avatar].path)
-
-	# 	if params[:info][:avatar].nil?
-
-	# 		Rails.logger.debug "No avatar chosen! <#{params[:info][:avatar].to_s}>"
-
-	# 		self.update_attributes( :bio => params[:info][:bio],
-	# 								:website => params[:info][:website] )
-	# 	else
-
-	# 	Rails.logger.debug "Got to UPDATE INFO FIELDS!!!!!"
-
-	# 		self.update_attributes(	:bio 				=> params[:info][:bio],
-	# 								:avatar 			=> params[:info][:avatar],
-	# 								:size 				=> params[:info][:avatar].size,
-	# 								:ext 				=> File.extname(params[:info][:avatar].original_filename),
-	# 								:data 				=> params[:info][:avatar].path,
-	# 								#:avatar_width		=> avatar[:width],
-	# 								#:avatar_height		=> avatar[:height],
-	# 								:website 			=> params[:info][:website])
-	# 	end
-
-	# end
 end

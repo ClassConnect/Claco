@@ -103,17 +103,10 @@
 
 			<div>
 				<%= image_tag('settings/website.png', :style => "float:left; margin-top:7px;margin-right:5px") %>
-				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %><br />
-
-				<%= image_tag('settings/twitter.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
-				<%= i.text_field :twitterhandle, :placeholder => "Twitter username" %><br />
-
-				<%= image_tag('settings/facebook.png', :style => "float:left; margin-top:6px;margin-right:5px") %>
-				<%= i.text_field :facebookurl, :placeholder => "Facebook username" %>
+				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %>
 				<% end %>
-				<%= link_to "Link your Twitter Account", teacher_omniauth_authorize_path(:twitter) %>
-				<%= link_to "Link your Facebook Account", teacher_omniauth_authorize_path(:facebook) %>
-				<%= current_teacher.omnihash["twitter"]["username"] if !current_teacher.omnihash["twitter"].nil? %>
+				<p><%= link_to "Link your Twitter Account", teacher_omniauth_authorize_path(:twitter), :class => "zocial twitter", :target => "_blank" %></p>
+				<p><%= link_to "Link your Facebook Account", teacher_omniauth_authorize_path(:facebook), :class => "zocial facebook", :target => "_blank" %></p>
 			</div>
 
 

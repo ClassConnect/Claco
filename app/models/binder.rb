@@ -51,24 +51,7 @@ class Binder
 	field :last_update, :type => Integer
 	field :last_updated_by, :type => String
 
-	# categorized by last update type
-	# 0 - creation
-	# 1 - update data
-	# 2 - new/modified version
-	# 3 - rename
-	# 4 - created/modified tags
-	# 5 - move
-	# 6 - copy
-	# 7 - delete
-	# 8 - permission modification
-	# 9 - reordered
-	# 10- downloaded
-	# 11- forked
-
 	field :download_count, :type => Integer, :default => 0
-
-	#field :last_action_update, :type => Array, :default => [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
-	#55field :last_action_owner, :type => Array, :default 	=> [nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil]
 
 	#Counts
 	field :files, :type => Integer, :default => 0
@@ -109,20 +92,20 @@ class Binder
 	# end
 
 
-	# def self.seedbinder(id)
+	def self.seedbinder(id)
 
-	# 	a = Binder.new
+		a = Binder.new
 
-	# 	a.update_attributes( 	:owner => id.to_s,
-	# 							:parent => { :id => "0", :title => "" },
-	# 							:parents => [{ :id => "0", :title => "" }],
-	# 							:title => "seed binder",
-	# 							:type => 1,
-	# 							:last_update => Time.now)
+		a.update_attributes( 	:owner => id.to_s,
+								:parent => { :id => "0", :title => "" },
+								:parents => [{ :id => "0", :title => "" }],
+								:title => "seed binder",
+								:type => 1,
+								:last_update => Time.now)
 
-	# 	a.save
+		a.save
 
-	# end
+	end
 
 	# returns array of URLs of images, in order of size
 	def self.get_folder_array(id)

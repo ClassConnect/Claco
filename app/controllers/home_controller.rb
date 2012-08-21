@@ -40,7 +40,7 @@ class HomeController < ApplicationController
 					if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?#(current_teacher.id.to_s==f.ownerid.to_s ? binder.is_pub? : (binder.get_access(signed_in? ? current_teacher.id.to_s : 0)))
 
 						# eliminate redundant entries in feed
-						if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
+						if !( @feed.map { |g| [g[0].ownerid,g[0].method,g[0].controller,g[0].modelid,g[0].params,g[0].data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
 							( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
 
 							# current_teacher is subscribed to the entry's owner, unlimited entries
@@ -49,32 +49,34 @@ class HomeController < ApplicationController
 								# migrate individual DB calls here
 								#f = 
 
-								@subsc_feed << f if @subsc_feed.size < SUBSC_FEED_LENGTH
-								@feed << f if @feed.size < MAIN_FEED_LENGTH
+								@feed << [f,binder] if @feed.size < MAIN_FEED_STORAGE
+
+								@subsc_feed << [f,binder] if @subsc_feed.size < SUBSC_FEED_STORAGE
 							
 							else
 								c = (@feed.reject { |h| h.ownerid.to_s!=f.ownerid.to_s }).size
 
 								if c<5
-									@feed << f if @feed.size  < MAIN_FEED_LENGTH
+									@feed << [f,binder] if @feed.size  < MAIN_FEED_STORAGE
 								end
 							end
 						end
 					end
 
-					break if (@feed.size == MAIN_FEED_LENGTH) && (@subfeed.size == SUBSC_FEED_LENGTH)
+					break if (@feed.size == MAIN_FEED_STORAGE) && (@subfeed.size == SUBSC_FEED_STORAGE)
 
 				end
 			end
 
 			@feed = current_teacher.feed.multipush(@feed,0)
+
 			@subsc_feed = current_teacher.feed.multipush(@subsc_feed,1)
 
 			# the array should already be sorted
-			# .sort_by { |e| -e.timestamp }						haha, BLT
-			@feed = @feed.any? ? @feed.reverse.map{ |f| { 	:binder => 	Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
-															:log => 	Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
-															:owner => 	Teacher.find( f[:ownerid].nil? ? f['ownerid'].to_s : f[:ownerid].to_s) } } : []
+			# .sort_by { |e| -e.timestamp }								haha, BLT
+			@feed = @feed.any? ? @feed.reverse.map{ |f| { 	:binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+															:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+															:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
 
 		end
 

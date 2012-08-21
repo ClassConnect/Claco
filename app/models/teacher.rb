@@ -193,7 +193,7 @@ class Feed
 		# bail if a nonexistant feed field is specified
 		raise "Invalid feed identifier!" and return if !([0,1,2].include? feedid)
 
-		feedlength = (feedid==0 ? MAIN_FEED_LENGTH : feedid==1 ? SUBSC_FEED_LENGTH : PERSONAL_FEED_LENGTH)
+		feedlength = (feedid==0 ? MAIN_FEED_STORAGE : feedid==1 ? SUBSC_FEED_STORAGE : PERSONAL_FEED_STORAGE)
 
 		# ignore old values if a surplus of new events have occured
 		if newvals.size >= feedlength
@@ -224,21 +224,43 @@ class Feed
 
 		feedlength.times do #|f|
 			#f = (newvals.any? ? newvals.pop : oldvals.pop)
-			f = (oldvals.any? ? oldvals.pop : newvals.pop)
-			feedarr << ((f.class.to_s=="Log") ? f.peel : f) #(newvals.any? ? newvals.pop : oldvals.pop)#.peel
-			#feedarr.push((f.class.to_s=="Log") ? f.peel : f)
+
+			if oldvals.any?
+				f = [oldvals.pop,Binder.find(f[:modelid].to_s)]
+			else
+				f = newvals.pop
+			end
+
+			if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
+				feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
+			end
+
 			break if (newvals.empty?) && (oldvals.empty?)
+
+			# working code:
+
+			# f = (oldvals.any? ? oldvals.pop : newvals.pop)
+
+			# binder = Binder.find(f[:modelid].to_s)
+
+			# if binder.is_pub? && binder.parent!={'id'=>'0','title'=>''}
+			# 	feedarr << ((f.class.to_s=="Log") ? f.peel : f)
+			# end
+
+			# break if (newvals.empty?) && (oldvals.empty?)
+
+			# end working code
 		end
 
 		#feedarr.reverse!
 
 		case feedid
 			when 0
-				self.update_attributes( :main_feed => feedarr )
+				self.update_attributes( :main_feed => feedarr.map{ |f| f[0] })
 			when 1
-				self.update_attributes( :subsc_feed => feedarr )
+				self.update_attributes( :subsc_feed => feedarr.map{ |f| f[0] })
 			when 2
-				self.update_attributes( :personal_feed => feedarr )
+				self.update_attributes( :personal_feed => feedarr.map{ |f| f[0] })
 		end			
 
 		# return array to be used in the view
@@ -246,7 +268,7 @@ class Feed
 
 	end
 
-	# returns the timestamp of the head of the queue
+	# returns the timestamp of the head of the queue (most recent time)
 	def headtime(feedid = 0)
 
 		case feedid

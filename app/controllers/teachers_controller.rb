@@ -165,7 +165,8 @@ class TeachersController < ApplicationController
 												:bio			=> params[:info][:bio][0..189],
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
-												:country		=> params[:info][:fulllocation].split(', ').third || "")
+												:country		=> params[:info][:fulllocation].split(', ').third || "",
+												:location		=> [params[:lon], params[:lat]])
 		# if !params[:info][:avatar].empty?
 		# 	params[:info][:avatar] = params[:info][:avatar].original_filename
 		# end

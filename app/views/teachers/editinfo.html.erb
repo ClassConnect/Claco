@@ -112,7 +112,8 @@
 				<%= i.text_field :website, :placeholder => "Personal website (or blog)" %>
 				<% end %>
 				<p><%= link_to "Link your Twitter Account", teacher_omniauth_authorize_path(:twitter), :class => "zocial twitter", :target => "_blank" %></p>
-				<p><%= link_to "Link your Facebook Account", teacher_omniauth_authorize_path(:facebook), :class => "zocial facebook", :target => "_blank" %></p>
+				<p><%= link_to "Link your Facebook Account", teacher_omniauth_authorize_path(:facebook), :class => "popup zocial facebook", :"data-width" => 600, :"data-height" => 400
+ %></p>
 			</div>
 
 

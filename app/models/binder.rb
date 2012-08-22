@@ -75,7 +75,7 @@ class Binder
 
 	#field :debug_data, :type => Array, :default => []
 
-	#TODO: Add indexing functions that allow binders to be put in a user-defined order via dragon drop
+	scope :root_binders, where("parent.id" => "0")
 
 	# tag contains both local and parent tag data
 	embeds_one :tag

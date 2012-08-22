@@ -42,7 +42,6 @@ class Teacher
 	field :fname, :type => String
 	field :lname, :type => String
 	field :username, :type => String, :unique => true
-	field :lower_username, :type => String, :unique => true
 
 	field :omnihash, :type => Hash, :default => {}
 
@@ -134,10 +133,6 @@ class Teacher
 		username
 	end
 
-	before_save do 
-		self.lower_username = self.username.downcase
-	end
-
 	def self.find_for_authentication(conditions) 
 		conditions[:login].downcase!
 		super(conditions)
@@ -150,9 +145,11 @@ class Teacher
 		if auth.provider == "twitter"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
+			teacher.omnihash[auth.provider]["data"] = auth
 		elsif auth.provider == "facebook"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname if !auth.info.nickname.empty?
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Facebook
+			teacher.omnihash[auth.provider]["data"] = auth
 		end
 		teacher
 		# end

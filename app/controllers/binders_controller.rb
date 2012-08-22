@@ -6,7 +6,7 @@ class BindersController < ApplicationController
 	end
 
 	def index
-		@owner = Teacher.where(:lower_username => params[:username].downcase).first || Teacher.find(params[:username])
+		@owner = Teacher.where(:username => /#{params[:username]}/i).first || Teacher.find(params[:username])
 
 		@children = Binder.where(:owner => @owner.id, "parent.id" => "0").sort_by { |binder| binder.order_index }
 
@@ -123,9 +123,11 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@root = Binder.where("parent.id" => "0", :owner => @binder.owner)
+		@root = signed_in? ? Binder.where("parent.id" => "0", :owner => current_teacher.id.to_s) : []
 
-		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
+		@access = signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
+		
+		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 
 		if !binder_routing_ok?(@binder, params[:action])
 			error = true

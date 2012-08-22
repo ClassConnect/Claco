@@ -81,4 +81,251 @@ $(document).ready(function() {
 		}
 	});
 
+
+
+
+
+
+
+	// for our modification actions
+  $('.modaction').click(function() {
+    // if we're doing a rename
+    if ($(this).attr('id') == 'rename-act') {
+      popForm('rename-form', $(this).parent().parent().parent().parent().parent());
+
+    } else if ($(this).attr('id') == 'delete-act') {
+      popForm('delete-form', $(this).parent().parent().parent().parent().parent());
+
+    } else if ($(this).attr('id') == 'copy-act') {
+      popForm('copy-form', $(this).parent().parent().parent().parent().parent());
+
+    } else if ($(this).attr('id') == 'move-act') {
+      popForm('move-form', $(this).parent().parent().parent().parent().parent());
+
+    }
+
+
+  });
+
+
+
+
+
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+// here are the popup form helpers
+function popForm(formID, obje) {
+  // fire the open event for facebox
+  jQuery.facebox({ div: '#' + formID });
+  //$("#facebox").find('.firstfocus').focus();
+  setTimeout(function() {$("#facebox").find('.firstfocus').focus();},100);
+
+  // extended if to handle the different form types
+  // if we're renaming a piece of content
+  if (formID == 'rename-form') {
+
+    // preset the title
+    var contitle = obje.find('.titler a').text();
+    $("#facebox").find('.rename-title').val(contitle);
+    $("#facebox").find('.conid').val( obje.attr("id") );
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/rename",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            obje.find('.titler a').text(newTitle);
+            setTimeout(function() {obje.effect('highlight');},100);
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+  ////////// if this is the delete form
+  } else if (formID == 'delete-form') {
+
+
+    $("#facebox").find('.conid').val( obje.attr("id") );
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "DELETE",
+        url: obje.find('.titler a').attr("href"),
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+
+
+
+  ////////// if this is the copy form
+  } else if (formID == 'copy-form') {
+
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/copy",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Copied successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+
+  } else if (formID == 'move-form') {
+
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: obje.find('.titler a').attr("href") + "/move",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+            obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+
+
+
+
+
+
+
+  } else if (formID == 'addfolder-form') {
+
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "POST",
+        url: location.protocol+'//'+location.host+location.pathname + "/create",
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            scrollBottom = true;
+            softRefresh();
+            closefBox();
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+
+
+
+  }
+
+}

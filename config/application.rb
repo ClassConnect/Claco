@@ -92,7 +92,7 @@ module Claco
     # config.active_record.whitelist_attributes = true
 
     # Enable the asset pipeline
-    config.assets.enabled = true
+    config.assets.enabled = ENV['RAILS_ENV'] == "staging" ? false : true
 
     # Component of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'

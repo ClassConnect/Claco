@@ -15,7 +15,7 @@ class HomeController < ApplicationController
 
 		#blacklist = []
 
-		if false
+		if true
 
 			@feed = []
 

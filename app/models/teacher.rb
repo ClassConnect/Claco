@@ -42,7 +42,6 @@ class Teacher
 	field :fname, :type => String
 	field :lname, :type => String
 	field :username, :type => String, :unique => true
-	field :lower_username, :type => String, :unique => true
 
 	field :omnihash, :type => Hash, :default => {}
 
@@ -132,10 +131,6 @@ class Teacher
 
 	def to_param
 		username
-	end
-
-	before_save do 
-		self.lower_username = self.username.downcase
 	end
 
 	def self.find_for_authentication(conditions) 

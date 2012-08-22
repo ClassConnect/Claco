@@ -18,7 +18,7 @@ class TeachersController < ApplicationController
 	#/teachers/:id
 	#Teacher Profiles
 	def show
-		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
+		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
 
 		render "public/404.html", :status => 404 and return if @teacher.nil?
 
@@ -234,7 +234,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
+		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 
@@ -263,7 +263,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
+		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
 
 		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
@@ -339,7 +339,7 @@ class TeachersController < ApplicationController
 		errors = []
 
 		#Teacher to be added
-		@teacher = Teacher.where(:lower_username => params[:username].downcase).first
+		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
 
 		@title = "Add #{ @teacher.full_name } as a Colleague"
 

@@ -167,9 +167,7 @@
 			            <div class="drop-tog">
 
 			            	<% if @is_self %>
-				            	<button id="snapbtn" class="btn modaction">Snap to binder</button>
-			            	<% else %>
-
+			            	
 				            	<div class="btn-group">
 
 						          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
@@ -184,6 +182,11 @@
 						          </ul>
 
 						        </div>
+
+			            	<% else %>
+
+				            	<button id="snapbtn" class="btn modaction">Snap to binder</button>
+
 					        <% end %>
 
 			            </div>

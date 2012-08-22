@@ -982,6 +982,12 @@ class BindersController < ApplicationController
 				method = "forkitem"
 				# fork_total is 
 				@binder.inc(:fork_total, 1)
+
+				# cascade upwards
+				@binder.parents.each do |f|
+					Binder.find(f['id'].to_s).inc(:owned_fork_total,1) if f['id'].to_i>0
+				end
+
 			else
 				method = __method__.to_s
 			end

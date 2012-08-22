@@ -113,8 +113,8 @@
 
 
 			<div>
-				<input type="text" name="grades" id="grades" placeholder="Enter the grade(s) you teach" /><br />
-				<input type="text" name="subjects" id="subjects" placeholder="Enter the subject(s) you teach" />
+				<input type="text" name="grades" id="grades" placeholder="Enter the grade(s) you teach" value="<%= current_teacher.info.grades.join(', ') %>" /><br />
+				<input type="text" name="subjects" id="subjects" placeholder="Enter the subject(s) you teach" value="<%= current_teacher.info.subjects.join(', ') %>" />
 			</div>
 
 

@@ -237,6 +237,58 @@
 
 							</div>
 
+					<% when "forkitem" %>
+
+							<%
+							# this should always return a single query 
+							forkowner = Teacher.where(:username => f[:log].params['username'].to_s).first 
+							%>
+
+							<div class="feedcontent">
+								<div class="thetitle">
+									<% if @is_self %>
+										You forked <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
+									<% else %>
+										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> forked <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a>from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
+									<% end %>
+								</div>
+
+								<% if (!f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:binder].type != 1 || !f[:binder].body.empty? %>
+								<a href="<%= named_binder_route(f[:binder]) %>" class="conlink">
+									<div class="thecontent">
+											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
+											<% if f[:binder].type==1 %>
+											<% if false %>
+												<% imgarr = Binder.get_folder_array(f[:binder].id.to_s) %>
+												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
+											<% end %>
+											<% else %>
+												<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
+													<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
+												<% end %>
+											<% end %>
+											<% if !f[:binder].body.empty? %>
+											<div class="txtcon">
+												<div class="contitle">
+													<!--Curiosity Landing Pictures (NASA Exclusive)-->
+													<%= #f[:binder].title 
+													%>
+												</div>
+
+												
+												<div class="condesc">
+													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+												</div>
+											</div>
+											<% end %>
+
+										<div style="clear:both"></div>
+									</div>
+								</a>
+								<% end %>
+
+							</div>
 
 					<% when "setpub" %>
 

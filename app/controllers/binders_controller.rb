@@ -620,6 +620,8 @@ class BindersController < ApplicationController
 										:last_updated_by	=> current_teacher.id.to_s,
 										#:body				=> params[:binder][:body],
 										:total_size			=> params[:file].size,
+										:pub_size			=> @inherited[:binder].is_pub? ? params[:file].size.to_i : 0, 
+										:priv_size			=> @inherited[:binder].is_pub? ? 0 : params[:file].size.to_i,
 										:order_index 		=> @parent_child_count,
 										:parent_permissions	=> @parentperarr,
 										:files				=> 1,
@@ -866,7 +868,9 @@ class BindersController < ApplicationController
 						op.update_attributes(	:owned_fork_total => op.owned_fork_total - (@binder.fork_total+@binder.owned_fork_total),
 												:files		=> op.files - @binder.files,
 												:folders	=> op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-												:total_size	=> op.total_size - @binder.total_size)
+												:total_size	=> op.total_size - @binder.total_size,
+												:pub_size	=> op.pub_size - @binder.pub_size, 
+												:priv_size	=> op.priv_size - @binder.priv_size)
 					end
 				end
 		 
@@ -932,7 +936,9 @@ class BindersController < ApplicationController
 						parent.update_attributes(	:owned_fork_total => op.owned_fork_total + (@binder.fork_total+@binder.owned_fork_total),
 													:files		=> parent.files + @binder.files,
 													:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
-													:total_size	=> parent.total_size + @binder.total_size)
+													:total_size	=> parent.total_size + @binder.total_size,
+													:pub_size 	=> parent.pub_size + @binder.pub_size,
+													:priv_size 	=> parent.priv_size + @binder.priv_size)
 					end
 				end
 
@@ -1020,6 +1026,8 @@ class BindersController < ApplicationController
 										:forked_from		=> fork ? @binder.id.to_s : nil,
 										:fork_stamp			=> fork ? Time.now.to_i : nil,
 										:total_size			=> @binder.total_size,
+										:pub_size			=> @binder.pub_size,
+										:priv_size			=> @binder.priv_size,
 										:order_index		=> @parent_child_count,
 										:parent				=> @parenthash,
 										:parents			=> @parentsarr,
@@ -1117,7 +1125,9 @@ class BindersController < ApplicationController
 											:folders			=> h.folders,
 											:forked_from		=> fork ? h.id.to_s : nil,
 											:fork_stamp			=> fork ? Time.now.to_i : nil,
-											:total_size			=> h.total_size)
+											:total_size			=> h.total_size,
+											:pub_size			=> h.pub_size,
+											:priv_size			=> h.priv_size)
 
 					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
 					# 									:file_hash	=> h.current_version.file_hash,
@@ -1161,7 +1171,9 @@ class BindersController < ApplicationController
 
 					parent.update_attributes(	:files		=> parent.files + @new_parent.files,
 												:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-												:total_size	=> parent.total_size + @new_parent.total_size)
+												:total_size	=> parent.total_size + @new_parent.total_size,
+												:pub_size	=> parent.pub_size + @new_parent.pub_size,
+												:priv_size	=> parent.priv_size + @new_parent.priv_size)
 				end
 			end
 
@@ -1185,6 +1197,12 @@ class BindersController < ApplicationController
 	end
 
 	def createversion
+
+		# TODO:
+		# the current implementation will allow teachers to abuse their storage limits by
+		# putting multiple versions on a file, and switching between them.  alter this to
+		# take into account aggregate storage size
+
 		@binder = Binder.find(params[:id])
 
 		@old_size = @binder.total_size
@@ -1286,9 +1304,15 @@ class BindersController < ApplicationController
 
 		error = ""
 
+		# read/write access
 		if @binder.get_access(current_teacher.id.to_s) == 2
 
+			Rails.logger.debug "<<< NEW SETPUB ACTION: >>>"
+
+			# check if parent binder has any type 3 permissions
 			if @binder.parent_permissions.find {|p| p["type"] == 3}.nil?
+
+				Rails.logger.debug "<<< No type three permissions! >>>"
 
 				src = Mongo.log(current_teacher.id.to_s,
 								__method__.to_s,
@@ -1298,17 +1322,31 @@ class BindersController < ApplicationController
 
 				if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
+					# this binder has no existing type 3 permissions, inherit!
 					@binder.permissions << {:type		=> 3,
 											:auth_level	=> params[:enabled] == "true" ? 1 : 0}
 					@binder.save
 
 				else
 
+					Rails.logger.debug "<<< SETPUB LOG 3 params:#{params[:enabled]} >>>"
+
+					# set this binder's permissions
 					@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
-					@binder.save
 
 				end
 
+				if params[:enabled]=="true"
+					@binder.pub_size = @binder.pub_size + @binder.priv_size
+					@binder.priv_size = 0
+				else
+					@binder.priv_size = @binder.priv_size + @binder.pub_size
+					@binder.pub_size = 0
+				end
+
+				@binder.save
+
+				# deal with the naughty children
 				@binder.subtree.each do |h|
 
 					h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
@@ -1320,26 +1358,34 @@ class BindersController < ApplicationController
 													:folder_id => params[:id],
 													:auth_level	=> params[:enabled] == "true" ? 1 : 0}
 
-
-						h.save
-
 					else
 
 						h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
 						h.parent_permissions.find {|p| p["type"] == 3}["folder_id"] = params[:id]
-						h.save
 
 					end
+
+					if params[:enabled]=="true"
+						h.pub_size = h.pub_size + h.priv_size
+						h.priv_size = 0
+					else
+						h.priv_size = h.priv_size + h.pub_size
+						h.pub_size = 0
+					end
+
+					h.save
 
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
 								params[:controller].to_s,
 								h.id.to_s,
 								params,
-								{ :src => src,  })
+								{ :src => src })
 				end
 
 			else
+
+				Rails.logger.debug "<<< SETPUB LOG 4 >>>"
 
 				if @binder.parent_permissions.find {|p| p["type"] == 3}["auth_level"] == 1 && params[:enabled] == "false"
 
@@ -1357,15 +1403,47 @@ class BindersController < ApplicationController
 
 						@binder.permissions << {:type		=> 3,
 												:auth_level	=> params[:enabled] == "true" ? 1 : 0}
-						@binder.save
+						#@binder.save
 
 					else
 
+						Rails.logger.debug "<<< SETPUB LOG 5 params:#{params[:enabled]} >>>"
+
 						@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
-						@binder.save
+						#@binder.save
 
 					end
 
+					if params[:enabled]=="true"
+						@binder.pub_size = @binder.pub_size + @binder.priv_size
+						@binder.priv_size = 0
+						
+						@binder.parents.each do |f| 
+							if f['id'].to_s!='0'
+								g = Binder.find(f['id'].to_s)
+								g.update_attributes(:pub_size => g.pub_size + @binder.priv_size,
+													:priv_size => 0)
+							end
+						end
+					else
+						@binder.priv_size = @binder.priv_size + @binder.pub_size
+						@binder.pub_size = 0
+						
+						@binder.parents.each do |f| 
+							if f['id'].to_s!='0'
+								g = Binder.find(f['id'].to_s)
+								g.update_attributes(:pub_size => 0,
+													:priv_size => g.priv_size + @binder.pub_size)
+							end
+						end
+
+					end
+
+					@binder.save
+
+
+
+					# take care of the naughty children
 					@binder.subtree.each do |h|
 
 						h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
@@ -1375,15 +1453,25 @@ class BindersController < ApplicationController
 							h.parent_permissions << {	:type		=> 3,
 														:folder_id => params[:id],
 														:auth_level	=> params[:enabled] == "true" ? 1 : 0}
-							h.save
+							#h.save
 
 						else
 
 							h.parent_permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
 							h.parent_permissions.find {|p| p["type"] == 3}["folder_id"] = params[:id]
-							h.save
+							#h.save
 
 						end
+
+						if params[:enabled]=="true"
+							h.pub_size = h.pub_size + h.priv_size
+							h.priv_size = 0
+						else
+							h.priv_size = h.priv_size + h.pub_size
+							h.pub_size = 0
+						end
+
+						h.save
 
 						Mongo.log(	current_teacher.id.to_s,
 									__method__.to_s,
@@ -1537,7 +1625,9 @@ class BindersController < ApplicationController
 				@op.update_attributes(	:owned_fork_total => op.owned_fork_total - (@binder.fork_total+@binder.owned_fork_total),
 										:files		=> @op.files - @binder.files,
 										:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
-										:total_size	=> @op.total_size - @binder.total_size)
+										:total_size	=> @op.total_size - @binder.total_size,
+										:pub_size	=> @op.pub_size - @binder.pub_size,
+										:priv_size	=> @op.priv_size - @binder.priv_size)
 			end
 
 			@binder.update_attributes(	:parent		=> @parenthash,
@@ -1573,7 +1663,9 @@ class BindersController < ApplicationController
 					parent.update_attributes(	:owned_fork_total => parent.owned_fork_total + (@binder.fork_total+@binder.owned_fork_total),
 												:files		=> parent.files + @binder.files,
 												:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
-												:total_size	=> parent.total_size + @binder.total_size)
+												:total_size	=> parent.total_size + @binder.total_size,
+												:pub_size	=> parent.pub_size + @binder.pub_size,
+												:priv_size	=> parent.priv_size + @binder.priv_size)
 				end
 			end
 

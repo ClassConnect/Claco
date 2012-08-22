@@ -58,7 +58,7 @@ class TeachersController < ApplicationController
 		#if @is_self
 			#logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).desc(:timestamp)#.in( method: ["create","createfile","createcontent","update","updatetags","setpub"] )
 		#else
-			logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+			logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
 		#end
 
 		if logs.any?

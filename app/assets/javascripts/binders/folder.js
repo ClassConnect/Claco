@@ -64,6 +64,13 @@ function softRefresh() {
 
 function viewInit() {
   dontPjax = false;
+
+
+
+  $('#snapbtn').click(function() {
+    popForm('copy-form', $(this).parent().parent().parent());
+
+  });
   
   // CONTENT SPECIFIC FUNCTIONS GO HERE!
   // if this is a website, fade in the overlay and stuff on hover
@@ -163,9 +170,6 @@ function editInit() {
 
     } else if ($(this).attr('id') == 'move-act') {
       popForm('move-form', $(this).parent().parent().parent().parent().parent());
-
-    } else if ($(this).attr('id') == 'snapbtn') {
-      popForm('copy-form', $(this).parent().parent().parent());
 
     }
 

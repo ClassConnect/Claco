@@ -46,6 +46,7 @@ class Teacher
 	field :omnihash, :type => Hash, :default => {}
 
 	field :allow_short_username, :type => Boolean, :default => false
+	field :getting_started, :type => Boolean, :default => true
 
 	embeds_one :info#, autobuild: true #, validate: false
 
@@ -94,18 +95,12 @@ class Teacher
 		return "#{title} #{lname}"
 	end
 
-	# Relationship Class Method Wrappers
-
-	# this is not formal MVC style, but I wasn't able to successfully move this
-	# function down to the Relationship class
 	def relationship_by_teacher_id(teacher_id)
-		#self.relationships.by_teacher_id(params)
 		self.relationships.find_or_initialize_by(:user_id => teacher_id)
 	end
 
 	def get_incoming_colleague_requests
 		self.relationships.where(:colleague_status => 2)
-		#self.relationships.find_by(colleague_status: 2)
 	end
 
 	def subscribed_to?(id)
@@ -155,24 +150,13 @@ class Teacher
 		# end
 	end
 
-	# def self.new_with_session(params, session)
-	# 	if session["devise.user_attributes"]
-	# 		new(session["devise.user_attributes"], without_protection: true) do |user|
-	# 			user.attributes = params
-	# 			user.valid?
-	# 		end
-	# 	else
-	# 		super
-	# 	end
-	# end
-
 	private
 	@@username_blacklist = nil
 
 	# checks if the username is on a blacklist
 	def username_blacklist
 		unless @@username_blacklist
-			@@username_blacklist = Set.new [] # Put in any additional words in this array
+			@@username_blacklist = Set.new ["signup"] # Put in any additional words in this array
 			Rails.application.routes.routes.each do |r|
 				words = r.path.spec.to_s.gsub(/(\(\.:format\)|[:()])/, "").split('/')
 				words.each {|reserved_word| @@username_blacklist << reserved_word if !reserved_word.empty?}
@@ -399,8 +383,6 @@ class Info
 	field :size, 				:type => Integer, :default => 0
 	field :ext, 				:type => String, :default => ""
 	field :data, 				:type => String, :default => "" #URL, path to file
-	#field :avatar_width,		:type => Integer, :default => 0
-	#field :avatar_height,		:type => Integer, :default => 0
 
 	field :grades,				:type => Array, :default => []
 	field :subjects,			:type => Array, :default => []
@@ -412,9 +394,6 @@ class Info
 	field :location,			:type => Array, :default => []
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
-	#field :profile_picture, 	:type => String, :default => ""
-
-	#field :debug_data,			:type => Array, :default => []
 
 	embedded_in :teacher
 

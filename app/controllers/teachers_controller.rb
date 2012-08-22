@@ -18,7 +18,9 @@ class TeachersController < ApplicationController
 	#/teachers/:id
 	#Teacher Profiles
 	def show
-		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
+		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
+
+		redirect_to "/#{@teacher.username}" and return if @teacher.username != params[:username]
 
 		render "public/404.html", :status => 404 and return if @teacher.nil?
 
@@ -234,7 +236,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
+		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 
@@ -263,7 +265,7 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
+		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
 		@relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
@@ -339,7 +341,7 @@ class TeachersController < ApplicationController
 		errors = []
 
 		#Teacher to be added
-		@teacher = Teacher.where(:username => /#{params[:username]}/i).first
+		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
 		@title = "Add #{ @teacher.full_name } as a Colleague"
 

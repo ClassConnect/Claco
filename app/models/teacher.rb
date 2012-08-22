@@ -235,38 +235,40 @@ class Feed
 		# retrieve old values
 		case feedid
 			when 0
-				oldvals = self.main_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
+				oldvals = self.main_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
 			when 1
-				oldvals = self.subsc_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
+				oldvals = self.subsc_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
 			when 2
-				oldvals = self.personal_feed.clone.sort_by{ |f| f['timestamp'] }.reverse
+				oldvals = self.personal_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
 		end
 
-		newvals = newvals.sort_by { |f| f[1]['timestamp'] }.reverse
+		#newvals = newvals.sort_by { |f| f[0]['timestamp'] }.reverse
 
 		# assume that newvals are sorted in descending order by time
 		feedarr = []
 		
 		# may need to reverse arrays here...
 
-		feedlength.times do 
+		# feedlength.times do 
 
-			if oldvals.any? && feedarr.size+newvals.size < feedlength
-				f = oldvals.pop
-				f = [f,Binder.find(f['modelid'].to_s)]
-			elsif newvals.any?
-				f = newvals.pop
-			end
+		# 	if oldvals.any? && feedarr.size+newvals.size < feedlength
+		# 		f = oldvals.pop
+		# 		f = [f,Binder.find(f['modelid'].to_s)]
+		# 	elsif newvals.any?
+		# 		f = newvals.pop
+		# 	end
 
-			if !f.nil?
-				if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
-					feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
-				end
-			end
+		# 	if !f.nil?
+		# 		if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
+		# 			feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
+		# 		end
+		# 	end
 
-			break if (newvals.empty?) && (oldvals.empty?)
+		# 	break if (newvals.empty?) && (oldvals.empty?)
 
-		end
+		# end
+
+		feedarr = (newvals.map{ |f| [f[0].peel,f[1]] } + oldvals.map{ |f| [f,Binder.find(f['modelid'].to_s)] }).uniq.sort_by{ |f| f[0]['timestamp'] }#.reverse
 
 		#feedarr.reverse!
 

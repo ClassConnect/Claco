@@ -853,6 +853,7 @@ class BindersController < ApplicationController
 
 			@nps = @parentsarr.collect {|x| x["id"] || x[:id]}
 
+
 			if !@nps.include?(params[:id])
 
 				@ops = @binder.parents.collect {|x| x["id"] || x[:id]}
@@ -860,7 +861,8 @@ class BindersController < ApplicationController
 					if opid != "0"
 						op = Binder.find(opid)
 
-						op.update_attributes(	:files		=> op.files - @binder.files,
+						op.update_attributes(	:owned_fork_total => op.owned_fork_total - (@binder.fork_total+@binder.owned_fork_total),
+												:files		=> op.files - @binder.files,
 												:folders	=> op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
 												:total_size	=> op.total_size - @binder.total_size)
 					end
@@ -925,7 +927,8 @@ class BindersController < ApplicationController
 					if pid != "0"
 						parent = Binder.find(pid)
 
-						parent.update_attributes(	:files		=> parent.files + @binder.files,
+						parent.update_attributes(	:owned_fork_total => op.owned_fork_total + (@binder.fork_total+@binder.owned_fork_total),
+													:files		=> parent.files + @binder.files,
 													:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
 													:total_size	=> parent.total_size + @binder.total_size)
 					end
@@ -1529,7 +1532,8 @@ class BindersController < ApplicationController
 			if @binder.parent["id"] != "0"
 				@op = Binder.find(@binder.parent["id"])
 
-				@op.update_attributes(	:files		=> @op.files - @binder.files,
+				@op.update_attributes(	:owned_fork_total => op.owned_fork_total - (@binder.fork_total+@binder.owned_fork_total),
+										:files		=> @op.files - @binder.files,
 										:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
 										:total_size	=> @op.total_size - @binder.total_size)
 			end
@@ -1564,7 +1568,8 @@ class BindersController < ApplicationController
 				if pid != "-1"
 					parent = Binder.find(pid)
 
-					parent.update_attributes(	:files		=> parent.files + @binder.files,
+					parent.update_attributes(	:owned_fork_total => parent.owned_fork_total + (@binder.fork_total+@binder.owned_fork_total),
+												:files		=> parent.files + @binder.files,
 												:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
 												:total_size	=> parent.total_size + @binder.total_size)
 				end

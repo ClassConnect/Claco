@@ -6,7 +6,7 @@ class BindersController < ApplicationController
 	end
 
 	def index
-		@owner = Teacher.where(:username => /#{params[:username]}/i).first || Teacher.find(params[:username])
+		@owner = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first || Teacher.find(params[:username])
 
 		@children = Binder.where(:owner => @owner.id, "parent.id" => "0").sort_by { |binder| binder.order_index }
 

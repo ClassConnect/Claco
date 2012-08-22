@@ -162,6 +162,8 @@ class TeachersController < ApplicationController
 
 		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],
 												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,
+												:grades			=> params[:grades].strip.split(/\s*,\s/),
+												:subjects		=> params[:subjects].strip.split(/\s*,\s/),
 												:bio			=> params[:info][:bio][0..189],
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",

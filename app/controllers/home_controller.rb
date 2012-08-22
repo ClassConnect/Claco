@@ -153,15 +153,15 @@ class HomeController < ApplicationController
 
 				# the array should already be sorted
 				# .sort_by { |e| -e.timestamp }								haha, BLT
-				@feed = @feed.any? ? @feed.reverse.map{ |f| { 	:binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
-																:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
-																#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
-																:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(MAIN_FEED_LENGTH) : []
+				@feed = @feed.any? ? @feed.map{ |f| { 	:binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+														:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+														#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+														:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(MAIN_FEED_LENGTH) : []
 
-				@subsc_feed = @subsc_feed.any? ? @subsc_feed.reverse.map{ |f| { :binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
-																				:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
-																				#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
-																				:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(SUBSC_FEED_LENGTH) : []
+				#@subsc_feed = @subsc_feed.any? ? @subsc_feed.map{ |f| { :binder => 	f[1],#Binder.find( f[:modelid].nil? ? f['modelid'].to_s : f[:modelid].to_s ),
+				#														:log => 	f[0],#Log.find( f[:id].nil? ? f['id'].to_s : f[:id].to_s ),
+				#														#:owner => 	Teacher.find( f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s) } }.first(MAIN_FEED_LENGTH) : []
+				#														:owner => 	teacherhash[f[0][:ownerid].nil? ? f[0]['ownerid'].to_s : f[0][:ownerid].to_s]} }.first(SUBSC_FEED_LENGTH) : []
 
 			end																
 		end

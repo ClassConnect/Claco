@@ -268,7 +268,7 @@ class Feed
 
 		# end
 
-		feedarr = (newvals.map{ |f| [f[0].peel,f[1]] } + oldvals.map{ |f| [f,Binder.find(f['modelid'].to_s)] }).uniq.sort_by{ |f| f[0]['timestamp'] }#.reverse
+		feedarr = ((newvals.map{ |f| [f[0].peel,f[1]] }) + ((oldvals.map{ |f| [f,Binder.find(f['modelid'].to_s)] }).sort_by{ |f| f[0]['timestamp'] }.reverse)).reject{ |f| !(f[1].is_pub?) || !(f[1].parent!={'id'=>'0','title'=>''}) }.uniq.first(feedlength)#.reverse
 
 		#feedarr.reverse!
 
@@ -307,15 +307,18 @@ class Feed
 				when 0
 					#return self.main_feed[0].timestamp.to_i
 					#return self.main_feed[0]['timestamp']
-					return self.main_feed.last['timestamp']
+					#return self.main_feed.last['timestamp']
+					return self.main_feed.first['timestamp']
 				when 1
 					#return self.subsc_feed[0].timestamp.to_i
 					#return self.subsc_feed[0]['timestamp']
-					return self.subsc_feed.last['timestamp']
+					#return self.subsc_feed.last['timestamp']
+					return self.subsc_feed.first['timestamp']
 				when 2
 					#return self.personal_feed[0].timestamp.to_i
 					#return self.personal_feed[0]['timestamp']
-					return self.personal_feed.last['timestamp']
+					#return self.personal_feed.last['timestamp']
+					return self.personal_feed.first['timestamp']
 			end
 		end
 	end

@@ -126,6 +126,8 @@ class BindersController < ApplicationController
 		@root = Binder.where("parent.id" => "0", :owner => @binder.owner)
 
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
+		
+		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 
 		if !binder_routing_ok?(@binder, params[:action])
 			error = true

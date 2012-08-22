@@ -166,24 +166,25 @@
 			        <% if signed_in? && current_teacher.id.to_s == @binder.owner %>
 			            <div class="drop-tog">
 
-			            	<button id="snapbtn" class="btn modaction">Snap to binder</button>
+			            	<% if @is_self %>
+				            	<button id="snapbtn" class="btn modaction">Snap to binder</button>
+			            	<% else %>
 
+				            	<div class="btn-group">
 
+						          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
+						          <div class="tog-arrow"></div>
+						          </button>
 
-			            	<div class="btn-group">
+						          <ul class="dropdown-menu">
+						            <li><a id="rename-act" class="modaction">Rename</a></li>
+						            <li><a id="copy-act" class="modaction">Copy</a></li>
+						            <li><a id="move-act" class="modaction">Move</a></li>
+						            <li><a id="delete-act" class="modaction">Delete</a></li>
+						          </ul>
 
-					          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
-					          <div class="tog-arrow"></div>
-					          </button>
-
-					          <ul class="dropdown-menu">
-					            <li><a id="rename-act" class="modaction">Rename</a></li>
-					            <li><a id="copy-act" class="modaction">Copy</a></li>
-					            <li><a id="move-act" class="modaction">Move</a></li>
-					            <li><a id="delete-act" class="modaction">Delete</a></li>
-					          </ul>
-
-					        </div>
+						        </div>
+					        <% end %>
 
 			            </div>
 		            <% end %>

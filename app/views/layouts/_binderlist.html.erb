@@ -70,6 +70,7 @@
 
 			    <div class="drop-tog">
 
+				<% if @is_self %>
 			    	<div class="btn-group">
 
 					          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
@@ -81,8 +82,9 @@
 					            <li><a id="delete-act" class="modaction">Delete</a></li>
 					          </ul>
 
-					        </div>
-			    	
+			        </div>
+			    <% end %>
+
 
 			    </div>
 

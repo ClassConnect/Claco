@@ -78,7 +78,7 @@ class BindersController < ApplicationController
 
 				new_binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if @parent == "0"
 
-				Rails.logger.debug "METHOD got here! #{__method__}"
+				#Rails.logger.debug "METHOD got here! #{__method__}"
 
 				new_binder.save
 
@@ -961,23 +961,40 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		src = Mongo.log(current_teacher.id.to_s,
-						__method__.to_s,
-						params[:controller].to_s,
-						@binder.id.to_s,
-						params)
-
 		@inherited = inherit_from(params[:folid])
 
 		@parenthash = @inherited[:parenthash]
 		@parentsarr = @inherited[:parentsarr]
 		@parentperarr = @inherited[:parentperarr]
 
+		# src = Mongo.log(current_teacher.id.to_s,
+		# 				__method__.to_s,
+		# 				params[:controller].to_s,
+		# 				@binder.id.to_s,
+		# 				params)
+
 		if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
 			fork = @inherited[:parent].owner != @binder.owner
 
-			@binder.inc(:fork_total, 1) if fork
+			# due to shared functionality, define method var
+			if fork
+				method = "forkitem"
+				# fork_total is 
+				@binder.inc(:fork_total, 1)
+			else
+				method = __method__.to_s
+			end
+
+			src = Mongo.log(current_teacher.id.to_s,
+							method.to_s,
+							params[:controller].to_s,
+							@binder.id.to_s,
+							params)
+
+			#@binder.inc(:fork_total, 1) if fork
+
+			#recurse upwards
 
 			@parent_child_count = @inherited[:parent_child_count]
 
@@ -1021,7 +1038,7 @@ class BindersController < ApplicationController
 			#TODO: copy related images?
 
 			Mongo.log(	current_teacher.id.to_s,
-						__method__.to_s,
+						method.to_s,
 						params[:controller].to_s,
 						@new_parent.id.to_s,
 						params,
@@ -1051,7 +1068,7 @@ class BindersController < ApplicationController
 				@children.each do |h|
 
 					Mongo.log(	current_teacher.id.to_s,
-								__method__.to_s,
+								method.to_s,
 								params[:controller].to_s,
 								h.id.to_s,
 								params,
@@ -1109,7 +1126,7 @@ class BindersController < ApplicationController
 					@new_node.save
 
 					Mongo.log(	current_teacher.id.to_s,
-								__method__.to_s,
+								method.to_s,
 								params[:controller].to_s,
 								@new_node.id.to_s,
 								params,

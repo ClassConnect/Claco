@@ -211,27 +211,6 @@ class Feed
 
 		feedlength = (feedid==0 ? MAIN_FEED_STORAGE : feedid==1 ? SUBSC_FEED_STORAGE : PERSONAL_FEED_STORAGE)
 
-		# ignore old values if a surplus of new events have occured
-		# if newvals.size >= feedlength
-
-		# 	newvals.each do |f|
-
-		# 	end
-
-		# 	newvals.first(feedlength)
-
-		# 	case feedid
-		# 		when 0
-		# 			self.update_attributes( :main_feed => newvals.first(feedlength) ) and return
-		# 		when 1
-		# 			self.update_attributes( :subsc_feed => newvals.first(feedlength) ) and return
-		# 		when 2
-		# 			self.update_attributes( :personal_feed => newvals.first(feedlength) ) and return
-		# 	end	
-
-		# 	return 
-		# end
-
 		# retrieve old values
 		case feedid
 			when 0
@@ -242,31 +221,8 @@ class Feed
 				oldvals = self.personal_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
 		end
 
-		#newvals = newvals.sort_by { |f| f[0]['timestamp'] }.reverse
-
 		# assume that newvals are sorted in descending order by time
 		feedarr = []
-		
-		# may need to reverse arrays here...
-
-		# feedlength.times do 
-
-		# 	if oldvals.any? && feedarr.size+newvals.size < feedlength
-		# 		f = oldvals.pop
-		# 		f = [f,Binder.find(f['modelid'].to_s)]
-		# 	elsif newvals.any?
-		# 		f = newvals.pop
-		# 	end
-
-		# 	if !f.nil?
-		# 		if f[1].is_pub? && f[1].parent!={'id'=>'0','title'=>''}
-		# 			feedarr << ((f[0].class.to_s=="Log") ? [f[0].peel,f[1]] : f)
-		# 		end
-		# 	end
-
-		# 	break if (newvals.empty?) && (oldvals.empty?)
-
-		# end
 
 		feedarr = ((newvals.map{ |f| [f[0].peel,f[1]] }) + ((oldvals.map{ |f| [f,Binder.find(f['modelid'].to_s)] }).sort_by{ |f| f[0]['timestamp'] }.reverse)).reject{ |f| !(f[1].is_pub?) || !(f[1].parent!={'id'=>'0','title'=>''}) }.uniq.first(feedlength)#.reverse
 

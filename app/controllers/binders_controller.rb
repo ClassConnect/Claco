@@ -123,9 +123,9 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
-		@root = Binder.where("parent.id" => "0", :owner => current_teacher.id.to_s)
+		@root = signed_in? ? Binder.where("parent.id" => "0", :owner => current_teacher.id.to_s) : []
 
-		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
+		@access = signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
 		
 		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 

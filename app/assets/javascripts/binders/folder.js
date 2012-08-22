@@ -164,6 +164,9 @@ function editInit() {
     } else if ($(this).attr('id') == 'move-act') {
       popForm('move-form', $(this).parent().parent().parent().parent().parent());
 
+    } else if ($(this).attr('id') == 'snapbtn') {
+      popForm('copy-form', $(this).parent().parent().parent());
+
     }
 
 
@@ -416,6 +419,9 @@ function editInit() {
             type: 'post',
             success: function(data) {
               // nothing
+            },
+            error: function(data) {
+              alert(data);
             }
           });
 

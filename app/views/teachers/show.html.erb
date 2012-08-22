@@ -83,7 +83,7 @@
       <ul class="profile-info-items">
         <% if !@teacher.omnihash["twitter"].nil? %>
         <li>
-          <a href="<%= current_teacher.omnihash["twitter"]["profile"] %>" target="_blank">
+          <a href="<%= @teacher.omnihash["twitter"]["profile"] %>" target="_blank">
             <span class="twitterIcon"><%= image_tag("settings/twitter.png", :style => "margin-top:-4px") %></span>
             @<%= @teacher.omnihash["twitter"]["username"] %>
           </a>

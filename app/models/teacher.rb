@@ -405,6 +405,8 @@ class Info
 	#field :avatar_width,		:type => Integer, :default => 0
 	#field :avatar_height,		:type => Integer, :default => 0
 
+	field :grades,				:type => Array, :default => []
+	field :subjects,			:type => Array, :default => []
 	field :bio, 				:type => String, :default => ""
 	field :website,				:type => String, :default => ""
 	field :city,				:type => String, :default => ""

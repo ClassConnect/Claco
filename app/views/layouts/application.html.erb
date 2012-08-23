@@ -16,6 +16,7 @@
 		<%= javascript_include_tag "tooltip" %>
 		<%= javascript_include_tag "tabs" %>
 		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]');$.pjax.defaults.timeout = 5000;$.pjax.defaults.maxCacheLength=0;" %>
+		<%= javascript_tag "page = #{params[:controller]}##{params[:action]}; loggedin = #{signed_in?}" %>
 		<%= yield :headcon %>
 
 

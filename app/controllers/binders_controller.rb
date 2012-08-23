@@ -1610,7 +1610,7 @@ class BindersController < ApplicationController
 			if @binder.parent["id"] != "0"
 				@op = Binder.find(@binder.parent["id"])
 
-				@op.update_attributes(	:owned_fork_total => op.owned_fork_total - (@binder.fork_total+@binder.owned_fork_total),
+				@op.update_attributes(	:owned_fork_total => @op.owned_fork_total - (@binder.fork_total+@binder.owned_fork_total),
 										:files		=> @op.files - @binder.files,
 										:folders	=> @op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
 										:total_size	=> @op.total_size - @binder.total_size,

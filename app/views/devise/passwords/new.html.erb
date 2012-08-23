@@ -11,7 +11,7 @@
 <%= form_for(resource, :as => resource_name, :url => teacher_password_path, :html => { :method => :post }) do |f| %>
   <%= devise_error_messages! %>
 
-  <input type="text" placeholder="Enter your Claco email address" style="margin-top:10px;margin-bottom:10px" />
+  <%= f.email_field :email, :placeholder => "Enter your Claco email address", :style => "margin-top:10px;margin-bottom:10px" %>
 
   <div><%= f.submit "Send me reset password instructions", :class => "btn btn-primary", :style => "font-weight:bolder" %></div>
 <% end %>

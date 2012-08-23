@@ -330,6 +330,8 @@ class BindersController < ApplicationController
 
 					raise "Invalid URL" if (url || embedtourl) && link.empty?
 
+					raise "Sorry, you can't link to this site. Please download any files and upload them to Claco." if URI.parse(link).host.include?("teacherspayteachers.com")
+
 					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
@@ -452,8 +454,8 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue
-			errors << "Invalid URL"
+		rescue Exception => e
+			errors << e
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
@@ -597,11 +599,6 @@ class BindersController < ApplicationController
 
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 			
-			# override carrierwave uploader field
-			#altparams = params.clone
-			#altparams[:file] = altparams[:file].original_filename
-
-
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
 																				File.extname(params[:file].original_filename)).strip[0..49],
 										:owner				=> current_teacher.id,
@@ -647,8 +644,9 @@ class BindersController < ApplicationController
 											:owner		=> current_teacher.id)#,
 											#:croc_uuid => filedata)
 
-			@binder.save
+			if @binder.save
 
+<<<<<<< HEAD
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
 						params[:controller].to_s,
@@ -656,99 +654,111 @@ class BindersController < ApplicationController
 						params.to_s)
 
 			#logger.debug(@binder.versions.last.file.class)
+=======
+				Mongo.log(	current_teacher.id.to_s,
+							__method__.to_s,
+							params[:controller].to_s,
+							@binder.id.to_s,
+							params.to_s)
+				#logger.debug(@binder.versions.last.file.class)
+>>>>>>> b186bc1cd590a5dbffe101da4391aaf6bad51080
 
-			#logger.debug @binder.versions.last.file.url
-			#logger.debug "current path: #{@binder.versions.last.file.current_path}"
-			#logger.debug params[:binder][:versions][:file].current_path
-			if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext.downcase
-				# send file to crocodoc if the format is supported
-				if Crocodoc.check_format_validity(@binder.current_version.ext)
+				#logger.debug @binder.versions.last.file.url
+				#logger.debug "current path: #{@binder.versions.last.file.current_path}"
+				#logger.debug params[:binder][:versions][:file].current_path
+				if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext.downcase
+					# send file to crocodoc if the format is supported
+					if Crocodoc.check_format_validity(@binder.current_version.ext)
 
-					Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
+						Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 
-					@binder.current_version.update_attributes( :thumbnailgen => 3 )
+						@binder.current_version.update_attributes( :thumbnailgen => 3 )
 
-					filedata = Crocodoc.upload(@binder.current_version.file.url)
-						
-					filedata = filedata["uuid"] if !filedata.nil?
+						filedata = Crocodoc.upload(@binder.current_version.file.url)
+							
+						filedata = filedata["uuid"] if !filedata.nil?
 
-					@binder.current_version.update_attributes(:croc_uuid => filedata)
+						@binder.current_version.update_attributes(:croc_uuid => filedata)
 
-					# delegate image fetch to Delayed Job worker
-					#Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
+						# delegate image fetch to Delayed Job worker
+						#Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 
-					# DELAYTAG
-					# .delay(:queue => 'thumbgen')
-					Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+						# DELAYTAG
+						# .delay(:queue => 'thumbgen')
+						Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 
-					# delay(:queue => 'thumbgen').
-					#Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
+						# delay(:queue => 'thumbgen').
+						#Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
 
-				elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
-					# for now, image will be added as file AND as imgfile
-					stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
-					stathash[:imgfile][:retrieved] = true
-
-					# upload image
-					@binder.current_version.update_attributes( 	:imgfile => params[:file],
-																:imgclass => 0,
-																:imgstatus => stathash)
-
-					#Binder.generate_folder_thumbnail(@binder.id)
-
-					#GC.start
-
-					#Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
-					#Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
-
-					Binder.delay(:queue => 'thumbgen').gen_smart_thumbnails(@binder.id)
-
-					# DELAYTAG
-					#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
-
-				elsif @binder.current_version.ext.downcase == ".notebook"
-
-					zip = Zip::ZipFile.open(params[:file].path)
-
-					if !zip.find_entry('preview.png').nil?
-
-						png = FilelessIO.new(zip.read('preview.png'))
-
-						png.original_filename = 'preview.png'
-
-						stathash = @binder.current_version.imgstatus
+					elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
+						# for now, image will be added as file AND as imgfile
+						stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
 						stathash[:imgfile][:retrieved] = true
 
-						@binder.current_version.update_attributes(:imgfile => png)
+						# upload image
+						@binder.current_version.update_attributes( 	:imgfile => params[:file],
+																	:imgclass => 0,
+																	:imgstatus => stathash)
 
-						Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
+						#Binder.generate_folder_thumbnail(@binder.id)
+
+						#GC.start
+
+						#Rails.logger.debug ">>> About to call generate_folder_thumbnail on #{@binder.parent["id"].to_s}"
+						#Rails.logger.debug ">>> Binder.inspect #{@binder.parent.to_s}"
+
+						Binder.delay(:queue => 'thumbgen').gen_smart_thumbnails(@binder.id)
+
+						# DELAYTAG
+						#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
+					elsif @binder.current_version.ext.downcase == ".notebook"
+
+						#This job should probably be delayed
+
+						zip = Zip::ZipFile.open(params[:file].path)
+
+						if !zip.find_entry('preview.png').nil?
+
+							png = FilelessIO.new(zip.read('preview.png'))
+
+							png.original_filename = 'preview.png'
+
+							stathash = @binder.current_version.imgstatus
+							stathash[:imgfile][:retrieved] = true
+
+							@binder.current_version.update_attributes(:imgfile => png)
+
+							Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
+						end
+
 					end
+				else
+					stathash = @binder.current_version.imgstatus
+					stathash[:imageable] = false
 
+					# unable to derive iamge from filetype
+					@binder.current_version.update_attributes(	:imgstatus => stathash,
+																:imgclass => 4 )
 				end
-			else
-				stathash = @binder.current_version.imgstatus
-				stathash[:imageable] = false
-
-				# unable to derive iamge from filetype
-				@binder.current_version.update_attributes(	:imgstatus => stathash,
-															:imgclass => 4 )
-			end
 
 
-			@binder.create_binder_tags(params,current_teacher.id)
-	 
-			pids = @parentsarr.collect {|x| x["id"] || x[:id]}
+				@binder.create_binder_tags(params,current_teacher.id)
+		 
+				pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
-			pids.each do |id|
+				pids.each do |id|
 
-				if id != "0"
-					parent = Binder.find(id)
-					parent.update_attributes(	:files		=> parent.files + 1,
-												:total_size	=> parent.total_size + params[:file].size)
+					if id != "0"
+						parent = Binder.find(id)
+						parent.update_attributes(	:files		=> parent.files + 1,
+													:total_size	=> parent.total_size + params[:file].size)
+					end
 				end
-			end
 
-			Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+				Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+
+			end
 
 		else
 

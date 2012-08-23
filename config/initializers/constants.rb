@@ -10,7 +10,7 @@ PATH_THUMBNAIL = "/download/thumbnail"
 PATH_STATUS = "/document/status"
 PATH_SESSION = "/session/create"
 
-CROC_VALID_FILE_FORMATS = ['.doc','.docx','.pdf','.ppt','.pptx','.xls','xls','.xlsx','xlsx']
+CROC_VALID_FILE_FORMATS = %w[.doc .docx .pdf .ppt .pptx .xls xls .xlsx xlsx]
 
 CROC_API_OPTIONS = {
 	# Your API token
@@ -96,3 +96,5 @@ PERSONAL_FEED_LENGTH = 40
 MAIN_FEED_STORAGE = 50
 SUBSC_FEED_STORAGE = 50
 PERSONAL_FEED_STORAGE = 50
+
+FEED_METHOD_WHITELIST = %w[create createfile createcontent update updatetags forkitem favorite setpub]

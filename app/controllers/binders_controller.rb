@@ -196,13 +196,14 @@ class BindersController < ApplicationController
 		#TODO: Verify permissions before rendering view
 		if @binder.format == 1
 
+			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1)
+
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
 						params[:controller].to_s,
 						@binder.id.to_s,
 						params)
 
-			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1)
 			redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return 
 		end
 
@@ -466,12 +467,6 @@ class BindersController < ApplicationController
 
 		errors = []
 
-		Mongo.log(	current_teacher.id.to_s,
-					__method__.to_s,
-					params[:controller].to_s,
-					@binder.id.to_s,
-					params)
-
 		if params[:text] != "Type a note..."
 
 			if teacher_signed_in? && @binder.get_access(current_teacher.id.to_s) == 2
@@ -494,6 +489,12 @@ class BindersController < ApplicationController
 
 		end
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@binder.id.to_s,
+					params)
+
 		respond_to do |format|
 			format.html {render :text => errors.empty? ? "1" : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 		end
@@ -504,17 +505,15 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		@binder.update_attributes(	:title				=> params[:newtitle][0..49],
+									:last_update		=> Time.now.to_i,
+									:last_updated_by	=> current_teacher.id.to_s)
+
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					@binder.id.to_s,
 					params)
-
-		@binder.update_attributes(	:title				=> params[:newtitle][0..49],
-									:last_update		=> Time.now.to_i,
-									:last_updated_by	=> current_teacher.id.to_s)
-
-		
 
 		@children = @binder.children.sort_by {|binder| binder.parents.length}
 
@@ -543,13 +542,13 @@ class BindersController < ApplicationController
 		#Rails.logger.debug params.to_s
 		#Rails.logger.debug params["standards"].to_s
 
+		@binder.tag.update_node_tags(params,current_teacher.id)
+
 		src = Mongo.log(current_teacher.id.to_s,
 						__method__.to_s,
 						params[:controller].to_s,
 						@binder.id.to_s,
 						params)
-
-		@binder.tag.update_node_tags(params,current_teacher.id)
 
 		@binder.children.sort_by {|binder| binder.parents.length}.each do |h|
 
@@ -599,14 +598,9 @@ class BindersController < ApplicationController
 			#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 			
 			# override carrierwave uploader field
-			altparams = params.clone
-			altparams[:file] = altparams[:file].original_filename
+			#altparams = params.clone
+			#altparams[:file] = altparams[:file].original_filename
 
-			Mongo.log(	current_teacher.id.to_s,
-						__method__.to_s,
-						params[:controller].to_s,
-						@binder.id.to_s,
-						altparams)
 
 			@binder.update_attributes(	:title				=> File.basename(	params[:file].original_filename,
 																				File.extname(params[:file].original_filename)).strip[0..49],
@@ -654,6 +648,12 @@ class BindersController < ApplicationController
 											#:croc_uuid => filedata)
 
 			@binder.save
+
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						params[:controller].to_s,
+						@binder.id.to_s,
+						params.to_s)
 
 			#logger.debug(@binder.versions.last.file.class)
 
@@ -793,6 +793,8 @@ class BindersController < ApplicationController
 
 			@children.each do |c| 
 
+				c.update_attributes(:order_index => params[:data].index(c.id.to_s))
+
 				if src.nil?
 					src = Mongo.log(current_teacher.id.to_s,
 									__method__.to_s,
@@ -808,7 +810,6 @@ class BindersController < ApplicationController
 									{ :src => src })
 				end
 
-				c.update_attributes(:order_index => params[:data].index(c.id.to_s))
 			end
 
 		else
@@ -902,12 +903,6 @@ class BindersController < ApplicationController
 
 					@children.each do |h|
 
-						Mongo.log(	current_teacher.id.to_s,
-									__method__.to_s,
-									params[:controller].to_s,
-									h.id.to_s,
-									params,
-									{ :src => src })
 
 						@current_parents = h.parents
 
@@ -922,6 +917,12 @@ class BindersController < ApplicationController
 
 						h.update_parent_tags()
 
+						Mongo.log(	current_teacher.id.to_s,
+									__method__.to_s,
+									params[:controller].to_s,
+									h.id.to_s,
+									params,
+									{ :src => src })
 					end
 
 				end
@@ -986,10 +987,17 @@ class BindersController < ApplicationController
 
 		if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 
+			# fork will only be set if there is a teacher id mismatch
+			fav = !params[:favorite].nil?
 			fork = @inherited[:parent].owner != @binder.owner
 
 			# due to shared functionality, define method var
-			if fork
+			
+			if fav
+				method = "favorite"
+
+				@binder.inc(:fav_total, 1)
+			elsif fork
 				method = "forkitem"
 				# fork_total is 
 				@binder.inc(:fork_total, 1)
@@ -998,16 +1006,9 @@ class BindersController < ApplicationController
 				@binder.parents.each do |f|
 					Binder.find(f['id'].to_s).inc(:owned_fork_total,1) if f['id'].to_i>0
 				end
-
 			else
 				method = __method__.to_s
 			end
-
-			src = Mongo.log(current_teacher.id.to_s,
-							method.to_s,
-							params[:controller].to_s,
-							@binder.id.to_s,
-							params)
 
 			#@binder.inc(:fork_total, 1) if fork
 
@@ -1026,13 +1027,14 @@ class BindersController < ApplicationController
 										:forked_from		=> fork ? @binder.id.to_s : nil,
 										:fork_stamp			=> fork ? Time.now.to_i : nil,
 										:total_size			=> @binder.total_size,
+										:fav_total			=> @binder.fav_total,
 										:pub_size			=> @binder.pub_size,
 										:priv_size			=> @binder.priv_size,
 										:order_index		=> @parent_child_count,
-										:parent				=> @parenthash,
-										:parents			=> @parentsarr,
-										:permissions		=> @binder.permissions,
-										:parent_permissions	=> @parentperarr,
+										:parent				=> (fav ? { 'id'=>'-2', 'title'=>'' } : @parenthash),#@parenthash,
+										:parents			=> (fav ? [{ 'id'=>'-2', 'title'=>'' }] : @parentsarr),#@parentsarr,
+										:permissions		=> (fav ? [{"type"=>3, "auth_level"=>1}] : @binder.permissions),#@binder.permissions,
+										:parent_permissions	=> (fav ? [] : @parentperarr),#@parentperarr,
 										:owner				=> current_teacher.id,
 										:username			=> @binder.username,
 										:fname				=> @binder.fname,
@@ -1056,16 +1058,20 @@ class BindersController < ApplicationController
 
 			#TODO: copy related images?
 
+			@new_parent.save
+
+			src = Mongo.log(current_teacher.id.to_s,
+							method.to_s,
+							params[:controller].to_s,
+							@binder.id.to_s,
+							params)
+
 			Mongo.log(	current_teacher.id.to_s,
 						method.to_s,
 						params[:controller].to_s,
 						@new_parent.id.to_s,
 						params,
 						{ :copy => @binder.id.to_s, :src => src })
-
-			@new_parent.save
-
-
 
 			@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
 
@@ -1110,9 +1116,9 @@ class BindersController < ApplicationController
 					@new_node = Binder.new(	:title				=> h.title,
 											:body				=> h.body,
 											:parent				=> @node_parent,
-											:parents			=> @node_parents,
-											:permissions		=> h.permissions,
-											:parent_permissions	=> @parentperarr + @old_permissions,
+											:parents			=> fav ? [{ 'id'=>'-2', 'title'=>'' }] + (h.parents - {'id'=>'0','title'=>''}) : @node_parents,
+											:permissions		=> fav ? [] : h.permissions,
+											:parent_permissions	=> fav ? @parentperarr : @parentperarr + @old_permissions,
 											:owner				=> current_teacher.id,
 											:username			=> h.username,
 											:fname				=> h.fname,
@@ -1127,7 +1133,8 @@ class BindersController < ApplicationController
 											:fork_stamp			=> fork ? Time.now.to_i : nil,
 											:total_size			=> h.total_size,
 											:pub_size			=> h.pub_size,
-											:priv_size			=> h.priv_size)
+											:priv_size			=> h.priv_size,
+											:fav_total			=> h.fav_total)
 
 					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
 					# 									:file_hash	=> h.current_version.file_hash,
@@ -1307,18 +1314,8 @@ class BindersController < ApplicationController
 		# read/write access
 		if @binder.get_access(current_teacher.id.to_s) == 2
 
-			Rails.logger.debug "<<< NEW SETPUB ACTION: >>>"
-
 			# check if parent binder has any type 3 permissions
 			if @binder.parent_permissions.find {|p| p["type"] == 3}.nil?
-
-				Rails.logger.debug "<<< No type three permissions! >>>"
-
-				src = Mongo.log(current_teacher.id.to_s,
-								__method__.to_s,
-								params[:controller].to_s,
-								@binder.id.to_s,
-								params)
 
 				if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
@@ -1328,8 +1325,6 @@ class BindersController < ApplicationController
 					@binder.save
 
 				else
-
-					Rails.logger.debug "<<< SETPUB LOG 3 params:#{params[:enabled]} >>>"
 
 					# set this binder's permissions
 					@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
@@ -1345,6 +1340,12 @@ class BindersController < ApplicationController
 				end
 
 				@binder.save
+
+				src = Mongo.log(current_teacher.id.to_s,
+								__method__.to_s,
+								params[:controller].to_s,
+								@binder.id.to_s,
+								params)
 
 				# deal with the naughty children
 				@binder.subtree.each do |h|
@@ -1385,19 +1386,11 @@ class BindersController < ApplicationController
 
 			else
 
-				Rails.logger.debug "<<< SETPUB LOG 4 >>>"
-
 				if @binder.parent_permissions.find {|p| p["type"] == 3}["auth_level"] == 1 && params[:enabled] == "false"
 
 					error = "Oops! The parent is currently shared."
 
 				else
-
-					src = Mongo.log(current_teacher.id.to_s,
-									__method__.to_s,
-									params[:controller].to_s,
-									@binder.id.to_s,
-									params)
 
 					if @binder.permissions.find {|p| p["type"] == 3}.nil?
 
@@ -1406,8 +1399,6 @@ class BindersController < ApplicationController
 						#@binder.save
 
 					else
-
-						Rails.logger.debug "<<< SETPUB LOG 5 params:#{params[:enabled]} >>>"
 
 						@binder.permissions.find {|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0
 						#@binder.save
@@ -1441,7 +1432,11 @@ class BindersController < ApplicationController
 
 					@binder.save
 
-
+					src = Mongo.log(current_teacher.id.to_s,
+									__method__.to_s,
+									params[:controller].to_s,
+									@binder.id.to_s,
+									params)
 
 					# take care of the naughty children
 					@binder.subtree.each do |h|
@@ -1602,12 +1597,6 @@ class BindersController < ApplicationController
 
 		if @binder.get_access(current_teacher.id.to_s == 2)
 
-			src = Mongo.log(current_teacher.id.to_s,
-							__method__.to_s,
-							params[:controller].to_s,
-							@binder.id.to_s,
-							params)
-
 			# preserve parent ID before writing over
 			@parentid = @binder.parent["id"]
 
@@ -1633,22 +1622,27 @@ class BindersController < ApplicationController
 			@binder.update_attributes(	:parent		=> @parenthash,
 										:parents	=> @parentsarr)
 
+			src = Mongo.log(current_teacher.id.to_s,
+							__method__.to_s,
+							params[:controller].to_s,
+							@binder.id.to_s,
+							params)
 
 			#If directory, deal with the children
 			if @binder.type == 1 #Eventually will apply to type == 3 too
 
 				@binder.subtree.each do |h|
 
+					@current_parents = h.parents
+					@size = @current_parents.size
+					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
+					
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
 								params[:controller].to_s,
 								@binder.id.to_s,
 								params,
 								{ :src => src })
-
-					@current_parents = h.parents
-					@size = @current_parents.size
-					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
 				end
 
 			end

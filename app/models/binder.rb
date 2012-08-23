@@ -65,6 +65,8 @@ class Binder
 	field :fork_total, :type => Integer, :default => 0
 	# number of times this binder, or binders below it, are forked
 	field :owned_fork_total, :type => Integer, :default => 0
+	# number of times this binder has been favorited
+	field :fav_total, :type => Integer, :default => 0
 
 	#Social
 	field :likes, :type => Integer

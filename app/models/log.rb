@@ -1,5 +1,6 @@
 class Log
 	include Mongoid::Document
+	cache
 
 	field :ownerid
 	field :timestamp, :type => Integer

@@ -23,7 +23,7 @@
 									<% 	# /5029db22c3e41e3a470000a3/portfolio/seed+binder/502afef1c3e41e0dcc000004
 										# /:username/portfolio(/:root)/:title/:id
 									%>
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You created <a href="<%= named_binder_route(Binder.find(f[:binder].id.to_s)) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> created <a href="<%= named_binder_route(Binder.find(f[:binder].id.to_s)) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
@@ -55,7 +55,7 @@
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You added a file to <a href="<%= f[:binder].parents.size==2 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents.size==2 ? f[:binder].parents[1]["title"] : f[:binder].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added a file to <a href="<%= f[:binder].parents.size==2 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents.size==2 ? f[:binder].parents[1]["title"] : f[:binder].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
@@ -100,7 +100,7 @@
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You added content to <a href="<%= f[:binder].parents.size==2 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents.size==2 ? f[:binder].parents[1]["title"] : f[:binder].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added content to <a href="<%= f[:binder].parents.size==2 ? named_binder_route(Binder.find(f[:binder].parent['id'])) : named_binder_route(Binder.find(f[:binder].parents[1]['id'])) %>"><%= f[:binder].parents.size==2 ? f[:binder].parents[1]["title"] : f[:binder].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
@@ -142,7 +142,7 @@
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You updated <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
@@ -193,7 +193,7 @@
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You changed the tags for <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> changed the tags for <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
@@ -246,10 +246,58 @@
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You forked <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> forked <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
+									<% end %>
+								</div>
+
+								<% if (!f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:binder].type != 1 || !f[:binder].body.empty? %>
+								<a href="<%= named_binder_route(f[:binder]) %>" class="conlink">
+									<div class="thecontent">
+											<!-- <div class="previmg" style="background-image: url(http://img.cla.co/3b4c0e0a00ddab30cff952e4a7158c95/thumb_lg.png)"></div> -->
+											<% if f[:binder].type==1 %>
+											<% if false %>
+												<% imgarr = Binder.get_folder_array(f[:binder].id.to_s) %>
+												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
+											<% end %>
+											<% else %>
+												<% if !f[:binder].current_version.nil? && f[:binder].current_version.imgstatus["img_thumb_lg"]["generated"] %>
+													<div class="previmg" style="background-image: url('<%= f[:binder].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
+												<% end %>
+											<% end %>
+											<% if !f[:binder].body.empty? %>
+											<div class="txtcon">
+												<div class="contitle">
+													<!--Curiosity Landing Pictures (NASA Exclusive)-->
+													<%= #f[:binder].title 
+													%>
+												</div>
+
+												
+												<div class="condesc">
+													<!-- The curiosity rover successfully landed on the Mars surface last Friday. These photos are the first to come back from the red planet. Very exciting times for the NASA team! <u>view more</u> -->
+													<%= f[:binder].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:binder].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+												</div>
+											</div>
+											<% end %>
+
+										<div style="clear:both"></div>
+									</div>
+								</a>
+								<% end %>
+
+							</div>
+
+					<% when "favorite" %>
+
+							<div class="feedcontent">
+								<div class="thetitle">
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
+										You favorited <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
+									<% else %>
+										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> favorited <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% end %>
 								</div>
 
@@ -294,7 +342,7 @@
 
 							<div class="feedcontent">
 								<div class="thetitle">
-									<% if @is_self %>
+									<% if current_teacher.id.to_s==f[:owner].id.to_s %>
 										You shared <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 									<% else %>
 										<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> shared <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.

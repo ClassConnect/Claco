@@ -15,6 +15,8 @@ class HomeController < ApplicationController
 
 		#blacklist = []
 
+		#@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
+
 		if true
 
 			@feed = []

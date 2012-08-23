@@ -37,17 +37,17 @@ class Log
 
 	end
 
-	def self.by_id_cache_key(id)
-		"log_by_id=#{id}"
-	end
+	# def self.by_id_cache_key(id)
+	# 	"log_by_id=#{id}"
+	# end
 
-	def self.find(*args)
-		# checks cache for Stock.find(id:String) and Stock.find(BSON::ObjectId)
-		if args.length == 1 && (args[0].is_a?(String) || args[0].is_a?(BSON::ObjectId))
-			Rails.cache.fetch(Log.by_id_cache_key(args[0].to_s)) { super(*args) }
-		else
-			super(*args)
-		end
-	end
+	# def self.find(*args)
+	# 	# checks cache for find(id:String) and find(BSON::ObjectId)
+	# 	if args.length == 1 && (args[0].is_a?(String) || args[0].is_a?(BSON::ObjectId))
+	# 		Rails.cache.fetch(Log.by_id_cache_key(args[0].to_s)) { super(*args) }
+	# 	else
+	# 		super(*args)
+	# 	end
+	# end
 
 end

@@ -20,9 +20,9 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		redirect_to "/#{@teacher.username}" and return if @teacher.username != params[:username]
-
 		render "public/404.html", :status => 404 and return if @teacher.nil?
+
+		redirect_to "/#{@teacher.username}" and return if @teacher.username != params[:username]
 
 		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 

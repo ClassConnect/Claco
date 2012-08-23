@@ -747,6 +747,10 @@ class BindersController < ApplicationController
 
 				Binder.find(pids.last).inc(:children,1) if pids.last != "0"
 
+			else
+
+				errors << ""
+
 			end
 
 		else

@@ -329,6 +329,8 @@ class BindersController < ApplicationController
 
 					raise "Invalid URL" if (url || embedtourl) && link.empty?
 
+					raise "Sorry, you can't link to this site. Please download any files and upload them to Claco." if URI.parse(link).host.include?("teacherspayteachers.com")
+
 					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 											:owner				=> current_teacher.id,
 											:username			=> current_teacher.username,
@@ -451,8 +453,8 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
-		rescue
-			errors << "Invalid URL"
+		rescue Exception => e
+			errors << e
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}

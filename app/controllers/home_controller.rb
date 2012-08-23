@@ -24,7 +24,7 @@ class HomeController < ApplicationController
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 			#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
-			logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
+			logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
 
 			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
@@ -102,7 +102,6 @@ class HomeController < ApplicationController
 				#logs = Log.where( :ownerid.ne => current_teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","setpub"] ).desc(:timestamp)
 				logs = Log.where( :model => "binders", "data.src" => nil, :timestamp.gt => [current_teacher.feed.headtime(0).to_i,current_teacher.feed.headtime(1).to_i].min ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
 
-				Rails.logger.debug "<<< FORK LOGS: #{logs.to_s} >>>"
 
 				subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 

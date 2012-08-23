@@ -646,22 +646,11 @@ class BindersController < ApplicationController
 
 			if @binder.save
 
-<<<<<<< HEAD
-			Mongo.log(	current_teacher.id.to_s,
-						__method__.to_s,
-						params[:controller].to_s,
-						@binder.id.to_s,
-						params.to_s)
-
-			#logger.debug(@binder.versions.last.file.class)
-=======
 				Mongo.log(	current_teacher.id.to_s,
 							__method__.to_s,
 							params[:controller].to_s,
 							@binder.id.to_s,
 							params.to_s)
-				#logger.debug(@binder.versions.last.file.class)
->>>>>>> b186bc1cd590a5dbffe101da4391aaf6bad51080
 
 				#logger.debug @binder.versions.last.file.url
 				#logger.debug "current path: #{@binder.versions.last.file.current_path}"

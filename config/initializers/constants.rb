@@ -10,7 +10,7 @@ PATH_THUMBNAIL = "/download/thumbnail"
 PATH_STATUS = "/document/status"
 PATH_SESSION = "/session/create"
 
-CROC_VALID_FILE_FORMATS = %w[.doc .docx .pdf .ppt .pptx .xls xls .xlsx xlsx]
+CROC_VALID_FILE_FORMATS = %w[doc .doc docx .docx pdf .pdf ppt .ppt pptx .pptx xls .xls xlsx .xlsx]
 
 CROC_API_OPTIONS = {
 	# Your API token

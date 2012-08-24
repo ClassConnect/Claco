@@ -657,7 +657,7 @@ class BindersController < ApplicationController
 				#logger.debug params[:binder][:versions][:file].current_path
 				if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext.downcase
 					# send file to crocodoc if the format is supported
-					if Crocodoc.check_format_validity(@binder.current_version.ext)
+					if Crocodoc.check_format_validity(@binder.current_version.ext.downcase)
 
 						Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 

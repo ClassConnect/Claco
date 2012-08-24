@@ -183,9 +183,9 @@
 					<div class="feedcontent">
 						<div class="thetitle">
 							<% if current_teacher.id.to_s==f[:owner].id.to_s %>
-								You forked <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
+								You snapped <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> forked <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
+								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> snapped <a href="<%= named_binder_route(f[:binder]) %>"><%= f[:binder].title  %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
 							<% end %>
 						</div>
 

@@ -72,20 +72,10 @@ class Teacher
 	## Token authenticatable
 	# field :authentication_token, :type => String
 
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
+
 	# Class Methods
-
-
-	# regenerate all thumbnails for a teacher's content
-	# incomplete method
-	# def self.regen_thumbnails(id)
-
-	# 	Binder.where( :owner => id.to_s ).each do |f|
-
-	# 		f.regen_thumbnails
-
-	# 	end
-
-	# end
 
 	# Mr. John Smith
 	def full_name

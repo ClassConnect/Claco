@@ -62,7 +62,7 @@ gem 'daemons'
 
 gem 'thin'
 
-
+gem 'debugger', group: [:development, :test]
 #gem 'rest-open-uri'
 #gem 'open-uri'
 

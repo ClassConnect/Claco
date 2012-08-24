@@ -99,4 +99,27 @@ class HomeController < ApplicationController
 		end
 	end
 
+	def teachersearch
+
+		if params[:query].present?
+			@teachers = Teacher.search(params[:query], load: true)
+		else
+			@teachers = Teacher.all
+		end
+
+		Rails.logger.debug "<<< TEACHERS RETURNED >>>"
+		Rails.logger.debug @teachers.size.to_s
+
+		retstr=""
+
+		@teachers.each do |t|
+			retstr += t.fname + ' ' + t.lname + '<br />'
+		end
+
+		respond_to do |format|
+			format.html {render :text => retstr}
+		end
+
+	end
+
 end

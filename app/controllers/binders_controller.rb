@@ -581,6 +581,8 @@ class BindersController < ApplicationController
 
 		#@teststr = "1234567890"
 
+		#debugger
+
 		errors = []
 
 		@inherited = inherit_from(params[:id])

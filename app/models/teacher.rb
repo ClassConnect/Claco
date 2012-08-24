@@ -67,6 +67,8 @@ class Teacher
 	
 	attr_accessor :login
 
+	index [["info.location", MONGO::GEO2D]]
+
 	## Token authenticatable
 	# field :authentication_token, :type => String
 

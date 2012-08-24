@@ -659,9 +659,11 @@ class BindersController < ApplicationController
 					# send file to crocodoc if the format is supported
 					if Crocodoc.check_format_validity(@binder.current_version.ext.downcase)
 
-						Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
+						#Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 
 						@binder.current_version.update_attributes( :thumbnailgen => 3 )
+
+						#Rails.logger.debug "<<< URL: #{@binder.current_version.file.url.to_s} >>>"
 
 						filedata = Crocodoc.upload(@binder.current_version.file.url)
 							
@@ -1867,7 +1869,7 @@ class BindersController < ApplicationController
 
 			filedata = JSON.parse(RestClient.post(CROC_API_URL+PATH_UPLOAD, :token => CROC_API_TOKEN, 
 																			#:file => File.open("#{filestring}")){ |response, request, result| response })
-																			:url => filestring))#open(filestring)){ |response, request, result| response })
+																			:url => filestring.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co")))#open(filestring)){ |response, request, result| response })
 
 			Rails.logger.debug "filedata: #{filedata.to_s}"
 			Rails.logger.debug docstatus(filedata["uuid"])
@@ -1888,8 +1890,10 @@ class BindersController < ApplicationController
 		# QUEUED,PROCESSING,DONE,ERROR
 		def docstatus(uuid)
 			# this does not appear to work
-			return JSON.parse(RestClient.get(CROC_API_URL + PATH_STATUS, :token => CROC_API_TOKEN, :uuids => uuid ){ |response, request, result| response })
+			#return JSON.parse(RestClient.get(CROC_API_URL + PATH_STATUS, :token => CROC_API_TOKEN, :uuids => uuid ){ |response, request, result| response })
 			
+			return JSON.parse(RestClient.get("https://crocodoc.com/api/v2/document/status?token=#{CROC_API_TOKEN}&uuids=#{uuid.to_s}"))
+
 		end
 
 		 # passed uuid of file

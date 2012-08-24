@@ -142,7 +142,7 @@ class Teacher
 		if auth.provider == "twitter"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
-			auth.extra.delte("access_token")
+			auth.extra.delete("access_token")
 			teacher.omnihash[auth.provider]["data"] = auth
 		elsif auth.provider == "facebook"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname if !auth.info.nickname.empty?

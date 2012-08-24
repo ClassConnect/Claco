@@ -251,6 +251,38 @@ class TeachersController < ApplicationController
 
 	end
 
+	def omnifriend
+
+		errors = []
+
+		if !current_teacher.omnihash["facebook"].nil?
+
+			if current_teacher.omnihash["facebook"]["data"]["credentials"]["expires_at"] > Time.now.to_i
+
+				fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{current_teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{current_teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
+
+				Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |teacher|
+
+					current_teacher.relationship_by_teacher_id(teacher.id).subscribe
+
+				end
+
+			else
+
+				#Set redir session var and redir to oauth for new token, then redir back to this function.
+
+				errors = "Your token has expired"
+
+			end
+
+		else
+
+			errors = "You still need to authenticate your facebook account"
+
+		end
+
+	end
+
 	# #/subs
 	# def subs
 

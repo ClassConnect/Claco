@@ -170,7 +170,7 @@ class TeachersController < ApplicationController
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",
-												:location		=> [params[:lng], params[:lat]])
+												:location		=> [params[:lng].to_f, params[:lat].to_f])
 		# if !params[:info][:avatar].empty?
 		# 	params[:info][:avatar] = params[:info][:avatar].original_filename
 		# end

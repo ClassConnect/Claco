@@ -21,6 +21,7 @@ class HomeController < ApplicationController
 					begin
 						binder = Binder.find(f.modelid.to_s)
 					rescue
+						Rails.logger.fatal "Invalid binder ID!"
 						next
 					end
 

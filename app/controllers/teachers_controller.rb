@@ -57,78 +57,23 @@ class TeachersController < ApplicationController
 		@feed = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		#if @is_self
-			#logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).desc(:timestamp)#.in( method: ["create","createfile","createcontent","update","updatetags","setpub"] )
-		#else
-			logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
-		#end
+		logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
 
 		if logs.any?
 			logs.each do |f|
-
-				# push onto the feed if the node is not deleted
-				binder = Binder.find(f.modelid.to_s)
-
-				#  && (current_teacher.id.to_s==f.ownerid.to_s ? true : (binder.get_access(current_teacher.id.to_s) > 0))
-
-				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
-
-					#Rails.logger.debug "feed log: #{f.params.to_s}"
-
-					#timestamp << f.timestamp
-
-					#f.delete(:timestamp)
-
-					
-
-					#if @feed.any? && !(@feed.map { |g| g.clone.delete("timestamp") }.include? f.clone.delete("timestamp"))
-
-					# field :ownerid
-					# field :timestamp, :type => Integer
-					# # method and model are potentially redundant or unneeded fields
-					# # model is a lowercase string of the model name
-					# field :method
-					# field :controller
-					# field :modelid
-					# field :params, :type => Hash
-
-					# # non-standard optional data hash
-					# # :copy - this is a copy, and was copied from the binder ID specified by :copy
-					# # :src - this log is part of a logset, src is the ID of the 'parent' log
-					# field :data, :type => Hash, :default => {}
-
-					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) &&
-						( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-
-					#temp << f
-
-					#if temp.map { |g| g.delete(:timestamp) }.uniq.size == temp.size
-				
-
-							@feed << f
-
-						#end
-
-					#temp <<
-
-					#Rails.logger.debug "FEED: #{@feed.map { |h| h.delete("timestamp") }}"	
-
-					end
-
-					#temp = @feed.clone
-
-					#end
-
+				begin
+					binder = Binder.find(f.modelid.to_s)
+				rescue
+					next
 				end
-
-				#@feed.uniq!
-
-				# exit the loop if the maximum amount has been found
+				
+				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
+					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+						@feed << f
+					end
+				end
 				break if @feed.size == PERSONAL_FEED_LENGTH
-
-				#@feed[f.method.to_s] << f
 			end
-
 		end
 
 		# the array should already be sorted

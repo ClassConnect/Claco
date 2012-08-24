@@ -18,26 +18,34 @@ class HomeController < ApplicationController
 
 			if logs.any?
 				logs.each do |f|
+					begin
+						binder = Binder.find(f.modelid.to_s)
+					rescue
+						next
+					end
 
 					# push onto the feed if the node is not deleted
-					binder = Binder.find(f.modelid.to_s)
-
 					if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?
 						if !( @feed.map { |g| [g[:log].ownerid,g[:log].method,g[:log].controller,g[:log].modelid,g[:log].params,g[:log].data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+							
+							c = (@feed.reject { |h| h[:log].ownerid.to_s!=f.ownerid.to_s }).size
+
 							if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
-								f = { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-								@feed << f if @feed.size < 30
-								@subsfeed << f
+								if c < 10
+									f = { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
+									@feed << f if @feed.size < MAIN_FEED_LENGTH
+									# subsfeed will always be filled simultaneously or first, check anyway
+									@subsfeed << f if @subsfeed.size < SUBSC_FEED_LENGTH
+								end
 							else
-								c = (@feed.reject { |h| h[:log].ownerid.to_s!=f.ownerid.to_s }).size
 								# limit occupancy of non-subscibed teachers to 6
-								if c<6
-									@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f } if @feed.size < 30
+								if c < 6 && @feed.size < MAIN_FEED_LENGTH
+									@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
 								end
 							end
 						end
 					end
-					break if @feed.size == 30 && @subsfeed.size == 30
+					break if @feed.size == MAIN_FEED_LENGTH && @subsfeed.size == SUBSC_FEED_LENGTH
 				end
 			end
 		end

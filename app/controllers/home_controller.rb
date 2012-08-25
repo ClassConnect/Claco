@@ -102,15 +102,25 @@ class HomeController < ApplicationController
 	def teachersearch
 
 		if params[:query].present?
-			@teachers = Teacher.search(params[:query], load: true)
+			#@teachers = Teacher.all.tire.search(params[:query], load: true)
+			@teachers = Tire.search 'mongo-teachers' do
+				#query do
+				#	string 'fname:E*'
+				#end
+				query { all } 
+			end
+
+			@teachers=@teachers.results
 		else
 			@teachers = Teacher.all
 		end
 
 		Rails.logger.debug "<<< TEACHERS RETURNED >>>"
-		Rails.logger.debug @teachers.size.to_s
+		#Rails.logger.debug @teachers.size.to_s
 
 		retstr=""
+
+		debugger
 
 		@teachers.each do |t|
 			retstr += t.fname + ' ' + t.lname + '<br />'

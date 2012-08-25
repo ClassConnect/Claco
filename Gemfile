@@ -71,6 +71,11 @@ gem 'tire'
 
 gem 'yajl-ruby'
 
+# do not use! not supported
+#gem 'will_paginate'#, '~> 3.0'
+
+gem 'kaminari'
+
 # Soulmate
 gem 'rack-contrib'
 

@@ -72,22 +72,22 @@ class Teacher
 	## Token authenticatable
 	# field :authentication_token, :type => String
 
-	include Tire::Model::Search
-	#include Tire::Model::Callbacks
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
-	mapping do
-		indexes :id,		:index 		=> :not_analyzed
-		indexes :fname,		:analyzer 	=> 'snowball'
-		indexes :lname,		:analyzer 	=> 'snowball'
-		indexes :tags,		:analyzer 	=> 'keyword',		:default 	=> []
-	end
+	# mapping do
+	# 	indexes :id,		:index 		=> :not_analyzed
+	# 	indexes :fname,		:analyzer 	=> 'snowball'
+	# 	indexes :lname,		:analyzer 	=> 'snowball'
+	# 	indexes :tags,		:analyzer 	=> 'keyword',		:default 	=> []
+	# end
 
 	# Class Methods
 
 	# used for elasticsearch
-	def self
-    	to_indexed_json.as_json
-	end
+	# def self
+ #    	to_indexed_json.as_json
+	# end
 
 	# Mr. John Smith
 	def full_name

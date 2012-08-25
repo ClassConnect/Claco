@@ -414,6 +414,64 @@ class Binder
 		return title
 	end
 
+	def regen
+
+		if self.current_version.croc?
+
+			filedata = JSON.parse(RestClient.post(CROC_API_URL+PATH_UPLOAD, :token => CROC_API_TOKEN, 
+																			#:file => File.open("#{filestring}")){ |response, request, result| response })
+																			:url => self.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co")))
+
+			if filedata["error"].nil?
+
+				self.current_version.update_attributes(:croc_uuid => filedata["uuid"])
+
+				options = CROC_API_OPTIONS.merge({:uuid => filedata["uuid"], :size => '300x300'})
+
+				Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(self.id, "#{CROC_API_URL+PATH_THUMBNAIL}?#{URI.encode_www_form(options)}")
+
+			end
+
+		elsif self.current_version.img?
+
+			self.current_version.update_attributes(:remote_imgfile_url => self.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co"))
+
+			Binder.delay(:queue => 'thumbgen').gen_smart_thumbnails(self.id)
+
+		# elsif self.format == 2 && !self.current_version.embed && !self.current_version.vid?
+
+		# 	#URL2PNG
+
+		# 	# debugger
+
+		# 	query = {
+		# 		:url => self.current_version.data,
+		# 		:force => "always", # [false,always,timestamp] Default: false
+		# 		:fullpage => true, # [true,false] Default: false
+		# 		:max_width => "800", # options[:max_width], # scaled img width px; Default no-scaling
+		# 		:viewport => "800x600" # Max 5000x5000; Default 1280x1024
+		# 	}
+
+		# 	query_string = query.
+		# 		sort_by {|s| s[0].to_s }. # sort query by keys for uniformity
+		# 		select {|s| s[1] }. # skip empty options
+		# 		map {|s| s.map {|v| CGI::escape(v.to_s) }.join('=') }. # escape keys & vals
+		# 		join('&')
+
+  # 			token = Digest::MD5.hexdigest(query_string + URL2PNG_PRIVATE_KEY)
+
+  # 			url = "http://beta.url2png.com/v6/#{URL2PNG_API_KEY}/#{token}/png/?#{query_string}"
+
+  # 			Rails.logger.debug "URL:" + url
+
+		# 	Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(self.id,url)
+			
+		# 	# return "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{URI.encode(url)}"
+
+		end
+
+	end
+
 	###############################################################################################
 
 	            ####   ##### #       ##   #     # ##### ####          # ##### ####
@@ -1282,6 +1340,12 @@ class Version
 
 		rescue URI::InvalidURIError
 			return false
+
+	end
+
+	def vid?
+
+		return showme? || schooltube? || vimeo? || educreations? || youtube?
 
 	end
 

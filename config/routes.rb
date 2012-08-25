@@ -94,6 +94,7 @@ Claco::Application.routes.draw do
 
 	post	'/:username/portfolio(/:root)/:title/:id/reorder'				=> 'binders#reorderitem',			:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
+	get		'/:username/portfolio(/:root)/:title/:id/regen'					=> 'binders#regen',					:constraints => {:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/}
 
 	################################################
 	# Paths handled by named_binder_route function #

@@ -214,6 +214,21 @@ class BindersController < ApplicationController
 
 	end
 
+	def regen
+
+		@binder = Binder.find(params[:id])
+
+		@binder.regen
+
+		redirect_to named_binder_route(@binder)
+
+		rescue BSON::InvalidObjectId
+			render "public/404.html", :status => 404 and return
+		rescue Mongoid::Errors::DocumentNotFound
+			render "public/404.html", :status => 404 and return		
+
+	end
+
 	#Add links function
 	def createcontent
 

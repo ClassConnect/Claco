@@ -86,9 +86,9 @@ class Teacher
 	# Class Methods
 
 	# used for elasticsearch
-	# def self
- #    	to_indexed_json.as_json
-	# end
+	def self
+    	to_indexed_json.as_json
+	end
 
 	# Mr. John Smith
 	def full_name

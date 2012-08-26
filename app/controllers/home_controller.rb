@@ -27,7 +27,7 @@ class HomeController < ApplicationController
 
 					# push onto the feed if the node is not deleted
 					if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?
-						if !( @feed.map { |g| [g[:log].ownerid,g[:log].method,g[:log].controller,g[:log].modelid,g[:log].params,g[:log].data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+						if !( @feed.map { |g| [g[:log].ownerid,g[:log].method,g[:log].controller,g[:log].modelid,g[:log].data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
 							
 							c = (@feed.reject { |h| h[:log].ownerid.to_s!=f.ownerid.to_s }).size
 
@@ -103,11 +103,13 @@ class HomeController < ApplicationController
 
 		if params[:query].present?
 			#@teachers = Teacher.all.tire.search(params[:query], load: true)
-			@teachers = Tire.search 'mongo-teachers' do
+			@teachers = Tire.search 'mongo-teachers' do |search|
 				#query do
-				#	string 'fname:E*'
-				#end
-				query { all } 
+				search.query do |query|
+					#string 'fname:S*'
+					query.string params[:query]
+				end
+				#query { all } 
 			end
 
 			@teachers=@teachers.results

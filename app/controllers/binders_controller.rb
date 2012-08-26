@@ -342,109 +342,121 @@ class BindersController < ApplicationController
 					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
 					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
 
-					raise "Invalid URL" if (url || embedtourl) && link.empty?
+					if !((url || embedtourl) && link.empty?)
 
-					raise "Sorry, you can't link to this site. Please download any files and upload them to Claco." if URI.parse(link).host.include?("teacherspayteachers.com")
-
-					@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
-											:owner				=> current_teacher.id,
-											:username			=> current_teacher.username,
-											:fname				=> current_teacher.fname,
-											:lname				=> current_teacher.lname,
-											:parent				=> @parenthash,
-											:parents			=> @parentsarr,
-											:last_update		=> Time.now.to_i,
-											:last_updated_by	=> current_teacher.id.to_s,
-											:body				=> params[:body],
-											:order_index		=> @parent_child_count,
-											:parent_permissions	=> @parentperarr,
-											:files				=> 1,
-											:type				=> 2,
-											:format				=> 2)
-
-
-					@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
-													:thumbnailgen => 1, #video
-													:embed		=> embed,
-													:timestamp	=> Time.now.to_i,
-													:owner		=> current_teacher.id)
+						if !URI.parse(link).host.include?("teacherspayteachers.com")
+						
+							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
+													:owner				=> current_teacher.id,
+													:username			=> current_teacher.username,
+													:fname				=> current_teacher.fname,
+													:lname				=> current_teacher.lname,
+													:parent				=> @parenthash,
+													:parents			=> @parentsarr,
+													:last_update		=> Time.now.to_i,
+													:last_updated_by	=> current_teacher.id.to_s,
+													:body				=> params[:body],
+													:order_index		=> @parent_child_count,
+													:parent_permissions	=> @parentperarr,
+													:files				=> 1,
+													:type				=> 2,
+													:format				=> 2)
 
 
-					#@binder.create_binder_tags(params,current_teacher.id)
+							@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
+															:thumbnailgen => 1, #video
+															:embed		=> embed,
+															:timestamp	=> Time.now.to_i,
+															:owner		=> current_teacher.id)
 
-					@binder.save
 
-					Mongo.log(	current_teacher.id.to_s,
-								__method__.to_s,
-								params[:controller].to_s,
-								@binder.id.to_s,
-								params)
+							#@binder.create_binder_tags(params,current_teacher.id)
 
-					if url || embedtourl
+							@binder.save
 
-						uri = URI.parse(link)
+							Mongo.log(	current_teacher.id.to_s,
+										__method__.to_s,
+										params[:controller].to_s,
+										@binder.id.to_s,
+										params)
 
-						stathash = @binder.current_version.imgstatus
-						stathash[:imgfile][:retrieved] = true
+							if url || embedtourl
 
-						if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+								uri = URI.parse(link)
 
-							# YOUTUBE
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
+								stathash = @binder.current_version.imgstatus
+								stathash[:imgfile][:retrieved] = true
 
-							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+								if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 
-						elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+									# YOUTUBE
+									# DELAYTAG
+									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
 
-							# VIMEO
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
+									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+								elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
-						elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
+									# VIMEO
+									# DELAYTAG
+									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
 
-							# EDUCREATIONS
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
+									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+								elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
 
-						elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+									# EDUCREATIONS
+									# DELAYTAG
+									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
 
-							# SCHOOLTUBE
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
+									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+								elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
-						elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+									# SCHOOLTUBE
+									# DELAYTAG
+									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
 
-							# SHOWME
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
+									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-							#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+								elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
+									# SHOWME
+									# DELAYTAG
+									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
+
+									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+								else
+									@binder.versions.last.update_attributes( :thumbnailgen => 2 )
+									# generic URL, grab Url2png
+									# DELAYTAG
+									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
+
+									#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+								end
+
+							end
+
+							@binder.create_binder_tags(params,current_teacher.id)
+
+							pids = @parentsarr.collect {|x| x["id"] || x[:id]}
+
+							pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
+
+							Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
+							
 						else
-							@binder.versions.last.update_attributes( :thumbnailgen => 2 )
-							# generic URL, grab Url2png
-							# DELAYTAG
-							Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
 
-							#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+							errors << "Sorry, you can't link to this site. Please download any files and upload them to Claco."
+
 						end
 
+					else
+
+						errors << "Invalid URL"
+
 					end
-
-					@binder.create_binder_tags(params,current_teacher.id)
-
-					pids = @parentsarr.collect {|x| x["id"] || x[:id]}
-
-					pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
-
-					Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
 
 				else
 
@@ -470,8 +482,8 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue RestClient::ResourceNotFound
 			errors << "Invalid URL - Not Found"
-		rescue Exception => e
-			errors << e
+		rescue
+			errors << "Invalid URL"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}

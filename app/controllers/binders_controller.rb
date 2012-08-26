@@ -1806,7 +1806,7 @@ class BindersController < ApplicationController
 		
 			return nil if hop == 5
 
-			r = RestClient.get(url){|r1,r2,r3| r1}
+			r = RestClient.head(url){|r1,r2,r3|r1}
 
 			return follow(r.headers[:location], hop + 1) if r.code > 300 && r.code != 304 && r.code < 400
 

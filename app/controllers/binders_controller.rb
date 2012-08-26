@@ -231,7 +231,6 @@ class BindersController < ApplicationController
 
 	#Add links function
 	def createcontent
-
 		#TODO: if the URL is to a document, ask if they want to upload it as a document instead
 
 		################## URI REFERENCE - DO NOT DELETE! #####################
@@ -469,6 +468,8 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			errors << "Invalid Request"
+		rescue RestClient::ResourceNotFound
+			errors << "Invalid URL - Not Found"
 		rescue Exception => e
 			errors << e
 		ensure
@@ -1804,13 +1805,17 @@ class BindersController < ApplicationController
 		
 		def follow(url, hop = 0)
 		
-			return nil if hop == 5
+			raise "Url is not redirecting properly" if hop == 5
 
-			r = RestClient.head(url){|r1,r2,r3|r1}
+			r = RestClient.get(url){|r1,r2,r3|r1}
 
 			return follow(r.headers[:location], hop + 1) if r.code > 300 && r.code != 304 && r.code < 400
 
 			return url if r.code == 200 || r.code == 304
+
+			rescue
+
+			raise "Url is not redirecting properly"
 
 		end
 

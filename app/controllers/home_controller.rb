@@ -103,11 +103,13 @@ class HomeController < ApplicationController
 
 		if params[:query].present?
 			#@teachers = Teacher.all.tire.search(params[:query], load: true)
-			@teachers = Tire.search 'mongo-teachers' do
+			@teachers = Tire.search 'mongo-teachers' do |search|
 				#query do
-				#	string 'fname:E*'
-				#end
-				query { all } 
+				search.query do |query|
+					#string 'fname:S*'
+					query.string params[:query]
+				end
+				#query { all } 
 			end
 
 			@teachers=@teachers.results

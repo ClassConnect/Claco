@@ -77,7 +77,7 @@ gem 'yajl-ruby'
 gem 'kaminari'
 
 # Soulmate
-gem 'rack-contrib'
+# gem 'rack-contrib'
 
 #gem "oink"
 # gem 'soulmate', :require => 'soulmate/server'

@@ -153,8 +153,6 @@ GEM
     rack (1.4.1)
     rack-cache (1.2)
       rack (>= 0.4)
-    rack-contrib (1.1.0)
-      rack (>= 0.9.1)
     rack-pjax (0.5.9)
       hpricot (~> 0.8.6)
       rack (~> 1.3)
@@ -249,7 +247,6 @@ DEPENDENCIES
   omniauth
   omniauth-facebook
   omniauth-twitter
-  rack-contrib
   rack-pjax
   rails (= 3.2.3)
   rest-client

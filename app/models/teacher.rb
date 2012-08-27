@@ -159,7 +159,7 @@ class Teacher
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
 
-			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
+			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{teacher.omnihash["twitter"]["uid"]}&stringify_ids=true"))["ids"]
 
 			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
 

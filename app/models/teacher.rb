@@ -77,10 +77,13 @@ class Teacher
 	# include Tire::Model::Callbacks
 
 	# mapping do
-	# 	indexes :id,		:index 		=> :not_analyzed
-	# 	indexes :fname,		:analyzer 	=> 'snowball'
-	# 	indexes :lname,		:analyzer 	=> 'snowball'
-	# 	indexes :tags,		:analyzer 	=> 'keyword',		:default 	=> []
+	# 	#indexes :id,		:index 		=> :not_analyzed
+	# 	indexes :fname#,		:analyzer 	=> 'snowball'
+	# 	indexes :lname#,		:analyzer 	=> 'snowball'
+	# 	indexes :username
+	# 	indexes :bio
+	# 	#indexes self.info.bio
+	# 	#indexes :tags,		:analyzer 	=> 'keyword',		:default 	=> []
 	# end
 
 	# Class Methods
@@ -406,6 +409,13 @@ class Info
 	field :facebookurl,			:type => String, :default => ""
 
 	embedded_in :teacher
+
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
+
+	# mapping do
+	# 	indexes :bio
+	# end
 
 	# Class Methods
 

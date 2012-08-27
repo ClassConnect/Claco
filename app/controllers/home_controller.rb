@@ -34,19 +34,19 @@ class HomeController < ApplicationController
 							if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
 								if c < 10
 									f = { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-									@feed << f if @feed.size < MAIN_FEED_LENGTH
+									# @feed << f if @feed.size < MAIN_FEED_LENGTH
 									# subsfeed will always be filled simultaneously or first, check anyway
-									@subsfeed << f if @subsfeed.size < SUBSC_FEED_LENGTH
+									@subsfeed << f# if @subsfeed.size < SUBSC_FEED_LENGTH
 								end
 							else
 								# limit occupancy of non-subscibed teachers to 6
-								if c < 6 && @feed.size < MAIN_FEED_LENGTH
-									@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-								end
+								# if c < 6 && @feed.size < MAIN_FEED_LENGTH
+								# 	@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
+								# end
 							end
 						end
 					end
-					break if @feed.size == MAIN_FEED_LENGTH && @subsfeed.size == SUBSC_FEED_LENGTH
+					break if @subsfeed.size == SUBSC_FEED_LENGTH
 				end
 			end
 		end

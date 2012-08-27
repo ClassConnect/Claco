@@ -56,26 +56,30 @@
 <div class="actionswrap">
 	<div class="content-actions">
 
-		<button class="btn">
+		<button id="favbtn" class="btn">
 			<img src="/assets/binders/fav.png" />
 			<div class="texter">Add to favorites</div>
 		</button>
 
-		<button class="btn">
+		<button id="snapbtn" class="btn">
 			<img src="/assets/binders/snap.png" />
 			<div class="texter">Snap to binder</div>
 		</button>
 
+	<div style="float:right;font-weight:bolder;margin-top:7px;width:300px;height:20px;overflow:hidden;text-align:right">
 	<% if !@binder.current_version.embed %>
 		<% if @binder.format == 1 %>
 
-			<% link_to "Download #{@binder.title}", named_binder_route(@binder, "download"), :target => "_blank" %>	
+			<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download"), :target => "_blank" %>	
 
 		<% else %>
 
-			<% link_to @binder.title, @binder.current_version.data, :target => "_blank" %>
+			<%= link_to @binder.title, @binder.current_version.data, :target => "_blank" %>
 
 		<% end %>
 	<% end %>
+	</div>
+
+
 	</div>
 </div>

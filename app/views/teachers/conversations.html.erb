@@ -38,7 +38,7 @@
 									<%= Teacher.find(conversation.get_other(current_teacher.id.to_s)).first_last %>
 								</div>
 								<div class="messagetxt">
-									<%= conversation.last_message.body %>
+									<%= truncate(conversation.last_message.body, :length => 80, :omission => "...") %>
 								</div>
 							</div>
 

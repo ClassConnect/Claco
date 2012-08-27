@@ -21,7 +21,7 @@
 	<div class="mainbox">
 
 		<div class="announce"><%= image_tag('messages/message.png', :class => "micon") %>
-			<a href="#"><%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).first_last %></a> <a href="/messages" class="backmsg">← Back to messages</a>
+			<a href="/<%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).username %>"><%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).first_last %></a> <a href="/messages" class="backmsg">← Back to messages</a>
 		</div>
 <!--  -->
 
@@ -45,7 +45,7 @@
 								</a>
 							</div>
 							<div class="messagetxt">
-								<%= message.body %>
+								<%= h(message.body).gsub(/$/, "<br />").gsub(/(\r|\n)/, "").html_safe %>
 							</div>
 
 						</div>

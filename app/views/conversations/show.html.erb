@@ -1,25 +1,258 @@
-<h3><%= "#{params[:controller]}##{params[:action]}" %></h3>
-<p>app/views/<%= params[:controller] %>/<%= params[:action] %>.html.erb</p>
-
-Subject: <%= @conversation.subject %><br />
-Conversation between: <%= @conversation.members.each {|c| c + 
-	(@conversation.members.index(c) == @conversation.members.size - 1 ? String.new : ",")} %><br />
-<br />
-
-<% @messages.each do |message| %>
-	<br />
-	<hr />
-	<br />
-	<% if @unread.include?(message) %>
-		<%= "*NEW*" %>
-		<br />
-	<% end %>
-	Sender: <%= message.sender %><br />
-	Timestamp: <%= message.timestamp %><br />
-	Message: <%= message.body %><br />
-
+<% content_for :headcon do %>
+	<%= javascript_include_tag "messages/show" %>
+    <%= stylesheet_link_tag    "messages/main", :media => "all" %>
 <% end %>
-<br />
-<hr />
-<br />
-<%= link_to "Reply", add_message_path(@conversation) %>
+
+<div class="container">
+
+	<div class="leftbox">
+		Hello
+	</div>
+
+	<div class="mainbox">
+
+		<div class="announce"><%= image_tag('messages/message.png', :class => "micon") %>
+			<a href="#">Jordan Hamel</a> <a href="#" class="backmsg">← Back to messages</a>
+		</div>
+
+
+
+		<ul class="messages">
+
+			<li>
+
+					<a href="#"><img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+
+						<div class="personname">
+							<a href="#">
+								Jordan Hamel
+							</a>
+						</div>
+						<div class="messagetxt">
+							IMPORTANT: The latest version of this plugin reverts the offset adustment code that added the difference between the left offset and position to the left offset. For anyone that needed it, that code is now turned on by using the offsets: true option.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li>
+
+
+			<li>
+
+					<a href="#"><img src="http://img.cla.co/d1a54b8f36e8bb677aa654b84b162961/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+						
+						<div class="personname">
+							<a href="#">
+								Eric Simons
+							</a>
+						</div>
+						<div class="messagetxt">
+							Given an option marginTop, the element will stop moving vertically upward once the vertical scroll has reached the target position; but, the element will still move horizontally as the page is scrolled left or right. Once the page has been scrolled back down past the target position, the element will be restored to its original position on the page.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li><li>
+
+					<a href="#"><img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+
+						<div class="personname">
+							<a href="#">
+								Jordan Hamel
+							</a>
+						</div>
+						<div class="messagetxt">
+							IMPORTANT: The latest version of this plugin reverts the offset adustment code that added the difference between the left offset and position to the left offset. For anyone that needed it, that code is now turned on by using the offsets: true option.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li>
+
+
+			<li>
+
+					<a href="#"><img src="http://img.cla.co/d1a54b8f36e8bb677aa654b84b162961/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+						
+						<div class="personname">
+							<a href="#">
+								Eric Simons
+							</a>
+						</div>
+						<div class="messagetxt">
+							Given an option marginTop, the element will stop moving vertically upward once the vertical scroll has reached the target position; but, the element will still move horizontally as the page is scrolled left or right. Once the page has been scrolled back down past the target position, the element will be restored to its original position on the page.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li><li>
+
+					<a href="#"><img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+
+						<div class="personname">
+							<a href="#">
+								Jordan Hamel
+							</a>
+						</div>
+						<div class="messagetxt">
+							IMPORTANT: The latest version of this plugin reverts the offset adustment code that added the difference between the left offset and position to the left offset. For anyone that needed it, that code is now turned on by using the offsets: true option.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li>
+
+
+			<li>
+
+					<a href="#"><img src="http://img.cla.co/d1a54b8f36e8bb677aa654b84b162961/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+						
+						<div class="personname">
+							<a href="#">
+								Eric Simons
+							</a>
+						</div>
+						<div class="messagetxt">
+							Given an option marginTop, the element will stop moving vertically upward once the vertical scroll has reached the target position; but, the element will still move horizontally as the page is scrolled left or right. Once the page has been scrolled back down past the target position, the element will be restored to its original position on the page.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li><li>
+
+					<a href="#"><img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+
+						<div class="personname">
+							<a href="#">
+								Jordan Hamel
+							</a>
+						</div>
+						<div class="messagetxt">
+							IMPORTANT: The latest version of this plugin reverts the offset adustment code that added the difference between the left offset and position to the left offset. For anyone that needed it, that code is now turned on by using the offsets: true option.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li>
+
+
+			<li>
+
+					<a href="#"><img src="http://img.cla.co/d1a54b8f36e8bb677aa654b84b162961/thumb_md.png" class="profpic" /></a>
+
+					<div class="mescon">
+						<div class="tstamp">
+							33 minutes ago
+						</div>
+
+						
+						<div class="personname">
+							<a href="#">
+								Eric Simons
+							</a>
+						</div>
+						<div class="messagetxt">
+							Given an option marginTop, the element will stop moving vertically upward once the vertical scroll has reached the target position; but, the element will still move horizontally as the page is scrolled left or right. Once the page has been scrolled back down past the target position, the element will be restored to its original position on the page.
+						</div>
+
+					</div>
+
+
+
+
+				<div style="clear:both"></div>
+			</li>
+
+
+
+
+
+		</ul>
+
+
+
+
+		<div class="replywrap">
+			<div class="replybox">
+				<textarea class="replytext" placeholder="Write your message here"></textarea>
+				<button class="btn btn-primary replybtn">Send</button>
+			</div>
+		</div>
+
+
+
+
+	</div>
+
+
+</div>

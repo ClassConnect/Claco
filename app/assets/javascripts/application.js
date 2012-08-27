@@ -34,11 +34,11 @@ $(document).ready(function() {
 
 
 function initAsyc(content) {
-	$('.async-pop').html(content).slideDown(100);
+	$('.async-pop').html(content).slideDown(200).animate({ opacity: 1 },{ queue: false, duration: 200});
 }
 
 function destroyAsyc() {
-	$('.async-pop').slideUp(100);
+	$('.async-pop').slideUp(200).animate({ opacity: 0 },{ queue: false, duration: 200});
 }
 
 

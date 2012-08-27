@@ -14,14 +14,25 @@ noteInit = false;
 scrollBottom = false;
 permissionFail = false;
 
-$(document).ready(function() {
 
+function initPage() {
   viewInit();
-
   // if we have edit permissions, enable editing functionality
   if (isEditable === true) {
     editInit();
   }
+
+
+  // if this is a piece of content
+  if (contype == 2) {
+    contentInit();
+  }
+}
+
+
+$(document).ready(function() {
+
+  initPage();
 
 
 });
@@ -40,11 +51,8 @@ $(document).on('pjax:start', function() {
 }).on('pjax:end',   function() {
   destroyAsyc();
 
-  viewInit();
-  // if we have edit permissions, enable editing functionality
-  if (isEditable === true) {
-    editInit();
-  }
+  initPage();
+
 });
 
 
@@ -107,6 +115,37 @@ function viewInit() {
     dontPjax = true;
   });
 
+}
+
+
+
+
+// init for content
+function contentInit() {
+
+
+  $('.content-actions').scrollToFixed( {
+        bottom: -3,
+        limit: $('.content-actions').offset().top,
+        preFixed: function() { 
+          $(this).addClass('actions-float');
+          
+        },
+        postFixed: function() {
+          $(this).removeClass('actions-float');
+          
+        }
+    });
+
+
+
+}
+
+
+
+function resetConst() {
+  // reset inview
+  $('#inviewcheck').unbind('inview');
 }
 
 

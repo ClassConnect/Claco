@@ -14,7 +14,7 @@
   <div id="list-pane">
     <% if params[:action] == "show" %>
 
-      <%= javascript_tag "isEditable = #{teacher_signed_in? ? @binder.get_access(current_teacher.id.to_s) == 2 : "false"};" %>
+      <%= javascript_tag "isEditable = #{teacher_signed_in? ? @binder.get_access(current_teacher.id.to_s) == 2 : "false"}; contype = #{@binder.type};" %>
 
       <%= render 'layouts/embed' if @binder.type == 2 %>
 

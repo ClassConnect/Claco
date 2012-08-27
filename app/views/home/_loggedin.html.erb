@@ -7,6 +7,56 @@
 
 <%= javascript_tag "username = \"#{current_teacher.username}\"" %>
 
+
+<div class="starting-section">
+	<div class="container">
+
+		<div class="headtitle">
+			Welcome home! Here are a few things to get started with:
+		</div>
+
+		<div class="listbox">
+
+
+			<div class="listitem">
+				<div class="numbul">1</div> 
+				<div class="linker">
+					<a id="task4" onclick="wizardFocus(4)">Subscribe to your favorite colleagues, educators and organizations</a>
+				</div>
+			</div>
+
+			<div class="listitem">
+				<div class="numbul">2</div>
+				<div class="linker">
+					<a id="task2" onclick="wizardFocus(2)">Create a binder</a>
+				</div>
+			</div>
+
+			<div class="listitem">
+				<div class="numbul">3</div>
+				<div class="linker">
+					<a id="task3" onclick="wizardFocus(3)">Snap another teacher's lesson into your binder</a>
+				</div>
+			</div>
+
+			<div class="listitem">
+				<div class="numbul">4</div> 
+				<div class="linker">
+					<a id="task1" onclick="wizardFocus(1)">Edit your profile information</a>
+				</div>
+			</div>
+
+
+		</div>
+
+
+
+		<button class="btn btn-large finishbtn">✓ I'm finished getting started</button>
+	</div>
+</div>
+
+
+
 <div class="container">
 
 	<div id="paneleft">
@@ -24,9 +74,9 @@
 
 		</div>
 
-		<button id="newbinder" class="btn" style="font-weight:bolder; font-size:14px; padding: 7px 20px; margin-left:25px">
-			<%= image_tag('common/plus.png', :style => "float:left;margin-right:5px; margin-top:1px") %>
-			Create a new binder
+		<button id="newbinder" class="btn">
+			<%= image_tag('common/plus.png', :style => "position:absolute;margin-left:-10px; margin-top:1px") %>
+			&nbsp;&nbsp;&nbsp;Create a new binder
 		</button>
 
 	</div>

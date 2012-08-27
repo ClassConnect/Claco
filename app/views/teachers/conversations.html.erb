@@ -15,63 +15,44 @@
 
 
 		<ul class="messagers">
+<!-- li is each msg -->
+<!-- messelect only if unread -->
+			<% if !@conversations.empty? %>
 
-			<li class="messelect">
-				<a href="#">
+				<% @conversations.each do |conversation| %>
 
-					<img src="http://img.cla.co/a70efeab8e4fc5ab8120dcad81fee9f2/thumb_md.png" class="profpic" />
+					<li class=<%= "messelect" if conversation.unread[current_teacher.id.to_s] != 0%>>
+						<a href="/messages/<%= conversation.id.to_s %>">
 
-					<div class="mescon">
-						<div class="personname">
-							Jordan Hamel
-						</div>
-						<div class="messagetxt">
-							hey just checking in, is everything okay with your lesson plans?
-						</div>
-					</div>
+							<img src="<%= Teacher.find(conversation.get_other(current_teacher.id.to_s)).info.avatar.thumb_md %>" class="profpic" />
 
-					<div class="stampy">
+							<div class="mescon">
+								<div class="personname">
+									<%= Teacher.find(conversation.get_other(current_teacher.id.to_s)).first_last %>
+								</div>
+								<div class="messagetxt">
+									<%= conversation.last_message.body %>
+								</div>
+							</div>
 
-						<div class="tstamp">
-							33 minutes ago
-						</div>
+							<div class="stampy">
 
-					</div>
+								<div class="tstamp">
+									<%= time_ago_in_words(Time.at(conversation.last_message.timestamp).to_datetime) %> ago
+								</div>
 
-				</a>
+							</div>
 
+						</a>
 
-				
-			</li>
+					</li>
 
+				<% end %>
+			<% else %>
 
+				No messages...
 
-			<li>
-				<a href="#">
-
-					<img src="http://img.cla.co/a70efeab8e4fc5ab8120dcad81fee9f2/thumb_md.png" class="profpic" />
-
-					<div class="mescon">
-						<div class="personname">
-							Jordan Hamel
-						</div>
-						<div class="messagetxt">
-							hey just checking in, is everything okay with your lesson plans?
-						</div>
-					</div>
-
-					<div class="stampy">
-
-						<div class="tstamp">
-							33 minutes ago
-						</div>
-
-					</div>
-
-				</a>
-			</li>
-
-
+			<% end %>
 
 		</ul>
 <!--

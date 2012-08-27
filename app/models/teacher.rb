@@ -136,6 +136,12 @@ class Teacher
 		end
 	end
 
+	def get_unread_count
+
+		Conversation.where(:members => self.id.to_s, :"unread.#{self.id.to_s}".gte => 1).count
+
+	end
+
 	def to_param
 		username
 	end

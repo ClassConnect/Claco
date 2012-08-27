@@ -61,28 +61,33 @@ Claco::Application.routes.draw do
 	get		'/viewapps'														=> 'applicants#viewapps'
 
 
+	post	'/done'															=> 'teachers#done'
+
 	###################
 	# MESSAGE ROUTING #
 	###################
 
 	#Inbox
-	get		'/conversations'												=> 'teachers#conversations',		:as => 'conversations'
+	get		'/messages'												=> 'teachers#conversations',		:as => 'conversations'
 
 	#New conversation
-	get		'/conversations/new'											=> 'conversations#new',				:as => 'new_conversation'
-	post	'/conversations/new'											=> 'conversations#create'
+	get		'/messages/new'											=> 'conversations#new',				:as => 'new_conversation'
+	post	'/messages/new'											=> 'conversations#create'
 
 	#New message/reply
-	get		'/conversations/:id'											=> 'conversations#show',			:as => 'show_conversation'
-	get		'/conversations/:id/add'										=> 'conversations#newmessage',		:as => 'add_message'
-	put		'/conversations/:id/add'										=> 'conversations#createmessage'
+	get		'/messages/:id'											=> 'conversations#show',			:as => 'show_conversation'
+	get		'/messages/:id/add'										=> 'conversations#newmessage',		:as => 'add_message'
+	put		'/messages/:id/add'										=> 'conversations#createmessage'
 
-
-	##################
-	# BINDER ROUTING #
-	##################
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
+
+		post '/:username/message'											=> 'conversations#createmessage'
+
+		##################
+		# BINDER ROUTING #
+		##################
+
 
 		#Binder Index
 		get		'/:username/portfolio'											=> 'binders#index',					:as => 'binders'

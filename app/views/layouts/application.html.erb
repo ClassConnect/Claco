@@ -22,11 +22,13 @@
 		<%= javascript_tag "page = '#{params[:controller]}##{params[:action]}'; loggedin = #{signed_in?}" %>
 
 
+		<% if signed_in? && current_teacher.getting_started %>
 
-		<%= stylesheet_link_tag    "gen/guiders", :media => "all" %>
-		<%= javascript_include_tag "gen/guiders" %>
-		<%= javascript_include_tag "gen/wizard" %>
+			<%= stylesheet_link_tag    "gen/guiders", :media => "all" %>
+			<%= javascript_include_tag "gen/guiders" %>
+			<%= javascript_include_tag "gen/wizard" %>
 
+		<% end %>
 
 
 		<%= yield :headcon %>

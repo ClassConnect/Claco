@@ -7,13 +7,15 @@
           <a class="brand" href="/"><%= image_tag("claco.png", :style => "height:24px") %></a>
           <div class="nav-collapse">
 
-            <a href="/conversations" class="btn top-notch-btn notch-nav">
-              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-5px") %>
-              <div class="notchNum">33</div>
-            </a>
-
 
           <% if signed_in? %>
+
+            <a href="/messages" class="btn top-notch-btn notch-nav">
+              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-5px") %>
+              <% if current_teacher.get_unread_count != 0 %>
+              <div class="notchNum"><%= current_teacher.get_unread_count %></div>
+              <% end %>
+            </a>
 
             <ul class="nav nav-pills pull-right" style="margin-left:0px">
               <li id="menuopttog" class="dropdown">

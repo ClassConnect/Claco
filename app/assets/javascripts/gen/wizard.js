@@ -314,7 +314,7 @@ $(document).ready(function() {
 	// ...yer a wizard hary
 	$('.finishbtn').click(function() {
 		$.ajax({
-	        url: '/end_wizard',
+	        url: '/done',
 	        data: 'valid=1',
 	        type: 'post',
 	        success: function(data) {

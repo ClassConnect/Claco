@@ -65,7 +65,7 @@
             <div style="margin: 10px 2px 5px 0;">
 
               <div style="margin: 0 8px 0 15px; height:20px; float:left">
-                <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+                <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= @binder.type == 1 ? CGI.escape(get_binder_image(Binder.find(@binder.thumbimgids[0]))) : CGI.escape(@binder.current_version.img? ? @binder.current_version.img_contentview.url : get_binder_image(@binder)) %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
               </div>
 
               <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=Love this! <%= CGI.escape(@binder.title) %>&url=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>

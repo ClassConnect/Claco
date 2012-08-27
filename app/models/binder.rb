@@ -78,6 +78,8 @@ class Binder
 	#field :debug_data, :type => Array, :default => []
 
 	scope :root_binders, where("parent.id" => "0")
+	scope :favorites, where("parent.id" => "-2")
+	scope :trash, where("parent.id" => "-1")
 
 	# tag contains both local and parent tag data
 	embeds_one :tag

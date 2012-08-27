@@ -36,10 +36,8 @@ class ConversationsController < ApplicationController
 		members.each {|member| unread[member] = (member == current_teacher.id.to_s ? 0 : 1)}
 
 
-		@conversation = Conversation.new(	:author		=> current_teacher.id.to_s,
-											:members	=> members,
-											:unread		=> unread,
-											:subject	=> params[:conversation][:subject])
+		@conversation = Conversation.new(	:members	=> members,
+											:unread		=> unread)
 
 		@conversation.save
 
@@ -51,18 +49,44 @@ class ConversationsController < ApplicationController
 
 	def newmessage
 
+
 		@conversation = Conversation.find(params[:id])
 
 	end
 
 	def createmessage
 
-		@conversation = Conversation.find(params[:id])
+		recipient = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first if params[:id].nil?
+
+		@conversation = Conversation.where(:members => [recipient.id.to_s, current_teacher.id.to_s].sort).first if params[:id].nil?
+
+		@conversation = Conversation.find(params[:id]) if !params[:id].nil?
+
+		if @conversation.nil?
+			unread = {current_teacher.id.to_s => 0, recipient.id.to_s => 1}
+
+			@conversation = Conversation.new(	:members => [recipient.id.to_s, current_teacher.id.to_s].sort,
+												:unread => unread)
+		end
 
 		@conversation.new_message(params, current_teacher)
 
-		redirect_to show_conversation_path(@conversation)
+		redirect_to show_conversation_path(@conversation) and return if !params[:id].nil?
+
+		respond_to do |format|
+			format.html {render :text => 1}
+		end
 
 	end
+
+	# def createmessage
+
+	# 	@conversation = Conversation.find(params[:id])
+
+	# 	@conversation.new_message(params, current_teacher)
+
+	# 	redirect_to show_conversation_path(@conversation)
+
+	# end
 
 end

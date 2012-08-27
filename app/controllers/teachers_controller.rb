@@ -281,6 +281,32 @@ class TeachersController < ApplicationController
 
 		end
 
+		if !current_teacher.omnihash["twitter"].nil?
+
+			if current_teacher.omnihash["twitter"]["data"]["credentials"]["expires_at"] > Time.now.to_i
+
+				fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{current_teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
+
+				Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |teacher|
+
+					current_teacher.relationship_by_teacher_id(teacher.id).subscribe
+
+				end
+
+			else
+
+				#Set redir session var and redir to oauth for new token, then redir back to this function.
+
+				errors = "Your token has expired"
+
+			end
+
+		else
+
+			errors = "You still need to authenticate your twitter account"
+
+		end
+
 	end
 
 	# #/subs
@@ -446,6 +472,16 @@ class TeachersController < ApplicationController
 
 		@retarray = Array.new
 
+
+	end
+
+	def done
+
+		current_teacher.update_attributes(:getting_started => false)
+
+		respond_with do |format|
+			format.html {render :text => 1}
+		end
 
 	end
 

@@ -161,7 +161,7 @@ class Teacher
 
 			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{teacher.omnihash["twitter"]["uid"]}&stringify_ids=true"))["ids"]
 
-			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
+			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |fteacher|
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
 

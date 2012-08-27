@@ -487,7 +487,7 @@ class TeachersController < ApplicationController
 
 	def conversations
 
-		@conversations = Conversation.where("members" => current_teacher.id.to_s)
+		@conversations = Conversation.where("members" => current_teacher.id.to_s).sort_by{|c| c.last_message.timestamp}
 
 	end
 

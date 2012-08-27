@@ -5,6 +5,8 @@ class ConversationsController < ApplicationController
 
 		@conversation = Conversation.find(params[:id])
 
+		redirect_to "/messages" and return if @conversation.members.include?(current_teacher.id.to_s)
+
 		@unread = @conversation.unread_messages(current_teacher.id.to_s)
 
 		@conversation.unread[current_teacher.id.to_s] = 0

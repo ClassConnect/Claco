@@ -14,10 +14,4 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 	alias_method :twitter, :all
 	alias_method :facebook, :all
 
-	def gs
-		session["gs"] = "true"
-
-		redirect_to "auth/#{params[:provider]}"
-	end
-
 end

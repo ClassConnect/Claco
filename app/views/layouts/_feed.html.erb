@@ -4,7 +4,7 @@
 %>
 <div class="whitebox">
 
-	<!-- GETTING STARTED ONLY (make sure this only shows on home feed too) -->
+	<% if current_teacher.getting_started %>
 
 			<div class="findppl">
 
@@ -62,7 +62,7 @@
 
 
 
-			<!-- /GETTING STARTED -->
+			<% end %>
 
 
 

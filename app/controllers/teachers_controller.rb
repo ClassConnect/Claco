@@ -479,7 +479,7 @@ class TeachersController < ApplicationController
 
 		current_teacher.update_attributes(:getting_started => false)
 
-		respond_with do |format|
+		respond_to do |format|
 			format.html {render :text => 1}
 		end
 

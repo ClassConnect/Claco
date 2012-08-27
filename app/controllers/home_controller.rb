@@ -99,6 +99,12 @@ class HomeController < ApplicationController
 		end
 	end
 
+	def gs
+		session["gs"] = "true"
+
+		redirect_to "/auth/#{params[:provider]}"
+	end
+
 	def teachersearch
 
 		if params[:query].present?

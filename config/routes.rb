@@ -1,5 +1,6 @@
 Claco::Application.routes.draw do
 
+
 	##################
 	# DEVISE ROUTING #
 	##################
@@ -60,7 +61,7 @@ Claco::Application.routes.draw do
 	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
 	get		'/viewapps'														=> 'applicants#viewapps'
 
-	get		'/gs/:provider'													=> 'omniauth_callbacks#gs'
+	get		'/gs/:provider'													=> 'home#gs'
 	post	'/done'															=> 'teachers#done'
 
 	###################
@@ -140,6 +141,8 @@ Claco::Application.routes.draw do
 		
 		#Update :body
 		put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
+
+
 
 		#Profile Page
 		get		'/:username'													=> 'teachers#show'

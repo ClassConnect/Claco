@@ -177,7 +177,7 @@ class Teacher
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Facebook
 			teacher.omnihash[auth.provider]["data"] = auth
 
-			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
+			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{teacher.omnihash["facebook"]["data"]["credentials"]["token"]}"))["data"].collect{|f| f["id"]}
 
 			teacher.omnihash[auth.provider]["fids"] = fids
 

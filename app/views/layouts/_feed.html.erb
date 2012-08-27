@@ -15,7 +15,7 @@
 					</div>
 
 					<div class="connectbtns">
-						<% if current_teacher.omnihash["twitter"].nil? %>
+						<% if !current_teacher.omnihash["twitter"].nil? %>
 							Connected with Twitter!
 						<% else %>
 							<a href="/gs/twitter" class="zocial twitter">Connect with Twitter</a>
@@ -23,7 +23,7 @@
 					</div>
 
 					<div class="connectbtns">
-						<% if current_teacher.omnihash["facebook"].nil? %>
+						<% if !current_teacher.omnihash["facebook"].nil? %>
 							Connected with Facebook!
 						<% else %>
 							<a href="/gs/facebook" class="zocial facebook">Connect with Facebook</a>

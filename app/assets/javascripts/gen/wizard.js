@@ -148,11 +148,11 @@ function startWizard() {
 
 				guiders.createGuider({
 				  buttons: [{name: "Next"}],
-				  description: "Your lessons, curriculum, content and information will be showcased here in your portfolio for the world to see. Make it easy for colleagues and other teachers to find you and your work by filling out your profile!",
+				  description: '<iframe width="650" height="400" src="http://www.youtube.com/embed/X3oWFV1OIUw?vq=hd720" frameborder="0" allowfullscreen></iframe>',
 				  id: "first",
 				  next: "second",
 				  title: "Store websites, videos, and files in binders.",
-				  width: 600
+				  width: 650
 				}).show();
 
 
@@ -208,7 +208,7 @@ function startWizard() {
 
 				guiders.createGuider({
 				  buttons: [{name: "Close"}],
-				  description: "Your lessons, curriculum, content and information will be showcased here in your portfolio for the world to see. Make it easy for colleagues and other teachers to find you and your work by filling out your profile!",
+				  description: "Head over to a teacher's profile and click the 'Snap' button on one of their lessons!",
 				  id: "first",
 				  next: "second",
 				  title: "Learn how to snap together your curriculum!",

@@ -54,7 +54,7 @@ class TeachersController < ApplicationController
 		#Create info entry for teacher if not yet created
 		#@teacher.info = Info.new if !@teacher.info
 
-		@feed = []
+		@subsfeed = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 		logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
@@ -69,17 +69,17 @@ class TeachersController < ApplicationController
 				end
 				
 				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
-					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-						@feed << f
+					if !( @subsfeed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+						@subsfeed << f
 					end
 				end
-				break if @feed.size == PERSONAL_FEED_LENGTH
+				break if @subsfeed.size == PERSONAL_FEED_LENGTH
 			end
 		end
 
 		# the array should already be sorted
 		# .sort_by { |e| -e.timestamp }
-		@feed = @feed.any? ? @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
+		@subsfeed = @subsfeed.any? ? @subsfeed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
 
 		#feed.map { |f| f.modelid.to_s } if feed.any?
 

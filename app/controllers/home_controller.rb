@@ -105,6 +105,14 @@ class HomeController < ApplicationController
 		redirect_to "/auth/#{params[:provider]}"
 	end
 
+	def privacy
+		render "public/legal.html"#, :status => 200 and return
+	end
+
+	def tos
+		render "public/tos.html"#, :status => 200 and return
+	end
+
 	def teachersearch
 
 		if params[:query].present?

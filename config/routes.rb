@@ -53,6 +53,9 @@ Claco::Application.routes.draw do
 
 	post	'utils/fetchtitle'												=> 'home#fetchtitle'
 
+	get		'/legal/tos'													=> 'home#tos'
+	get		'/legal/privacy'												=> 'home#privacy'
+
 	#####################
 	# APPLICANT ROUTING #
 	#####################

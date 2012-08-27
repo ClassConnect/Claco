@@ -60,7 +60,7 @@ Claco::Application.routes.draw do
 	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
 	get		'/viewapps'														=> 'applicants#viewapps'
 
-
+	get		'/gs/:provider'													=> 'omniauth_callbacks#gs'
 	post	'/done'															=> 'teachers#done'
 
 	###################

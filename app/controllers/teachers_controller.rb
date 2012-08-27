@@ -251,63 +251,63 @@ class TeachersController < ApplicationController
 
 	end
 
-	def omnifriend
+	# def omnifriend
 
-		errors = []
+	# 	errors = []
 
-		if !current_teacher.omnihash["facebook"].nil?
+	# 	if !current_teacher.omnihash["facebook"].nil?
 
-			if current_teacher.omnihash["facebook"]["data"]["credentials"]["expires_at"] > Time.now.to_i
+	# 		if current_teacher.omnihash["facebook"]["data"]["credentials"]["expires_at"] > Time.now.to_i
 
-				fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{current_teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{current_teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
+	# 			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{current_teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{current_teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
 
-				Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |teacher|
+	# 			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |teacher|
 
-					current_teacher.relationship_by_teacher_id(teacher.id).subscribe
+	# 				current_teacher.relationship_by_teacher_id(teacher.id).subscribe
 
-				end
+	# 			end
 
-			else
+	# 		else
 
-				#Set redir session var and redir to oauth for new token, then redir back to this function.
+	# 			#Set redir session var and redir to oauth for new token, then redir back to this function.
 
-				errors = "Your token has expired"
+	# 			errors = "Your token has expired"
 
-			end
+	# 		end
 
-		else
+	# 	else
 
-			errors = "You still need to authenticate your facebook account"
+	# 		errors = "You still need to authenticate your facebook account"
 
-		end
+	# 	end
 
-		if !current_teacher.omnihash["twitter"].nil?
+	# 	if !current_teacher.omnihash["twitter"].nil?
 
-			if current_teacher.omnihash["twitter"]["data"]["credentials"]["expires_at"] > Time.now.to_i
+	# 		if current_teacher.omnihash["twitter"]["data"]["credentials"]["expires_at"] > Time.now.to_i
 
-				fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{current_teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
+	# 			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{current_teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
 
-				Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |teacher|
+	# 			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |teacher|
 
-					current_teacher.relationship_by_teacher_id(teacher.id).subscribe
+	# 				current_teacher.relationship_by_teacher_id(teacher.id).subscribe
 
-				end
+	# 			end
 
-			else
+	# 		else
 
-				#Set redir session var and redir to oauth for new token, then redir back to this function.
+	# 			#Set redir session var and redir to oauth for new token, then redir back to this function.
 
-				errors = "Your token has expired"
+	# 			errors = "Your token has expired"
 
-			end
+	# 		end
 
-		else
+	# 	else
 
-			errors = "You still need to authenticate your twitter account"
+	# 		errors = "You still need to authenticate your twitter account"
 
-		end
+	# 	end
 
-	end
+	# end
 
 	# #/subs
 	# def subs

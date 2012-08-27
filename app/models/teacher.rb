@@ -158,12 +158,31 @@ class Teacher
 		if auth.provider == "twitter"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
+
+			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
+
+			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
+
+				teacher.relationship_by_teacher_id(fteacher.id).subscribe
+
+			end
+
 			auth.extra.delete("access_token")
 			teacher.omnihash[auth.provider]["data"] = auth
+
 		elsif auth.provider == "facebook"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname if !auth.info.nickname.empty?
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Facebook
 			teacher.omnihash[auth.provider]["data"] = auth
+
+			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
+
+			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
+
+				teacher.relationship_by_teacher_id(fteacher.id).subscribe
+
+			end
+
 		end
 		teacher
 		# end

@@ -211,6 +211,11 @@
   width: 700px;
 }
 
+.mainbox .replywrap form{
+  margin: 0 0 0 0;
+
+}
+
 .mainbox .replybox {
   border-top:1px solid #ddd;
   position:relative;

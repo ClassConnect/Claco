@@ -107,6 +107,8 @@ Claco::Application.routes.draw do
 		# Paths handled by named_binder_route function #
 		################################################
 
+		# post	'/:username/portfolio(/:root)/:title/:id/favorite'				=> 'binders#create'
+
 		#New
 		post	'/:username/portfolio(/:root)/:title/:id/create'				=> 'binders#create'
 		post	'/:username/portfolio(/:root)/:title/:id/createfile'			=> 'binders#createfile'

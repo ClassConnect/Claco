@@ -74,24 +74,56 @@ class Teacher
 	# field :authentication_token, :type => String
 
 	# include Tire::Model::Search
-	# include Tire::Model::Callbacks
+	# #include Tire::Model::Callbacks
+
+	# after_save do
+	# 	tire.update_index
+	# end
+
+	# DO NOT DELETE:
+
+	# The Brown-Cow's Part_No. #A.BC123-456 joe@bloggs.com
+	# keyword:    			The Brown-Cow's Part_No. #A.BC123-456 joe@bloggs.com
+	# whitespace:   		The, 	Brown-Cow's, 			Part_No., 		#A.BC123-456, 				joe@bloggs.com
+	# simple:    			the, 	brown, 			cow, s, part, 		no, a, 				bc, 		joe, 			bloggs, 	com
+	# standard:    					brown, 			cow's, 	part_no, 		a.bc123, 			456, 	joe, 			bloggs.com
+	# snowball (English):   		brown, 			cow, 	part_no, 		a.bc123, 			456, 	joe, 			bloggs.com
+
+
+
+	# THIS MAPPING IS CORRECT
 
 	# mapping do
-	# 	#indexes :id,		:index 		=> :not_analyzed
-	# 	indexes :fname#,		:analyzer 	=> 'snowball'
-	# 	indexes :lname#,		:analyzer 	=> 'snowball'
-	# 	indexes :username
-	# 	indexes :bio
-	# 	#indexes self.info.bio
-	# 	#indexes :tags,		:analyzer 	=> 'keyword',		:default 	=> []
+	# 	indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
+	# 	indexes :fname, 	:type => 'string', 	:analyzer => 'standard'
+	# 	indexes :lname, 	:type => 'string', 	:analyzer => 'standard'
+	# 	indexes :username, 	:type => 'string', 	:analyzer => 'standard'
+	# 	indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
+	# 														:size 			=> { :type => 'object', :enabled => false },
+	# 														:ext 			=> { :type => 'object', :enabled => false },
+	# 														:data 			=> { :type => 'object', :enabled => false },
+	# 														:facebookurl	=> { :type => 'object', :enabled => false },
+	# 														:grades 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
+	# 														:subjects 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
+	# 														:bio 			=> { :type => 'string', :analyzer => 'snowball' },
+	# 														:website 		=> { :type => 'string', :analyzer => 'standard' },
+	# 														:city			=> { :type => 'string', :analyzer => 'standard' },
+	# 														:state 			=> { :type => 'string', :analyzer => 'standard' },
+	# 														:country		=> { :type => 'string', :analyzer => 'standard' },
+	# 														:twitterhandle 	=> { :type => 'string', :analyzer => 'standard' },
+	# 														:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
 	# end
 
 	# Class Methods
 
 	# used for elasticsearch
-	def self
-    	to_indexed_json.as_json
-	end
+	# def self
+ #    	to_indexed_json.as_json
+	# end
+
+	#def to_indexed_json
+    #	self.as_json
+	#end
 
 	# Mr. John Smith
 	def full_name
@@ -411,13 +443,25 @@ class Info
 	embedded_in :teacher
 
 	# include Tire::Model::Search
-	# include Tire::Model::Callbacks
+	# #include Tire::Model::Callbacks
+
+	# after_save do
+	# 	tire.update_index
+	# end
 
 	# mapping do
 	# 	indexes :bio
 	# end
 
-	# Class Methods
+	# # Class Methods
+
+	# def self
+ #    	to_indexed_json.as_json
+	# end
+	
+	def to_indexed_json
+    	self.as_json
+	end
 
 	def fulllocation
 		"#{city}, #{state}, #{country}"

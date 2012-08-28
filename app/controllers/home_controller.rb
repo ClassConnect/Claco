@@ -105,8 +105,13 @@ class HomeController < ApplicationController
 			#@teachers = Teacher.all.tire.search(params[:query], load: true)
 			@teachers = Tire.search 'mongo-teachers' do |search|
 				#query do
+
+				# number of results returned
+				search.size 100
+
 				search.query do |query|
 					#string 'fname:S*'
+					#query.size 15
 					query.string params[:query]
 				end
 				#query { all } 
@@ -122,7 +127,7 @@ class HomeController < ApplicationController
 
 		retstr=""
 
-		debugger
+		#debugger
 
 		@teachers.each do |t|
 			retstr += t.fname + ' ' + t.lname + '<br />'

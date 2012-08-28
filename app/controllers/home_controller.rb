@@ -113,6 +113,14 @@ class HomeController < ApplicationController
 		render "public/tos.html"#, :status => 200 and return
 	end
 
+	def search
+
+		@teachers = Teacher.all[0..2]
+
+		render "search"
+
+	end
+
 	def teachersearch
 
 		if params[:query].present?

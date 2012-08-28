@@ -10,6 +10,13 @@
 
           <% if signed_in? %>
 
+            <a href="/messages" class="btn top-notch-btn notch-nav">
+              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-5px") %>
+              <% if current_teacher.get_unread_count != 0 %>
+              <div class="notchNum"><%= current_teacher.get_unread_count %></div>
+              <% end %>
+            </a>
+
             <ul class="nav nav-pills pull-right" style="margin-left:0px">
               <li id="menuopttog" class="dropdown">
 
@@ -47,7 +54,7 @@
             <ul class="nav nav-pills pull-right">
               <li class="dropdown">
 
-                <button id="top-notch-btn" data-toggle="dropdown" class="btn">Sign in</button>
+                <button data-toggle="dropdown" class="btn top-notch-btn notch-login">Sign in</button>
                 <ul class="dropdown-menu noclose">
                   <%= form_for("teacher", :url => teacher_session_path) do |f| %>
                     <%= f.text_field :login, :class => "span3 login-focus", :placeholder => "Username / Email" %>

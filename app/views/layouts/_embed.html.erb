@@ -1,6 +1,6 @@
 <% if @binder.current_version.croc? %>
 
-	<iframe id="crocFrame" width="700" height="600" class="embeddrop" frameborder="0" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe>
+	<center><iframe id="crocFrame" width="700" height="600" class="embeddrop" frameborder="0" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe></center>
 
 <% elsif @binder.current_version.youtube? %>
 
@@ -49,16 +49,37 @@
 <% end %>
 
 
-<div class="content-actions">
-<% if !@binder.current_version.embed %>
-	<% if @binder.format == 1 %>
 
-		<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download"), :target => "_blank" %>	
 
-	<% else %>
 
-		<%= link_to @binder.title, @binder.current_version.data, :target => "_blank" %>
 
-	<% end %>
+<div class="actionswrap">
+	<div class="content-actions">
+<% if false %>
+		<button id="favbtn" class="btn">
+			<img src="/assets/binders/fav.png" />
+			<div class="texter">Add to favorites</div>
+		</button>
 <% end %>
+		<button id="snapbtn" class="btn">
+			<img src="/assets/binders/snap.png" />
+			<div class="texter">Snap to binder</div>
+		</button>
+
+	<div style="float:right;font-weight:bolder;margin-top:7px;width:300px;height:20px;overflow:hidden;text-align:right">
+	<% if !@binder.current_version.embed %>
+		<% if @binder.format == 1 %>
+
+			<%= link_to "Download #{@binder.title}", named_binder_route(@binder, "download"), :target => "_blank" %>	
+
+		<% else %>
+
+			<%= link_to @binder.title, @binder.current_version.data, :target => "_blank" %>
+
+		<% end %>
+	<% end %>
+	</div>
+
+
+	</div>
 </div>

@@ -15,8 +15,22 @@
 		<%= javascript_include_tag "facebox" %>
 		<%= javascript_include_tag "tooltip" %>
 		<%= javascript_include_tag "tabs" %>
+		<%= javascript_include_tag "gen/cookie" %>
+		<%= javascript_include_tag "gen/sticky" %>
+		<%= javascript_include_tag "gen/boxresize" %>
 		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]');$.pjax.defaults.timeout = 5000;$.pjax.defaults.maxCacheLength=0;" %>
-		<%= javascript_tag "page = #{params[:controller]}##{params[:action]}; loggedin = #{signed_in?}" %>
+		<%= javascript_tag "page = '#{params[:controller]}##{params[:action]}'; loggedin = #{signed_in?}" %>
+
+
+		<% if signed_in? && current_teacher.getting_started %>
+
+			<%= stylesheet_link_tag    "gen/guiders", :media => "all" %>
+			<%= javascript_include_tag "gen/guiders" %>
+			<%= javascript_include_tag "gen/wizard" %>
+
+		<% end %>
+
+
 		<%= yield :headcon %>
 
 

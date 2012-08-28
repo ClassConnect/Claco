@@ -54,7 +54,7 @@ class TeachersController < ApplicationController
 		#Create info entry for teacher if not yet created
 		#@teacher.info = Info.new if !@teacher.info
 
-		@feed = []
+		@subsfeed = []
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 		logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
@@ -69,17 +69,17 @@ class TeachersController < ApplicationController
 				end
 				
 				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
-					if !( @feed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-						@feed << f
+					if !( @subsfeed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+						@subsfeed << f
 					end
 				end
-				break if @feed.size == PERSONAL_FEED_LENGTH
+				break if @subsfeed.size == PERSONAL_FEED_LENGTH
 			end
 		end
 
 		# the array should already be sorted
 		# .sort_by { |e| -e.timestamp }
-		@feed = @feed.any? ? @feed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
+		@subsfeed = @subsfeed.any? ? @subsfeed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
 
 		#feed.map { |f| f.modelid.to_s } if feed.any?
 
@@ -251,37 +251,63 @@ class TeachersController < ApplicationController
 
 	end
 
-	def omnifriend
+	# def omnifriend
 
-		errors = []
+	# 	errors = []
 
-		if !current_teacher.omnihash["facebook"].nil?
+	# 	if !current_teacher.omnihash["facebook"].nil?
 
-			if current_teacher.omnihash["facebook"]["data"]["credentials"]["expires_at"] > Time.now.to_i
+	# 		if current_teacher.omnihash["facebook"]["data"]["credentials"]["expires_at"] > Time.now.to_i
 
-				fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{current_teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{current_teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
+	# 			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{current_teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{current_teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
 
-				Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |teacher|
+	# 			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |teacher|
 
-					current_teacher.relationship_by_teacher_id(teacher.id).subscribe
+	# 				current_teacher.relationship_by_teacher_id(teacher.id).subscribe
 
-				end
+	# 			end
 
-			else
+	# 		else
 
-				#Set redir session var and redir to oauth for new token, then redir back to this function.
+	# 			#Set redir session var and redir to oauth for new token, then redir back to this function.
 
-				errors = "Your token has expired"
+	# 			errors = "Your token has expired"
 
-			end
+	# 		end
 
-		else
+	# 	else
 
-			errors = "You still need to authenticate your facebook account"
+	# 		errors = "You still need to authenticate your facebook account"
 
-		end
+	# 	end
 
-	end
+	# 	if !current_teacher.omnihash["twitter"].nil?
+
+	# 		if current_teacher.omnihash["twitter"]["data"]["credentials"]["expires_at"] > Time.now.to_i
+
+	# 			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{current_teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
+
+	# 			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |teacher|
+
+	# 				current_teacher.relationship_by_teacher_id(teacher.id).subscribe
+
+	# 			end
+
+	# 		else
+
+	# 			#Set redir session var and redir to oauth for new token, then redir back to this function.
+
+	# 			errors = "Your token has expired"
+
+	# 		end
+
+	# 	else
+
+	# 		errors = "You still need to authenticate your twitter account"
+
+	# 	end
+
+	# end
 
 	# #/subs
 	# def subs
@@ -449,9 +475,19 @@ class TeachersController < ApplicationController
 
 	end
 
+	def done
+
+		current_teacher.update_attributes(:getting_started => false)
+
+		respond_to do |format|
+			format.html {render :text => 1}
+		end
+
+	end
+
 	def conversations
 
-		@conversations = Conversation.where("members" => current_teacher.id.to_s)
+		@conversations = Conversation.where("members" => current_teacher.id.to_s).sort_by{|c| c.last_message.timestamp}.reverse
 
 	end
 

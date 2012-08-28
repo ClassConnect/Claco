@@ -16,7 +16,7 @@ class Conversation
 
 		message = Message.new(	:timestamp	=> Time.now.to_i,
 								:sender		=> current_teacher.id.to_s,
-								:body		=> params[:message][:body],
+								:body		=> params[:body],
 								:thread		=> self.id.to_s,
 								:read_by	=> {current_teacher.id.to_s => Time.now.to_i})
 
@@ -26,6 +26,10 @@ class Conversation
 
 		self.save
 
+	end
+
+	def get_other(id)
+		members.each{|m| return m if m != id}
 	end
 
 	def get_messages

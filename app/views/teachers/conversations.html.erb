@@ -1,12 +1,81 @@
-<h3><%= "#{params[:controller]}##{params[:action]}" %></h3>
-<p>app/views/<%= "#{params[:controller]}/#{params[:action]}" %>.html.erb</p>
-
-<% @conversations.each do |conversation| %>
-
-	<%= conversation.last_message.sender == current_teacher.id.to_s ? ">" : "<" %>
-	<%= link_to conversation.subject, show_conversation_path(conversation) %>
-	<%= conversation.unread[current_teacher.id.to_s] == 0 ? "Read" : "Unread" %>
-
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "messages/main", :media => "all" %>
 <% end %>
-<br /><br />
-<%= link_to "New conversation", new_conversation_path %>
+
+<div class="container">
+
+	<div class="leftbox">
+		<div class="leftbox">
+			<div style="font-size:14px;font-weight:bolder;color:#333;margin-top:15px">
+				Send messages
+			</div>
+			<div style="font-size:12px;color:#666;margin-top:10px;line-height:13px;padding-right:5px">
+				Go to a teacher's profile and click on "Message" to start a new message thread.
+			</div>
+		</div>
+	</div>
+
+	<div class="mainbox">
+
+		<div class="announce"><%= image_tag('messages/message.png', :class => "micon") %>
+			Messages</div>
+
+
+		<ul class="messagers">
+
+			<% if !@conversations.empty? %>
+
+				<% @conversations.each do |conversation| %>
+
+					<li class=<%= "messelect" if conversation.unread[current_teacher.id.to_s] != 0%>>
+						<a href="/messages/<%= conversation.id.to_s %>">
+
+							<img src="<%= Teacher.find(conversation.get_other(current_teacher.id.to_s)).info.avatar.thumb_md %>" class="profpic" />
+
+							<div class="mescon">
+								<div class="personname">
+									<%= Teacher.find(conversation.get_other(current_teacher.id.to_s)).first_last %>
+								</div>
+								<div class="messagetxt">
+									<%= truncate(conversation.last_message.body, :length => 80, :omission => "...") %>
+								</div>
+							</div>
+
+							<div class="stampy">
+
+								<div class="tstamp">
+									<%= time_ago_in_words(Time.at(conversation.last_message.timestamp).to_datetime) %> ago
+								</div>
+
+							</div>
+
+						</a>
+
+					</li>
+
+				<% end %>
+			<% else %>
+
+				No messages...
+
+			<% end %>
+
+		</ul>
+<!--
+		<% @conversations.each do |conversation| %>
+
+			<%= conversation.last_message.sender == current_teacher.id.to_s ? ">" : "<" %>
+			<%= link_to conversation.subject, show_conversation_path(conversation) %>
+			<%= conversation.unread[current_teacher.id.to_s] == 0 ? "Read" : "Unread" %>
+
+		<% end %>
+		<br /><br />
+		<%= link_to "New conversation", new_conversation_path %>
+
+-->
+
+
+	</div>
+
+
+</div>

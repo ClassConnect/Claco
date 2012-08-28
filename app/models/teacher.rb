@@ -56,7 +56,7 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started
 	
 	validate :username_blacklist
 
@@ -168,6 +168,12 @@ class Teacher
 		end
 	end
 
+	def get_unread_count
+
+		Conversation.where(:members => self.id.to_s, :"unread.#{self.id.to_s}".gte => 1).count
+
+	end
+
 	def to_param
 		username
 	end
@@ -184,12 +190,35 @@ class Teacher
 		if auth.provider == "twitter"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
+
+			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{teacher.omnihash["twitter"]["uid"]}&stringify_ids=true"))["ids"]
+
+			teacher.omnihash[auth.provider]["fids"] = fids
+
+			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |fteacher|
+
+				teacher.relationship_by_teacher_id(fteacher.id).subscribe
+
+			end
+
 			auth.extra.delete("access_token")
 			teacher.omnihash[auth.provider]["data"] = auth
+
 		elsif auth.provider == "facebook"
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname if !auth.info.nickname.empty?
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Facebook
 			teacher.omnihash[auth.provider]["data"] = auth
+
+			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{teacher.omnihash["facebook"]["data"]["credentials"]["token"]}"))["data"].collect{|f| f["id"]}
+
+			teacher.omnihash[auth.provider]["fids"] = fids
+
+			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
+
+				teacher.relationship_by_teacher_id(fteacher.id).subscribe
+
+			end
+
 		end
 		teacher
 		# end

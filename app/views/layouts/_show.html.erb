@@ -14,7 +14,7 @@
   <div id="list-pane">
     <% if params[:action] == "show" %>
 
-      <%= javascript_tag "isEditable = #{teacher_signed_in? ? @binder.get_access(current_teacher.id.to_s) == 2 : "false"};" %>
+      <%= javascript_tag "isEditable = #{teacher_signed_in? ? @binder.get_access(current_teacher.id.to_s) == 2 : "false"}; contype = #{@binder.type};" %>
 
       <%= render 'layouts/embed' if @binder.type == 2 %>
 
@@ -56,7 +56,7 @@
                     <img src="/assets/binders/link.png" style="height:14px; margin-top:-4px" />
                   </span>
 
-                  <input type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="<%= "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>" readonly />
+                  <input id="normcurs" type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="<%= "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>" readonly="readonly" />
               </div>
 
             </div>
@@ -65,12 +65,12 @@
             <div style="margin: 10px 2px 5px 0;">
 
               <div style="margin: 0 8px 0 15px; height:20px; float:left">
-                <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+                <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= @binder.type == 1 ? (!@binder.thumbimgids[0].empty? ? CGI.escape(get_binder_image(Binder.find(@binder.thumbimgids[0]))) : CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}")) : CGI.escape(@binder.current_version.img? ? @binder.current_version.img_contentview.url : get_binder_image(@binder)) %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
               </div>
 
               <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=Love this! <%= CGI.escape(@binder.title) %>&url=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>
 
-              <iframe src="//www.facebook.com/plugins/like.php?href=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&amp;send=false&amp;layout=standard&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=90&amp;appId=213954741999891" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
+              <iframe src="//www.facebook.com/plugins/like.php?href=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&send=false&layout=standard&width=450&show_faces=true&action=like&colorscheme=light&font&height=90" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
 
             </div>
 
@@ -457,6 +457,76 @@
 
     </form>
   </div>
+
+
+
+
+
+
+   <div id="snap-form" style="display:none">
+    <div class="headtitle">
+      Snap to binder
+    </div>
+
+    <div class="errorBox"></div>
+
+    <form action="#" class="bodcon">
+      <div class="conitem">
+
+        <div class="fol-picker" style="margin-bottom:10px">
+
+          <div class="togbar" onclick="togglePicker(this)">
+            <span class="chosenTitle">
+              <i>Choose a binder or folder to snap this to</i>
+            </span>
+            <div class="down-arrow"></div>
+            <input type="hidden" name="folid" class="chosenOne" value="" />
+          </div>
+
+          <div class="pickerpane">
+
+            <% if !@root.nil? %>
+            <% @root.each do |binder| %>
+
+
+              <% if binder.parent["id"] == "0" %>
+
+                <div class="bndr">
+
+                  <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
+                    <div class="arrow-right" onclick="togglePickFolder(this)"></div>
+                    <span class="dirtitle" onclick="selectPickFolder(this)">
+                      <img src="/assets/binders/folder.png" class="foldicon" />
+                      <%= binder.title %>
+                    </span>
+                    <div class="dirWrap"></div>
+
+                  </div>
+                </div>
+
+              <% end %>
+
+            <% end %>
+            <% end %>
+
+
+          </div>
+        </div>
+
+
+
+      </div>
+
+      <div class="buttonbar">
+         <button class="btn btn-primary showloader" type="submit">Snap this!</button>
+         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+      </div>
+
+    </form>
+  </div>
+
+
+
 
 
 

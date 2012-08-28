@@ -14,14 +14,25 @@ noteInit = false;
 scrollBottom = false;
 permissionFail = false;
 
-$(document).ready(function() {
 
+function initPage() {
   viewInit();
-
   // if we have edit permissions, enable editing functionality
   if (isEditable === true) {
     editInit();
   }
+
+
+  // if this is a piece of content
+  if (contype == 2) {
+    contentInit();
+  }
+}
+
+
+$(document).ready(function() {
+
+  initPage();
 
 
 });
@@ -40,11 +51,8 @@ $(document).on('pjax:start', function() {
 }).on('pjax:end',   function() {
   destroyAsyc();
 
-  viewInit();
-  // if we have edit permissions, enable editing functionality
-  if (isEditable === true) {
-    editInit();
-  }
+  initPage();
+
 });
 
 
@@ -67,8 +75,8 @@ function viewInit() {
 
 
 
-  $('#snapbtn').click(function() {
-    popForm('copy-form', $(this).parent().parent().parent());
+  $('.snapbtn').click(function() {
+    popForm('snap-form', $(this).parent().parent().parent());
 
   });
   
@@ -107,6 +115,55 @@ function viewInit() {
     dontPjax = true;
   });
 
+}
+
+
+
+
+// init for content
+function contentInit() {
+
+
+  $('#favbtn').click(function() {
+    $(this).attr("disabled", "disabled");
+    $(this).find('.texter').text('Added to favorites');
+
+    $.ajax({
+      url: location.protocol+'//'+location.host+location.pathname + '/favorite',
+      data: 'success=1',
+      type: 'post',
+      success: function(data) {
+
+      }
+    });
+  });
+
+  $('#snapbtn').click(function() {
+      popForm('snapperform', $(this));
+  });
+
+  $('.content-actions').scrollToFixed( {
+        bottom: -3,
+        limit: $('.content-actions').offset().top,
+        preFixed: function() { 
+          $(this).addClass('actions-float');
+          
+        },
+        postFixed: function() {
+          $(this).removeClass('actions-float');
+          
+        }
+    });
+
+
+
+}
+
+
+
+function resetConst() {
+  // reset inview
+  $('#inviewcheck').unbind('inview');
 }
 
 
@@ -670,6 +727,48 @@ function popForm(formID, obje) {
     // end of form handler
 
 
+  ////////// if this is the snap form
+  } else if (formID == 'snap-form' || formID == 'snapperform') {
+
+    if (formID == 'snapperform') {
+      jQuery.facebox({ div: '#snap-form' });
+      turl = location.protocol+'//'+location.host+location.pathname + "/copy";
+    } else {
+      turl = obje.find('.titler a').attr("href") + "/copy";
+    }
+    // set the form handler
+    $('#facebox .bodcon').submit(function() {
+      var serData = $("#facebox .bodcon").serialize();
+      newTitle = $("#facebox").find('.rename-title').val();
+      fbFormSubmitted();
+
+
+      $.ajax({
+        type: "PUT",
+        url: turl,
+        data: serData,
+        success: function(retData) {
+          if (retData == 1) {
+            closefBox();
+            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Snapped successfully!');
+            setTimeout(function() {destroyAsyc();},1500);
+
+
+          } else {
+            fbFormRevert();
+            showFormError(retData);
+
+          }
+
+        }
+        
+      });
+
+      return false;
+    });
+    // end of form handler
+
+
   } else if (formID == 'move-form') {
 
 
@@ -842,8 +941,13 @@ function popForm(formID, obje) {
             $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
         },
         fail: function (e, data) {
+          /*
           $('#facebox .tempprog').html('We had an issue uploading your file...<br /><strong>Please try again!</strong>');
-          $('#facebox .file-upload-btn').show();
+          $('#facebox .file-upload-btn').show();*/
+            scrollBottom = true;
+            softRefresh();
+            closefBox();
+            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
         }
     });
 

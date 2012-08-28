@@ -86,8 +86,7 @@ footer {
   filter: alpha(opacity=100);
 }
 
-#top-notch-btn {
-  margin-top:12px;
+.top-notch-btn {
   color:#fff;
   font-weight:bolder;
   text-shadow: 0 1px 0 #333;
@@ -105,23 +104,48 @@ footer {
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
-#top-notch-btn:hover,
-#top-notch-btn:active,
-#top-notch-btn.active,
-#top-notch-btn.disabled,
-#top-notch-btn[disabled] {
+.top-notch-btn:hover,
+.top-notch-btn:active,
+.top-notch-btn.active,
+.top-notch-btn.disabled,
+.top-notch-btn[disabled] {
   color:#fff;
   font-weight:bolder;
   background-color: #850708;
   *background-color: #850708;
 }
 
-#top-notch-btn:active,
-#top-notch-btn.active {
+.top-notch-btn:active,
+.top-notch-btn.active {
   color:#fff;
   font-weight:bolder;
   background-color: #942a25 \9;
 }
+
+
+.notch-login {
+  margin-top:12px !important;
+}
+
+.notch-nav {
+  margin-top:13px !important;
+}
+
+.notchNum {
+  font-size:11px !important;
+  text-shadow: 0px 1px 1px #999;
+  padding:0px 5px;
+  background:#F20000;
+  margin-left:15px;
+  margin-top:-5px;
+  -webkit-border-radius: 10px;
+     -moz-border-radius: 10px;
+          border-radius: 10px;
+
+  position:absolute;
+
+}
+
 
 .noclose {
   padding: 10px;

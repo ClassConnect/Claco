@@ -1,25 +1,81 @@
-<h3><%= "#{params[:controller]}##{params[:action]}" %></h3>
-<p>app/views/<%= params[:controller] %>/<%= params[:action] %>.html.erb</p>
-
-Subject: <%= @conversation.subject %><br />
-Conversation between: <%= @conversation.members.each {|c| c + 
-	(@conversation.members.index(c) == @conversation.members.size - 1 ? String.new : ",")} %><br />
-<br />
-
-<% @messages.each do |message| %>
-	<br />
-	<hr />
-	<br />
-	<% if @unread.include?(message) %>
-		<%= "*NEW*" %>
-		<br />
-	<% end %>
-	Sender: <%= message.sender %><br />
-	Timestamp: <%= message.timestamp %><br />
-	Message: <%= message.body %><br />
-
+<% content_for :headcon do %>
+	<%= javascript_include_tag "messages/show" %>
+    <%= stylesheet_link_tag    "messages/main", :media => "all" %>
 <% end %>
-<br />
-<hr />
-<br />
-<%= link_to "Reply", add_message_path(@conversation) %>
+
+<div class="container">
+
+
+
+	<div class="leftbox">
+		<div style="font-size:14px;font-weight:bolder;color:#333;margin-top:15px">
+			Send messages
+		</div>
+		<div style="font-size:12px;color:#666;margin-top:10px;line-height:13px;padding-right:5px">
+			Go to a teacher's profile and click on "Message" to start a new message thread.
+		</div>
+	</div>
+
+
+
+	<div class="mainbox">
+
+		<div class="announce"><%= image_tag('messages/message.png', :class => "micon") %>
+			<a href="/<%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).username %>"><%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).first_last %></a> <a href="/messages" class="backmsg">← Back to messages</a>
+		</div>
+<!--  -->
+
+
+		<ul class="messages">
+
+			<% @messages.each do |message| %>
+				<li>
+
+						<a href="/<%= Teacher.find(message.sender).username %>"><img src="<%= Teacher.find(message.sender).info.avatar.thumb_md %>" class="profpic" /></a>
+
+						<div class="mescon">
+							<div class="tstamp">
+								<%= time_ago_in_words(Time.at(message.timestamp).to_datetime) %> ago
+							</div>
+
+
+							<div class="personname">
+								<a href="/<%= Teacher.find(message.sender).username %>">
+									<%= Teacher.find(message.sender).first_last %>
+								</a>
+							</div>
+							<div class="messagetxt">
+								<%= h(message.body).gsub(/$/, "<br />").gsub(/(\r|\n)/, "").html_safe %>
+							</div>
+
+						</div>
+
+
+
+
+					<div style="clear:both"></div>
+				</li>
+			<% end %>
+
+		</ul>
+
+
+
+<!-- form this shit, no ajax -->
+		<div class="replywrap">
+			<div class="replybox">
+				<%= form_for @conversation, :url => add_message_path(@conversation) do |f| %>
+				<!-- <textarea class="replytext" placeholder="Write your message here"></textarea> -->
+					<%= text_area_tag "body", "",:class => "replytext", :placeholder => "Write your message here" %>
+				<button class="btn btn-primary replybtn">Send</button>
+				<% end %>
+			</div>
+		</div>
+
+
+
+
+	</div>
+
+
+</div>

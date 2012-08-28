@@ -1,5 +1,6 @@
 Claco::Application.routes.draw do
 
+
 	##################
 	# DEVISE ROUTING #
 	##################
@@ -52,6 +53,9 @@ Claco::Application.routes.draw do
 
 	post	'utils/fetchtitle'												=> 'home#fetchtitle'
 
+	get		'/legal/tos'													=> 'home#tos'
+	get		'/legal/privacy'												=> 'home#privacy'
+
 	#####################
 	# APPLICANT ROUTING #
 	#####################
@@ -60,29 +64,34 @@ Claco::Application.routes.draw do
 	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
 	get		'/viewapps'														=> 'applicants#viewapps'
 
+	get		'/gs/:provider'													=> 'home#gs'
+	post	'/done'															=> 'teachers#done'
 
 	###################
 	# MESSAGE ROUTING #
 	###################
 
 	#Inbox
-	get		'/conversations'												=> 'teachers#conversations',		:as => 'conversations'
+	get		'/messages'												=> 'teachers#conversations',		:as => 'conversations'
 
 	#New conversation
-	get		'/conversations/new'											=> 'conversations#new',				:as => 'new_conversation'
-	post	'/conversations/new'											=> 'conversations#create'
+	get		'/messages/new'											=> 'conversations#new',				:as => 'new_conversation'
+	post	'/messages/new'											=> 'conversations#create'
 
 	#New message/reply
-	get		'/conversations/:id'											=> 'conversations#show',			:as => 'show_conversation'
-	get		'/conversations/:id/add'										=> 'conversations#newmessage',		:as => 'add_message'
-	put		'/conversations/:id/add'										=> 'conversations#createmessage'
+	get		'/messages/:id'											=> 'conversations#show',			:as => 'show_conversation'
+	get		'/messages/:id/add'										=> 'conversations#newmessage',		:as => 'add_message'
+	put		'/messages/:id/add'										=> 'conversations#createmessage'
 
-
-	##################
-	# BINDER ROUTING #
-	##################
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
+
+		post '/:username/message'											=> 'conversations#createmessage'
+
+		##################
+		# BINDER ROUTING #
+		##################
+
 
 		#Binder Index
 		get		'/:username/portfolio'											=> 'binders#index',					:as => 'binders'
@@ -101,6 +110,8 @@ Claco::Application.routes.draw do
 		################################################
 		# Paths handled by named_binder_route function #
 		################################################
+
+		# post	'/:username/portfolio(/:root)/:title/:id/favorite'				=> 'binders#create'
 
 		#New
 		post	'/:username/portfolio(/:root)/:title/:id/create'				=> 'binders#create'
@@ -133,6 +144,8 @@ Claco::Application.routes.draw do
 		
 		#Update :body
 		put		'/:username/portfolio(/:root)/:title/:id'						=> 'binders#update'
+
+
 
 		#Profile Page
 		get		'/:username'													=> 'teachers#show'

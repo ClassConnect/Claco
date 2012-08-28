@@ -1,0 +1,243 @@
+.leftbox {
+  float:left;
+  width:180px;
+  padding:10px;
+}
+
+.mainbox {
+	margin-top:20px;
+	padding: 5px 20px 20px 20px;
+	margin-bottom:10px;
+
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+
+	-moz-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  box-shadow: 0 1px 3px rgba(34,25,25,0.3);
+
+  background: #fff;
+  width:700px;
+  float:left;
+}
+
+.mainbox .announce {
+  padding-top:15px;
+  font-size:18px;
+  font-weight:bolder;
+  padding-bottom:10px;
+  border-bottom:1px solid #eee;
+  color:#333;
+  background:#fff;
+}
+
+.mainbox .announce a, .mainbox .announce a:hover{
+  color:#333;
+}
+
+.mainbox .announce .micon{
+  width:28px;
+  margin-top:-4px;
+}
+
+.mainbox .messagers {
+  list-style: none;
+  margin:0;
+}
+
+.mainbox .messagers li {
+  height:60px;
+  list-style: none;
+  border-bottom:1px solid #eee;
+  padding: 0 5px;
+}
+
+
+.mainbox .messagers li:hover {
+  background:#DCEAFD;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.mainbox .messagers li .profpic {
+  float:left;
+  height:48px;
+  width:48px;
+  margin-top:6px;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.mainbox .messagers li .mescon {
+  float:left;
+  height:48px;
+  width:500px;
+  margin:5px 0 0 10px;
+}
+
+.mainbox .messagers li .stampy {
+  float:left;
+  height:48px;
+  width:130px;
+}
+
+.mainbox .messagers li .stampy .tstamp {
+  color:#A3A59E;
+  padding-top:21px;
+  padding-right:5px;
+  text-align: right;
+}
+
+.mainbox .messagers li .stampy .tstamp:hover {
+  color:#A3A59E;
+}
+
+.mainbox .messagers li .mescon .personname {
+  font-size:14px;
+  font-weight:bolder;
+  margin-top:7px;
+}
+
+.mainbox .messagers li .mescon .messagetxt, .mainbox .messagers li .mescon .messagetxt:hover {
+  color:#A3A59E;
+}
+
+
+.messelect, .messelect:hover  {
+  background:#C9DEFD;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.messelect .personname {
+  color:#005580 !important;
+}
+
+.messelect .messagetxt, .messelect .messagetxt:hover, .messelect .stampy .tstamp, .messelect .stampy .tstamp:hover {
+  color: #777A8A !important;
+}
+
+
+
+.namefloat {
+  -webkit-box-shadow: 0 2px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0 2px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px rgba(0, 0, 0, 0.15);
+}
+
+.replyfloat {
+  -webkit-box-shadow: 0 -2px rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0 -2px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -2px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* for message viewing (SHOW) */
+
+
+.mainbox .messages {
+  list-style: none;
+  margin:0;
+}
+
+.mainbox .backmsg {
+  color:#08C !important;
+  font-size:14px;
+  font-weight:normal !important;
+  margin-top:3px;
+  float:right;
+}
+
+.mainbox .messages li {
+  list-style: none;
+  border-bottom:1px solid #eee;
+  padding: 5px 5px 10px 0;
+}
+
+.mainbox .messages li .profpic {
+  float:left;
+  height:48px;
+  width:48px;
+  margin-top:6px;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.mainbox .messages li .mescon {
+  float:left;
+  width:630px;
+  margin:5px 0 0 10px;
+}
+
+
+.mainbox .messages li .tstamp {
+  font-size:11px;
+  margin-top:5px;
+  color:#A3A59E;
+  float:right;
+}
+
+.mainbox .messages li .mescon .personname {
+  font-size:14px;
+  font-weight:bolder;
+  margin-top:3px;
+}
+
+
+
+.mainbox .messages li .mescon .messagetxt {
+  color:#333;
+  width:630px;
+  overflow-x:hidden;
+}
+
+
+.mainbox .replywrap {
+  margin: 0 0 -20px -20px;
+  width: 700px;
+}
+
+.mainbox .replywrap form{
+  margin: 0 0 0 0;
+
+}
+
+.mainbox .replybox {
+  border-top:1px solid #ddd;
+  position:relative;
+  background:#f4f4f4;
+  padding:15px 20px 10px 20px;
+  width: 700px;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+
+.mainbox .replybox .replytext {
+  width:610px;
+  height:40px;
+}
+
+.mainbox .replybox .replybtn {
+  font-size:14px;
+  padding:10px 15px 10px 15px;
+  font-weight:bolder;
+  position:absolute !important;
+  bottom:0 !important;
+  margin: 0 0 21px 10px !important;
+}

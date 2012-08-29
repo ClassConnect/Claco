@@ -98,4 +98,4 @@ MAIN_FEED_STORAGE = 50
 SUBSC_FEED_STORAGE = 50
 PERSONAL_FEED_STORAGE = 50
 
-FEED_METHOD_WHITELIST = %w[create createfile createcontent update updatetags forkitem favorite setpub]
+FEED_METHOD_WHITELIST = %w[create createfile createcontent update forkitem favorite setpub]

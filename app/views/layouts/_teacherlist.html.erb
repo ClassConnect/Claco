@@ -1,9 +1,9 @@
 <% @teachers.each do |t| %>
-	<% #if !signed_in? || (t.id.to_s != current_teacher.id.to_s) 
+	<% #if !signed_in? || (t.id.to_s != current_teacher.id.to_s)
 	%>
 	<div class="listitem">
 		<a href="<%= "/#{t.username}" %>">
-			<img src=<%= t.info.avatar.thumb_md.url.to_s if !t.info.nil? && !t.info.avatar.nil? %> class="thumbster" />
+			<img src=<%= (!t.info.nil? && !t.info.avatar.nil?) ? t.info.avatar.thumb_md.url.to_s : "" %> class="thumbster" />
 		</a>
 		<div class="infowrap">
 			<div class="bigtitle">
@@ -44,6 +44,6 @@
 		</div>
 		<div style="clear:both"></div>
 	</div>
-	<% #end 
+	<% #end
 	%>
 <% end %>

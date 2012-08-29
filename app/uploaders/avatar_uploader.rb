@@ -55,6 +55,10 @@ class AvatarUploader < CarrierWave::Uploader::Base
     Digest::MD5.hexdigest(model.teacher.id.to_s + model.size.to_s + model.data.to_s)
   end
 
+  def default_url
+    "/assets/placer.png"
+  end
+
   def fog_directory
     "img.cla.co"
   end

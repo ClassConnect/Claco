@@ -208,11 +208,11 @@ function startWizard() {
 
 				guiders.createGuider({
 				  buttons: [{name: "Close"}],
-				  description: "Head over to a teacher's profile and click the 'Snap' button on one of their lessons!",
+				  description: "<iframe width=\"650\" height=\"400\" src=\"http://www.youtube.com/embed/AaLT4qD0dMc?vq=hd720\" frameborder=\"0\" allowfullscreen></iframe>",
 				  id: "first",
 				  next: "second",
 				  title: "Learn how to snap together your curriculum!",
-				  width: 600
+				  width: 650
 				}).show();
 
 

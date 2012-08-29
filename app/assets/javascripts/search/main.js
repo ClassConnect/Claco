@@ -6,7 +6,7 @@ $(document).ready(function() {
 
 
 		$.ajax({
-            url: $(this).parent().parent().find('.bigtitle a:first').attr("href"),
+            url: $(this).parent().parent().find('.bigtitle a:first').attr("href") + '/subscribe/',
             data: '',
             type: 'put',
             success: function(data) {

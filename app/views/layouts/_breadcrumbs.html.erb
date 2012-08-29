@@ -1,6 +1,15 @@
 <div class="content-header">
   <div class="con-inner">
     <div class="container">
+
+      <div class="myImgBox">
+        <a href="#">
+          <img src="http://img.cla.co/d1a54b8f36e8bb677aa654b84b162961/thumb_lg.png" />
+        </a>
+        <div class="info">
+          <a href="#" class="namester">Eric Simons</a>
+        </div>
+      </div>
       
       <div class="crumbster">
         <ul class="crumbs">
@@ -8,6 +17,7 @@
         	<% @binder.parents.each do |parent| %>
 				<% if parent["id"] == "0" %>
 					<!--<li><%= link_to "Home", binders_path %></li>-->
+          <li><a href="/eric/portfolio/" class="pjax">Eric Simons</a></li>
 
 				<% elsif parent["id"] == "-1" %>
 					<li><%= link_to "Trash", trash_path %></li>
@@ -48,7 +58,7 @@
 
       <% else %>
 
-        <%= link_to "← Back to folder", named_binder_route(@binder.parent["id"]), :class => "pjax", :style => "float:right;font-size:16px" %>
+        <%= link_to "← Back to folder", named_binder_route(@binder.parent["id"]), :class => "pjax", :style => "float:right;font-size:16px;margin-top:20px" %>
 
       <% end %>
     </div>

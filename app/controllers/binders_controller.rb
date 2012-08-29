@@ -622,6 +622,12 @@ class BindersController < ApplicationController
 
 		@uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}#{named_binder_route(params[:id], "createfile")}/#{@v.data}/#{@v.timestamp}/#{token}"
 
+		render "cf", :layout => false
+
+		# respond_to do |format|
+			# format.html {render "cf"}
+		# end
+
 	end
 
 	# Add file process
@@ -859,7 +865,7 @@ class BindersController < ApplicationController
 		# 	errors << "Invalid Request"
 		# ensure
 			if errors.empty?
-				redirect_to named_binder_route(@inherited[:parent])
+				redirect_to "#{named_binder_route(@inherited[:parent])}#rdir"
 			else
 				respond_to do |format|
 					format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}

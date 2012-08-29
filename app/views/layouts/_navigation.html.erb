@@ -21,7 +21,7 @@
 
             <div class="searchWrap">
               <form method="GET" action="/search" style="margin:0">
-                <input type="text" name="q" class="topSearch" placeholder="Search" />
+                <input type="text" name="q" class="topSearch" placeholder="Search" value="<%= params[:q] if !params[:q].nil? %>" />
               </form>
             </div>
 

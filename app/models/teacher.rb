@@ -96,28 +96,45 @@ class Teacher
 
 
 
-	# THIS MAPPING IS CORRECT
-
-	# mapping do
-	# 	indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
-	# 	indexes :fname, 	:type => 'string', 	:analyzer => 'standard'
-	# 	indexes :lname, 	:type => 'string', 	:analyzer => 'standard'
-	# 	indexes :username, 	:type => 'string', 	:analyzer => 'stan dard'
-	# 	indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
-	# 														:size 			=> { :type => 'object', :enabled => false },
-	# 														:ext 			=> { :type => 'object', :enabled => false },
-	# 														:data 			=> { :type => 'object', :enabled => false },
-	# 														:facebookurl	=> { :type => 'object', :enabled => false },
-	# 														:grades 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
-	# 														:subjects 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
-	# 														:bio 			=> { :type => 'string', :analyzer => 'snowball' },
-	# 														:website 		=> { :type => 'string', :analyzer => 'standard' },
-	# 														:city			=> { :type => 'string', :analyzer => 'standard' },
-	# 														:state 			=> { :type => 'string', :analyzer => 'standard' },
-	# 														:country		=> { :type => 'string', :analyzer => 'standard' },
-	# 														:twitterhandle 	=> { :type => 'string', :analyzer => 'standard' },
-	# 														:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
-	# end
+	settings analysis: {
+		filter: {
+			ngram_filter: {
+				type: 		"nGram",
+				min_gram: 	3,
+				max_gram: 	8
+			}
+		},
+		analyzer: {
+			ngram_analyzer: {
+				tokenizer: "lowercase",
+				filter: ["nGram"],
+				type: "custom"
+				#tokenizer: "snowball",
+				#filter: ["lowercase","ngram_filter"]
+			}
+		}
+	} 	do
+		mapping do
+			#indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
+			indexes :fname, 	:type => 'string', 	:analyzer => 'standard'
+			indexes :lname, 	:type => 'string', 	:analyzer => 'standard'
+			indexes :username, 	:type => 'string', 	:analyzer => 'standard'
+			indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
+																:size 			=> { :type => 'object', :enabled => false },
+																:ext 			=> { :type => 'object', :enabled => false },
+																:data 			=> { :type => 'object', :enabled => false },
+																:facebookurl	=> { :type => 'object', :enabled => false },
+																:grades 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
+																:subjects 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
+																:bio 			=> { :type => 'string', :analyzer => 'snowball' },
+																:website 		=> { :type => 'string', :analyzer => 'standard' },
+																:city			=> { :type => 'string', :analyzer => 'standard' },
+																:state 			=> { :type => 'string', :analyzer => 'standard' },
+																:country		=> { :type => 'string', :analyzer => 'standard' },
+																:twitterhandle 	=> { :type => 'string', :analyzer => 'standard' },
+																:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
+		end
+	end
 
 	# Class Methods
 

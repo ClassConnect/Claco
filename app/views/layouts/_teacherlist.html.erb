@@ -1,0 +1,49 @@
+<% @teachers.each do |t| %>
+	<% if !signed_in? || (t.id.to_s != current_teacher.id.to_s) %>
+	<div class="listitem">
+		<a href="<%= "/#{t.username}" %>">
+			<img src=<%= t.info.avatar.thumb_md.url.to_s if !t.info.nil? && !t.info.avatar.nil? %> class="thumbster" />
+		</a>
+		<div class="infowrap">
+			<div class="bigtitle">
+				<a href="<%= "/#{t.username}" %>"><%= "#{t.fname} #{t.lname}" %></a> <a href="<%= "/#{t.username}" %>"><span class="uname">(<%= t.username.to_s %>)</span></a>
+			</div>
+			<% if !t.info.nil? %>
+			<div class="biotxt">
+				<%= t.info.bio.to_s %>
+			</div>
+			<div class="medata">
+				<% if t.info.subjects.any? %>
+				<span>
+					<%= image_tag("profile/subject.png") %>
+					<%= t.info.subjects[0].to_s %>
+					<%= ", #{t.info.subjects[1].to_s}" if t.info.subjects.size > 1 %>
+					<%= ", and #{t.info.subjects.size-2} more" if t.info.subjects.size > 2 %>
+				</span>
+				&nbsp;&nbsp;
+				<% end %>
+				<% if !t.info.city.empty? || !t.info.state.empty? || !t.info.country.empty? %>
+				<span>
+					<%= image_tag("profile/point.png", :style => "margin-right:0px") %>
+					<%= "#{t.info.city}#{', ' if !t.info.city.empty?}#{t.info.state}#{', ' if !t.info.city.empty? && !t.info.state.empty?}#{t.info.country}" %>
+				</span>
+				<% end %>
+			</div>
+			<% end %>
+		</div>
+		<div class="actarea">
+			<% if signed_in? %>
+				<% if !current_teacher.subscribed_to?(t.id) %>
+				<a class="btn btn-medium subbtn" style="font-weight:bolder">
+					<%= image_tag("profile/darkscribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
+					Subscribe
+				</a>
+				<% else %>
+				<div style="margin-right:5px;font-weight:bolder;color:#555">✓ Subscribed!</div>
+				<% end %>
+			<% end %>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+	<% end %>
+<% end %>

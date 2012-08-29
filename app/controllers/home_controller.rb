@@ -115,7 +115,28 @@ class HomeController < ApplicationController
 
 	def search
 
-		@teachers = Teacher.all[0..2]
+		if params[:q].present?
+			#@teachers = Teacher.all.tire.search(params[:query], load: true)
+			@teachers = Tire.search 'teachers' do |search|
+				#query do
+
+				# number of results returned
+				search.size 30
+
+				search.query do |query|
+					#string 'fname:S*'
+					#query.size 15
+					query.string "#{params[:q]}*"
+				end
+				#query { all } 
+			end
+
+			@teachers=@teachers.results
+		else
+			@teachers = []#Teacher.all
+		end
+
+		#@teachers = Teacher.all[0..2]
 
 		render "search"
 
@@ -144,16 +165,16 @@ class HomeController < ApplicationController
 			@teachers = Teacher.all
 		end
 
-		Rails.logger.debug "<<< TEACHERS RETURNED >>>"
+		#Rails.logger.debug "<<< TEACHERS RETURNED >>>"
 		#Rails.logger.debug @teachers.size.to_s
 
-		retstr=""
+		#retstr=""
 
 		#debugger
 
-		@teachers.each do |t|
-			retstr += t.fname + ' ' + t.lname + '<br />'
-		end
+		# @teachers.each do |t|
+		# 	retstr += t.fname + ' ' + t.lname + '<br />'
+		# end
 
 		respond_to do |format|
 			format.html {render :text => retstr}

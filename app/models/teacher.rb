@@ -77,9 +77,11 @@ class Teacher
 
 
 	# after_save do
-	# 	#debugger
+	# 	debugger
 	# 	#Rails.logger.debug "AFTER_SAVE got here!"
 	# 	self.tire.update_index
+	# 	#self.tire.index.delete
+	# 	#self.tire.index.create
 	# end
 
 

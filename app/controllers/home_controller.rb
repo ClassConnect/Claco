@@ -125,7 +125,7 @@ class HomeController < ApplicationController
 
 		if params[:query].present?
 			#@teachers = Teacher.all.tire.search(params[:query], load: true)
-			@teachers = Tire.search 'mongo-teachers' do |search|
+			@teachers = Tire.search 'teachers' do |search|
 				#query do
 
 				# number of results returned

@@ -2,11 +2,11 @@ $(document).ready(function() {
 
 	$('.subbtn').click(function() {
 		// new subscription
-		$(this).after('<div>Subscribed!</div>');
+		$(this).after('<div style="margin-right:5px;font-weight:bolder;color:#555">✓ Subscribed!</div>');
 
 
 		$.ajax({
-            url: location.protocol+'//'+location.host+location.pathname + '/' + "varhere",
+            url: $(this).parent().parent().find('.bigtitle a:first').attr("href"),
             data: '',
             type: 'put',
             success: function(data) {

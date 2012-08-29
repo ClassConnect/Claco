@@ -411,7 +411,7 @@ class Binder
 	end
 
 	def root
-		return parents.second["title"] if parents.size > 1
+		return parents.second["title"] || parents.second[:title] if parents.size > 1
 
 		return title
 	end
@@ -489,6 +489,34 @@ class Binder
 	# Delayed Job Methods
 
 	# Do not explicitly call these!  All these methods have very long latency.
+
+	def self.gen_smartnotebook_thumbnail(id)
+
+		binder = Binder.find(id)
+
+		t = Tempfile.new("nb")
+
+		t.binmode
+
+		open(binder.current_version.file.url){|data| t.write data.read}
+
+		zip = Zip::ZipFile.open(t)
+
+		if !zip.find_entry('preview.png').nil?
+
+			png = FilelessIO.new(zip.read('preview.png')).set_filename('preview.png')
+
+			# png.original_filename = 'preview.png'
+
+			stathash = binder.current_version.imgstatus
+			stathash["imgfile"]["retrieved"] = true
+
+			binder.current_version.update_attributes(:imgfile => png)
+
+			Binder.gen_croc_thumbnails(binder.id)
+		end
+
+	end
 
 	def self.gen_url_thumbnails(id)
 
@@ -1177,6 +1205,7 @@ end
 
 class Version
 	include Mongoid::Document
+	# include CarrierWaveDirect::Mount
 
 	#attr_accessible :thumbnailgen
 
@@ -1184,6 +1213,7 @@ class Version
 	field :timestamp, :type => Integer
 	field :comments_priv, :type => Array
 	field :comments_pub, :type => Array
+	field :filename, :type => String
 	field :size, :type => Integer, :default => 0
 	field :ext, :type => String
 	field :data, :type => String #URL, path to file

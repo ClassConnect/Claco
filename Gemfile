@@ -41,6 +41,7 @@ gem 'addressable'
 
 gem 'dynamic_form'
 gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
+gem 'carrierwave_direct'
 gem "fog", "~> 1.3.1"
 gem 'sendgrid-rails', '~> 2.0'
 gem 'newrelic_rpm'

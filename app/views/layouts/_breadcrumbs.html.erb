@@ -3,11 +3,11 @@
     <div class="container">
 
       <div class="myImgBox">
-        <a href="#">
-          <img src="http://img.cla.co/d1a54b8f36e8bb677aa654b84b162961/thumb_lg.png" />
+        <a href="/<%= @binder.username %>">
+          <img src="/<%= Teacher.find(@binder.owner).info.avatar.thumb_lg %>" />
         </a>
         <div class="info">
-          <a href="#" class="namester">Eric Simons</a>
+          <a href="/<%= @binder.username %>" class="namester"><%= "#{@binder.fname} #{@binder.lname}" %></a>
         </div>
       </div>
       
@@ -17,7 +17,7 @@
         	<% @binder.parents.each do |parent| %>
 				<% if parent["id"] == "0" %>
 					<!--<li><%= link_to "Home", binders_path %></li>-->
-          <li><a href="/eric/portfolio/" class="pjax">Eric Simons</a></li>
+          <li><a href="/<%= @binder.username %>"><%= "#{@binder.fname} #{@binder.lname}" %></a></li>
 
 				<% elsif parent["id"] == "-1" %>
 					<li><%= link_to "Trash", trash_path %></li>

@@ -1,0 +1,157 @@
+.leftbox {
+  margin-top:30px;
+  margin-bottom:10px;
+  width:250px;
+  float:left;
+
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+
+  -moz-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  box-shadow: 0 1px 3px rgba(34,25,25,0.3);
+
+}
+
+.leftbox li{
+  padding:8px 12px 8px 8px;
+  list-style:none;
+  border-bottom: 1px solid #DFDFDF;
+  background: rgba(255, 255, 255, 0.50);
+}
+
+.leftbox li:hover{
+  background: rgba(255, 255, 255, 1) !important;
+}
+
+.leftbox li .titler{
+  font-size:16px;
+}
+
+.leftbox li .titler .arrow{
+  float:right;
+  font-size:10px !important;
+  color:#ccc !important;
+}
+
+
+.leftbox li:first-child {
+  -moz-border-radius-topright:4px;
+  -webkit-border-top-right-radius:4px; 
+  border-top-right-radius:4px;
+  -moz-border-radius-topleft:4px;
+  -webkit-border-top-left-radius:4px;  
+  border-top-left-radius:4px;
+}
+
+.leftbox li:last-child {
+  border-bottom:none;
+  -moz-border-radius-bottomright:4px;
+  -webkit-border-bottom-right-radius:4px; 
+  border-bottom-right-radius:4px;
+  -moz-border-radius-bottomleft:4px;
+  -webkit-border-bottom-left-radius:4px;  
+  border-bottom-left-radius:4px;
+}
+
+
+.leftbox .active{
+  background: rgba(255, 255, 255, 1) !important;
+}
+.leftbox .active .titler {
+  font-weight:bolder;
+  color:#333 !important;
+}
+.leftbox .active a:hover{
+  color:#333 !important;
+  
+}
+
+.leftbox .active .titler .arrow{
+  color:#999 !important;
+}
+
+
+
+
+.mainbox {
+	margin-top:30px;
+	margin-bottom:10px;
+  width:660px;
+  float:right;
+
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+
+	-moz-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  box-shadow: 0 1px 3px rgba(34,25,25,0.3);
+
+  background: #fff;
+}
+
+.mainbox .headnounce{
+  font-size:18px;
+  color:#333;
+  font-weight:bolder;
+  padding:12px 0 10px 10px;
+  border-bottom:1px solid #EAEAEA;
+}
+
+
+.mainbox .listitem{
+  padding:13px 0 13px 10px;
+  border-bottom:1px solid #EAEAEA;
+}
+
+.mainbox .listitem .thumbster{
+  float:left;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+.mainbox .listitem .infowrap {
+  float:left;
+  margin-left:14px;
+  width:430px;
+}
+
+.mainbox .listitem .bigtitle{
+  font-size:16px;
+  font-weight:bolder;
+}
+
+.mainbox .listitem .bigtitle .uname{
+  color:#888 !important;
+  font-size:13px !important;
+  font-weight:normal !important;
+  text-decoration: none !important;
+}
+
+.mainbox .listitem .biotxt{
+  font-size:13px;
+  color:#555;
+  font-style: italic;
+}
+
+.mainbox .listitem .medata {
+  margin-top:10px;
+}
+
+.mainbox .listitem .medata span{
+  color:#777;
+  font-size:12px;
+}
+
+.mainbox .listitem .medata span img{
+  margin-top:-4px;
+  margin-right:3px;
+}
+
+.mainbox .listitem .actarea {
+  float:right;
+  margin-right:10px;
+}

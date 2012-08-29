@@ -31,7 +31,11 @@
 			Educators
 		</div>
 
-		<%= render 'layouts/teacherlist' %>
+		<% if @teachers.empty? %>
+			<div class="listitem">No educators found!</div>
+		<% else %>
+			<%= render 'layouts/teacherlist' %>
+		<% end %>
 
 		<!--<div class="listitem">
 			<a href="#">

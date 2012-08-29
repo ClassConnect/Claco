@@ -116,9 +116,9 @@ class Teacher
 	} 	do
 		mapping do
 			#indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
-			indexes :fname, 	:type => 'string', 	:analyzer => 'standard'
-			indexes :lname, 	:type => 'string', 	:analyzer => 'standard'
-			indexes :username, 	:type => 'string', 	:analyzer => 'standard'
+			indexes :fname, 	:type => 'string', 	:analyzer => 'standard', :boost => 3.0
+			indexes :lname, 	:type => 'string', 	:analyzer => 'standard', :boost => 3.0
+			indexes :username, 	:type => 'string', 	:analyzer => 'standard', :boost => 3.0
 			indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
 																:size 			=> { :type => 'object', :enabled => false },
 																:ext 			=> { :type => 'object', :enabled => false },
@@ -126,7 +126,7 @@ class Teacher
 																:facebookurl	=> { :type => 'object', :enabled => false },
 																:grades 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
 																:subjects 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
-																:bio 			=> { :type => 'string', :analyzer => 'snowball' },
+																:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 2.0 },
 																:website 		=> { :type => 'string', :analyzer => 'standard' },
 																:city			=> { :type => 'string', :analyzer => 'standard' },
 																:state 			=> { :type => 'string', :analyzer => 'standard' },

@@ -138,48 +138,73 @@ class HomeController < ApplicationController
 
 		#@teachers = Teacher.all[0..2]
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					'',
+					params)
+
 		render "search"
 
 	end
 
 	def teachersearch
 
-		if params[:query].present?
-			#@teachers = Teacher.all.tire.search(params[:query], load: true)
-			@teachers = Tire.search 'teachers' do |search|
-				#query do
+		# if params[:query].present?
+		# 	#@teachers = Teacher.all.tire.search(params[:query], load: true)
+		# 	@teachers = Tire.search 'teachers' do |search|
+		# 		#query do
 
-				# number of results returned
-				search.size 100
+		# 		# number of results returned
+		# 		search.size 100
 
-				search.query do |query|
-					#string 'fname:S*'
-					#query.size 15
-					query.string params[:query]
-				end
-				#query { all } 
-			end
+		# 		search.query do |query|
+		# 			#string 'fname:S*'
+		# 			#query.size 15
+		# 			query.string params[:query]
+		# 		end
+		# 		#query { all } 
+		# 	end
 
-			@teachers=@teachers.results
-		else
-			@teachers = Teacher.all
-		end
-
-		#Rails.logger.debug "<<< TEACHERS RETURNED >>>"
-		#Rails.logger.debug @teachers.size.to_s
-
-		#retstr=""
-
-		#debugger
-
-		# @teachers.each do |t|
-		# 	retstr += t.fname + ' ' + t.lname + '<br />'
+		# 	@teachers=@teachers.results
+		# else
+		# 	@teachers = Teacher.all
 		# end
 
-		respond_to do |format|
-			format.html {render :text => retstr}
-		end
+		# #Rails.logger.debug "<<< TEACHERS RETURNED >>>"
+		# #Rails.logger.debug @teachers.size.to_s
+
+		# #retstr=""
+
+		# #debugger
+
+		# # @teachers.each do |t|
+		# # 	retstr += t.fname + ' ' + t.lname + '<br />'
+		# # end
+
+		# respond_to do |format|
+		# 	format.html {render :text => retstr}
+		# end
 
 	end
 
+	module Mongo
+		extend self
+
+		def log(ownerid,method,model,modelid,params,data = {})
+
+			log = Log.new( 	:ownerid => ownerid.to_s,
+							:timestamp => Time.now.to_i,
+							:method => method.to_s,
+							:model => model.to_s,
+							:modelid => modelid.to_s,
+							:params => params,
+							:data => data)
+
+			log.save
+
+			return log.id.to_s
+
+		end
+	end
 end

@@ -1,5 +1,30 @@
+<div class="headtitle">
+	Upload File
+</div>
+
+<div class="bodcon">
 <%= direct_upload_form_for @uploader do |f| %>
-	<%= f.file_field :file %>
+	<%= f.file_field :file, :id => "stupidfilepicker" %>
 	<br />
-	<%= f.submit "Upload this file" %>
+
+	<div class="buttonbar">
+		<button class="btn btn-primary" id="checkout" type="submit">Upload this file</button>
+		<button class="btn" id="rmclose" type="reset" onClick="closefBox()">Cancel</button>
+	</div>
 <% end %>
+</div>
+
+<script>
+$(document).ready(function() {
+	$('#checkout').click(function() {
+		if ($('#stupidfilepicker').val() === "") {
+			alert('You need to choose a file!');
+			return false;
+		} else {
+			$(".buttonbar").after('<div style="margin-left:100px; font-weight:bolder">Uploading...</div> <img src="/assets/miniload.gif" style="float:right" />');
+			$(".buttonbar").hide();
+			$('#stupidfilepicker').hide();
+		}
+	});
+});
+</script>

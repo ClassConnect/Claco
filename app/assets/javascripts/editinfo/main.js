@@ -45,7 +45,7 @@ $(function() {
 		$('.biotext').keypress(function(e) {
 		    var tval = $('.biotext').val(),
 		        tlength = tval.length,
-		        set = 190,
+		        set = 180,
 		        remain = parseInt(set - tlength);
 		    $('.remain').text(remain);
 		    if (remain <= 0 && e.which !== 0 && e.charCode !== 0) {

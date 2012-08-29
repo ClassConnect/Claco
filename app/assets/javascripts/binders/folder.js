@@ -31,6 +31,11 @@ function initPage() {
 
 
 $(document).ready(function() {
+  // file upload? scroll down
+  if(window.location.hash === "#rdir" || window.location.hash === "rdir") {
+    $('html, body').animate({ scrollTop: $(document).height() }, 1500);
+    removeHash();
+  }
 
   initPage();
 
@@ -923,36 +928,47 @@ function popForm(formID, obje) {
   } else if (formID == 'addfile-form') {
 
 
-    // initialize the file upload functionality
-    $('#facebox .filepick').fileupload({
-        url: location.protocol+'//'+location.host+location.pathname + '/createfile',
-        dataType: 'json',
-        add: function (e, data) {
-            data.submit();
-        },
-        start: function (e, data) {
-          $('#facebox .file-upload-btn').after('<div class="tempprog" style="margin-left:50px;margin-top:5px"><img src="/assets/miniload.gif" style="float:left;margin-right:8px;margin-top:3px" /> <span style="font-size:14px;font-weight:bolder">Uploading your file...</span></div>');
-          $('#facebox .file-upload-btn').hide();
-        },
-        done: function (e, data) {
-            scrollBottom = true;
-            softRefresh();
-            closefBox();
-            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
-        },
-        fail: function (e, data) {
-          /*
-          $('#facebox .tempprog').html('We had an issue uploading your file...<br /><strong>Please try again!</strong>');
-          $('#facebox .file-upload-btn').show();*/
-            scrollBottom = true;
-            softRefresh();
-            closefBox();
-            $('html, body').animate({ scrollTop: $(document).height() + 200 }, 700);
-        }
-    });
+    jQuery.facebox({ ajax: location.protocol+'//'+location.host+location.pathname + "/cf", })
 
 
 
   }
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// helper for removing hash
+function removeHash () { 
+    var scrollV, scrollH, loc = window.location;
+    if ("pushState" in history)
+        history.pushState("", document.title, loc.pathname + loc.search);
+    else {
+        // Prevent scrolling by storing the page's current scroll offset
+        scrollV = document.body.scrollTop;
+        scrollH = document.body.scrollLeft;
+
+        loc.hash = "";
+
+        // Restore the scroll offset, should be flicker free
+        document.body.scrollTop = scrollV;
+        document.body.scrollLeft = scrollH;
+    }
 }

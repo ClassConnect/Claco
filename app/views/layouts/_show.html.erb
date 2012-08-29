@@ -4,8 +4,6 @@
 	<%= javascript_include_tag "binders/pretags" %>
 	<%= javascript_include_tag "binders/folder" %>
 	<%= javascript_include_tag "binders/taginit" %>
-  <%= javascript_include_tag "binders/upload/iframe-transport" %>
-  <%= javascript_include_tag "binders/upload/fileupload" %>
   <%= javascript_include_tag "binders/icheck" %>
   <%= stylesheet_link_tag    "widgets/icheck", :media => "all" %>
 <% end %>
@@ -240,22 +238,7 @@
 <div id="form-helpers" style="display:none">
 
 	<div id="upload-form" style="display:none">
-		<div class="headtitle">
-		  Upload File
-		</div>
-
-		<div class="bodcon">
-		  <div class="conitem">
-		    <div class="lablr">Choose a title</div>
-		    <input type="file" />
-		  </div>
-
-		  <div class="buttonbar">
-		     <button class="btn btn-primary">Upload File!</button>
-		     <button class="btn" onClick="closefBox()">Cancel</button>
-		  </div>
-
-		</div>
+		
 	</div>
 
 
@@ -319,28 +302,7 @@
 
 
   <div id="addfile-form" style="display:none">
-    <div class="headtitle">
-      Upload file
-    </div>
-
-    <div class="errorBox"></div>
-
-    <form action="#" class="bodcon">
-      <div class="conitem">
-
-        <div class="file-upload-btn">
-          <input name="file" class="filepick" type="file" />
-          <a class="btn btn-primary btnsauce">Choose a file to upload!</a>
-        </div>
-
-
-      </div>
-
-      <div class="buttonbar">
-         <button class="btn canceler" type="reset" onClick="$('#facebox .filepick').fileupload('destroy'); closefBox()">Cancel</button>
-      </div>
-
-    </form>
+    
   </div>
 
 

@@ -1,5 +1,7 @@
 class Teacher
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	# Include default devise modules. Others available are:
 	# :token_authenticatable, :confirmable,
@@ -73,12 +75,13 @@ class Teacher
 	## Token authenticatable
 	# field :authentication_token, :type => String
 
-	# include Tire::Model::Search
-	# #include Tire::Model::Callbacks
 
 	# after_save do
-	# 	tire.update_index
+	# 	#debugger
+	# 	#Rails.logger.debug "AFTER_SAVE got here!"
+	# 	self.tire.update_index
 	# end
+
 
 	# DO NOT DELETE:
 
@@ -97,7 +100,7 @@ class Teacher
 	# 	indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
 	# 	indexes :fname, 	:type => 'string', 	:analyzer => 'standard'
 	# 	indexes :lname, 	:type => 'string', 	:analyzer => 'standard'
-	# 	indexes :username, 	:type => 'string', 	:analyzer => 'standard'
+	# 	indexes :username, 	:type => 'string', 	:analyzer => 'stan dard'
 	# 	indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
 	# 														:size 			=> { :type => 'object', :enabled => false },
 	# 														:ext 			=> { :type => 'object', :enabled => false },
@@ -117,13 +120,14 @@ class Teacher
 	# Class Methods
 
 	# used for elasticsearch
-	# def self
- #    	to_indexed_json.as_json
-	# end
+	def self
+    	#to_indexed_json.as_json
+    	to_indexed_json.to_json
+	end
 
-	#def to_indexed_json
-    #	self.as_json
-	#end
+	# def to_indexed_json
+ #    	self.as_json
+	# end
 
 	# Mr. John Smith
 	def full_name
@@ -436,6 +440,8 @@ end
 
 class Info
 	include Mongoid::Document
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 
@@ -471,10 +477,9 @@ class Info
 
 	embedded_in :teacher
 
-	# include Tire::Model::Search
-	# #include Tire::Model::Callbacks
 
 	# after_save do
+	# 	Rails.logger.debug "AFTER_SAVE_INFO"
 	# 	tire.update_index
 	# end
 
@@ -488,9 +493,14 @@ class Info
  #    	to_indexed_json.as_json
 	# end
 	
-	def to_indexed_json
-    	self.as_json
-	end
+	# def self
+ #    	#to_indexed_json.as_json
+ #    	to_indexed_json.to_json
+	# end
+	
+	# def to_indexed_json
+ #    	self.as_json
+	# end
 
 	def fulllocation
 		"#{city}, #{state}, #{country}"

@@ -16,6 +16,14 @@ class AvatarUploader < CarrierWave::Uploader::Base
   # storage :file
   storage :fog
 
+  version :thumb_xlg do
+    process resize_to_fill: [AVATAR_XLDIM,AVATAR_XLDIM]
+    process :convert => "png"
+    def full_filename(for_file = model.avatar.file)
+      "thumb_xlg.png"
+    end
+  end
+
   version :thumb_lg do
     process resize_to_fill: [AVATAR_LDIM,AVATAR_LDIM]
     process :convert => "png"

@@ -131,7 +131,9 @@ class HomeController < ApplicationController
 				#query { all } 
 			end
 
-			@teachers=@teachers.results
+			@teachers=@teachers.results.to_a
+
+			@teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )
 		else
 			@teachers = []#Teacher.all
 		end

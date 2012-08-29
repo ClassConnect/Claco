@@ -100,14 +100,14 @@ class Teacher
 		filter: {
 			ngram_filter: {
 				type: 		"nGram",
-				min_gram: 	3,
-				max_gram: 	8
+				min_gram: 	1,
+				max_gram: 	6
 			}
 		},
 		analyzer: {
 			ngram_analyzer: {
-				tokenizer: "lowercase",
-				filter: ["nGram"],
+				tokenizer: "standard",
+				filter: ["ngram_filter"],
 				type: "custom"
 				#tokenizer: "snowball",
 				#filter: ["lowercase","ngram_filter"]
@@ -116,22 +116,22 @@ class Teacher
 	} 	do
 		mapping do
 			#indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
-			indexes :fname, 	:type => 'string', 	:analyzer => 'standard', :boost => 3.0
-			indexes :lname, 	:type => 'string', 	:analyzer => 'standard', :boost => 3.0
-			indexes :username, 	:type => 'string', 	:analyzer => 'standard', :boost => 3.0
+			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
+			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
+			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
 			indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
 																:size 			=> { :type => 'object', :enabled => false },
 																:ext 			=> { :type => 'object', :enabled => false },
 																:data 			=> { :type => 'object', :enabled => false },
 																:facebookurl	=> { :type => 'object', :enabled => false },
-																:grades 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
-																:subjects 		=> { :type => 'string', :analyzer => 'standard', :default => [] },
-																:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 2.0 },
-																:website 		=> { :type => 'string', :analyzer => 'standard' },
-																:city			=> { :type => 'string', :analyzer => 'standard' },
-																:state 			=> { :type => 'string', :analyzer => 'standard' },
-																:country		=> { :type => 'string', :analyzer => 'standard' },
-																:twitterhandle 	=> { :type => 'string', :analyzer => 'standard' },
+																:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
+																:website 		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																:twitterhandle 	=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
 		end
 	end

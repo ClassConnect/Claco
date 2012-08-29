@@ -4,7 +4,7 @@
 
       <div class="myImgBox">
         <a href="/<%= @binder.username %>">
-          <img src="/<%= Teacher.find(@binder.owner).info.avatar.thumb_lg %>" />
+          <img src="<%= Teacher.find(@binder.owner).info.avatar.thumb_lg.url %>" />
         </a>
         <div class="info">
           <a href="/<%= @binder.username %>" class="namester"><%= "#{@binder.fname} #{@binder.lname}" %></a>

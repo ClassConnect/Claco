@@ -140,6 +140,8 @@ class HomeController < ApplicationController
 			@teachers = []#Teacher.all
 		end
 
+		#debugger
+
 		#@teachers = Teacher.all[0..2]
 
 		Mongo.log(	current_teacher.id.to_s,

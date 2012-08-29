@@ -133,7 +133,7 @@ class HomeController < ApplicationController
 
 			@teachers=@teachers.results.to_a
 
-			@teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )
+			@teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } ) if @teachers.any?
 		else
 			@teachers = []#Teacher.all
 		end

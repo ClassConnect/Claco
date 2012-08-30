@@ -635,10 +635,8 @@ class BindersController < ApplicationController
 	# Add file process
 	def createfile
 
-		# debugger
-
 		errors = []
-		# debugger
+
 		if Binder.where("version.data" => params[:data]).count == 0
 
 			#Validate the request
@@ -713,7 +711,7 @@ class BindersController < ApplicationController
 					@binder.current_version.data = params[:data]
 					@binder.current_version.timestamp = params[:timestamp]
 					@binder.current_version.owner = current_teacher.id
-					
+
 					@binder.current_version.file.key = params[:key]
 					@binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url # THIS FKIN LINE
 					@binder.current_version.size = @binder.current_version.file.file.size

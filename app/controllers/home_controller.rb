@@ -194,6 +194,18 @@ class HomeController < ApplicationController
 
 	end
 
+	###############################################################################################
+
+							#    #  ##### #     #####  ##### #####   #### 
+							#    #  #     #     #    # #     #    # #    #
+							#    #  #     #     #    # #     #    # # 
+							######  ####  #     #####  ####  #####   ####
+							#    #  #     #     #      #     #  #        #
+							#    #  #     #     #      #     #   #  #    #
+							#    #  ##### ##### #      ##### #    #  ####
+
+	###############################################################################################
+
 	module Mongo
 		extend self
 
@@ -205,7 +217,8 @@ class HomeController < ApplicationController
 							:model => model.to_s,
 							:modelid => modelid.to_s,
 							:params => params,
-							:data => data)
+							:data => data,
+							:feedhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s+params.to_s+data.to_s))
 
 			log.save
 

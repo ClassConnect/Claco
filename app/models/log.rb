@@ -15,6 +15,9 @@ class Log
 	# :src - this log is part of a logset, src is the ID of the 'parent' log
 	field :data, :type => Hash, :default => {}
 
+	# 
+	field :feedhash, :type => String#, :default => ""
+
 	# returns hash of object's fields
 	def peel
 
@@ -26,6 +29,7 @@ class Log
 				:modelid => self.modelid,
 				:params => self.params,
 				:data => self.data,
+				:feedhash => self.feedhash,
 				'id' => self.id.to_s,
 				'ownerid' => self.ownerid, 
 				'timestamp' => self.timestamp, 
@@ -33,7 +37,14 @@ class Log
 				'controller' => self.controller,
 				'modelid' => self.modelid,
 				'params' => self.params,
-				'data' => self.data }
+				'data' => self.data,
+				'feedhash' => self.feedhash }
+
+	end
+
+	def genhash
+
+		update_attributes(:feedhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s+params.to_s+data.to_s))
 
 	end
 

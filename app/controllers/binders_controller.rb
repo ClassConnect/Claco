@@ -206,7 +206,7 @@ class BindersController < ApplicationController
 						@binder.id.to_s,
 						params)
 
-			redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return 
+			redirect_to @binder.current_version.file.url.sub(/https:\/\/#{@binder.current_version.file.fog_directory}.s3.amazonaws.com/, @binder.current_version.file.fog_host) and return 
 		end
 
 		rescue BSON::InvalidObjectId

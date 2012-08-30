@@ -37,7 +37,7 @@ class TeachersController < ApplicationController
 
         @teacher.info = Info.new if @teacher.info.nil?
 
-		@title = "#{ @teacher.full_name }'s Profile"
+		@title = "#{@teacher.full_name}'s Portfolio"
 
 		# @relationship = current_teacher.relationship_by_teacher_id(@teacher.id)
 
@@ -134,6 +134,7 @@ class TeachersController < ApplicationController
 			redirect_to "/#{current_teacher.username}"
 		else
 			# remain on current page, display errors
+			@title = "Edit your information"
 			render "editinfo"
 		end
 

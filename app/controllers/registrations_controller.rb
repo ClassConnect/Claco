@@ -40,6 +40,7 @@ class RegistrationsController < Devise::RegistrationsController
       end
     else
       if Ns.where(:code => params[:teacher][:code]).first.active
+        @title = "Join the beta"
         resource.code = params[:teacher][:code]
         clean_up_passwords resource
         respond_with resource

@@ -35,6 +35,12 @@ $(document).ready(function() {
   if(window.location.hash === "#rdir" || window.location.hash === "rdir") {
     $('html, body').animate({ scrollTop: $(document).height() }, 1500);
     removeHash();
+
+  } if(window.location.hash === "#uploaderror" || window.location.hash === "uploaderror") {
+    initAsyc('ERROR! We had a probem uploading this file, please try again!');
+    setTimeout(function() {destroyAsyc();},8000);
+
+    removeHash();
   }
 
   initPage();

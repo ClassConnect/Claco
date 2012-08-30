@@ -198,7 +198,7 @@ class BindersController < ApplicationController
 		#TODO: Verify permissions before rendering view
 		if @binder.format == 1
 
-			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1)
+			@binder.inc(:download_count, 1)
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,

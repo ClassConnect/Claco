@@ -866,13 +866,17 @@ class BindersController < ApplicationController
 		# rescue Mongoid::Errors::DocumentNotFound
 		# 	errors << "Invalid Request"
 		# ensure
-			if errors.empty?
-				redirect_to "#{named_binder_route(@inherited[:parent])}#rdir"
-			else
-				respond_to do |format|
-					format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
-				end
+		if errors.empty?
+			redirect_to "#{named_binder_route(@inherited[:parent])}#rdir"
+		else
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
+		end
+
+		rescue
+			@binder.destroy
+			redirect_to "#{named_binder_route(@inherited[:parent])}#error"
 
 	end
 

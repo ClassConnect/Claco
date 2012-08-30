@@ -716,7 +716,7 @@ class BindersController < ApplicationController
 					
 					@binder.current_version.file.key = params[:key]
 					@binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url
-					@binder.current_version.size = @binder.current_version.file.size
+					@binder.current_version.size = @binder.current_version.file.file.size
 					@binder.total_size = @binder.current_version.file.size
 
 					# @binder.current_version.update_attributes(#:file		=> CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{store_dir}/#{model.filename}"),

@@ -247,6 +247,12 @@ class Teacher
 		# end
 	end
 
+	after_create do
+
+		self.info = Info.new
+
+	end
+
 	private
 	@@username_blacklist = nil
 

@@ -876,7 +876,7 @@ class BindersController < ApplicationController
 
 		rescue
 			@binder.destroy
-			redirect_to "#{named_binder_route(@inherited[:parent])}#error"
+			redirect_to "#{named_binder_route(@inherited[:parent])}#uploaderror"
 
 	end
 

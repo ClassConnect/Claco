@@ -21,7 +21,7 @@
 	<div class="mainbox">
 
 		<div class="announce"><%= image_tag('messages/message.png', :class => "micon") %>
-			<a href="/<%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).username %>"><%= Teacher.find(@conversation.get_other(current_teacher.id.to_s)).first_last %></a> <a href="/messages" class="backmsg">← Back to messages</a>
+			<a href="/<%= @other.username %>"><%= @other.first_last %></a> <a href="/messages" class="backmsg">← Back to messages</a>
 		</div>
 
 
@@ -31,7 +31,7 @@
 			<% @messages.each do |message| %>
 				<li>
 
-						<a href="/<%= Teacher.find(message.sender).username %>"><img src="<%= Teacher.find(message.sender).info.avatar.thumb_md %>" class="profpic" /></a>
+						<a href="/<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).username %>"><img src="<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).info.avatar.thumb_md %>" class="profpic" /></a>
 
 						<div class="mescon">
 							<div class="tstamp">
@@ -40,8 +40,8 @@
 
 
 							<div class="personname">
-								<a href="/<%= Teacher.find(message.sender).username %>">
-									<%= Teacher.find(message.sender).first_last %>
+								<a href="/<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).username %>">
+									<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).first_last %>
 								</a>
 							</div>
 							<div class="messagetxt">

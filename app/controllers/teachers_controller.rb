@@ -488,6 +488,8 @@ class TeachersController < ApplicationController
 
 	def conversations
 
+		@title = "Messages"
+
 		@conversations = Conversation.where("members" => current_teacher.id.to_s).sort_by{|c| c.last_message.timestamp}.reverse
 
 	end

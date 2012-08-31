@@ -12,6 +12,8 @@ class ConversationsController < ApplicationController
 
 		@unread = @conversation.unread_messages(current_teacher.id.to_s)
 
+		@title = "#{@other.full_name} - Messages"
+
 		@conversation.unread[current_teacher.id.to_s] = 0
 
 		@conversation.save

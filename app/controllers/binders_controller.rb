@@ -713,7 +713,10 @@ class BindersController < ApplicationController
 					@binder.current_version.owner = current_teacher.id
 
 					@binder.current_version.file.key = params[:key]
-					@binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url # THIS FKIN LINE
+					# @binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url # THIS FKIN LINE
+
+					@binder.current_version.file.store!(CarrierWave::Storage::Fog::File.new(@binder.current_version.file, CarrierWave::Storage::Fog.new(@binder.current_version.file), params[:key]))
+
 					@binder.current_version.size = @binder.current_version.file.file.size
 					@binder.total_size = @binder.current_version.file.size
 

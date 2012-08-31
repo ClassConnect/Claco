@@ -1,6 +1,7 @@
 class ConversationsController < ApplicationController
 	before_filter :authenticate_teacher!
 
+	#TODO THIS NEEDS TO BE OPTIMIZED
 	def show
 
 		@conversation = Conversation.find(params[:id])

@@ -70,10 +70,6 @@ class DataUploader < CarrierWave::Uploader::Base
     fog_uri
   end
 
-  def max_file_size
-    200.megabytes
-  end
-
   # CarrierWave::Storage::Fog::File.new(DataUploader, CarrierWave::Storage::Fog.new(), key)
 
   # MIGRATION: Binder.where(:format => 1).each{|b| b.current_version.update_attributes(:filename => URI.parse(b.current_version.file.url).path.split("/").last)}

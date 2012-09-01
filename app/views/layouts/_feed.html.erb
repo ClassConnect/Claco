@@ -377,7 +377,12 @@
 						<% end %>
 					</div>
 				<% else %>
-					<% Rails.logger.fatal "An attempt to render an invalid feed item was made!" %>
+					<div class="feedcontent">
+						<% debugger 
+						f[:log]['method'].to_s %>
+					</div>
+					<% #Rails.logger.fatal "An attempt to render an invalid feed item was made!" 
+					%>
 			<% end %>
 			<div style="clear:both"></div>
 		</div>

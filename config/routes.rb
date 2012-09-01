@@ -37,6 +37,7 @@ Claco::Application.routes.draw do
 	get		'/search'														=> 'home#search'
 
 	get		'/teachersearch'												=> 'home#teachersearch'
+	get		'/subscribedlog'												=> 'home#subscribedlog'
 
 	##################
 	# TEACHER ROUTING#

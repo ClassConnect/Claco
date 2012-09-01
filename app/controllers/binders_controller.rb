@@ -1149,7 +1149,8 @@ class BindersController < ApplicationController
 										:fname				=> @binder.fname,
 										:lname				=> @binder.lname,
 										:last_update		=> Time.now.to_i,
-										:last_updated_by	=> current_teacher.id)
+										:last_updated_by	=> current_teacher.id,
+										:thumbimgids		=> @binder.thumbimgids)
 
 			#@new_parent.format = @binder.format if @binder.type == 2
 
@@ -1243,8 +1244,9 @@ class BindersController < ApplicationController
 											:total_size			=> h.total_size,
 											:pub_size			=> h.pub_size,
 											:priv_size			=> h.priv_size,
-											:fav_total			=> h.fav_total)
-
+											:fav_total			=> h.fav_total,
+											:thumbimgids		=> @binder.thumbimgids,)
+	
 					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
 					# 									:file_hash	=> h.current_version.file_hash,
 					# 									:timestamp	=> h.current_version.timestamp,
@@ -1832,59 +1834,21 @@ class BindersController < ApplicationController
 		def log(ownerid,method,model,modelid,params,data = {})
 
 			log = Log.new( 	:ownerid => ownerid.to_s,
-							:timestamp => Time.now.to_i,
+							:timestamp => Time.now.to_f,
 							:method => method.to_s,
 							:model => model.to_s,
 							:modelid => modelid.to_s,
 							:params => params,
-							:data => data)
+							:data => data,
+							:actionhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s))
 
 			log.save
 
 			return log.id.to_s
 
 		end
-
-		# this method is unused
-		def method_index(method)
-
-			# categorized by last update type
-			# 0 - creation
-			# 1 - update data
-			# 2 - new/modified version
-			# 3 - rename
-			# 4 - created/modified tags
-			# 5 - move
-			# 6 - copy
-			# 7 - delete
-			# 8 - permission modification
-			# 9 - reordered
-			# 10- downloaded
-			# 11- forked
-
-			#Rails.logger.debug "Method: #{method.to_s}"
-
-			method = method.to_s
-
-			return 0 if ( method=="createcontent" || method=="createfile" || method=="create" )
-			return 1 if ( method=="update" )
-			return 2 if ( method=="createversion" )
-			return 3 if ( method=="rename" )
-			return 4 if ( method=="updatetags" )
-			return 5 if ( method=="moveitem" )
-			return 6 if ( method=="copyitem" )
-			return 7 if ( method=="delete" )
-			return 8 if ( method=="setpub" || method=="createpermission" || method=="destroypermission" )
-			return 9 if ( method=="reorder" )
-			return 10 if ( method=="download" )
-			#return 11 if ( method== )			
-
-			# if this point is reached, the method is unknown
-			raise "Method not recognized!"
-
-		end
-
 	end
+
 
 	module Url
 		extend self

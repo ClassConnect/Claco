@@ -98,4 +98,6 @@ MAIN_FEED_STORAGE = 50
 SUBSC_FEED_STORAGE = 50
 PERSONAL_FEED_STORAGE = 50
 
-FEED_METHOD_WHITELIST = %w[create createfile createcontent update forkitem favorite setpub]
+FEED_METHOD_WHITELIST = %w[create createfile createcontent update forkitem favorite setpub sub unsub]
+
+FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove', 'confremove'=>'add' }

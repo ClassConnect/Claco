@@ -1,12 +1,13 @@
 class Log
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	field :ownerid
-	field :timestamp, :type => Integer
+	field :timestamp, :type => Float
 	# method and model are potentially redundant or unneeded fields
 	# model is a lowercase string of the model name
 	field :method
-	field :controller
 	field :modelid
 	field :params, :type => Hash
 
@@ -16,35 +17,48 @@ class Log
 	field :data, :type => Hash, :default => {}
 
 	# 
-	field :feedhash, :type => String#, :default => ""
+	field :actionhash, :type => String#, :default => ""
+	#field :feedhash, :type => String
+
+	# mapping do
+	# 	indexes :ownerid, 	:type => 'string'
+	# 	indexes :timestamp, :type => 'float'
+	# 	indexes :method,	:type => 'string'
+	# 	indexes :modelid,	:type => 'string'
+	# 	indexes :params,	:type => 'hash'
+	# end	
 
 	# returns hash of object's fields
-	def peel
+	# def peel
 
-		return {:id => self.id.to_s,
-				:ownerid => self.ownerid, 
-				:timestamp => self.timestamp, 
-				:method => self.method, 
-				:controller => self.controller,
-				:modelid => self.modelid,
-				:params => self.params,
-				:data => self.data,
-				:feedhash => self.feedhash,
-				'id' => self.id.to_s,
-				'ownerid' => self.ownerid, 
-				'timestamp' => self.timestamp, 
-				'method' => self.method, 
-				'controller' => self.controller,
-				'modelid' => self.modelid,
-				'params' => self.params,
-				'data' => self.data,
-				'feedhash' => self.feedhash }
+	# 	return {:id => self.id.to_s,
+	# 			:ownerid => self.ownerid, 
+	# 			:timestamp => self.timestamp, 
+	# 			:method => self.method, 
+	# 			:controller => self.controller,
+	# 			:modelid => self.modelid,
+	# 			:params => self.params,
+	# 			:data => self.data,
+	# 			:feedhash => self.feedhash,
+	# 			'id' => self.id.to_s,
+	# 			'ownerid' => self.ownerid, 
+	# 			'timestamp' => self.timestamp, 
+	# 			'method' => self.method, 
+	# 			'controller' => self.controller,
+	# 			'modelid' => self.modelid,
+	# 			'params' => self.params,
+	# 			'data' => self.data,
+	# 			'feedhash' => self.feedhash }
 
-	end
+	# end
 
-	def genhash
+	def hashgen
 
-		update_attributes(:feedhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s+params.to_s+data.to_s))
+		md5 = Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s)
+
+		update_attributes(:actionhash => md5)
+
+		return md5.to_s
 
 	end
 

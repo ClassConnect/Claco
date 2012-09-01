@@ -69,7 +69,7 @@ class TeachersController < ApplicationController
 				end
 				
 				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
-					if !( @subsfeed.map { |g| [g.ownerid,g.method,g.controller,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+					if !( @subsfeed.map { |g| [g.ownerid,g.method,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
 						@subsfeed << f
 					end
 				end
@@ -238,7 +238,8 @@ class TeachersController < ApplicationController
 					@teacher.id.to_s,
 					params,
 					{ 	:relationship => @relationship.id.to_s, 
-						:affected_relationship => @affected_relationship.id.to_s })
+						:affected_relationship => @affected_relationship.id.to_s,
+						:annihilate => [Digest::MD5.hexdigest(ownerid.to_s+'unsub'+modelid.to_s)]}) 
 
 		rescue BSON::InvalidObjectId
 			errors << "Invalid Request"
@@ -509,12 +510,13 @@ class TeachersController < ApplicationController
 		def log(ownerid,method,model,modelid,params,data = {})
 
 			log = Log.new( 	:ownerid => ownerid.to_s,
-							:timestamp => Time.now.to_i,
+							:timestamp => Time.now.to_f,
 							:method => method.to_s,
 							:model => model.to_s,
 							:modelid => modelid.to_s,
 							:params => params,
-							:data => data)
+							:data => data,
+							:actionhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s))
 
 			log.save
 

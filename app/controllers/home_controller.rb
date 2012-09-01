@@ -8,48 +8,162 @@ class HomeController < ApplicationController
 		@feed = []
 		@subsfeed = []
 
+		# i = 0
+
+		feedblacklist = {}
+
 		if signed_in?
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-			logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
+			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
+			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
+
 
 			# pull the current teacher's subscription IDs
 			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
+
+			logs = Tire.search 'logs' do |search|
+
+				search.query do |query|
+					#query.string params[:q]
+
+					query.all
+
+					#search.size 40
+				end
+
+				# technically these should be cascaded to avoid cross-method name conflicts
+				search.filter :terms, :model => ['binders','teachers']
+				search.filter :terms, :method => FEED_METHOD_WHITELIST
+				search.filter :terms, :ownerid => subs + [current_teacher.id.to_s]
+
+				search.size 60
+
+				search.sort { by :timestamp, 'desc' }
+
+			end
+			
+			logs = logs.results
+
+			#debugger
+			
 			if logs.any?
 				logs.each do |f|
-					begin
-						binder = Binder.find(f.modelid.to_s)
-					rescue
-						Rails.logger.fatal "Invalid binder ID!"
-						next
-					end
-
-					# push onto the feed if the node is not deleted
-					if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?
-						if !( @feed.map { |g| [g[:log].ownerid,g[:log].method,g[:log].controller,g[:log].modelid,g[:log].data] }.include? [f.ownerid,f.method,f.controller,f.modelid,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-							
-							c = (@feed.reject { |h| h[:log].ownerid.to_s!=f.ownerid.to_s }).size
-
-							if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
-								if c < 10
-									f = { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-									# @feed << f if @feed.size < MAIN_FEED_LENGTH
-									# subsfeed will always be filled simultaneously or first, check anyway
-									@subsfeed << f# if @subsfeed.size < SUBSC_FEED_LENGTH
-								end
-							else
-								# limit occupancy of non-subscibed teachers to 6
-								# if c < 6 && @feed.size < MAIN_FEED_LENGTH
-								# 	@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-								# end
+					case f[:model].to_s
+						when 'binders'
+					
+							begin
+								binder = Binder.find(f[:modelid].to_s)
+							rescue
+								Rails.logger.fatal "Invalid binder ID!"
+								next
 							end
-						end
+
+							#debugger
+
+							# push onto the feed if the node is not deleted
+							if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?
+
+								# if i==5
+								# 	#debugger
+								# 	i += 1
+								# else
+								# 	i += 1
+								# end
+
+								if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
+								
+
+								#debugger
+								#if !(feedblacklist.include? f[:actionhash]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
+								#if !( @subsfeed.map { |g| [g[:log][:ownerid].to_s,g[:log][:method].to_s,g[:log][:modelid].to_s,g[:log][:data].to_s] }.include? [f[:ownerid].to_s,f[:method].to_s,f[:modelid].to_s,f[:data].to_s] ) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
+								#if !( @subsfeed.map { |g| [g[:log].ownerid,g[:log].method,g[:log].modelid,g[:log].data] }.include? [f.ownerid,f.method,f.modelid,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+								#if !( @subsfeed.map { |g| g[:log].feedhash}.include? f.feedhash) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
+
+									c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+
+									if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+									#if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
+										
+										#debugger
+										if c < 10
+
+											feedblacklist[f[:actionhash].to_s] = true
+											f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+											# if f[:data][:annihilate]
+											# 	f[:data][:annihilate].each do |a|
+											# 		feedblacklist[a.to_s] = true
+											# 	end
+											# end
+
+											f = { :binder => binder, :owner => Teacher.find(f[:ownerid].to_s), :log => f }
+											#f = { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
+																				
+
+											@subsfeed << f# if @subsfeed.size < SUBSC_FEED_LENGTH
+
+											# @feed << f if @feed.size < MAIN_FEED_LENGTH
+											# subsfeed will always be filled simultaneously or first, check anyway
+											
+											# push this action's signature onto the blacklist
+											#debugger
+											# feedhash[f[:log].actionhash] = true
+
+											# # if this action has annilation pairs, add those too
+											# if !f[:log].data.nil? && !f[:log].data['annihilate'].nil?
+											# 	f[:log].data['annihilate'].each do |i|
+											# 		feedhash[i] = true
+											# 	end
+											# end
+										end
+									#else
+										# limit occupancy of non-subscibed teachers to 6
+										# if c < 6 && @feed.size < MAIN_FEED_LENGTH
+										# 	@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
+										# end
+									end
+								end
+							end
+							#debugger
+							break if @subsfeed.size == SUBSC_FEED_LENGTH
+							#debugger
+						when 'teachers'
+
+							begin
+								teacher = Teacher.find(f[:modelid].to_s)
+							rescue
+								Rails.logger.fatal "Invalid binder ID!"
+								next
+							end
+
+								if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
+
+									c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+
+									if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+									#if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
+										
+										#debugger
+										if c < 10
+
+											feedblacklist[f[:actionhash].to_s] = true
+											f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+
+											f = { :binder => teacher, :owner => Teacher.find(f[:ownerid].to_s), :log => f }
+
+											@subsfeed << f# if @subsfeed.size < SUBSC_FEED_LENGTH
+
+										end
+									end
+								end
+
+							break if @subsfeed.size == SUBSC_FEED_LENGTH
 					end
-					break if @subsfeed.size == SUBSC_FEED_LENGTH
 				end
 			end
 		end
+		#debugger
 	end
 
 	def fetchtitle
@@ -194,6 +308,42 @@ class HomeController < ApplicationController
 
 	end
 
+	def subscribedlog
+
+		subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+
+		@feed = Tire.search 'logs' do |search|
+
+			search.query do |query|
+				#query.string params[:q]
+
+				query.all
+
+				#search.size 40
+			end
+
+			search.filter :terms, :model => ['binders','teachers']
+			search.filter :terms, :method => FEED_METHOD_WHITELIST
+			search.filter :terms, :ownerid => subs + [current_teacher.id.to_s]
+
+			search.size 40
+
+			search.sort { by :timestamp, 'desc' }
+
+		end
+		@feed = @feed.results
+
+		retstr = ''
+		
+		@feed.each do |f|
+			retstr += Teacher.find(f.ownerid.to_s).full_name + ' - ' + f[:method] + '<br />'# + ' ' + f.ownerid.to_s + '<br />'
+		end
+
+		respond_to do |format|
+			format.html { render :text => retstr }
+		end
+	end
+
 	###############################################################################################
 
 							#    #  ##### #     #####  ##### #####   #### 
@@ -212,13 +362,13 @@ class HomeController < ApplicationController
 		def log(ownerid,method,model,modelid,params,data = {})
 
 			log = Log.new( 	:ownerid => ownerid.to_s,
-							:timestamp => Time.now.to_i,
+							:timestamp => Time.now.to_f,
 							:method => method.to_s,
 							:model => model.to_s,
 							:modelid => modelid.to_s,
 							:params => params,
 							:data => data,
-							:feedhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s+params.to_s+data.to_s))
+							:actionhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s))
 
 			log.save
 

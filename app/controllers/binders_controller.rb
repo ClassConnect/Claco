@@ -737,7 +737,7 @@ class BindersController < ApplicationController
 									__method__.to_s,
 									params[:controller].to_s,
 									@binder.id.to_s,
-									params.to_s)
+									params)
 
 						#logger.debug @binder.versions.last.file.url
 						#logger.debug "current path: #{@binder.versions.last.file.current_path}"

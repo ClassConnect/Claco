@@ -32,6 +32,14 @@ class AvatarUploader < CarrierWave::Uploader::Base
     end
   end
 
+  version :thumb_mg do
+    process resize_to_fill: [AVATAR_MGDIM,AVATAR_MGDIM]
+    process :convert => "png"
+    def full_filename(for_file = model.avatar.file)
+      "thumb_mg.png"
+    end
+  end
+
   version :thumb_md, :from_version => :thumb_lg do
     process resize_to_fill: [AVATAR_MDIM,AVATAR_MDIM]
     process :convert => "png"

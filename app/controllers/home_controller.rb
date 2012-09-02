@@ -50,116 +50,91 @@ class HomeController < ApplicationController
 			
 			if logs.any?
 				logs.each do |f|
-					case f[:model].to_s
-						when 'binders'
-					
-							begin
-								binder = Binder.find(f[:modelid].to_s)
-							rescue
-								Rails.logger.fatal "Invalid binder ID!"
-								next
-							end
 
-							#debugger
+					debugger
 
-							# push onto the feed if the node is not deleted
-							if binder.parents[0]!={ "id" => "-1", "title" => "" } && binder.is_pub?
-
-								# if i==5
-								# 	#debugger
-								# 	i += 1
-								# else
-								# 	i += 1
-								# end
-
-								if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
-								
-
-								#debugger
-								#if !(feedblacklist.include? f[:actionhash]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
-								#if !( @subsfeed.map { |g| [g[:log][:ownerid].to_s,g[:log][:method].to_s,g[:log][:modelid].to_s,g[:log][:data].to_s] }.include? [f[:ownerid].to_s,f[:method].to_s,f[:modelid].to_s,f[:data].to_s] ) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
-								#if !( @subsfeed.map { |g| [g[:log].ownerid,g[:log].method,g[:log].modelid,g[:log].data] }.include? [f.ownerid,f.method,f.modelid,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-								#if !( @subsfeed.map { |g| g[:log].feedhash}.include? f.feedhash) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-
-									c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
-
-									if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
-									#if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
-										
-										#debugger
-										if c < 10
-
-											feedblacklist[f[:actionhash].to_s] = true
-											f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
-											# if f[:data][:annihilate]
-											# 	f[:data][:annihilate].each do |a|
-											# 		feedblacklist[a.to_s] = true
-											# 	end
-											# end
-
-											f = { :binder => binder, :owner => Teacher.find(f[:ownerid].to_s), :log => f }
-											#f = { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-																				
-
-											@subsfeed << f# if @subsfeed.size < SUBSC_FEED_LENGTH
-
-											# @feed << f if @feed.size < MAIN_FEED_LENGTH
-											# subsfeed will always be filled simultaneously or first, check anyway
-											
-											# push this action's signature onto the blacklist
-											#debugger
-											# feedhash[f[:log].actionhash] = true
-
-											# # if this action has annilation pairs, add those too
-											# if !f[:log].data.nil? && !f[:log].data['annihilate'].nil?
-											# 	f[:log].data['annihilate'].each do |i|
-											# 		feedhash[i] = true
-											# 	end
-											# end
-										end
-									#else
-										# limit occupancy of non-subscibed teachers to 6
-										# if c < 6 && @feed.size < MAIN_FEED_LENGTH
-										# 	@feed << { :binder => binder, :owner => Teacher.find(f.ownerid.to_s), :log => f }
-										# end
-									end
-								end
-							end
-							#debugger
-							break if @subsfeed.size == SUBSC_FEED_LENGTH
-							#debugger
-						when 'teachers'
-
-							begin
-								teacher = Teacher.find(f[:modelid].to_s)
-							rescue
-								Rails.logger.fatal "Invalid binder ID!"
-								next
-							end
-
-								if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
-
-									c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
-
-									if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
-									#if (subs.include? f.ownerid.to_s) || (f.ownerid.to_s == current_teacher.id.to_s)
-										
-										#debugger
-										if c < 10
-
-											feedblacklist[f[:actionhash].to_s] = true
-											f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
-
-											f = { :binder => teacher, :owner => Teacher.find(f[:ownerid].to_s), :log => f }
-
-											@subsfeed << f# if @subsfeed.size < SUBSC_FEED_LENGTH
-
-										end
-									end
-								end
-
-							break if @subsfeed.size == SUBSC_FEED_LENGTH
+					begin
+						case f[:model].to_s
+							when 'binders'
+								model = Binder.find(f[:modelid].to_s)
+							when 'teachers'
+								model = Teacher.find(f[:modelid].to_s)
+						end
+					rescue
+						Rails.logger.fatal "Invalid log model ID!"
+						next
 					end
+
+					debugger
+
+					# push onto the feed if the node is not deleted
+					case f[:model].to_s
+					when 'binders'
+						# the binder log entry:	should not be deleted
+						# 						should not be private
+						# 						should not be sourced from another log
+						if model.parents[0]!={ "id" => "-1", "title" => "" } && model.is_pub? && !f[:data][:src]
+
+							# the binder log entry: should not have a blacklist entry
+							# 						should not be a setpub -> private
+							if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
+
+								c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+
+								if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+									
+									#debugger
+									if c < 10
+
+										# whether or not the item is included in the blacklist,
+										# add the actionhash and annihilation IDs to the exclusion list
+										feedblacklist[f[:actionhash].to_s] = true
+
+										f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+
+										if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s) && 
+
+											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+
+											@subsfeed << f
+
+										end
+									end
+								end
+							end
+						end
+						#debugger
+						#break if @subsfeed.size == SUBSC_FEED_LENGTH
+						#debugger
+					when 'teachers'
+						if !(feedblacklist[f[:actionhash].to_s])
+
+							c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+
+							if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+								
+								#debugger
+								if c < 10
+
+									# whether or not the item is included in the blacklist,
+									# add the actionhash and annihilation IDs to the exclusion list
+									feedblacklist[f[:actionhash].to_s] = true
+
+									f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+
+									if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s) && 
+
+										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+
+										@subsfeed << f
+
+									end
+								end
+							end
+						end
+					end
+
+					break if @subsfeed.size == SUBSC_FEED_LENGTH
 				end
 			end
 		end

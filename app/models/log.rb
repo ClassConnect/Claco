@@ -1,5 +1,6 @@
 class Log
 	include Mongoid::Document
+	include Mongoid::Paranoia
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
 

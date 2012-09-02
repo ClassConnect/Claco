@@ -81,6 +81,8 @@ class TeachersController < ApplicationController
 		# .sort_by { |e| -e.timestamp }
 		@subsfeed = @subsfeed.any? ? @subsfeed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
 
+		@subsfeed = []
+
 		#feed.map { |f| f.modelid.to_s } if feed.any?
 
 		#Rails.logger.debug "feed: #{feed.map { |f| f.modelid.to_s }.to_s} "
@@ -239,7 +241,7 @@ class TeachersController < ApplicationController
 					params,
 					{ 	:relationship => @relationship.id.to_s, 
 						:affected_relationship => @affected_relationship.id.to_s,
-						:annihilate => [Digest::MD5.hexdigest(ownerid.to_s+'unsub'+modelid.to_s)]}) 
+						:annihilate => [Digest::MD5.hexdigest(current_teacher.id.to_s+'sub'+@teacher.id.to_s)]}) 
 
 		rescue BSON::InvalidObjectId
 			errors << "Invalid Request"

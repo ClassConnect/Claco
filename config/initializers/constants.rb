@@ -86,6 +86,7 @@ CROC_BORDER_COLOR = "#CCCCCC"
 # Teachers
 #AVATAR_XLDIM = 170
 AVATAR_LDIM = 170
+AVATAR_MGDIM = 122
 AVATAR_MDIM = 48
 AVATAR_SDIM = 30
 
@@ -99,5 +100,6 @@ SUBSC_FEED_STORAGE = 50
 PERSONAL_FEED_STORAGE = 50
 
 FEED_METHOD_WHITELIST = %w[create createfile createcontent update forkitem favorite setpub sub unsub]
+FEED_DISPLAY_BLACKLIST = %w[unsub]
 
 FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove', 'confremove'=>'add' }

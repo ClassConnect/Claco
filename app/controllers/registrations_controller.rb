@@ -24,6 +24,8 @@ class RegistrationsController < Devise::RegistrationsController
     build_resource
 
     resource.code = params[:teacher][:code]
+    resource.registered_at = Time.now.to_i
+    resource.registered_ip = request.ip
     
     if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
 
@@ -40,6 +42,7 @@ class RegistrationsController < Devise::RegistrationsController
       end
     else
       if Ns.where(:code => params[:teacher][:code]).first.active
+        @title = "Join the beta"
         resource.code = params[:teacher][:code]
         clean_up_passwords resource
         respond_with resource

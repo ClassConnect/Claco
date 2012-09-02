@@ -45,6 +45,7 @@ gem 'carrierwave_direct'
 gem "fog", "~> 1.3.1"
 gem 'sendgrid-rails', '~> 2.0'
 gem 'newrelic_rpm'
+gem 'exceptional'
 gem 'memcachier'
 gem 'dalli'
 

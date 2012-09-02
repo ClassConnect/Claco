@@ -159,7 +159,7 @@ class BindersController < ApplicationController
 
 		#Rails.logger.debug @tags
 
-		@title = "Viewing: #{@binder.title}"
+		@title = @binder.title
 
 		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children.reject {|c| c.get_access == 0}).sort_by {|c| c.order_index}
 
@@ -198,7 +198,7 @@ class BindersController < ApplicationController
 		#TODO: Verify permissions before rendering view
 		if @binder.format == 1
 
-			@binder.update_attributes( 	:download_count => @binder.download_count.to_i+1)
+			@binder.inc(:download_count, 1)
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
@@ -206,7 +206,7 @@ class BindersController < ApplicationController
 						@binder.id.to_s,
 						params)
 
-			redirect_to @binder.current_version.file.url.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co") and return 
+			redirect_to @binder.current_version.file.url.sub(/https:\/\/#{@binder.current_version.file.fog_directory}.s3.amazonaws.com/, @binder.current_version.file.fog_host) and return 
 		end
 
 		rescue BSON::InvalidObjectId
@@ -635,10 +635,8 @@ class BindersController < ApplicationController
 	# Add file process
 	def createfile
 
-		# debugger
-
 		errors = []
-		# debugger
+
 		if Binder.where("version.data" => params[:data]).count == 0
 
 			#Validate the request
@@ -713,9 +711,12 @@ class BindersController < ApplicationController
 					@binder.current_version.data = params[:data]
 					@binder.current_version.timestamp = params[:timestamp]
 					@binder.current_version.owner = current_teacher.id
-					
+
 					@binder.current_version.file.key = params[:key]
-					@binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url
+					# @binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url # THIS FKIN LINE
+
+					@binder.current_version.file.store!(CarrierWave::Storage::Fog::File.new(@binder.current_version.file, CarrierWave::Storage::Fog.new(@binder.current_version.file), params[:key]))
+
 					@binder.current_version.size = @binder.current_version.file.file.size
 					@binder.total_size = @binder.current_version.file.size
 
@@ -866,13 +867,17 @@ class BindersController < ApplicationController
 		# rescue Mongoid::Errors::DocumentNotFound
 		# 	errors << "Invalid Request"
 		# ensure
-			if errors.empty?
-				redirect_to "#{named_binder_route(@inherited[:parent])}#rdir"
-			else
-				respond_to do |format|
-					format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
-				end
+		if errors.empty?
+			redirect_to "#{named_binder_route(@inherited[:parent])}#rdir"
+		else
+			respond_to do |format|
+				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
+		end
+
+		rescue
+			@binder.destroy
+			redirect_to "#{named_binder_route(@inherited[:parent])}#uploaderror"
 
 	end
 
@@ -1145,9 +1150,9 @@ class BindersController < ApplicationController
 										:permissions		=> (fav ? [{"type"=>3, "auth_level"=>1}] : @binder.permissions),#@binder.permissions,
 										:parent_permissions	=> (fav ? [] : @parentperarr),#@parentperarr,
 										:owner				=> current_teacher.id,
-										:username			=> @binder.username,
-										:fname				=> @binder.fname,
-										:lname				=> @binder.lname,
+										:username			=> current_teacher.username,
+										:fname				=> current_teacher.fname,
+										:lname				=> current_teacher.lname,
 										:last_update		=> Time.now.to_i,
 										:last_updated_by	=> current_teacher.id,
 										:thumbimgids		=> @binder.thumbimgids)
@@ -1230,9 +1235,9 @@ class BindersController < ApplicationController
 											:permissions		=> fav ? [] : h.permissions,
 											:parent_permissions	=> fav ? @parentperarr : @parentperarr + @old_permissions,
 											:owner				=> current_teacher.id,
-											:username			=> h.username,
-											:fname				=> h.fname,
-											:lname				=> h.lname,
+											:username			=> current_teacher.username,
+											:fname				=> current_teacher.fname,
+											:lname				=> current_teacher.lname,
 											:last_update		=> Time.now.to_i,
 											:last_updated_by	=> current_teacher.id,
 											:type				=> h.type,

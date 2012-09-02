@@ -16,7 +16,7 @@
 
         	<% @binder.parents.each do |parent| %>
 				<% if parent["id"] == "0" %>
-					<!--<li><%= link_to "Home", binders_path %></li>-->
+
           <li><a href="/<%= @binder.username %>"><%= "#{@binder.fname} #{@binder.lname}" %></a></li>
 
 				<% elsif parent["id"] == "-1" %>

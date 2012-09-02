@@ -121,7 +121,7 @@
         Subscriptions 
       </h3>
       <ul class="profile-avatars">
-        <% @subscriptions.shuffle.sort_by{|t| t.info.avatar.file.nil? ? 0 : 1}[0..5].shuffle.each do |sub| %>
+        <% @subscriptions.shuffle.sort_by{|t| t.info.avatar.file.nil? ? 1 : 0}[0..5].shuffle.each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
               <img src="<%= sub.info.avatar.thumb_md.url %>">
@@ -136,7 +136,7 @@
         Subscribers 
       </h3>
       <ul class="profile-avatars">
-        <% @subscribers.shuffle.sort_by{|t| t.info.avatar.file.nil? ? 0 : 1}[0..5].shuffle.each do |sub| %>
+        <% @subscribers.shuffle.sort_by{|t| t.info.avatar.file.nil? ? 1 : 0}[0..5].shuffle.each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
               <img src="<%= sub.info.avatar.thumb_md.url %>">

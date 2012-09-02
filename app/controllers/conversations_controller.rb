@@ -1,13 +1,18 @@
 class ConversationsController < ApplicationController
 	before_filter :authenticate_teacher!
 
+	#TODO THIS NEEDS TO BE OPTIMIZED
 	def show
 
 		@conversation = Conversation.find(params[:id])
 
 		redirect_to "/messages" and return if !@conversation.members.include?(current_teacher.id.to_s)
 
+		@other = Teacher.find(@conversation.get_other(current_teacher.id.to_s))
+
 		@unread = @conversation.unread_messages(current_teacher.id.to_s)
+
+		@title = "#{@other.full_name} - Messages"
 
 		@conversation.unread[current_teacher.id.to_s] = 0
 

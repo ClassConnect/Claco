@@ -47,10 +47,6 @@ Claco::Application.routes.draw do
 	put		'/editinfo'														=> "teachers#updatepass"
 	post	'/updateinfo'													=> "teachers#updateinfo"
 
-	#Subscribe/unsubscribe
-	put		'/:username/subscribe'											=> 'teachers#sub'
-	put		'/:username/unsubscribe'										=> 'teachers#unsub'
-
 	# resources :teachers, :only => [:show, :index]
 
 	post	'utils/fetchtitle'												=> 'home#fetchtitle'
@@ -87,6 +83,10 @@ Claco::Application.routes.draw do
 
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
+
+		#Subscribe/unsubscribe
+		put		'/:username/subscribe'											=> 'teachers#sub'
+		put		'/:username/unsubscribe'										=> 'teachers#unsub'
 
 		post '/:username/message'																	=> 'conversations#createmessage'
 

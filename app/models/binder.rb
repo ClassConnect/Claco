@@ -1261,6 +1261,8 @@ class Version
 													 	:img_thumb_lg => 	{ :generated => false },
 														:img_thumb_sm => 	{ :generated => false } }
 
+	field :vid_processed, :type => Boolean, :default => false
+
 	# the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
 	mount_uploader :imgfile, 		ImageUploader
 	mount_uploader :img_contentview,ImageUploader

@@ -99,3 +99,5 @@ SUBSC_FEED_STORAGE = 50
 PERSONAL_FEED_STORAGE = 50
 
 FEED_METHOD_WHITELIST = %w[create createfile createcontent update forkitem favorite setpub]
+
+Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"

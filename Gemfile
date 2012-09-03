@@ -62,6 +62,8 @@ gem 'delayed_job'
 gem 'delayed_job_mongoid'
 gem 'daemons'
 
+gem "zencoder"
+
 gem 'thin'
 
 gem 'debugger', group: [:development, :test]

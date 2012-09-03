@@ -177,6 +177,8 @@ class TeachersController < ApplicationController
 		# fetch root level directories that are owned by the teacher
 		@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).reject{|b| b.get_access(signed_in? ? current_teacher.id.to_s : 0) < 1}
 
+		rescue Errno::ECONNREFUSED
+
 	end
 
 	#/editinfo

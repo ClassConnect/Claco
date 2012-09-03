@@ -11,6 +11,7 @@ class HomeController < ApplicationController
 		# i = 0
 
 		feedblacklist = {}
+		duplist = {}
 
 		if signed_in?
 
@@ -51,7 +52,7 @@ class HomeController < ApplicationController
 			if logs.any?
 				logs.each do |f|
 
-					debugger
+					#debugger
 
 					begin
 						case f[:model].to_s
@@ -65,47 +66,47 @@ class HomeController < ApplicationController
 						next
 					end
 
-					debugger
+					#debugger
 
 					# push onto the feed if the node is not deleted
 					case f[:model].to_s
 					when 'binders'
 						# the binder log entry:	should not be deleted
 						# 						should not be private
-						# 						should not be sourced from another log
+						# 						should not be sourced from another log entry
 						if model.parents[0]!={ "id" => "-1", "title" => "" } && model.is_pub? && !f[:data][:src]
 
 							# the binder log entry: should not have a blacklist entry
 							# 						should not be a setpub -> private
 							if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
 
+								# calculate number of items contributed from this teacher
 								c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
 								if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
 									
-									#debugger
+									# occupancy of up to 10 from any teacher
 									if c < 10
 
 										# whether or not the item is included in the blacklist,
 										# add the actionhash and annihilation IDs to the exclusion list
 										feedblacklist[f[:actionhash].to_s] = true
 
+										# enter all annihilation entries into blacklist hash
 										f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
-										if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s) && 
+										# execute blacklist exclusion
+										if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
 											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
 
-											@subsfeed << f
+											@subsfeed << [f]
 
 										end
 									end
 								end
 							end
 						end
-						#debugger
-						#break if @subsfeed.size == SUBSC_FEED_LENGTH
-						#debugger
 					when 'teachers'
 						if !(feedblacklist[f[:actionhash].to_s])
 
@@ -122,11 +123,11 @@ class HomeController < ApplicationController
 
 									f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
-									if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s) && 
+									if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
 										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
 
-										@subsfeed << f
+										@subsfeed << [f]
 
 									end
 								end

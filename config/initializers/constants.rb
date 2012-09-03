@@ -86,7 +86,7 @@ CROC_BORDER_COLOR = "#CCCCCC"
 # Teachers
 #AVATAR_XLDIM = 170
 AVATAR_LDIM = 170
-AVATAR_MGDIM = 122
+AVATAR_MGDIM = 122 # between medium and large... marge?
 AVATAR_MDIM = 48
 AVATAR_SDIM = 30
 

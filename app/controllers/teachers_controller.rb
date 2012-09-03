@@ -56,32 +56,116 @@ class TeachersController < ApplicationController
 
 		@subsfeed = []
 
-		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
-		logs = Log.where( :ownerid => @teacher.id.to_s, :model => "binders", "data.src" => nil  ).in( method: ["create","createfile","createcontent","update","updatetags","forkitem","setpub"] ).desc(:timestamp)
+		feedblacklist = {}
 
-		if logs.any?
-			logs.each do |f|
-				begin
-					binder = Binder.find(f.modelid.to_s)
-				rescue
-					Rails.logger.fatal "Invalid binder ID!"
-					next
+		if signed_in?
+
+			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
+			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
+			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
+
+
+			# pull the current teacher's subscription IDs
+			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+
+
+			logs = Tire.search 'logs' do |search|
+
+				search.query do |query|
+					#query.string params[:q]
+
+					query.all
+
+					#search.size 40
 				end
-				
-				if (binder.parents[0]!={ "id" => "-1", "title" => "" }) && binder.is_pub?#binder.get_access(signed_in? ? current_teacher.id.to_s : 0 > 0)
-					if !( @subsfeed.map { |g| [g.ownerid,g.method,g.modelid,g.params,g.data] }.include? [f.ownerid,f.method,f.modelid,f.params,f.data] ) && ( f.method=="setpub" ? ( f.params["enabled"]=="true" ) : true )
-						@subsfeed << f
+
+				# technically these should be cascaded to avoid cross-method name conflicts
+				search.filter :terms, :model => ['binders','teachers']
+				search.filter :terms, :method => FEED_METHOD_WHITELIST
+				search.filter :terms, :ownerid => [@teacher.id.to_s]
+
+				search.size 60
+
+				search.sort { by :timestamp, 'desc' }
+
+			end
+			
+			logs = logs.results
+
+			#debugger
+			
+			if logs.any?
+				logs.each do |f|
+
+					#debugger
+
+					begin
+						case f[:model].to_s
+							when 'binders'
+								model = Binder.find(f[:modelid].to_s)
+							when 'teachers'
+								model = Teacher.find(f[:modelid].to_s)
+						end
+					rescue
+						Rails.logger.fatal "Invalid log model ID!"
+						next
 					end
+
+					#debugger
+
+					# push onto the feed if the node is not deleted
+					case f[:model].to_s
+					when 'binders'
+						# the binder log entry:	should not be deleted
+						# 						should not be private
+						# 						should not be sourced from another log
+						if model.parents[0]!={ "id" => "-1", "title" => "" } && model.is_pub? && !f[:data][:src]
+
+							# the binder log entry: should not have a blacklist entry
+							# 						should not be a setpub -> private
+							if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
+
+								# whether or not the item is included in the blacklist,
+								# add the actionhash and annihilation IDs to the exclusion list
+								feedblacklist[f[:actionhash].to_s] = true
+
+								f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+
+								if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+
+									f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+
+									@subsfeed << f
+
+								end
+							end
+						end
+						#debugger
+						#break if @subsfeed.size == SUBSC_FEED_LENGTH
+						#debugger
+					when 'teachers'
+						if !(feedblacklist[f[:actionhash].to_s])
+
+							# whether or not the item is included in the blacklist,
+							# add the actionhash and annihilation IDs to the exclusion list
+							feedblacklist[f[:actionhash].to_s] = true
+
+							f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+
+							if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+
+								f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+
+								@subsfeed << f
+
+							end
+						end
+					end
+
+					break if @subsfeed.size == SUBSC_FEED_LENGTH
 				end
-				break if @subsfeed.size == PERSONAL_FEED_LENGTH
 			end
 		end
-
-		# the array should already be sorted
-		# .sort_by { |e| -e.timestamp }
-		@subsfeed = @subsfeed.any? ? @subsfeed.map{ |f| {:binder => Binder.find( f.modelid.to_s ), :owner => Teacher.find( f.ownerid.to_s ), :log => f } } : []
-
-		@subsfeed = []
 
 		#feed.map { |f| f.modelid.to_s } if feed.any?
 
@@ -127,7 +211,7 @@ class TeachersController < ApplicationController
 					__method__.to_s,
 					params[:controller].to_s,
 					current_teacher.id.to_s,
-					params.to_s)
+					params)
 					# altparams.nil? ? params : altparams)
 		
 		redirect_to teacher_omniauth_authorize_path(params[:buttonredirect]) and return if !params[:buttonredirect].nil?

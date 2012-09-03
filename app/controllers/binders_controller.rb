@@ -1048,7 +1048,7 @@ class BindersController < ApplicationController
 					if pid != "0"
 						parent = Binder.find(pid)
 
-						parent.update_attributes(	:owned_fork_total => op.owned_fork_total + (@binder.fork_total+@binder.owned_fork_total),
+						parent.update_attributes(	:owned_fork_total => parent.owned_fork_total + (@binder.fork_total+@binder.owned_fork_total),
 													:files		=> parent.files + @binder.files,
 													:folders	=> parent.folders + @binder.folders + (@binder.type == 1 ? 1 : 0),
 													:total_size	=> parent.total_size + @binder.total_size,

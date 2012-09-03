@@ -68,7 +68,11 @@ class AvatarUploader < CarrierWave::Uploader::Base
   end
 
   def fog_directory
-    "img.cla.co"
+    if Rails.env == "production"
+      "img.cla.co"
+    else
+      "rich.cla.co"
+    end
   end
 
   def fog_public
@@ -76,7 +80,11 @@ class AvatarUploader < CarrierWave::Uploader::Base
   end
 
   def fog_host
-    "http://img.cla.co"
+    if Rails.env == "production"
+      "http://img.cla.co"
+    else
+      "http://rich.cla.co"
+    end
   end
 
   def extension_white_list

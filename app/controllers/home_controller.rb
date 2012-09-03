@@ -139,6 +139,12 @@ class HomeController < ApplicationController
 				end
 			end
 		end
+
+		rescue Errno::ECONNREFUSED
+			Rails.logger.fatal "ElasticSearch server unreachable"
+		rescue Tire::Search::SearchRequestFailed
+			Rails.logger.fatal "Index missing exception"
+
 		#debugger
 	end
 

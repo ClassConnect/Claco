@@ -387,11 +387,6 @@
 				<% subscribee = Teacher.where(:username => f[:log].params['username'].to_s).first %>
 
 				<div class="feedcontent">
-					<!--div class="imgarea">
-						<a href="<%= "/#{subscribee.username}" %>">
-							<img src=<%= subscribee.info.avatar.thumb_md.url.to_s if !subscribee.info.nil? && !subscribee.info.avatar.nil? %>>
-						</a>
-					</div>-->
 					<div class="thetitle">
 						<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
 							You subscribed to <a href="<%= "/#{subscribee.username}" %>"><%= "#{subscribee.fname} #{subscribee.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
@@ -412,8 +407,6 @@
 										<div class="contitle"><%= "#{subscribee.fname} #{subscribee.lname} (#{subscribee.username})" %></div>
 										<div class="condesc">
 											<%= truncate(strip_tags(subscribee.info.bio), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											<%= #f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe 
-											%>
 										</div>
 									</div>
 								<% else %>

@@ -11,6 +11,7 @@
 
 		<ul class="nav nav-tabs" id="myTab">
 		  <li class="active"><a href="#personal">Personal Info</a></li>
+		  <li><a href="#notis">Notifications</a></li>
 		  <li><a href="#password">Change Password</a></li>
 		</ul>
 		 
@@ -173,6 +174,47 @@
 			</div>
 
 			<% end %>
+
+		  </div>
+
+
+
+
+
+
+
+
+
+		  <div class="tab-pane" id="notis">
+
+		  	<div class="secter" style="margin-top:0px">
+				Choose when you would like to receive email notifications
+			</div>
+
+			<%= form_for current_teacher, :url => editinfo_path, :method => :put do |f| %>
+
+			<div>
+				<input type="checkbox" style="margin:-3px 5px 0 0" />
+				When someone subscribes to you
+			</div>
+			<div>
+				<input type="checkbox" style="margin:-3px 5px 0 0" />
+				When someone has requested you as a colleague
+			</div>
+			<div>
+				<input type="checkbox" style="margin:-3px 5px 0 0" />
+				When you receive a message
+			</div>
+
+
+
+
+			<div style="margin-top:20px">
+				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Change your password</button>
+			</div>
+
+			<% end %>
+
 
 		  </div>
 

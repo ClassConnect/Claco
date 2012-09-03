@@ -205,16 +205,20 @@ class TeachersController < ApplicationController
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",
 												:location		=> [params[:lng].to_f, params[:lat].to_f])
-		# if !params[:info][:avatar].empty?
-		# 	params[:info][:avatar] = params[:info][:avatar].original_filename
-		# end
+
+		altparams = nil
+
+		if !params[:info][:avatar].nil?
+			altparams = params.dup
+			altparams[:info][:avatar] = params[:info][:avatar].original_filename
+		end
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					current_teacher.id.to_s,
-					params)
-					# altparams.nil? ? params : altparams)
+					# params)
+					altparams.nil? ? params : altparams)
 		
 		redirect_to teacher_omniauth_authorize_path(params[:buttonredirect]) and return if !params[:buttonredirect].nil?
 

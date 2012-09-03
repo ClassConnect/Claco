@@ -1,0 +1,3 @@
+class ZencoderCallbacksController < ApplicationController
+
+end

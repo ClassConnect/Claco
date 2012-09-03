@@ -103,3 +103,6 @@ FEED_METHOD_WHITELIST = %w[create createfile createcontent update forkitem favor
 FEED_DISPLAY_BLACKLIST = %w[unsub]
 
 FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove', 'confremove'=>'add' }
+
+Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"
+

@@ -231,6 +231,8 @@ GEM
     warden (1.1.1)
       rack (>= 1.0)
     yajl-ruby (1.1.0)
+    zencoder (2.4.2)
+      multi_json
 
 PLATFORMS
   ruby
@@ -272,3 +274,4 @@ DEPENDENCIES
   tire
   uglifier (>= 1.0.3)
   yajl-ruby
+  zencoder

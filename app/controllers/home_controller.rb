@@ -100,7 +100,7 @@ class HomeController < ApplicationController
 
 											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
 
-											@subsfeed << [f]
+											@subsfeed << f
 
 										end
 									end
@@ -127,7 +127,7 @@ class HomeController < ApplicationController
 
 										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
 
-										@subsfeed << [f]
+										@subsfeed << f
 
 									end
 								end

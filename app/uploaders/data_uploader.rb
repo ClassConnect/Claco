@@ -27,11 +27,11 @@ class DataUploader < CarrierWave::Uploader::Base
   end
 
   def fog_directory
-    if Rails.env == "production"
+    # if Rails.env == "production"
       "cdn.cla.co"
-    else
-      "rich.cla.co"
-    end
+    # else
+      # "rich.cla.co"
+    # end
   end
 
   def fog_public
@@ -43,11 +43,11 @@ class DataUploader < CarrierWave::Uploader::Base
   end
 
   def fog_host
-    if Rails.env == "production"
+    # if Rails.env == "production"
       "http://cdn.cla.co"
-    else
-      "http://rich.cla.co"
-    end
+    # else
+      # "http://rich.cla.co"
+    # end
   end
 
   def url

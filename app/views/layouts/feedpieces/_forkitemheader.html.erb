@@ -1,0 +1,23 @@
+<% forkowner = Teacher.where(:username => @f[:log].params['username'].to_s).first %>
+
+<% if !@f[:array] %>
+
+	<div class="thetitle">
+		<% if !current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s %>
+			You snapped <a href="<%= named_binder_route(@f[:model]) %>"><%= @f[:model].title %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% else %>
+			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> snapped <a href="<%= named_binder_route(@f[:model]) %>"><%= @f[:model].title  %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% end %>
+	</div>
+
+<% else %>
+
+	<div class="thetitle">
+		<% if !current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s %>
+			You snapped <%= @f[:array].size %> resources <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% else %>
+			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> snapped <%= @f[:array].size %> resources <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% end %>
+	</div>
+
+<% end %>

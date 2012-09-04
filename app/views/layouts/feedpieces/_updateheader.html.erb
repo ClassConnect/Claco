@@ -1,0 +1,35 @@
+<% if !@f[:array] %>
+
+	<div class="thetitle">
+		<% if !current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s %>
+			You updated <a href="<%= named_binder_route(@f[:model]) %>"><%= @f[:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% else %>
+			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(@f[:model]) %>"><%= @f[:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% end %>
+	</div>
+
+<% else %>
+
+	<div class="thetitle">
+		<% if @f[:array].size==2 %>
+			<% if !current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s %>
+				You updated <a href="<%= named_binder_route(@f[:array][0][:model]) %>"><%= @f[:array][0][:model].title %></a> and <a href="<%= named_binder_route(@f[:array][1][:model]) %>"><%= @f[:array][1][:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+			<% else %>
+				<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(@f[:array][0][:model]) %>"><%= @f[:array][0][:model].title %></a> and <a href="<%= named_binder_route(@f[:array][1][:model]) %>"><%= @f[:array][1][:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+			<% end %>
+		<% elsif @f[:array].size==3 %>
+			<% if !current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s %>
+				You updated <a href="<%= named_binder_route(@f[:array][0][:model]) %>"><%= @f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(@f[:array][1][:model]) %>"><%= @f[:array][1][:model].title %></a>, and <a href="<%= named_binder_route(@f[:array][2][:model]) %>"><%= @f[:array][2][:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+			<% else %>
+				<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(@f[:array][0][:model]) %>"><%= @f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(@f[:array][1][:model]) %>"><%= @f[:array][1][:model].title %></a>, and <a href="<%= named_binder_route(@f[:array][2][:model]) %>"><%= @f[:array][2][:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+			<% end %>
+		<% else %>
+			<% if !current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s %>
+				You updated <a href="<%= named_binder_route(@f[:array][0][:model]) %>"><%= @f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(@f[:array][1][:model]) %>"><%= @f[:array][1][:model].title %></a>, <a href="<%= named_binder_route(@f[:array][2][:model]) %>"><%= @f[:array][2][:model].title %></a>, and <%= @f[:array].size-3 %> more <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+			<% else %>
+				<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(@f[:array][0][:model]) %>"><%= @f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(@f[:array][1][:model]) %>"><%= @f[:array][1][:model].title %></a>, <a href="<%= named_binder_route(@f[:array][2][:model]) %>"><%= @f[:array][2][:model].title %></a>, and <%= @f[:array].size-3 %> more <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+			<% end %>
+		<% end %>
+	</div>
+
+<% end %>

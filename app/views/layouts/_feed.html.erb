@@ -90,727 +90,77 @@
 			</div>
 			<% 
 			case f[:log]['method'].to_s 
-			when "create" %>
-
-				<!-- this event no longer appears in the feed -->
+			when "createfile" %>
 
 				<div class="feedcontent">
-					<div class="thetitle">
-						<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-							You created <a href="<%= named_binder_route(Binder.find(f[:model].id.to_s)) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-						<% else %>
-							<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> created <a href="<%= named_binder_route(Binder.find(f[:model].id.to_s)) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-						<% end %>
-					</div>
 
-					<% if !f[:model].body.empty? %>
-						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-							<div class="thecontent">
-								<div class="txtcon">
-									<div class="condesc">
-										<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-									</div>
-								</div>
-								<div style="clear:both"></div>
-							</div>
-						</a>
-					<% end %>
+					<%= render 'layouts/feedpieces/createfileheader' %>
+
+					<%= render 'layouts/feedpieces/feedcontent' %>
+
 				</div>
-
-			<% when "createfile" %>
-
-				<% if !f[:array] %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You added a file to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added a file to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-							<div class="thecontent">
-									<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-										<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-									<% end %>
-									<div class="txtcon">
-										<div class="contitle">
-											<%= f[:model].title %>
-										</div>
-										<% if !f[:model].body.empty? %>
-											<div class="condesc">
-												<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										<% end %>
-									</div>
-								<div style="clear:both"></div>
-							</div>
-						</a>
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You added <%= f[:array].size %> files to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added <%= f[:array].size %> files to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<% f[:array].each do |g| %>
-
-						<a href="<%= named_binder_route(g[:model]) %>" class="conlink">
-							<div class="thecontent">
-									<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-										<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-									<% end %>
-									<div class="txtcon">
-										<div class="contitle">
-											<%= g[:model].title %>
-										</div>
-										<% if !g[:model].body.empty? %>
-											<div class="condesc">
-												<%= g[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										<% end %>
-									</div>
-								<div style="clear:both"></div>
-							</div>
-						</a>
-
-						<% end %>
-					</div>
-				<% end %>
 
 			<% when "createcontent" %>
 
-				<% if !f[:array] %>
+				<div class="feedcontent">
 
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You added content to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added content to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
+					<%= render 'layouts/feedpieces/createcontentheader' %>
 
-						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-							<div class="thecontent">
-									<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-										<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-									<% end %>
-									<div class="txtcon">
-										<div class="contitle"><%= f[:model].title %></div>
-										<% if !f[:model].body.empty? %>
-											<div class="condesc">
-												<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										<% end %>
-									</div>
+					<%= render 'layouts/feedpieces/feedcontent' %>
 
-								<div style="clear:both"></div>
-							</div>
-						</a>
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You added <%= f[:array].size %> links to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> added <%= f[:array].size %> links to <a href="<%= f[:model].parents.size==2 ? named_binder_route(Binder.find(f[:model].parent['id'])) : named_binder_route(Binder.find(f[:model].parents[1]['id'])) %>"><%= f[:model].parents.size==2 ? f[:model].parents[1]["title"] : f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<% f[:array].each do |g| %>
-
-							<a href="<%= named_binder_route(g[:model]) %>" class="conlink">
-								<div class="thecontent">
-										<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-											<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
-										<div class="txtcon">
-											<div class="contitle"><%= g[:model].title %></div>
-											<% if !g[:model].body.empty? %>
-												<div class="condesc">
-													<%= g[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
-											<% end %>
-										</div>
-
-									<div style="clear:both"></div>
-								</div>
-							</a>
-
-						<% end %>
-
-					</div>
-				<% end %>
+				</div>
 
 			<% when "update" %>
 
-				<% if !f[:array] %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You updated <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<% if (!f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:model].type != 1 || !f[:model].body.empty? %>
-							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-								<div class="thecontent">
-										<% if f[:model].type==1 %>
-										<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-
-									<div style="float:left; margin-right: 10px;">
-										<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-											<img src=<%= imgarr[0] %> />
-										</div>
-
-										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-									</div>
-										<% else %>
-											<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
-										<% end %>
-
-										<div class="txtcon">
-											<div class="contitle"></div>
-											<% if !f[:model].body.empty? %>
-												<div class="condesc">
-													<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
-											<% end %>
-										</div>
-									<div style="clear:both"></div>
-								</div>
-							</a>
-						<% end %>
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if f[:array].size==2 %>
-								<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-									You updated <a href="<%= named_binder_route(f[:array][0][:model]) %>"><%= f[:array][0][:model].title %></a> and <a href="<%= named_binder_route(f[:array][1][:model]) %>"><%= f[:array][1][:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-								<% else %>
-									<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(f[:array][0][:model]) %>"><%= f[:array][0][:model].title %></a> and <a href="<%= named_binder_route(f[:array][1][:model]) %>"><%= f[:array][1][:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-								<% end %>
-							<% elsif f[:array].size==3 %>
-								<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-									You updated <a href="<%= named_binder_route(f[:array][0][:model]) %>"><%= f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(f[:array][1][:model]) %>"><%= f[:array][1][:model].title %></a>, and <a href="<%= named_binder_route(f[:array][2][:model]) %>"><%= f[:array][2][:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-								<% else %>
-									<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(f[:array][0][:model]) %>"><%= f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(f[:array][1][:model]) %>"><%= f[:array][1][:model].title %></a>, and <a href="<%= named_binder_route(f[:array][2][:model]) %>"><%= f[:array][2][:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-								<% end %>
-							<% else %>
-								<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-									You updated <a href="<%= named_binder_route(f[:array][0][:model]) %>"><%= f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(f[:array][1][:model]) %>"><%= f[:array][1][:model].title %></a>, <a href="<%= named_binder_route(f[:array][2][:model]) %>"><%= f[:array][2][:model].title %></a>, and <%= f[:array].size-3 %> more <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-								<% else %>
-									<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> updated <a href="<%= named_binder_route(f[:array][0][:model]) %>"><%= f[:array][0][:model].title %></a>, <a href="<%= named_binder_route(f[:array][1][:model]) %>"><%= f[:array][1][:model].title %></a>, <a href="<%= named_binder_route(f[:array][2][:model]) %>"><%= f[:array][2][:model].title %></a>, and <%= f[:array].size-3 %> more <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-								<% end %>
-							<% end %>
-						</div>
-					</div>
-
-				<% end %>
-
-			<% when "updatetags" %>
-
-				<!-- this event no longer appears in the feed -->
-
 				<div class="feedcontent">
-					<div class="thetitle">
-						<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-							You changed the tags for <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title  %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-						<% else %>
-							<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> changed the tags for <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title  %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-						<% end %>
-					</div>
+					
+					<%= render 'layouts/feedpieces/updateheader' %>
 
-					<% if (!f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:model].type != 1 || !f[:model].body.empty? %>
-						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-							<div class="thecontent">
-									<% if f[:model].type==1 %>
+					<%= render 'layouts/feedpieces/feedcontent' if !f[:array] %>
 
-										<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-
-										<div style="float:left; margin-right: 10px;">
-											<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-												<img src=<%= imgarr[0] %> />
-											</div>
-
-											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-										</div>
-
-									<% else %>
-										<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-											<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
-									<% end %>
-
-									<% if !f[:model].body.empty? %>
-										<div class="txtcon">
-											<div class="contitle"></div>
-											<div class="condesc">
-												<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										</div>
-									<% end %>
-								<div style="clear:both"></div>
-							</div>
-						</a>
-					<% end %>
 				</div>
 
 			<% when "forkitem" %>
 
-				<% if !f[:array] %>
+				<div class="feedcontent">
 
-					<% forkowner = Teacher.where(:username => f[:log].params['username'].to_s).first %>
+					<%= render 'layouts/feedpieces/forkitemheader' %>
 
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You snapped <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> snapped <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title  %></a> from <a href="<%= "/#{forkowner.username}" %>"><%= "#{forkowner.fname} #{forkowner.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
+					<%= render 'layouts/feedpieces/feedcontent' %>
 
-
-						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-							<div class="thecontent">
-								<% if f[:model].type==1 %>
-
-								<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
-
-								<div style="float:left; margin-right: 10px;">
-									<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-										<img src=<%= imgarr[0] %> />
-									</div>
-
-									<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-									<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-									<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-								</div>
-									
-								<% else %>
-									<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-									<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-									<% end %>
-								<% end %>
-								<% if !f[:model].body.empty? || !f[:model].title.empty? %>
-									<div class="txtcon">
-										<div class="contitle"><%= f[:model].title %></div>
-										<% if !f[:model].body.empty? %>
-										<div class="condesc">
-											<%= truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-										</div>
-										<% end %>
-									</div>
-								<% end %>
-								<div style="clear:both"></div>
-							</div>
-						</a>
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You snapped <%= f[:array].size %> resources <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> snapped <%= f[:array].size %> resources <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<% f[:array].each do |g| %>
-
-							<% @g = g %>
-
-							<%= render 'layouts/feedpieces/feedcontent' %>
-
-							<% if false %>
-
-							<% #if (!g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || g[:model].type != 1 || !g[:model].body.empty? 
-							%>
-								<!--<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-									<div class="thecontent">
-										<% if g[:model].type==1 %>
-
-											<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-
-											<div style="float:left; margin-right: 10px;">
-												<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-													<img src=<%= imgarr[0] %> />
-												</div>
-
-												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-											</div>
-
-										<% else %>
-											<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
-										<% end %>
-										<div class="txtcon">
-											<div class="contitle"><%= g[:model].title %></div>
-											<div class="condesc">
-												<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										</div>
-										<div style="clear:both"></div>
-									</div>
-								</a>-->
-							<% #end 
-							%>
-
-							<% end %>
-
-						<% end %>
-					</div>	
-
-				<% end %>
+				</div>
 
 			<% when "favorite" %>
 
-				<% if !f[:array] %>
+				<div class="feedcontent">
 
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You favorited <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> favorited <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title  %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
+					<%= render 'layouts/feedpieces/favoriteheader' %>
 
-						<% if (!f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:model].type != 1 || !f[:model].body.empty? %>
-							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-								<div class="thecontent">
-										<% if f[:model].type==1 %>
+					<%= render 'layouts/feedpieces/feedcontent' %>
 
-										<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-
-										<div style="float:left; margin-right: 10px;">
-											<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-												<img src=<%= imgarr[0] %> />
-											</div>
-
-											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-										</div>
-
-										<% else %>
-											<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
-										<% end %>
-										<% if !f[:model].body.empty? %>
-											<div class="txtcon">
-												<div class="contitle"></div>
-												<div class="condesc">
-													<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
-											</div>
-										<% end %>
-									<div style="clear:both"></div>
-								</div>
-							</a>
-						<% end %>
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You favorited <%= f[:array].size %> resources <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> favorited <%= f[:array].size %> resources <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-
-						<% f[:array].each do |g| %>
-
-							<% if (!g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || g[:model].type != 1 || !g[:model].body.empty? %>
-								<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-									<div class="thecontent">
-										<% if g[:model].type==1 %>
-
-											<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-
-											<div style="float:left; margin-right: 10px;">
-												<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-													<img src=<%= imgarr[0] %> />
-												</div>
-
-												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-											</div>
-
-										<% else %>
-											<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
-										<% end %>
-										<% if !g[:model].body.empty? %>
-											<div class="txtcon">
-												<div class="contitle"></div>
-												<div class="condesc">
-													<%= g[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
-											</div>
-										<% end %>
-										<div style="clear:both"></div>
-									</div>
-								</a>
-							<% end %>
-
-						<% end %>
-					</div>
-
-				<% end %>
+				</div>
 
 			<% when "setpub" %>
 
-				<% if !f[:array] %>
+				<div class="feedcontent">
 
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You shared <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> shared <a href="<%= named_binder_route(f[:model]) %>"><%= f[:model].title %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
+					<%= render 'layouts/feedpieces/setpubheader' %>
 
-						<% if f[:model].type != 1 %>
-							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-								<div class="thecontent">
-									<% if f[:model].type==1 %>
-										<% imgarr = Binder.get_folder_feed_array(f[:model].id.to_s) %>
-										<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-									<% else %>
-										<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-											<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
-									<% end %>
+					<%= render 'layouts/feedpieces/feedcontent' %>
 
-									<% if !f[:model].body.empty? %>
-										<div class="txtcon">
-											<div class="contitle"><%= f[:model].title %></div>
-											<div class="condesc">
-												<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										</div>
-									<% end %>
-									<div style="clear:both"></div>
-								</div>
-							</a>
-						<% end %>
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You shared <%= f[:array].size %> resources <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> shared <%= f[:array].size %> resources <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<% f[:array].each do |g| %>
-
-							<a href="<%= named_binder_route(g[:model]) %>" class="conlink">
-								<div class="thecontent">
-									<% if g[:model].type==1 %>
-
-									<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-
-									<div style="float:left; margin-right: 10px;">
-										<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-											<img src=<%= imgarr[0] %> />
-										</div>
-
-										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
-										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
-
-									</div>
-										
-									<% else %>
-										<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-										<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
-									<% end %>
-									<% if !g[:model].body.empty? || !f[:model].title.empty? %>
-										<div class="txtcon">
-											<div class="contitle"><%= g[:model].title %></div>
-											<% if !g[:model].body.empty? %>
-											<div class="condesc">
-												<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-											<% end %>
-										</div>
-									<% end %>
-									<div style="clear:both"></div>
-								</div>
-							</a>
-
-						<% end %>
-					</div>
-
-				<% end %>
+				</div>
 
 			<% when 'sub' %>
 
-				<% if !f[:array] %>
+				<% @subscribee = Teacher.where(:username => /^#{Regexp.escape(f[:log].params['username'].to_s)}$/i).first %>
 
-					<% subscribee = Teacher.where(:username => /^#{Regexp.escape(f[:log].params['username'].to_s)}$/i).first %>
+				<div class="feedcontent">
 
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You subscribed to <a href="<%= "/#{subscribee.username}" %>"><%= "#{subscribee.fname} #{subscribee.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> subscribed to <a href="<%= "/#{subscribee.username}" %>"><%= "#{subscribee.fname} #{subscribee.lname}" %></a> <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
+					<%= render 'layouts/feedpieces/subheader' %>
 
-						<a href="<%= "/#{subscribee.username}" %>" class="conlink">
-							<div class="thecontent">
-								<% if !subscribee.info.nil? %>
-									<% if !!(subscribee.info.avatar.nil? || subscribee.info.avatar.url=="/assets/placer.png") %>
-										<div class="previmg" style="background-image: url('<%= subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
-									<% end %>
+					<%= render 'layouts/feedpieces/feedsub' %>
 
-									<% if !subscribee.info.bio.nil? && !subscribee.info.bio.empty? %>
-										<div class="txtcon">
-											<div class="contitle"><%= "#{subscribee.fname} #{subscribee.lname} (#{subscribee.username})" %></div>
-											<div class="condesc">
-												<%= truncate(strip_tags(subscribee.info.bio), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-											</div>
-										</div>
-									<% else %>
-										<div class="txtcon">
-											<div class="contitle"><%= "#{subscribee.fname} #{subscribee.lname} (#{subscribee.username})" %></div>
-											<% if subscribee.info.subjects.any? %>
-											<div class="condesc" >
-												<span>
-													<%= image_tag("profile/subject.png", :style=>"margin-top:-4px;margion-right:3px;opacity:0.50;") %>
-													<%= "#{subscribee.info.subjects[0]}#{", #{subscribee.info.subjects[1]}" if subscribee.info.subjects.size > 1}#{", and #{subscribee.info.subjects.size-2} more" if subscribee.info.subjects.size > 2}" %>
-												</span>
-											</div>
-											<% end %>
-											<% if !subscribee.info.city.empty? || !subscribee.info.state.empty? || !subscribee.info.country.empty? %>
-											<div class="condesc" >
-												<span>
-													<%= image_tag("profile/point.png", :style=>"margin-top:-4px;margion-right:0px;opacity:0.50;") %>
-													<%= "#{subscribee.info.city}#{', ' if !subscribee.info.city.empty?}#{subscribee.info.state}#{', ' if !subscribee.info.city.empty? || !subscribee.info.state.empty?}#{subscribee.info.country}" %>
-												</span>
-											</div>
-											<% end %>
-										</div>
-									<% end %>
-								<% end %>
-								<div style="clear:both"></div>
-							</div>
-						</a>
-
-					</div>
-
-				<% else %>
-
-					<div class="feedcontent">
-						<div class="thetitle">
-							<% if !current_teacher.nil? && current_teacher.id.to_s==f[:owner].id.to_s %>
-								You subscribed to <%= f[:array].size %> educators <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% else %>
-								<a href="<%= "/#{f[:owner].username}" %>"><%= "#{f[:owner].fname} #{f[:owner].lname}" %></a> subscribed to <%= f[:array].size %> educators <%= time_ago_in_words(Time.at(f[:log]['timestamp']).to_datetime) %> ago.
-							<% end %>
-						</div>
-
-						<% f[:array].each do |g| %>
-
-							<% subscribee = Teacher.where(:username => /^#{Regexp.escape(g[:log].params['username'].to_s)}$/i).first %>
-
-							<a href="<%= "/#{subscribee.username}" %>" class="conlink">
-								<div class="thecontent">
-									<% if !subscribee.info.nil? %>
-										<% if !(subscribee.info.avatar.nil? || subscribee.info.avatar.url=="/assets/placer.png") %>
-											<div class="previmg" style="background-image: url('<%= subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
-										<% end %>
-
-										<% if !subscribee.info.bio.nil? && !subscribee.info.bio.empty? %>
-											<div class="txtcon">
-												<div class="contitle"><%= "#{subscribee.fname} #{subscribee.lname} (#{subscribee.username})" %></div>
-												<div class="condesc">
-													<%= truncate(strip_tags(subscribee.info.bio), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
-											</div>
-										<% else %>
-											<div class="txtcon">
-												<div class="contitle"><%= "#{subscribee.fname} #{subscribee.lname} (#{subscribee.username})" %></div>
-												<% if subscribee.info.subjects.any? %>
-												<div class="condesc" >
-													<span>
-														<%= image_tag("profile/subject.png", :style=>"margin-top:-4px;margion-right:3px;opacity:0.50;") %>
-														<%= "#{subscribee.info.subjects[0]}#{", #{subscribee.info.subjects[1]}" if subscribee.info.subjects.size > 1}#{", and #{subscribee.info.subjects.size-2} more" if subscribee.info.subjects.size > 2}" %>
-													</span>
-												</div>
-												<% end %>
-												<% if !subscribee.info.city.empty? || !subscribee.info.state.empty? || !subscribee.info.country.empty? %>
-												<div class="condesc" >
-													<span>
-														<%= image_tag("profile/point.png", :style=>"margin-top:-4px;margion-right:0px;opacity:0.50;") %>
-														<%= "#{subscribee.info.city}#{', ' if !subscribee.info.city.empty?}#{subscribee.info.state}#{', ' if !subscribee.info.city.empty? || !subscribee.info.state.empty?}#{subscribee.info.country}" %>
-													</span>
-												</div>
-												<% end %>
-											</div>
-										<% end %>
-									<% end %>
-									<div style="clear:both"></div>
-								</div>
-							</a>
-						<% end %>
-
-					</div>
-
-				<% end %>
+				</div>
 
 			<% end %>
 			<div style="clear:both"></div>

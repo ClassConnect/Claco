@@ -1,0 +1,90 @@
+<% if !@f[:array] %>
+
+	<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
+		<div class="thecontent">
+			<% if !@subscribee.info.nil? %>
+				<% if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") %>
+					<div class="previmg" style="background-image: url('<%= @subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+				<% end %>
+
+				<% if !@subscribee.info.bio.nil? && !@subscribee.info.bio.empty? %>
+					<div class="txtcon">
+						<div class="contitle"><%= "#{@subscribee.fname} #{@subscribee.lname} (#{@subscribee.username})" %></div>
+						<div class="condesc">
+							<%= truncate(strip_tags(@subscribee.info.bio), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+						</div>
+					</div>
+				<% else %>
+					<div class="txtcon">
+						<div class="contitle"><%= "#{@subscribee.fname} #{@subscribee.lname} (#{@subscribee.username})" %></div>
+						<% if @subscribee.info.subjects.any? %>
+						<div class="condesc" >
+							<span>
+								<%= image_tag("profile/subject.png", :style=>"margin-top:-4px;margion-right:3px;opacity:0.50;") %>
+								<%= "#{@subscribee.info.subjects[0]}#{", #{@subscribee.info.subjects[1]}" if @subscribee.info.subjects.size > 1}#{", and #{@subscribee.info.subjects.size-2} more" if @subscribee.info.subjects.size > 2}" %>
+							</span>
+						</div>
+						<% end %>
+						<% if !@subscribee.info.city.empty? || !@subscribee.info.state.empty? || !@subscribee.info.country.empty? %>
+						<div class="condesc" >
+							<span>
+								<%= image_tag("profile/point.png", :style=>"margin-top:-4px;margion-right:0px;opacity:0.50;") %>
+								<%= "#{@subscribee.info.city}#{', ' if !@subscribee.info.city.empty?}#{@subscribee.info.state}#{', ' if !@subscribee.info.city.empty? || !@subscribee.info.state.empty?}#{@subscribee.info.country}" %>
+							</span>
+						</div>
+						<% end %>
+					</div>
+				<% end %>
+			<% end %>
+			<div style="clear:both"></div>
+		</div>
+	</a>
+
+<% else %>
+
+	<% @f[:array].each do |g| %>
+
+		<% @subscribee = Teacher.where(:username => /^#{Regexp.escape(g[:log].params['username'].to_s)}$/i).first %>
+
+		<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
+			<div class="thecontent">
+				<% if !@subscribee.info.nil? %>
+					<% if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") %>
+						<div class="previmg" style="background-image: url('<%= @subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+					<% end %>
+
+					<% if !@subscribee.info.bio.nil? && !@subscribee.info.bio.empty? %>
+						<div class="txtcon">
+							<div class="contitle"><%= "#{@subscribee.fname} #{@subscribee.lname} (#{@subscribee.username})" %></div>
+							<div class="condesc">
+								<%= truncate(strip_tags(@subscribee.info.bio), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+							</div>
+						</div>
+					<% else %>
+						<div class="txtcon">
+							<div class="contitle"><%= "#{@subscribee.fname} #{@subscribee.lname} (#{@subscribee.username})" %></div>
+							<% if @subscribee.info.subjects.any? %>
+							<div class="condesc" >
+								<span>
+									<%= image_tag("profile/subject.png", :style=>"margin-top:-4px;margion-right:3px;opacity:0.50;") %>
+									<%= "#{@subscribee.info.subjects[0]}#{", #{@subscribee.info.subjects[1]}" if @subscribee.info.subjects.size > 1}#{", and #{@subscribee.info.subjects.size-2} more" if @subscribee.info.subjects.size > 2}" %>
+								</span>
+							</div>
+							<% end %>
+							<% if !@subscribee.info.city.empty? || !@subscribee.info.state.empty? || !@subscribee.info.country.empty? %>
+							<div class="condesc" >
+								<span>
+									<%= image_tag("profile/point.png", :style=>"margin-top:-4px;margion-right:0px;opacity:0.50;") %>
+									<%= "#{@subscribee.info.city}#{', ' if !@subscribee.info.city.empty?}#{@subscribee.info.state}#{', ' if !@subscribee.info.city.empty? || !@subscribee.info.state.empty?}#{@subscribee.info.country}" %>
+								</span>
+							</div>
+							<% end %>
+						</div>
+					<% end %>
+				<% end %>
+				<div style="clear:both"></div>
+			</div>
+		</a>
+	<% end %>
+
+<% end %>

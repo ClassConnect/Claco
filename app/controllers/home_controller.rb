@@ -39,7 +39,7 @@ class HomeController < ApplicationController
 				search.filter :terms, :method => FEED_METHOD_WHITELIST
 				search.filter :terms, :ownerid => subs + [current_teacher.id.to_s]
 
-				search.size 60
+				search.size 200
 
 				search.sort { by :timestamp, 'desc' }
 
@@ -81,7 +81,7 @@ class HomeController < ApplicationController
 							if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
 
 								# calculate number of items contributed from this teacher
-								c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+								c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
 								if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
 									
@@ -98,10 +98,31 @@ class HomeController < ApplicationController
 										# execute blacklist exclusion
 										if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
-											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+											#debugger
 
-											@subsfeed << f
+											# create a key for an owner and an action
+											similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
+											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
+
+											# if there are no members in the duplist, create a new action in each tracking hash
+											if !(duplist[similar]) || f[:log][:timestamp].to_i-duplist[similar]['timestamp'] > 15.minutes			
+
+												# store the index at which the similar item resides, and the current time
+												duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
+
+												# new array set for feed object type
+												@subsfeed << [f]
+
+											# there is a similar event, combine in feed array
+											else	
+
+												@subsfeed[duplist[similar]['index']] << f
+
+												# update to the most recent time
+												duplist[similar]['timestamp'] = Time.now.to_i
+
+											end
 										end
 									end
 								end
@@ -110,7 +131,7 @@ class HomeController < ApplicationController
 					when 'teachers'
 						if !(feedblacklist[f[:actionhash].to_s])
 
-							c = (@subsfeed.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+							c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
 							if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
 								
@@ -123,12 +144,34 @@ class HomeController < ApplicationController
 
 									f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
+									# execute blacklist exclusion
 									if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
-										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+										#debugger
 
-										@subsfeed << f
+										# create a key for an owner and an action
+										similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
+										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
+
+										# if there are no members in the duplist, create a new action in each tracking hash
+										if !(duplist[similar]) || f[:log][:timestamp].to_i-duplist[similar]['timestamp'] > 15.minutes			
+
+											# store the index at which the similar item resides, and the current time
+											duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
+
+											# new array set for feed object type
+											@subsfeed << [f]
+
+										# there is a similar event, combine in feed array
+										else	
+
+											@subsfeed[duplist[similar]['index']] << f
+
+											# update to the most recent time
+											duplist[similar]['timestamp'] = Time.now.to_i
+
+										end
 									end
 								end
 							end

@@ -29,29 +29,24 @@ class Log
 	# 	indexes :params,	:type => 'hash'
 	# end	
 
-	# returns hash of object's fields
-	# def peel
+	# determine whether a subscription has occured before to this teacher
+	def self.first_subsc?(subscriber_id,subscribee_id)
 
-	# 	return {:id => self.id.to_s,
-	# 			:ownerid => self.ownerid, 
-	# 			:timestamp => self.timestamp, 
-	# 			:method => self.method, 
-	# 			:controller => self.controller,
-	# 			:modelid => self.modelid,
-	# 			:params => self.params,
-	# 			:data => self.data,
-	# 			:feedhash => self.feedhash,
-	# 			'id' => self.id.to_s,
-	# 			'ownerid' => self.ownerid, 
-	# 			'timestamp' => self.timestamp, 
-	# 			'method' => self.method, 
-	# 			'controller' => self.controller,
-	# 			'modelid' => self.modelid,
-	# 			'params' => self.params,
-	# 			'data' => self.data,
-	# 			'feedhash' => self.feedhash }
+		logs = Tire.search 'logs' do |search|
 
-	# end
+			search.query do |query|
+				query.all
+			end
+
+			search.filter :terms, :model => ['teachers']
+			search.filter :terms, :modelid => [subscribee_id.to_s]
+			search.filter :terms, :method => ['sub']
+			search.filter :terms, :ownerid => [subscriber_id.to_s]
+		end
+
+		logs.results.size==0
+
+	end
 
 	def hashgen
 

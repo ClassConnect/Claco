@@ -139,6 +139,21 @@ class Binder
 
 	end
 
+	def self.get_folder_feed_array(id)
+
+		binder = Binder.find(id.to_s)
+
+		retarr = []
+
+		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
+		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
+		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
+		retarr << Binder.find(binder.thumbimgids[3].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
+
+		return retarr
+
+	end
+
 	# recursive call to parent to set the folder thumbnail
 	def self.generate_folder_thumbnail(id,imageset = [[],[],[],[]])
 

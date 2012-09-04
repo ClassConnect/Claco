@@ -76,7 +76,11 @@
 	
 	<% @subsfeed.each do |f| 
 
-		f = f.size==1 ? f.first : { :model=>f.first[:model], :owner=>f.first[:owner], :log=>f.first[:log], :array=>f } %>
+		f = f.size==1 ? f.first : { :model=>f.first[:model], :owner=>f.first[:owner], :log=>f.first[:log], :array=>f } 
+
+		@f = f
+
+		%>
 
 		<div class="newsitem">
 			<div class="imgarea">
@@ -267,10 +271,18 @@
 							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
 								<div class="thecontent">
 										<% if f[:model].type==1 %>
-											<% if false %>
-												<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
-												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
+										<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
+
+									<div style="float:left; margin-right: 10px;">
+										<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+											<img src=<%= imgarr[0] %> />
+										</div>
+
+										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
+									</div>
 										<% else %>
 											<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
 												<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
@@ -336,10 +348,20 @@
 						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
 							<div class="thecontent">
 									<% if f[:model].type==1 %>
-										<% if false %>
-											<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
-											<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
+
+										<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
+
+										<div style="float:left; margin-right: 10px;">
+											<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+												<img src=<%= imgarr[0] %> />
+											</div>
+
+											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
+										</div>
+
 									<% else %>
 										<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
 											<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
@@ -375,31 +397,42 @@
 							<% end %>
 						</div>
 
-						<% if (!f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || f[:model].type != 1 || !f[:model].body.empty? %>
-							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
-								<div class="thecontent">
-										<% if f[:model].type==1 %>
-											<% if false %>
-												<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
-												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
-										<% else %>
-											<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-												<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
-										<% end %>
-										<% if !f[:model].body.empty? %>
-											<div class="txtcon">
-												<div class="contitle"></div>
-												<div class="condesc">
-													<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
-											</div>
-										<% end %>
-									<div style="clear:both"></div>
+
+						<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
+							<div class="thecontent">
+								<% if f[:model].type==1 %>
+
+								<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
+
+								<div style="float:left; margin-right: 10px;">
+									<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+										<img src=<%= imgarr[0] %> />
+									</div>
+
+									<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+									<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+									<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
 								</div>
-							</a>
-						<% end %>
+									
+								<% else %>
+									<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
+									<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
+									<% end %>
+								<% end %>
+								<% if !f[:model].body.empty? || !f[:model].title.empty? %>
+									<div class="txtcon">
+										<div class="contitle"><%= f[:model].title %></div>
+										<% if !f[:model].body.empty? %>
+										<div class="condesc">
+											<%= truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+										</div>
+										<% end %>
+									</div>
+								<% end %>
+								<div style="clear:both"></div>
+							</div>
+						</a>
 					</div>
 
 				<% else %>
@@ -415,30 +448,48 @@
 
 						<% f[:array].each do |g| %>
 
-							<% if (!g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || g[:model].type != 1 || !g[:model].body.empty? %>
-								<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
+							<% @g = g %>
+
+							<%= render 'layouts/feedpieces/feedcontent' %>
+
+							<% if false %>
+
+							<% #if (!g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"]) || g[:model].type != 1 || !g[:model].body.empty? 
+							%>
+								<!--<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
 									<div class="thecontent">
 										<% if g[:model].type==1 %>
-											<% if false %>
-												<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
+
+											<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
+
+											<div style="float:left; margin-right: 10px;">
+												<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+													<img src=<%= imgarr[0] %> />
+												</div>
+
+												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
+											</div>
+
 										<% else %>
 											<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
 												<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
 											<% end %>
 										<% end %>
-										<% if !g[:model].body.empty? %>
-											<div class="txtcon">
-												<div class="contitle"></div>
-												<div class="condesc">
-													<%= g[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-												</div>
+										<div class="txtcon">
+											<div class="contitle"><%= g[:model].title %></div>
+											<div class="condesc">
+												<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 											</div>
-										<% end %>
+										</div>
 										<div style="clear:both"></div>
 									</div>
-								</a>
+								</a>-->
+							<% #end 
+							%>
+
 							<% end %>
 
 						<% end %>
@@ -463,10 +514,20 @@
 							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
 								<div class="thecontent">
 										<% if f[:model].type==1 %>
-											<% if false %>
-												<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
-												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
+
+										<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
+
+										<div style="float:left; margin-right: 10px;">
+											<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+												<img src=<%= imgarr[0] %> />
+											</div>
+
+											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+											<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
+										</div>
+
 										<% else %>
 											<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
 												<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
@@ -504,10 +565,20 @@
 								<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
 									<div class="thecontent">
 										<% if g[:model].type==1 %>
-											<% if false %>
-												<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-												<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-											<% end %>
+
+											<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
+
+											<div style="float:left; margin-right: 10px;">
+												<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+													<img src=<%= imgarr[0] %> />
+												</div>
+
+												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+												<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
+											</div>
+
 										<% else %>
 											<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
 												<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
@@ -548,10 +619,8 @@
 							<a href="<%= named_binder_route(f[:model]) %>" class="conlink">
 								<div class="thecontent">
 									<% if f[:model].type==1 %>
-										<% if false %>
-											<% imgarr = Binder.get_folder_array(f[:model].id.to_s) %>
-											<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
+										<% imgarr = Binder.get_folder_feed_array(f[:model].id.to_s) %>
+										<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
 									<% else %>
 										<% if !f[:model].current_version.nil? && f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
 											<div class="previmg" style="background-image: url('<%= f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
@@ -560,7 +629,7 @@
 
 									<% if !f[:model].body.empty? %>
 										<div class="txtcon">
-											<div class="contitle"></div>
+											<div class="contitle"><%= f[:model].title %></div>
 											<div class="condesc">
 												<%= f[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 											</div>
@@ -588,13 +657,23 @@
 							<a href="<%= named_binder_route(g[:model]) %>" class="conlink">
 								<div class="thecontent">
 									<% if g[:model].type==1 %>
-										<% if false %>
-											<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
-											<div class="previmg" style="background-image: url('<%= imgarr[0].to_s %>');background-repeat: no-repeat;background-position: center;"></div>
-										<% end %>
+
+									<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
+
+									<div style="float:left; margin-right: 10px;">
+										<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
+											<img src=<%= imgarr[0] %> />
+										</div>
+
+										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[1].nil? || imgarr[1].empty?) ? "/assets/common/nothumb.png" : imgarr[1] %> />
+										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
+										<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+
+									</div>
+										
 									<% else %>
 										<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-											<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
+										<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
 										<% end %>
 									<% end %>
 									<% if !g[:model].body.empty? || !f[:model].title.empty? %>

@@ -1,4 +1,4 @@
-if !Exceptional::Config.api_key.nil? && Rails.env == 'production'
+if !Exceptional::Config.api_key.nil?# && Rails.env == 'production'
   begin
     class Delayed::Worker
       def handle_failed_job_with_exceptional(job, error)

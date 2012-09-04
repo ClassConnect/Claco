@@ -48,6 +48,14 @@ class Log
 
 	end
 
+	def self.last_action_time(teacherid)
+
+		action = Log.where(:ownerid=>teacherid.to_s).desc(:timestamp).limit(1).first
+
+		return action.nil? ? -1 : action.timestamp.to_i
+
+	end
+
 	def hashgen
 
 		md5 = Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s)

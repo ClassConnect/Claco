@@ -600,9 +600,11 @@
 									<% if !g[:model].body.empty? || !f[:model].title.empty? %>
 										<div class="txtcon">
 											<div class="contitle"><%= g[:model].title %></div>
+											<% if !g[:model].body.empty? %>
 											<div class="condesc">
-												<%= g[:model].body.empty? ? "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe : truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+												<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
 											</div>
+											<% end %>
 										</div>
 									<% end %>
 									<div style="clear:both"></div>
@@ -632,7 +634,7 @@
 						<a href="<%= "/#{subscribee.username}" %>" class="conlink">
 							<div class="thecontent">
 								<% if !subscribee.info.nil? %>
-									<% if !subscribee.info.avatar.nil? %>
+									<% if !!(subscribee.info.avatar.nil? || subscribee.info.avatar.url=="/assets/placer.png") %>
 										<div class="previmg" style="background-image: url('<%= subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
 									<% end %>
 
@@ -689,7 +691,7 @@
 							<a href="<%= "/#{subscribee.username}" %>" class="conlink">
 								<div class="thecontent">
 									<% if !subscribee.info.nil? %>
-										<% if !(subscribee.info.nil? || subscribee.info.avatar.nil? || subscribee.info.avatar.url=="/assets/placer.png") %>
+										<% if !(subscribee.info.avatar.nil? || subscribee.info.avatar.url=="/assets/placer.png") %>
 											<div class="previmg" style="background-image: url('<%= subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
 										<% end %>
 

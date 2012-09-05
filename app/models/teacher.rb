@@ -151,6 +151,36 @@ class Teacher
  #    	self.as_json
 	# end
 
+	# field :size, 				:type => Integer, :default => 0
+	# field :ext, 				:type => String, :default => ""
+	# field :data, 				:type => String, :default => "" #URL, path to file
+
+	# field :grades,				:type => Array, :default => []
+	# field :subjects,			:type => Array, :default => []
+	# field :bio, 				:type => String, :default => ""
+	# field :website,				:type => String, :default => ""
+	# field :city,				:type => String, :default => ""
+	# field :state,				:type => String, :default => ""
+	# field :country,				:type => String, :default => ""
+	# field :location,			:type => Array, :default => []
+	# field :twitterhandle,		:type => String, :default => ""
+	# field :facebookurl,			:type => String, :default => ""
+
+	# returns best info for an at-a-glance panel
+	def glance_info
+
+		return [] if info.nil?
+
+		return [{:type => 'bio', :content => info.bio}] if !info.bio.nil? && !info.bio.empty?
+
+		[{:type => 'subjects', 	:content => info.subjects},
+		{:type => 'location', 	:content => "#{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
+		{:type => 'subjects', 	:content => info.subjects},
+		{:type => 'grades', 	:content => info.grades},
+		{:type => 'website', 	:content => info.website}]
+
+	end
+
 	# Mr. John Smith
 	def full_name
 		return "#{title} #{fname} #{lname}"
@@ -504,7 +534,6 @@ class Info
 	field :facebookurl,			:type => String, :default => ""
 
 	embedded_in :teacher
-
 
 	# after_save do
 	# 	Rails.logger.debug "AFTER_SAVE_INFO"

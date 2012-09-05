@@ -180,7 +180,7 @@ class HomeController < ApplicationController
 										# there is a similar event, combine in feed array
 										else	
 
-											if f[:model].info.nil? || f[:model].info.avatar.nil? || f[:model].info.avatar.url.nil? || f[:model].info.avatar.url.empty?
+											if f[:model].info.nil? || f[:model].info.avatar.nil? || f[:model].info.avatar.url.nil? || f[:model].info.avatar.url.empty? || f[:model].info.avatar.url == "/assets/placer.png"
 
 												@subsfeed[duplist[similar]['index']] << f
 

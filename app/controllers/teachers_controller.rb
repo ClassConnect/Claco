@@ -154,10 +154,10 @@ class TeachersController < ApplicationController
 											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
 
 											# if there are no members in the duplist, create a new action in each tracking hash
-											if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > 30.minutes.to_i)			
+											if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)			
 
 												# store the index at which the similar item resides, and the current time
-												duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => f[:log][:timestamp].to_i }
+												duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
 
 												# new array set for feed object type
 												@subsfeed << [f]
@@ -165,7 +165,16 @@ class TeachersController < ApplicationController
 											# there is a similar event, combine in feed array
 											else	
 
-												@subsfeed[duplist[similar]['index']] << f
+												if f[:model].thumbimgids[0].nil? || f[:model].thumbimgids[0].empty?
+													@subsfeed[duplist[similar]['index']] << f
+
+												else
+
+													@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
+
+													duplist[similar]['blank_index'] += 1
+
+												end
 
 												# update to the most recent time
 												duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
@@ -203,10 +212,10 @@ class TeachersController < ApplicationController
 										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
 
 										# if there are no members in the duplist, create a new action in each tracking hash
-										if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > 30.minutes.to_i)			
+										if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)			
 
 											# store the index at which the similar item resides, and the current time
-											duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => f[:log][:timestamp].to_i }
+											duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
 
 											# new array set for feed object type
 											@subsfeed << [f]
@@ -214,7 +223,17 @@ class TeachersController < ApplicationController
 										# there is a similar event, combine in feed array
 										else	
 
-											@subsfeed[duplist[similar]['index']] << f
+											if f[:model].info.nil? || f[:model].info.avatar.nil? || f[:model].info.avatar.url.nil? || f[:model].info.avatar.url.empty?
+
+												@subsfeed[duplist[similar]['index']] << f
+
+											else
+
+												@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
+
+												duplist[similar]['blank_index'] += 1
+
+											end
 
 											# update to the most recent time
 											duplist[similar]['timestamp'] = f[:log][:timestamp].to_i

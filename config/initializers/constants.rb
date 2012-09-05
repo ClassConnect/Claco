@@ -104,6 +104,8 @@ FEED_DISPLAY_BLACKLIST = %w[unsub]
 
 FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove', 'confremove'=>'add' }
 
+FEED_COLLAPSE_TIME = 30.minutes.to_i
+
 Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"
 
 Twitter.configure do |config|

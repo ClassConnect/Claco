@@ -6,14 +6,14 @@
 
 				<% imgarr = Binder.get_folder_array(@f[:model].id.to_s) %>
 
-				<% if !imgarr[0].nil? && !imgarr[0].empty? && !imgarr[0]=="/" %>
+				<% if !imgarr[0].nil? && !imgarr[0].empty? %>
 
 				<div style="float:left; margin-right: 10px;">
 					<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
 						<img src=<%= imgarr[0] %> />
 					</div>
 
-					<% if !imgarr[1].nil? && !imgarr[1].empty? && !imgarr[1]=="/" %>
+					<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
 					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= imgarr[1] %> />
 					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
@@ -50,14 +50,14 @@
 
 				<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
 
-				<% if !imgarr[0].nil? && !imgarr[0].empty? && !imgarr[0]=="/" %>
+				<% if !imgarr[0].nil? && !imgarr[0].empty? %>
 
 				<div style="float:left; margin-right: 10px;">
 					<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
 						<img src=<%= imgarr[0] %> />
 					</div>
 
-					<% if !imgarr[1].nil? && !imgarr[1].empty? && !imgarr[1]=="/" %>
+					<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
 					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= imgarr[1] %> />
 					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />

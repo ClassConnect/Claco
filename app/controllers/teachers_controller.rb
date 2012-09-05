@@ -154,7 +154,7 @@ class TeachersController < ApplicationController
 											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
 
 											# if there are no members in the duplist, create a new action in each tracking hash
-											if !(duplist[similar]) || f[:log][:timestamp].to_i-duplist[similar]['timestamp'].to_i > 15.minutes.to_i			
+											if !(duplist[similar]) || ((f[:log][:timestamp].to_i-duplist[similar]['timestamp'].to_i) > 15.minutes.to_i)			
 
 												# store the index at which the similar item resides, and the current time
 												duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
@@ -203,7 +203,7 @@ class TeachersController < ApplicationController
 										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
 
 										# if there are no members in the duplist, create a new action in each tracking hash
-										if !(duplist[similar]) || f[:log][:timestamp].to_i-duplist[similar]['timestamp'] > 15.minutes			
+										if !(duplist[similar]) || ((f[:log][:timestamp].to_i-duplist[similar]['timestamp'].to_i) > 15.minutes.to_i)			
 
 											# store the index at which the similar item resides, and the current time
 											duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }

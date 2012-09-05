@@ -171,10 +171,16 @@ class Teacher
 
 		return [] if info.nil?
 
-		# if bio is present, this is the full infoset
-		return [{:type => 'bio', :content => info.bio}] if !info.bio.nil? && !info.bio.empty?
-
 		retarr = []
+
+		# if bio is present, this is the full infoset
+		if !info.bio.nil? && !info.bio.empty?
+			if info.bio.size > 100
+				return [{:type => 'bio', :content => info.bio}] 
+			else
+				retarr << {:type => 'bio', :content => info.bio}
+			end
+		end
 
 		# iterate through single-line content items
 		[{:type => 'subjects', 	:content => info.subjects},

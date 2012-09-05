@@ -12,8 +12,13 @@ class BindersController < ApplicationController
 
 		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
 
-		# these are temporary fixes:
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@owner.id.to_s,
+					params)
 
+		# these are temporary fixes:
 		@tagset = []
 
 		@tags = [[],[],[],[]]
@@ -125,6 +130,12 @@ class BindersController < ApplicationController
 
 		@owner = Teacher.find(@binder.owner)
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@binder.id.to_s,
+					params)
+
 		@root = signed_in? ? Binder.where("parent.id" => "0", :owner => current_teacher.id.to_s) : []
 
 		@access = signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
@@ -221,6 +232,12 @@ class BindersController < ApplicationController
 		@binder = Binder.find(params[:id])
 
 		@binder.regen
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@binder.id.to_s,
+					params)
 
 		redirect_to named_binder_route(@binder)
 
@@ -611,6 +628,13 @@ class BindersController < ApplicationController
 		@nb = Binder.new
 
 		@v = @nb.versions.new
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@nb.id.to_s,
+					params,
+					{:version => @v.id.to_s})
 
 		@v.owner = current_teacher.id.to_s
 		@v.timestamp = Time.now.to_i
@@ -1395,6 +1419,12 @@ class BindersController < ApplicationController
 	def versions
 		@binder = Binder.find(params[:id])
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@binder.id.to_s,
+					params)
+
 		redirect_to named_binder_route(@binder.parent["id"]) and return if @binder.type == 1 && @binder.parent["id"] != "0"
 
 		redirect_to binders_path if @binder.type == 1
@@ -1402,6 +1432,12 @@ class BindersController < ApplicationController
 
 	def swap
 		@binder = Binder.find(params[:id])
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@binder.id.to_s,
+					params)
 
 		@binder.versions.each {|v| v.update_attributes(:active => v.id.to_s == params[:version][:id])}
 
@@ -1695,6 +1731,12 @@ class BindersController < ApplicationController
 
 	def trash
 		@children = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					nil,
+					params)
 
 		@tagset = []
 

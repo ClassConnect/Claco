@@ -7,6 +7,12 @@ class TeachersController < ApplicationController
 		@title = "Teacher Listing"
 		@teachers = Teacher.all
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					nil,
+					params) if signed_in?
+
 		#@feed = Binder.where( :owner.ne => current_teacher.id.to_s, "parents.id" => { "$ne" => "-1"}).desc(:last_update).limit(10)#, "last_update" => { "$gte" => Time.now-24.hours }  ).desc(:last_update).limit(10)
 
 		#@feed = Log.where( :ownerid.ne => current_teacher.id.to_s).in( method: ["create","createfile","createcontent"] ).desc(:timestamp).limit(10)
@@ -25,6 +31,12 @@ class TeachersController < ApplicationController
 		redirect_to "/#{@teacher.username}" and return if @teacher.username != params[:username]
 
 		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@teacher.id.to_s,
+					params)
 
 		if @is_self
 			@children = Binder.where( :owner => current_teacher.id.to_s, :parent => { 'id'=>'0','title'=>'' } )
@@ -185,7 +197,9 @@ class TeachersController < ApplicationController
 								end
 							end
 						end
+
 					when 'teachers'
+
 						if !(feedblacklist[f[:actionhash].to_s])
 
 							c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
@@ -270,6 +284,12 @@ class TeachersController < ApplicationController
 		@title = "Edit your information"
 
 		current_teacher.info = Info.new if !current_teacher.info
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					params)
 	end
 
 	#PUT /updateinfo
@@ -326,6 +346,12 @@ class TeachersController < ApplicationController
 
 		current_teacher.update_attributes(:emailconfig => emailconfig)
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					params)
+
 		redirect_to editinfo_path
 
 	end
@@ -333,6 +359,12 @@ class TeachersController < ApplicationController
 	def updatepass
 
 		@teacher = current_teacher
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@teacher.id.to_s,
+					params)
 
 		if @teacher.update_attributes(params[:teacher])
 
@@ -353,6 +385,12 @@ class TeachersController < ApplicationController
 		@title = "Manage your subscribed tags"
 
 		current_teacher.tag = Tag.new if !current_teacher.tag
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					params)
 	end
 
 	#PUT /updatetags
@@ -619,6 +657,12 @@ class TeachersController < ApplicationController
 
 		current_teacher.update_attributes(:getting_started => false)
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					params)
+
 		respond_to do |format|
 			format.html {render :text => 1}
 		end
@@ -630,6 +674,12 @@ class TeachersController < ApplicationController
 		@title = "Messages"
 
 		@conversations = Conversation.where("members" => current_teacher.id.to_s).sort_by{|c| c.last_message.timestamp}.reverse
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					current_teacher.id.to_s,
+					params)
 
 	end
 

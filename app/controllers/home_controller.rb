@@ -140,7 +140,9 @@ class HomeController < ApplicationController
 								end
 							end
 						end
+
 					when 'teachers'
+						
 						if !(feedblacklist[f[:actionhash].to_s])
 
 							c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size

@@ -106,3 +106,7 @@ FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove',
 
 Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"
 
+Twitter.configure do |config|
+  config.consumer_key = 'RAlHtL8ZSNBg16RaYiDBQ'
+  config.consumer_secret = 'In2ol36fFfI6GRnyDZQxLpGFf1QIhMUJlFpeYG4zo'
+end

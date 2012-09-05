@@ -50,6 +50,8 @@ class Teacher
 
 	field :omnihash, :type => Hash, :default => {}
 
+	field :emailconfig, :type => Hash, :default => {}
+
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
 
@@ -61,7 +63,7 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig
 	
 	validate :username_blacklist
 
@@ -253,7 +255,7 @@ class Teacher
 	def self.find_for_authentication(conditions) 
 		conditions[:login].downcase!
 		super(conditions)
-	end 
+	end
 
 	def self.from_omniauth(auth, teacher)
 		# where(auth.slice(:provider, :uid)).first_or_create do |teacher|
@@ -263,7 +265,10 @@ class Teacher
 			teacher.omnihash[auth.provider]["username"] = auth.info.nickname
 			teacher.omnihash[auth.provider]["profile"] = auth.info.urls.Twitter
 
-			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{teacher.omnihash["twitter"]["uid"]}&stringify_ids=true"))["ids"]
+			Twitter.oauth_token = auth.credentials.token
+			Twitter.oauth_token_secret = auth.credentials.secret
+
+			fids = Twitter.friend_ids(auth.uid).all
 
 			teacher.omnihash[auth.provider]["fids"] = fids
 
@@ -294,6 +299,13 @@ class Teacher
 		end
 		teacher
 		# end
+	end
+
+	#DELAYED JOB
+	def self.newsub_email(subscriber, subscribee)
+
+		UserMailer.new_sub(subscriber, subscribee).deliver# if Log.first_subsc?(subscriber, subscribee)
+
 	end
 
 	after_create do

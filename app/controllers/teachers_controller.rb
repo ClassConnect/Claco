@@ -154,10 +154,10 @@ class TeachersController < ApplicationController
 											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
 
 											# if there are no members in the duplist, create a new action in each tracking hash
-											if !(duplist[similar]) || ((f[:log][:timestamp].to_i-duplist[similar]['timestamp'].to_i) > 15.minutes.to_i)			
+											if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > 30.minutes.to_i)			
 
 												# store the index at which the similar item resides, and the current time
-												duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
+												duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => f[:log][:timestamp].to_i }
 
 												# new array set for feed object type
 												@subsfeed << [f]
@@ -168,7 +168,7 @@ class TeachersController < ApplicationController
 												@subsfeed[duplist[similar]['index']] << f
 
 												# update to the most recent time
-												duplist[similar]['timestamp'] = Time.now.to_i
+												duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
 											end
 										end
@@ -203,10 +203,10 @@ class TeachersController < ApplicationController
 										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
 
 										# if there are no members in the duplist, create a new action in each tracking hash
-										if !(duplist[similar]) || ((f[:log][:timestamp].to_i-duplist[similar]['timestamp'].to_i) > 15.minutes.to_i)			
+										if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > 30.minutes.to_i)			
 
 											# store the index at which the similar item resides, and the current time
-											duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
+											duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => f[:log][:timestamp].to_i }
 
 											# new array set for feed object type
 											@subsfeed << [f]
@@ -217,7 +217,7 @@ class TeachersController < ApplicationController
 											@subsfeed[duplist[similar]['index']] << f
 
 											# update to the most recent time
-											duplist[similar]['timestamp'] = Time.now.to_i
+											duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
 										end
 									end
@@ -352,9 +352,12 @@ class TeachersController < ApplicationController
 
 	def sub
 
-		errors = []
-
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
+
+		# ignore duplicate requests
+		return if current_teacher.subscribed_to?(@teacher.id.to_s)
+
+		errors = []
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 

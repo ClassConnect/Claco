@@ -29,7 +29,7 @@ class Log
 	# 	indexes :params,	:type => 'hash'
 	# end	
 
-	# determine whether a subscription has occured before to this teacher
+	# determine whether an unsubscription has occured before to this teacher
 	def self.first_subsc?(subscriber_id,subscribee_id)
 
 		logs = Tire.search 'logs' do |search|
@@ -40,7 +40,7 @@ class Log
 
 			search.filter :terms, :model => ['teachers']
 			search.filter :terms, :modelid => [subscribee_id.to_s]
-			search.filter :terms, :method => ['sub']
+			search.filter :terms, :method => ['unsub']
 			search.filter :terms, :ownerid => [subscriber_id.to_s]
 		end
 

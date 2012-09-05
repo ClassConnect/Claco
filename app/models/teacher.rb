@@ -171,7 +171,7 @@ class Teacher
 	# returns best info for an at-a-glance panel
 	def glance_info(lines = 2)
 
-		return [] if info.nil2?
+		return [] if info.nil?
 
 		retarr = []
 

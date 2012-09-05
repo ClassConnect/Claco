@@ -449,64 +449,6 @@ class TeachersController < ApplicationController
 
 	end
 
-	# def omnifriend
-
-	# 	errors = []
-
-	# 	if !current_teacher.omnihash["facebook"].nil?
-
-	# 		if current_teacher.omnihash["facebook"]["data"]["credentials"]["expires_at"] > Time.now.to_i
-
-	# 			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{current_teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{current_teacher.omnihash["facebook"]["data"]["credentials"]}"))["data"].collect{|f| f["id"]}
-
-	# 			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |teacher|
-
-	# 				current_teacher.relationship_by_teacher_id(teacher.id).subscribe
-
-	# 			end
-
-	# 		else
-
-	# 			#Set redir session var and redir to oauth for new token, then redir back to this function.
-
-	# 			errors = "Your token has expired"
-
-	# 		end
-
-	# 	else
-
-	# 		errors = "You still need to authenticate your facebook account"
-
-	# 	end
-
-	# 	if !current_teacher.omnihash["twitter"].nil?
-
-	# 		if current_teacher.omnihash["twitter"]["data"]["credentials"]["expires_at"] > Time.now.to_i
-
-	# 			fids = JSON.parse(RestClient.get("https://api.twitter.com/1/friends/ids.json?user_id=#{current_teacher.omnihash["twitter"]["data"]["uid"]}&stringify_ids=true"))["ids"]
-
-	# 			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |teacher|
-
-	# 				current_teacher.relationship_by_teacher_id(teacher.id).subscribe
-
-	# 			end
-
-	# 		else
-
-	# 			#Set redir session var and redir to oauth for new token, then redir back to this function.
-
-	# 			errors = "Your token has expired"
-
-	# 		end
-
-	# 	else
-
-	# 		errors = "You still need to authenticate your twitter account"
-
-	# 	end
-
-	# end
-
 	# #/subs
 	# def subs
 
@@ -642,36 +584,36 @@ class TeachersController < ApplicationController
 
 	end
 
-	def showbinder
+	# def showbinder
 
-		#@text = "Success!"
-		@teacher = Teacher.find(params[:id])
+	# 	#@text = "Success!"
+	# 	@teacher = Teacher.find(params[:id])
 
-		@current_binder = Binder.find(params[:binder_id])
-		#@current_binder << Binder.where()
+	# 	@current_binder = Binder.find(params[:binder_id])
+	# 	#@current_binder << Binder.where()
 
-		@child_binders = Binder.where("parent.id" => params[:binder_id])
+	# 	@child_binders = Binder.where("parent.id" => params[:binder_id])
 
-		@binder_file_tree_array = Array.new
-		@binder_parent_id_array = Array.new
+	# 	@binder_file_tree_array = Array.new
+	# 	@binder_parent_id_array = Array.new
 
-		@current_binder.parents.each do |nodeparent|
-			# this is where versioning and permission logic should be inserted
-			@binder_file_tree_array << Binder.where("parent.id" => nodeparent["id"], :owner => params[:id]).entries
-			@binder_parent_id_array << nodeparent["id"].to_s
-		end
+	# 	@current_binder.parents.each do |nodeparent|
+	# 		# this is where versioning and permission logic should be inserted
+	# 		@binder_file_tree_array << Binder.where("parent.id" => nodeparent["id"], :owner => params[:id]).entries
+	# 		@binder_parent_id_array << nodeparent["id"].to_s
+	# 	end
 
 		
-		# if @child_binders.empty?
-		# 	@child_binders = Binder.new()
-		# end
+	# 	# if @child_binders.empty?
+	# 	# 	@child_binders = Binder.new()
+	# 	# end
 
-		#@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
+	# 	#@owned_root_binders = Binder.where("parent.id" => "0", :owner => params[:id]).entries
 
-		@retarray = Array.new
+	# 	@retarray = Array.new
 
 
-	end
+	# end
 
 	def done
 

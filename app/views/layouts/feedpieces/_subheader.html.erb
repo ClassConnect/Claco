@@ -1,6 +1,6 @@
 <% if !@f[:array] %>
 
-	<% @subscribee = Teacher.where(:username => /^#{Regexp.escape(f[:log].params['username'].to_s)}$/i).first %>
+	<% @subscribee = Teacher.where(:username => /^#{Regexp.escape(@f[:log].params['username'].to_s)}$/i).first %>
 
 	<div class="thetitle">
 		<% if @teacher_activity.nil? || (!current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s) %>

@@ -167,9 +167,9 @@ class Teacher
 	# field :facebookurl,			:type => String, :default => ""
 
 	# returns best info for an at-a-glance panel
-	def glance_info
+	def glance_info(lines = 2)
 
-		return [] if info.nil?
+		return [] if info.nil2?
 
 		retarr = []
 

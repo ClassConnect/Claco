@@ -74,6 +74,8 @@ class ConversationsController < ApplicationController
 
 			@conversation = Conversation.new(	:members => [recipient.id.to_s, current_teacher.id.to_s].sort,
 												:unread => unread)
+
+			@conversation.save
 		end
 
 		@conversation.new_message(params, current_teacher)

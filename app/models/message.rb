@@ -21,4 +21,23 @@ class Message
 
 	end
 
+	#Delayed Job
+	def self.send_email(messageid, sender)
+
+		message = Message.find(messageid)
+
+		conversation = Conversation.find(message.thread)
+
+		recipient = Teacher.find(conversation.get_other(sender))
+
+		UserMailer.new_msg(message, sender, recipient).deliver if Log.last_action_time(recipient) < 5.minutes.ago.to_i
+
+	end
+
+	after_create do
+
+		Message.delay(:queue => "email").send_email(self.id, self.sender)
+
+	end
+
 end

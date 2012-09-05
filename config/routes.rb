@@ -46,6 +46,7 @@ Claco::Application.routes.draw do
 	#Edit Info Form/Process
 	get		'/editinfo'														=> "teachers#editinfo"
 	put		'/editinfo'														=> "teachers#updatepass"
+	post	'/updateprefs'													=> "teachers#updateprefs"
 	post	'/updateinfo'													=> "teachers#updateinfo"
 
 	# resources :teachers, :only => [:show, :index]

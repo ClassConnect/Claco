@@ -191,18 +191,20 @@
 				Choose when you would like to receive email notifications
 			</div>
 
-			<%= form_for current_teacher, :url => editinfo_path, :method => :put do |f| %>
+			<%= form_for current_teacher, :url => updateprefs_path, :method => :post do |f| %>
 
 			<div>
-				<input type="checkbox" style="margin:-3px 5px 0 0" />
+				<%= check_box_tag "sub", 1, current_teacher.emailconfig["sub"].nil? ? true : current_teacher.emailconfig["sub"], :style => "margin:-3px 5px 0 0" %>
 				When someone subscribes to you
 			</div>
+			<% if false %>
 			<div>
-				<input type="checkbox" style="margin:-3px 5px 0 0" />
+				<%= check_box_tag "col", 1, current_teacher.emailconfig["col"].nil? ? true : current_teacher.emailconfig["col"], :style => "margin:-3px 5px 0 0" %>
 				When someone has requested you as a colleague
 			</div>
+			<% end %>
 			<div>
-				<input type="checkbox" style="margin:-3px 5px 0 0" />
+				<%= check_box_tag "msg", 1, current_teacher.emailconfig["msg"].nil? ? true : current_teacher.emailconfig["msg"], :style => "margin:-3px 5px 0 0" %>
 				When you receive a message
 			</div>
 
@@ -210,7 +212,7 @@
 
 
 			<div style="margin-top:20px">
-				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Change your password</button>
+				<button type="submit" class="btn btn-large btn-primary" style="font-weight:bolder">Update Preferences</button>
 			</div>
 
 			<% end %>

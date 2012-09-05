@@ -171,14 +171,24 @@ class Teacher
 
 		return [] if info.nil?
 
+		# if bio is present, this is the full infoset
 		return [{:type => 'bio', :content => info.bio}] if !info.bio.nil? && !info.bio.empty?
 
+		retarr = []
+
+		# iterate through single-line content items
 		[{:type => 'subjects', 	:content => info.subjects},
 		{:type => 'location', 	:content => "#{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
 		{:type => 'subjects', 	:content => info.subjects},
 		{:type => 'grades', 	:content => info.grades},
-		{:type => 'website', 	:content => info.website}]
+		{:type => 'website', 	:content => info.website}].each do |f|
 
+			retarr << f if !f[:content].nil? && !f[:content].empty?
+
+			break if retarr.size==2
+		end
+
+		return retarr
 	end
 
 	# Mr. John Smith

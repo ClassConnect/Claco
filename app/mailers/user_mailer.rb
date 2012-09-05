@@ -6,7 +6,7 @@ class UserMailer < ActionMailer::Base
 		@subscriber = Teacher.find(subscriber)
 		@subscribee = Teacher.find(subscribee)
 
-		@pre = "While you were gone, an educator subscribed to you on Claco!"
+		@pre = "Your learning network just got bigger!"
 		@head = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">' + @subscriber.first_last + '</a> has subscribed to you'
 		@omission = ""
 		@limg = @subscriber.info.avatar.url
@@ -37,7 +37,7 @@ class UserMailer < ActionMailer::Base
 		@sender = Teacher.find(sender)
 		@recipient = recipient
 
-		@pre = "While you were gone, an educator sent you a personal message on Claco!"
+		@pre = "Woah - you have a new message!"
 		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a> sent you a <a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">message</a>'
 		@omission = '<a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">view full message</a>'
 		@limg = @sender.info.avatar.url

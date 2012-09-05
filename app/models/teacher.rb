@@ -268,7 +268,7 @@ class Teacher
 			Twitter.oauth_token = auth.credentials.token
 			Twitter.oauth_token_secret = auth.credentials.secret
 
-			fids = Twitter.friend_ids(auth.uid).all
+			fids = Twitter.friend_ids(auth.info.nickname).all
 
 			teacher.omnihash[auth.provider]["fids"] = fids
 

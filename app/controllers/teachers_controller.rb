@@ -57,6 +57,9 @@ class TeachersController < ApplicationController
 		@subsfeed = []
 
 		feedblacklist = {}
+		duplist = {}
+
+		@teacher_activity = false
 
 		if signed_in?
 
@@ -118,46 +121,107 @@ class TeachersController < ApplicationController
 					when 'binders'
 						# the binder log entry:	should not be deleted
 						# 						should not be private
-						# 						should not be sourced from another log
+						# 						should not be sourced from another log entry
 						if model.parents[0]!={ "id" => "-1", "title" => "" } && model.is_pub? && !f[:data][:src]
 
 							# the binder log entry: should not have a blacklist entry
 							# 						should not be a setpub -> private
 							if !(feedblacklist[f[:actionhash].to_s]) && ( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )
 
-								# whether or not the item is included in the blacklist,
-								# add the actionhash and annihilation IDs to the exclusion list
-								feedblacklist[f[:actionhash].to_s] = true
+								# calculate number of items contributed from this teacher
+								c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
-								f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+								if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+									
+									# occupancy of up to 10 from any teacher
+									if c < 10
 
-								if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+										# whether or not the item is included in the blacklist,
+										# add the actionhash and annihilation IDs to the exclusion list
+										feedblacklist[f[:actionhash].to_s] = true
 
-									f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+										# enter all annihilation entries into blacklist hash
+										f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
-									@subsfeed << f
+										# execute blacklist exclusion
+										if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
+											#debugger
+
+											# create a key for an owner and an action
+											similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
+
+											f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
+
+											# if there are no members in the duplist, create a new action in each tracking hash
+											if !(duplist[similar]) || f[:log][:timestamp].to_i-duplist[similar]['timestamp'] > 15.minutes			
+
+												# store the index at which the similar item resides, and the current time
+												duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
+
+												# new array set for feed object type
+												@subsfeed << [f]
+
+											# there is a similar event, combine in feed array
+											else	
+
+												@subsfeed[duplist[similar]['index']] << f
+
+												# update to the most recent time
+												duplist[similar]['timestamp'] = Time.now.to_i
+
+											end
+										end
+									end
 								end
 							end
 						end
-						#debugger
-						#break if @subsfeed.size == SUBSC_FEED_LENGTH
-						#debugger
 					when 'teachers'
 						if !(feedblacklist[f[:actionhash].to_s])
 
-							# whether or not the item is included in the blacklist,
-							# add the actionhash and annihilation IDs to the exclusion list
-							feedblacklist[f[:actionhash].to_s] = true
+							c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
-							f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+							if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+								
+								#debugger
+								if c < 10
 
-							if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+									# whether or not the item is included in the blacklist,
+									# add the actionhash and annihilation IDs to the exclusion list
+									feedblacklist[f[:actionhash].to_s] = true
 
-								f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }							
+									f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
-								@subsfeed << f
+									# execute blacklist exclusion
+									if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
+										#debugger
+
+										# create a key for an owner and an action
+										similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
+
+										f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
+
+										# if there are no members in the duplist, create a new action in each tracking hash
+										if !(duplist[similar]) || f[:log][:timestamp].to_i-duplist[similar]['timestamp'] > 15.minutes			
+
+											# store the index at which the similar item resides, and the current time
+											duplist[similar] = { 'index' => @subsfeed.size, 'timestamp' => Time.now.to_i }
+
+											# new array set for feed object type
+											@subsfeed << [f]
+
+										# there is a similar event, combine in feed array
+										else	
+
+											@subsfeed[duplist[similar]['index']] << f
+
+											# update to the most recent time
+											duplist[similar]['timestamp'] = Time.now.to_i
+
+										end
+									end
+								end
 							end
 						end
 					end

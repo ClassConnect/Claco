@@ -304,7 +304,7 @@ class Teacher
 	#DELAYED JOB
 	def self.newsub_email(subscriber, subscribee)
 
-		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee)
+		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && Teacher.find(subscribee).emailconfig["sub"]
 
 	end
 

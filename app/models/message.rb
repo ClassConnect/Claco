@@ -30,7 +30,7 @@ class Message
 
 		recipient = Teacher.find(conversation.get_other(sender))
 
-		UserMailer.new_msg(message, sender, recipient).deliver if Log.last_action_time(recipient) < 5.minutes.ago.to_i
+		UserMailer.new_msg(message, sender, recipient).deliver if Log.last_action_time(recipient) < 5.minutes.ago.to_i && recipient.emailconfig["msg"]
 
 	end
 

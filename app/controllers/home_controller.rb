@@ -13,6 +13,8 @@ class HomeController < ApplicationController
 		feedblacklist = {}
 		duplist = {}
 
+		@teacher_activity = true
+
 		if signed_in?
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found

@@ -173,9 +173,9 @@ class Teacher
 
 		retarr = []
 
-		# if bio is present, this is the full infoset
 		if !info.bio.nil? && !info.bio.empty?
 			if info.bio.size > 100
+				# if bio is present and of sufficient length, this is the full infoset
 				return [{:type => 'bio', :content => info.bio}] 
 			else
 				retarr << {:type => 'bio', :content => info.bio}

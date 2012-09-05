@@ -363,7 +363,7 @@ class TeachersController < ApplicationController
 		@relationship.subscribe()
 
 		#Delay
-		Teacher.newsub_email(current_teacher.id.to_s, @teacher.id.to_s)
+		Teacher.delay(:queue => "email").newsub_email(current_teacher.id.to_s, @teacher.id.to_s)
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,

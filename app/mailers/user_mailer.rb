@@ -8,7 +8,7 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "While you were gone, an educator subscribed to you on Claco!"
 		@head = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">' + @subscriber.first_last + '</a> has subscribed to you'
-		@omission = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">view profile</a>'
+		@omission = ""
 		@limg = @subscriber.info.avatar.url
 
 		bioarr = @subscriber.glance_info
@@ -23,7 +23,7 @@ class UserMailer < ActionMailer::Base
 
 		end
 
-		@body += "<br />"
+		@body += '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">view profile</a>'
 
 		mail(:to => @subscribee.email, :subject => "FYI - #{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}

@@ -36,7 +36,7 @@ class Message
 
 	after_create do
 
-		Message.send_email(self.id, self.sender)
+		Message.delay(:queue => "email").send_email(self.id, self.sender)
 
 	end
 

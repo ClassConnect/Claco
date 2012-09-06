@@ -489,6 +489,17 @@ class Binder
 
 	end
 
+	def encode
+
+		r = Zencoder::Job.create({	:input => self.current_version.file.url,
+									:output => {:url => "s3://#{self.current_version.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4"}})
+
+		statushash = self.current_version.zendata
+
+		statushash["id"] = r.body["id"]
+
+	end
+
 	###############################################################################################
 
 	            ####   ##### #       ##   #     # ##### ####          # ##### ####
@@ -1252,6 +1263,13 @@ class Version
 	# 2 - website (horiz fill, crop bottom)
 	# 3 - document (center, no cropping)
 	field :thumbnailgen, :type => Integer, :default => 0
+
+	field :zenvid,	:type => Boolean, :default => false
+	field :zendata,	:type => Hash, :default => {"jobcreated"	=> false,
+												"id"			=> "",
+												"processing"	=> false,
+												"callbacked"	=> false,
+												"ready"			=> false}
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority

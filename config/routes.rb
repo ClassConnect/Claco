@@ -51,7 +51,7 @@ Claco::Application.routes.draw do
 
 	# resources :teachers, :only => [:show, :index]
 
-	post	'utils/fetchtitle'												=> 'home#fetchtitle'
+	post	'/utils/fetchtitle'												=> 'home#fetchtitle'
 
 	get		'/legal/tos'													=> 'home#tos'
 	get		'/legal/privacy'												=> 'home#privacy'
@@ -83,6 +83,7 @@ Claco::Application.routes.draw do
 	get		'/messages/:id/add'																		=> 'conversations#newmessage',		:as => 'add_message'
 	put		'/messages/:id/add'																		=> 'conversations#createmessage'
 
+	post	'/zcb'																					=> 'zencoder_callbacks#processed'
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
 

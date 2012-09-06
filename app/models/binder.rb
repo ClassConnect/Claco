@@ -491,7 +491,7 @@ class Binder
 
 	def encode
 
-		r = Zencoder::Job.create({	:input 	=> "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/#{self.current_version.filename}",
+		r = Zencoder::Job.create({	:input 	=> self.current_version.url,
 									:output => {:url => "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4",
 												:notifications => ["http://dragonrider.claco.com/zcb"]}
 												})

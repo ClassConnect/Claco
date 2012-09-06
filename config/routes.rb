@@ -88,10 +88,10 @@ Claco::Application.routes.draw do
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
 
 		#Subscribe/unsubscribe
-		put		'/:username/subscribe'											=> 'teachers#sub'
-		put		'/:username/unsubscribe'										=> 'teachers#unsub'
+		put		'/:username/subscribe'																=> 'teachers#sub'
+		put		'/:username/unsubscribe'															=> 'teachers#unsub'
 
-		post '/:username/message'																	=> 'conversations#createmessage'
+		post	'/:username/message'																=> 'conversations#createmessage'
 
 		##################
 		# BINDER ROUTING #

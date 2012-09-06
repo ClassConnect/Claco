@@ -19,12 +19,6 @@ class ApplicantsController < ApplicationController
 
 	end
 
-	def viewapps
-
-		@apps = Applicant.all
-
-	end
-
 	def show
 
 		@app = Applicant.find(params[:id])

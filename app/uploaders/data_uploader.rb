@@ -26,6 +26,10 @@ class DataUploader < CarrierWave::Uploader::Base
     @key ||= "#{store_dir}/#{FILENAME_WILDCARD}"
   end
 
+  def fog_authenticated_url_expiration
+    1.hour.to_i
+  end
+
   def fog_directory
     # if Rails.env == "production"
       "cdn.cla.co"

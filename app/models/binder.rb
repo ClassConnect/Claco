@@ -518,6 +518,17 @@ class Binder
 
 	# Do not explicitly call these!  All these methods have very long latency.
 
+	def self.process_zencoder_callback(id, key, data)
+
+		binder = Binder.find(id)
+
+		binder.current_version.zendata["data"] = data
+
+		binder.current_version.zenfile.store!(CarrierWave::Storage::Fog::File.new(binder.current_version.zenfile, CarrierWave::Storage::Fog.new(binder.current_version.zenfile), key))
+
+
+	end
+
 	def self.gen_smartnotebook_thumbnail(id)
 
 		binder = Binder.find(id)
@@ -1271,7 +1282,10 @@ class Version
 												"id"			=> "",
 												"processing"	=> false,
 												"callbacked"	=> false,
-												"ready"			=> false}
+												"ready"			=> false,
+												"data"			=> ""}
+
+	mount_uploader :zenfile, DataUploader
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority

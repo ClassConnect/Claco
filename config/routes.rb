@@ -62,7 +62,7 @@ Claco::Application.routes.draw do
 
 	get		'/apply'														=> 'applicants#apply'
 	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
-	get		'/viewapps'														=> 'applicants#viewapps'
+	get		'/viewapps'														=> 'admin#viewapps'
 
 	get		'/gs/:provider'													=> 'home#gs'
 	post	'/done'															=> 'teachers#done'

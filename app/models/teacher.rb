@@ -55,6 +55,8 @@ class Teacher
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
 
+	field :admin, :type => Boolean, :default => false
+
 	embeds_one :info#, autobuild: true #, validate: false
 
 	embeds_one :tag#, autobuild: true #, validate: false

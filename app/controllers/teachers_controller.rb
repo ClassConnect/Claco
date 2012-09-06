@@ -283,7 +283,7 @@ class TeachersController < ApplicationController
 												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,
 												:grades			=> params[:grades].strip.split(/\s*,\s*/),
 												:subjects		=> params[:subjects].strip.split(/\s*,\s*/),
-												:bio			=> params[:info][:bio][0..189],
+												:bio			=> params[:info][:bio][0..179],
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",

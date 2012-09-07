@@ -4,8 +4,16 @@ class Setting
 	field :setting, :type => String
 	field :value
 
-	def self.find(s)
+	def self.f(s)
 		Setting.where(:setting => s).first
+	end
+
+	def v=(v)
+		self.update_attribute(:value, v)
+	end
+
+	def v
+		self.value
 	end
 
 end

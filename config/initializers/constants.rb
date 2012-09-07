@@ -9,6 +9,7 @@ PATH_UPLOAD	   = "/document/upload"
 PATH_THUMBNAIL = "/download/thumbnail"	
 PATH_STATUS = "/document/status"
 PATH_SESSION = "/session/create"
+PATH_TEXTGRAB = "/download/text"
 
 CROC_VALID_FILE_FORMATS = %w[doc .doc docx .docx pdf .pdf ppt .ppt pptx .pptx xls .xls xlsx .xlsx]
 

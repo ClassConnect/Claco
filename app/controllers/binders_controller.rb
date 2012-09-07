@@ -790,6 +790,8 @@ class BindersController < ApplicationController
 								# .delay(:queue => 'thumbgen')
 								Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 
+								Binder.delay.get_croc_doctext(@binder.id, Crocodoc.get_doctext_url(filedata))
+
 								# delay(:queue => 'thumbgen').
 								#Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
 
@@ -2047,6 +2049,14 @@ class BindersController < ApplicationController
 
 			return "#{CROC_API_URL+PATH_THUMBNAIL}?#{URI.encode_www_form(options)}"
 			#return RestClient.get(CROC_API_URL+PATH_THUMBNAIL,options)
+
+		end
+
+		def get_doctext_url(uuid,options = {})
+
+			options = CROC_API_OPTIONS.merge(options).merge({:uuid => uuid})
+
+			return "#{CROC_API_URL+PATH_TEXTGRAB}?#{URI.encode_www_form(options)}"
 
 		end
 

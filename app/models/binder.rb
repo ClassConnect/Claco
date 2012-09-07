@@ -1075,7 +1075,7 @@ class Binder
 		timeout = 50 # in tenths of a second
 		#while [400,401,404,500].include? RestClient.get(url) {|response, request, result| response.code }.to_i
 
-		Rails.logger.debug "url: #{url.to_s}"
+		#Rails.logger.debug "url: #{url.to_s}"
 
 		# we can assume all HTTP codes above 400 represent a failure to fetch the image
 		while RestClient.get(url) {|response, request, result| response.code }.to_i >= 400
@@ -1105,7 +1105,27 @@ class Binder
 		#Binder.delay.generate_folder_thumbnail(id)
 		Binder.generate_folder_thumbnail(target.parent['id'] || target.parent[:id])
 
-		
+	end
+
+	def self.get_croc_doctext(id,url)
+
+		timeout = 50
+
+		while RestClient.get(url) {|response, request, result| response.code }.to_i >= 400
+			sleep 0.1
+			timeout -= 1
+			if timeout==0
+				# image fetch timed out
+				#Binder.delay(:queue => 'mulligan', :priority => 1, run_at: 15.minutes.from_now).get_croc_thumbnail(id,url)
+				#raise "Crocodoc thumbnail fetch timed out" and return
+				return
+			end
+		end
+
+		target = find(id)
+
+		# Croc API returns string that is not wrapped in JSON
+		target.current_version.update_attributes(:doctext => RestClient.get(url))
 
 	end
 
@@ -1240,6 +1260,7 @@ class Version
 
 	# UUID to access the document on crocodoc
 	field :croc_uuid
+	field :doctext, :default => ''
 
 	mount_uploader :file, DataUploader
 

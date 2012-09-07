@@ -20,9 +20,22 @@ class ConversationsController < ApplicationController
 
 		@messages = @conversation.get_messages
 
+		src = Mongo.log(current_teacher.id.to_s,
+						__method__.to_s,
+						params[:controller].to_s,
+						@conversation.id.to_s,
+						params)
+
 		@messages.each do |message|
 
 			message.add_read(current_teacher) if !message.read_by?(current_teacher.id.to_s)
+
+			Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					message.id.to_s,
+					params,
+					{:src => src})
 
 		end
 
@@ -32,6 +45,12 @@ class ConversationsController < ApplicationController
 
 		@conversation = Conversation.new
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@conversation.id.to_s,
+					params)
+
 	end
 
 	def create
@@ -40,11 +59,20 @@ class ConversationsController < ApplicationController
 
 		unread = {}
 
-		members.each {|member| unread[member] = (member == current_teacher.id.to_s ? 0 : 1)}
+		members.each do |member|
+
+			unread[member] = (member == current_teacher.id.to_s ? 0 : 1)
+		end
 
 
 		@conversation = Conversation.new(	:members	=> members,
 											:unread		=> unread)
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@conversation.id.to_s,
+					params)
 
 		@conversation.save
 
@@ -59,6 +87,12 @@ class ConversationsController < ApplicationController
 
 		@conversation = Conversation.find(params[:id])
 
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@conversation.id.to_s,
+					params)
+
 	end
 
 	def createmessage
@@ -68,6 +102,12 @@ class ConversationsController < ApplicationController
 		@conversation = Conversation.where(:members => [recipient.id.to_s, current_teacher.id.to_s].sort).first if params[:id].nil?
 
 		@conversation = Conversation.find(params[:id]) if !params[:id].nil?
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@conversation.id.to_s,
+					params)
 
 		if @conversation.nil?
 			unread = {current_teacher.id.to_s => 0, recipient.id.to_s => 1}
@@ -97,5 +137,37 @@ class ConversationsController < ApplicationController
 	# 	redirect_to show_conversation_path(@conversation)
 
 	# end
+	
+	###############################################################################################
 
+							#    #  ##### #     #####  ##### #####   #### 
+							#    #  #     #     #    # #     #    # #    #
+							#    #  #     #     #    # #     #    # # 
+							######  ####  #     #####  ####  #####   ####
+							#    #  #     #     #      #     #  #        #
+							#    #  #     #     #      #     #   #  #    #
+							#    #  ##### ##### #      ##### #    #  ####
+
+	###############################################################################################
+
+	module Mongo
+		extend self
+
+		def log(ownerid,method,model,modelid,params,data = {})
+
+			log = Log.new( 	:ownerid => ownerid.to_s,
+							:timestamp => Time.now.to_f,
+							:method => method.to_s,
+							:model => model.to_s,
+							:modelid => modelid.to_s,
+							:params => params,
+							:data => data,
+							:actionhash => Digest::MD5.hexdigest(ownerid.to_s+method.to_s+modelid.to_s))
+
+			log.save
+
+			return log.id.to_s
+
+		end
+	end
 end

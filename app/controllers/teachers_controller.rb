@@ -297,6 +297,13 @@ class TeachersController < ApplicationController
 
 		current_teacher.info = Info.new if current_teacher.info.nil?
 
+		if current_teacher.fname!=params[:teacher][:fname] || current_teacher.lname!=params[:teacher][:lname]
+			Binder.where(:username=>current_teacher.username).each do |f|
+				f.update_attributes(:fname => params[:teacher][:fname],
+									:lname => params[:teacher][:lname])
+			end
+		end
+
 		current_teacher.update_attributes(params[:teacher])
 
 		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],

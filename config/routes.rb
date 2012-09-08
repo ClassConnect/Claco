@@ -35,6 +35,8 @@ Claco::Application.routes.draw do
 	get		'/autocomplete'													=> 'home#auto'
 	get		'/dj'															=> 'home#dj'
 	get		'/search'														=> 'home#search'
+	get		'/about'														=> 'home#about'
+	get		'/unitedweteach'												=> 'home#united'
 
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'

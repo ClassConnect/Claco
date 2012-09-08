@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy]
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united]
 
 	def index
 		@title = "Claco"

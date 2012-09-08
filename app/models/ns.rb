@@ -6,6 +6,8 @@ class Ns
 	field :given, :type => Boolean, :default => false
 	field :timestamp, :type => Integer
 
+	validates_uniqueness_of :code 
+
 	def self.seed
 		10000.times do
 			ns = Ns.new

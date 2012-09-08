@@ -54,4 +54,22 @@ class UserMailer < ActionMailer::Base
 		end
 
 	end
+
+	def new_invite(invitation)
+
+		@sender = Teacher.find(invitation)
+
+		@pre = ""
+		@head = ""
+		@omission = ""
+		@limg = @sender.info.avatar.url
+
+		@html_safe = false
+
+		mail(:to => invitation.to, :subject => "FYI - #{@sender.first_last} sent you a message") do |format|
+			format.html {render "message_email"}
+		end		
+
+	end
+
 end

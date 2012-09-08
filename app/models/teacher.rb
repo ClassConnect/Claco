@@ -254,6 +254,10 @@ class Teacher
 		username
 	end
 
+	def binders
+		Binder.where(:owner => self.id.to_s)
+	end
+
 	def self.find_for_authentication(conditions) 
 		conditions[:login].downcase!
 		super(conditions)

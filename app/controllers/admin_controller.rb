@@ -7,7 +7,11 @@ class AdminController < ApplicationController
 
 	end
 
-	
+	def viewusers
+
+		@teachers = Teacher.all
+
+	end
 
 protected
 

@@ -125,7 +125,7 @@ class BindersController < ApplicationController
 
 		@owner = Teacher.find(@binder.owner)
 
-		@root = signed_in? ? Binder.where("parent.id" => "0", :owner => current_teacher.id.to_s) : []
+		@root = signed_in? ? current_teacher.binders.root_binders : []
 
 		@access = signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
 		

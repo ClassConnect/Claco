@@ -1,0 +1,23 @@
+<h2>app/views/applicants/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<table>
+<tr>
+<td>Name</td>
+<td>Username</td>
+<td>Email</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<% @teachers.each do |teacher| %>
+<tr>
+<td><%= teacher.full_name %></td>
+<td><a href="/<%= teacher.username %>"><%= teacher.username %></a></td>
+<td><%= teacher.email %></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<% end %>
+</table>

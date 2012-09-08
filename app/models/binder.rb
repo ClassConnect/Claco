@@ -79,6 +79,7 @@ class Binder
 
 	scope :root_binders, where("parent.id" => "0")
 	scope :favorites, where("parent.id" => "-2")
+	scope :binders, where("parents.id" => "0")
 	scope :trash, where("parent.id" => "-1")
 
 	# tag contains both local and parent tag data

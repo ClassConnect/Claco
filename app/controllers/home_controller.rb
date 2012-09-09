@@ -272,7 +272,11 @@ class HomeController < ApplicationController
 
 	end
 
-	def united 
+	def united
+
+	end
+
+	def team
 
 	end
 

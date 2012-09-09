@@ -1,2 +1,41 @@
-<h2>app/views/applicants/<%= params[:action] %></h2>
-<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "home/pub/uwt", :media => "all" %>
+<% end %>
+
+
+
+
+<div class="splashback">
+	<div class="container">
+
+		<div class="tagline">
+			If your job was to manage students they would call you managers.<br /><br />
+
+			But you're a <span style="color:#8FC606">teacher</span>, and your goal is to share knowledge and make content come to life.
+		</div>
+
+	</div>
+</div>
+
+
+<div class="container">
+	<div class="whitebox">
+
+		<div class="twitleft">
+			<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script><script>new TWTR.Widget({ version: 2, type: 'search', search: '#UnitedWeTeach', interval: 3000, title: 'ClassConnect', subject: '#UnitedWeTeach', width: 200, height: 180, theme: { shell: { background: '#424242', color: '#ffffff' }, tweets: { background: '#ffffff', color: '#444444', links: '#1985b5' } }, features: { scrollbar: false, loop: true, live: true, behavior: 'default' }
+}).render().start();</script>
+		</div>
+
+		<div class="exp">
+		The problem is that finding the time to create all this incredible content and having the energy to teach it is impossible if we play by the old rules.<br /><br />
+
+		<strong>Technology and the internet have changed the game.</strong> Now, for the first time ever, you can work collaboratively with teachers from around the world to build lessons. This gives you more time & energy to focus on what you do best — teaching and inspiring your students. The ideas you contribute will also help thousands of teachers and immediately impact the education of students around the world.<br /><br />
+
+		Every once in a while, a group of pioneers stray from the well-worn path and create the future. This is happening in education <u>right now</u>. Join the tens of thousands of teachers from around the world that are celebrating each other's unique ideas and lets leave education with something really beautiful.
+		</div>
+
+
+
+		<div style="clear:both"></div>
+	</div>
+</div>

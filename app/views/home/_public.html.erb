@@ -2,13 +2,115 @@
     <%= stylesheet_link_tag    "home/public", :media => "all" %>
 <% end %>
 
-<div class="whiteback">
+<div class="splashback">
 	<div class="container">
-		<div class="tagline">
-			A home for the world's greatest educators.
+
+		<div class="sectleft">
+			<div class="tagline">
+				Collaborate with the world's greatest educators.
+			</div>
+
+
+			<div class="addtl">
+				Find, build and share educational resources with great educators just like you — aligned with <%= image_tag('public/core.png', :style => "margin: -2px 3px 0 0;width:130px") %>
+
+				<div style="margin-top:20px;margin-bottom:5px;height:50px">
+					<a href="#" style="position:absolute;padding:15px 15px 15px 30px;text-decoration:underline">Learn more</a>
+					<a href="/apply" id="apply-btn" class="btn" style="float:right">We're in beta - request an invite!</a>
+				</div>
+
+			</div>
+
+
 		</div>
 
 
+
+
+
+		<div class="sectright">
+
+			<div class="spotlight_feed">
+				<div class="announcer">
+					<%= image_tag('common/plane.png', :style => "margin: -2px 3px 0 0") %>
+					What's happening now
+				</div>
+
+
+				<div class="feedster">
+
+					<div class="itemwrap">
+						<div class="imgarea">
+							<a href="#">
+								<img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" />
+							</a>
+						</div>
+
+
+						<div class="namester">
+							<a href="#">Jordan Hamel</a> posted to <a href="#">DES S1</a>
+						</div>
+
+						<div class="contentitem">
+							<div class="preview">
+								<a href="#">
+									<img src="http://img.cla.co/6ab1760d02d5e32baccd7bfe9ff6bf7c/thumb_lg.png" />
+								</a>
+							</div>
+
+
+							<div class="contitle">
+								<a href="#">Flat Classroom Project NS and Albert Pai</a>
+							</div>
+
+
+
+							<div style="clear:both"></div>
+						</div>
+					</div>
+
+
+					<div class="itemwrap">
+						<div class="imgarea">
+							<a href="#">
+								<img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" />
+							</a>
+						</div>
+
+
+						<div class="namester">
+							<a href="#">Jordan Hamel</a> posted to <a href="#">DES S1</a>
+						</div>
+
+						<div class="contentitem">
+							<div class="preview">
+								<a href="#">
+									<img src="http://img.cla.co/6ab1760d02d5e32baccd7bfe9ff6bf7c/thumb_lg.png" />
+								</a>
+							</div>
+
+
+							<div class="contitle">
+								<a href="#">Flat Classroom Project NS and Albert Pai</a>
+							</div>
+
+
+
+							<div style="clear:both"></div>
+						</div>
+					</div>
+
+				</div>
+
+
+
+			</div>
+
+		</div>
+
+
+
+<!--
 		<div class="vanitybox">
 			<img src="/assets/public/jerry.png" style="float:left" />
 
@@ -25,6 +127,8 @@
 
 			<a href="/apply" id="apply-btn" class="btn">Request a beta invite</a>
 		</div>
+
+	-->
 
 	</div>
 </div>

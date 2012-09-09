@@ -1,0 +1,52 @@
+.splashback {
+  background-image: url(/assets/public/uwt.png);
+  background-repeat:no-repeat;
+  background-position:center top; 
+  background-color:#fff;
+
+  height:250px;
+  border-bottom:1px solid #aaa;
+}
+
+
+.splashback .tagline {
+  font-size:32px;
+  font-weight:bolder;
+  color:#fff;
+  margin:35px 0 0 0;
+  text-shadow: 0px 1px 1px #000;
+  line-height: 1.1em;
+  background: rgba(0, 0, 0, 0.5);
+  padding:20px;
+
+  -webkit-border-radius: 6px 6px 0 0;
+     -moz-border-radius: 6px 6px 0 0;
+          border-radius: 6px 6px 0 0;
+}
+
+
+
+.whitebox{
+	padding:20px;
+	margin-bottom:10px;
+
+  -webkit-border-radius: 0 0 4px 4px;
+     -moz-border-radius: 0 0 4px 4px;
+          border-radius: 0 0 4px 4px;
+
+	-moz-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.3);
+  box-shadow: 0 1px 3px rgba(34,25,25,0.3);
+
+  background: #fff;
+}
+
+.whitebox .twitleft {
+	float:left;
+	height:275px;
+	margin-right:30px;
+}
+
+.whitebox .exp {
+	font-size:14px;
+}

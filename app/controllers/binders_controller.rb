@@ -709,8 +709,10 @@ class BindersController < ApplicationController
 								stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
 								stathash[:imgfile][:retrieved] = true
 
+								imgfile = FilelessIO.new(RestClient.get(@binder.current_version.file.url).to_s)
+								imgfile.original_filename = @binder.current_version.filename
 								# upload image
-								@binder.current_version.update_attributes( 	:remote_imgfile_url => @binder.current_version.file.url,
+								@binder.current_version.update_attributes( 	:imgfile => imgfile,
 																			:imgclass => 0,
 																			:imgstatus => stathash)
 

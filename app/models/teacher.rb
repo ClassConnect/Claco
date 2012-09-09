@@ -282,6 +282,8 @@ class Teacher
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
 
+				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s).deliver
+
 			end
 
 			auth.extra.delete("access_token")
@@ -299,6 +301,8 @@ class Teacher
 			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
+
+				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s).deliver
 
 			end
 

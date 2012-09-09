@@ -17,6 +17,22 @@ class AdminController < ApplicationController
 
 	end
 
+	def settings
+
+	end
+
+	def setfeatured
+
+		Setting.f("featured").v = params
+
+	end
+
+	def setfpfeatured
+
+		Setting.f("fpfeatured").v = params
+
+	end
+
 protected
 
 	def authenticate_admin

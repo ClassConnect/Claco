@@ -205,6 +205,10 @@ class HomeController < ApplicationController
 					break if @subsfeed.size == SUBSC_FEED_LENGTH
 				end
 			end
+		else
+
+			@featured = Setting.f("featured").v
+
 		end
 
 		rescue Errno::ECONNREFUSED

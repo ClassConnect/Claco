@@ -1,5 +1,6 @@
 class BindersController < ApplicationController
 	before_filter :authenticate_teacher!, :except => [:show, :index]
+	before_filter :find_binder, :only => [:show, :download, :regen, :update, :rename, :updatetags, :moveitem, :copyitem, :setpub, :destroy]
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -121,8 +122,6 @@ class BindersController < ApplicationController
 
 	def show
 
-		@binder = Binder.find(params[:id])
-
 		@owner = Teacher.find(@binder.owner)
 
 		@root = signed_in? ? current_teacher.binders.root_binders : []
@@ -140,8 +139,6 @@ class BindersController < ApplicationController
 			error = true
 			render "public/403.html", :status => 403 and return
 		end
-
-		#TODO: Verify permissions before rendering view
 
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
@@ -183,8 +180,6 @@ class BindersController < ApplicationController
 
 	def download
 
-		@binder = Binder.find(params[:id])
-
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
 		if !binder_routing_ok?(@binder, params[:action])
@@ -195,7 +190,6 @@ class BindersController < ApplicationController
 
 		# INCREMENT DOWNLOAD COUNT
 
-		#TODO: Verify permissions before rendering view
 		if @binder.format == 1
 
 			@binder.inc(:download_count, 1)
@@ -218,8 +212,6 @@ class BindersController < ApplicationController
 
 	def regen
 
-		@binder = Binder.find(params[:id])
-
 		@binder.regen
 
 		redirect_to named_binder_route(@binder)
@@ -233,48 +225,9 @@ class BindersController < ApplicationController
 
 	#Add links function
 	def createcontent
-		#TODO: if the URL is to a document, ask if they want to upload it as a document instead
-
-		################## URI REFERENCE - DO NOT DELETE! #####################
-
-
-		# require 'uri'
-
-		# uri = URI("http://foo.com/posts?id=30&limit=5#time=1305298413")
-		# #=> #<URI::HTTP:0x00000000b14880
-		#       URL:http://foo.com/posts?id=30&limit=5#time=1305298413>
-		# uri.scheme
-		# #=> "http"
-		# uri.host
-		# #=> "foo.com"
-		# uri.path
-		# #=> "/posts"
-		# uri.query
-		# #=> "id=30&limit=5"
-		# uri.fragment
-		# #=> "time=1305298413"
-
-		# uri.to_s
-		# #=> "http://foo.com/posts?id=30&limit=5#time=1305298413"
-
-
-		#######################################################################
-
-
-		#respcode = RestClient.get(params[:binder][:versions][:data]) { |response, request, result| response.code }.to_i
-	
-			# This will catch flawed URL structure, as well as bad HTTP response codes
-
-		# the RestClient object will catch most of the error codes before getting to here
-		#if ![200,301,302].include? respcode
-		#	raise "Invalud URL! Response code: #{respcode}" and return
-		#end
-
-		#@binder = Binder.new
-
+		
 		errors = []
 
-		#Trim to 60 chars (old spec)
 		if params[:webtitle].strip.length > 0
 
 			embed = false
@@ -495,8 +448,6 @@ class BindersController < ApplicationController
 
 	def update
 
-		@binder = Binder.find(params[:id])
-
 		errors = []
 
 		if params[:text] != "Type a note..."
@@ -535,8 +486,6 @@ class BindersController < ApplicationController
 
 	def rename
 
-		@binder = Binder.find(params[:id])
-
 		@binder.update_attributes(	:title				=> params[:newtitle][0..49],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
@@ -568,8 +517,6 @@ class BindersController < ApplicationController
 	end
 
 	def updatetags
-
-		@binder = Binder.find(params[:id])
 
 		#Rails.logger.debug params.to_s
 		#Rails.logger.debug params["standards"].to_s
@@ -720,18 +667,6 @@ class BindersController < ApplicationController
 					@binder.current_version.size = @binder.current_version.file.file.size
 					@binder.total_size = @binder.current_version.file.size
 
-					# @binder.current_version.update_attributes(#:file		=> CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{store_dir}/#{model.filename}"),
-					# 								:filename	=> params[:key].split("/").last,
-					# 								:file_hash	=> params[:etag].gsub("/", ""),
-					# 								:ext		=> File.extname(params[:key].split("/").last),
-					# 								:data		=> params[:data],
-					# 								# :size		=> params[:file].size,
-					# 								:timestamp	=> params[:time],
-					# 								:owner		=> current_teacher.id)#,
-													#:croc_uuid => filedata)
-
-
-
 					if @binder.save
 
 						Mongo.log(	current_teacher.id.to_s,
@@ -795,24 +730,6 @@ class BindersController < ApplicationController
 
 								Binder.delay(:queue => 'thumbgen').gen_smartnotebook_thumbnail(@binder.id)
 
-							# 	#This job should probably be delayed
-
-							# 	zip = Zip::ZipFile.open(params[:file].path)
-
-							# 	if !zip.find_entry('preview.png').nil?
-
-							# 		png = FilelessIO.new(zip.read('preview.png'))
-
-							# 		png.original_filename = 'preview.png'
-
-							# 		stathash = @binder.current_version.imgstatus
-							# 		stathash[:imgfile][:retrieved] = true
-
-							# 		@binder.current_version.update_attributes(:imgfile => png)
-
-							# 		Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
-							# 	end
-
 							end
 						else
 							stathash = @binder.current_version.imgstatus
@@ -862,11 +779,9 @@ class BindersController < ApplicationController
 			errors << "File Already in Database"
 
 		end
-		# rescue BSON::InvalidObjectId
-		# 	errors << "Invalid Request"
-		# rescue Mongoid::Errors::DocumentNotFound
-		# 	errors << "Invalid Request"
-		# ensure
+
+
+
 		if errors.empty?
 			redirect_to "#{named_binder_route(@inherited[:parent])}#rdir"
 		else
@@ -947,8 +862,6 @@ class BindersController < ApplicationController
 	def moveitem
 
 		errors = []
-
-		@binder = Binder.find(params[:id])
 
 		if params[:target] != params[:id]
 
@@ -1084,8 +997,6 @@ class BindersController < ApplicationController
 	def copyitem
 
 		errors = []
-
-		@binder = Binder.find(params[:id])
 
 		@inherited = inherit_from(params[:folid])
 
@@ -1408,22 +1319,8 @@ class BindersController < ApplicationController
 		redirect_to named_binder_route(@binder.parent["id"])
 	end
 
-	#Only owner can set permissions
-	# def permissions
-	# 	@binder = Binder.find(params[:id])
-
-	# 	render "public/403.html", :status => 403 and return if current_teacher.id.to_s != @binder.owner
-
-	# 	@title = "Permissions for #{@binder.title}"
-
-	# 	#To be replaced with current_teacher.colleagues
-	# 	@colleagues = Teacher.all.reject {|t| t == current_teacher}
-	# end
-
 	#This is so nasty.
 	def setpub
-
-		@binder = Binder.find(params[:id])
 
 		error = ""
 
@@ -1707,7 +1604,6 @@ class BindersController < ApplicationController
 
 	#More validation needed, Permissions
 	def destroy
-		@binder = Binder.find(params[:id])
 
 		errors = []
 
@@ -1800,20 +1696,10 @@ class BindersController < ApplicationController
 
 	end
 
-	# def seedbinder
-
-	# 	Binder.seedbinder(current_teacher.to_s) if !current_teacher.nil?
-
-	# 	redirect_to root_path
-
-	# end
-
-	def catcherr
-
-		# why in fuck's sake is the server trying to fetch a directory?
-		raise 'Bad Fetch'
-
+	def find_binder
+		@binder = Binder.find(params[:id])
 	end
+
 
 	###############################################################################################
 
@@ -1826,12 +1712,6 @@ class BindersController < ApplicationController
 							#    #  ##### ##### #      ##### #    #  ####
 
 	###############################################################################################
-
-	# def get_youtube_url(url)
-
-	# 	return "http://img.youtube.com/vi/#{CGI.parse(URI.parse(url).query)['v'].first.to_s}/0.jpg"
-
-	# end
 
 	module Mongo
 		extend self

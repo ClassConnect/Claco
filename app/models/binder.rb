@@ -87,35 +87,6 @@ class Binder
 
 	embeds_one :imageset
 
-	# passed the index to sift above
-	# decrement all binders with an index >= that index
-	# def sift_children(index)
-
-	# 	Binder.where("parent.id" => self.id).reject { |b| b.order_index < index }.each do |c|
-
-	# 		c.update_attributes( :order_index => c.order_index - 1)
-	# 		c.save
-
-	# 	end
-
-	# end
-
-
-	def self.seedbinder(id)
-
-		a = Binder.new
-
-		a.update_attributes( 	:owner => id.to_s,
-								:parent => { :id => "0", :title => "" },
-								:parents => [{ :id => "0", :title => "" }],
-								:title => "seed binder",
-								:type => 1,
-								:last_update => Time.now)
-
-		a.save
-
-	end
-
 	# returns array of URLs of images, in order of size
 	def self.get_folder_array(id)
 

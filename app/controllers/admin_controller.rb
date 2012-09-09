@@ -21,9 +21,17 @@ class AdminController < ApplicationController
 
 	end
 
+	def choosefeatured
+
+	end
+
 	def setfeatured
 
 		Setting.f("featured").v = params
+
+	end
+
+	def choosefpfeatured
 
 	end
 

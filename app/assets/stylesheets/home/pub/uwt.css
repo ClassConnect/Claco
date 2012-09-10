@@ -48,5 +48,75 @@
 }
 
 .whitebox .exp {
+	margin-top:5px;
 	font-size:14px;
+}
+
+.whitebox .sharelinks {
+	width:350px;
+	border:3px dotted #ddd;
+	float:right;
+	margin-top:10px;
+	padding:10px 10px 0 10px;
+	height:35px;
+	margin-top:18px !important;
+	-webkit-border-radius: 6px;
+       -moz-border-radius: 6px;
+            border-radius: 6px;
+}
+
+#joinbtn {
+	margin-left:10px;
+	margin-top:17px;
+	padding: 15px 50px;
+	font-weight:bolder;
+	font-size:16px;
+}
+
+
+.whitebox .divvr {
+	margin-top:75px;
+	margin-bottom:50px;
+}
+
+.whitebox .divvr .lineleft{
+	border:1px solid #F1F1F1;
+	width:400px;
+	float:left;
+}
+
+.whitebox .divvr .lineright{
+	border:1px solid #F1F1F1;
+	width:400px;
+	float:right;
+}
+
+.whitebox .divvr .heart{
+	float:left;
+	font-size:100px;
+	padding-left:20px;
+	margin-top:-5px;
+	color:#F1F1F1;
+}
+
+
+.whitebox .imgr {
+	background:#fff;
+	padding:10px;
+	border:1px solid #eee;
+	-webkit-border-radius: 4px;
+       -moz-border-radius: 4px;
+            border-radius: 4px;
+}
+
+.whitebox .imgr img{
+	-webkit-border-radius: 2px;
+       -moz-border-radius: 2px;
+            border-radius: 2px;
+}
+
+.whitebox .mid {
+	width:250px;
+	float:left;
+	margin-left:20px;
 }

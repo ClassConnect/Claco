@@ -1,2 +1,93 @@
-<h2>app/views/applicants/<%= params[:action] %></h2>
-<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "home/pub/about", :media => "all" %>
+<% end %>
+
+<div class="splashback">
+	<div class="container">
+
+		<div class="tagline">
+			Find & build great resources. Save time. Increase impact.<br /><br />
+			Meet your new learning network.
+		</div>
+
+
+		<div class="sectr">
+
+			<div class="imgbox" style="float:left;margin-right:30px">
+				<%= image_tag('public/product/new.png', :style => "") %>
+			</div>
+
+			<div class="text">
+				<div class="headtext">
+					Collaborate with educators across the hall or across the globe.
+				</div>
+
+				Find the best educators or bring along your own.
+			</div>
+
+
+			<div style="clear:both"></div>
+
+		</div>
+
+
+
+		<div class="sectr">
+
+			<div class="imgbox" style="float:right;margin-left:30px">
+				<%= image_tag('public/product/new.png', :style => "") %>
+			</div>
+
+			<div class="text">
+				<div class="headtext">
+					One place to store all of your resources.
+				</div>
+
+				Find the best educators or bring along your own.
+			</div>
+
+
+			<div style="clear:both"></div>
+
+		</div>
+
+
+
+		<div class="sectr">
+
+			<div class="imgbox" style="float:left;margin-right:30px">
+				<%= image_tag('public/product/new.png', :style => "") %>
+			</div>
+
+			<div class="text">
+				<div class="headtext">
+					One click to share with students, parents, and colleagues.
+				</div>
+
+				Find the best educators or bring along your own.
+			</div>
+
+
+			<div style="clear:both"></div>
+
+		</div>
+
+
+
+
+
+
+
+		<div class="buttoners">
+			<div class="hearter">We <span style="font-size:50px; color:#F70808">♥</span> educators!</div>
+			<a href="/unitedweteach" class="btn">Learn about the movement</a>
+			<a href="/about/team" class="btn">Our team</a>
+			<a href="/apply" class="btn btn-success" style="margin-right:0px">Request a beta invite</a>
+		</div>
+
+
+
+
+
+	</div>
+</div>

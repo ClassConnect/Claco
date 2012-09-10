@@ -1,9 +1,13 @@
 <% if signed_in? %>
 
-<%= render 'home/loggedin' %>
+	<%= render 'home/loggedin' %>
 
 <% else %>
 
-<%= render 'home/public' %>
+	<% #cache('publichome') %>
+
+		<%= render 'home/public' %>
+
+	<% #end %>
 
 <% end %>

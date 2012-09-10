@@ -21,23 +21,27 @@ class AdminController < ApplicationController
 
 	end
 
-	def choosefeatured
-
-	end
-
 	def setfeatured
 
-		Setting.f("featured").v = params
+		Setting.f("featured").v = [] if Setting.f("featured").v.nil?
 
-	end
+		Setting.f("featured").v = Setting.f("featured").v << params[:binder]
 
-	def choosefpfeatured
+		redirect_to "/admin"
 
 	end
 
 	def setfpfeatured
 
-		Setting.f("fpfeatured").v = params
+		Setting.f("fpfeatured").v = [] if Setting.f("fpfeatured").v.nil?
+
+		Setting.f("fpfeatured").v = Setting.f("fpfeatured").v << {	"top" => params[:binder1],
+																	"bot" => params[:binder2],
+																	"time" => Time.now.to_i}
+
+		# expire_fragment('publichome')
+
+		redirect_to "/admin"
 
 	end
 

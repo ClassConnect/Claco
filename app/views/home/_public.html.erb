@@ -39,28 +39,27 @@
 
 				<div class="feedster">
 
+					<% (Setting.f("fpfeatured").v.nil? ? [] : [Binder.find(Setting.f("fpfeatured").v.last["top"]), Binder.find(Setting.f("fpfeatured").v.last["bot"])]).each do |binder| %>
 					<div class="itemwrap">
 						<div class="imgarea">
-							<a href="#">
-								<img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" />
+							<a href="/<%= binder.find_owner.username %>">
+								<img src="<%= binder.find_owner.info.avatar.thumb_md %>" />
 							</a>
 						</div>
 
 
 						<div class="namester">
-							<a href="#">Jordan Hamel</a> posted to <a href="#">DES S1</a>
+							<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(binder.root, named_binder_route(binder.parent["id"])) %>
 						</div>
 
 						<div class="contentitem">
 							<div class="preview">
-								<a href="#">
-									<img src="http://img.cla.co/6ab1760d02d5e32baccd7bfe9ff6bf7c/thumb_lg.png" />
-								</a>
+								<%= link_to(image_tag(get_binder_image(binder)), named_binder_route(binder)) %>
 							</div>
 
 
 							<div class="contitle">
-								<a href="#">Flat Classroom Project NS and Albert Pai</a>
+								<%= link_to(binder.title, named_binder_route(binder)) %>
 							</div>
 
 
@@ -68,37 +67,7 @@
 							<div style="clear:both"></div>
 						</div>
 					</div>
-
-
-					<div class="itemwrap">
-						<div class="imgarea">
-							<a href="#">
-								<img src="http://img.cla.co/0b633282bfe561a3b9a9cc9669eb2706/thumb_md.png" />
-							</a>
-						</div>
-
-
-						<div class="namester">
-							<a href="#">Jordan Hamel</a> posted to <a href="#">DES S1</a>
-						</div>
-
-						<div class="contentitem">
-							<div class="preview">
-								<a href="#">
-									<img src="http://img.cla.co/6ab1760d02d5e32baccd7bfe9ff6bf7c/thumb_lg.png" />
-								</a>
-							</div>
-
-
-							<div class="contitle">
-								<a href="#">Flat Classroom Project NS and Albert Pai</a>
-							</div>
-
-
-
-							<div style="clear:both"></div>
-						</div>
-					</div>
+					<% end %>
 
 				</div>
 

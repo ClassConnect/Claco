@@ -1,9 +1,12 @@
 <h2>app/views/applicants/<%= params[:action] %></h2>
 <h2><%= params[:controller] %>#<%= params[:action] %></h2>
 <br />
-<%= form_tag :url => featured_path, :method => :post do %>
+<%= form_tag fpfeatured_path, :method => :post do %>
 
-	<%= label_tag :binder, "Featured Binder ID" %>
-	<%= text_field_tag :binder %>
-
+	<%= label_tag :binder1, "Top Binder ID" %>
+	<%= text_field_tag :binder1 %>
+	<%= label_tag :binder2, "Bottom Binder ID" %>
+	<%= text_field_tag :binder2 %>
+<br />
+<button type="submit">Change</button>
 <% end %>

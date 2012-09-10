@@ -205,10 +205,6 @@ class HomeController < ApplicationController
 					break if @subsfeed.size == SUBSC_FEED_LENGTH
 				end
 			end
-		else
-
-			@featured = Setting.f("featured").v
-
 		end
 
 		rescue Errno::ECONNREFUSED
@@ -290,6 +286,10 @@ class HomeController < ApplicationController
 
 	def tos
 		render "public/tos.html"#, :status => 200 and return
+	end
+
+	def invite
+		render "invite", :layout => false
 	end
 
 	def search

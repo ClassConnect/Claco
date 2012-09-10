@@ -343,6 +343,10 @@ class Binder
 		return versions.sort_by {|v| v.timestamp}.last
 	end
 
+	def find_owner
+		Teacher.find(owner)
+	end
+
 	def owner?(id)
 		return owner == id.to_s
 	end

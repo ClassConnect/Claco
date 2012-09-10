@@ -11,7 +11,7 @@
           <% if signed_in? %>
 
             <a href="/messages" class="btn top-notch-btn notch-nav">
-              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-2px") %>
+              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-3px") %>
               <% if current_teacher.get_unread_count != 0 %>
               <div class="notchNum"><%= current_teacher.get_unread_count %></div>
               <% end %>

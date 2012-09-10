@@ -268,6 +268,18 @@ class HomeController < ApplicationController
 		redirect_to "/auth/#{params[:provider]}"
 	end
 
+	def about
+		@title = "About"
+	end
+
+	def united
+		@title = "United We Teach"
+	end
+
+	def team
+		@title = "Team"
+	end
+
 	def privacy
 		render "public/legal.html"#, :status => 200 and return
 	end

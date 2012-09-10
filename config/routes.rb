@@ -105,6 +105,8 @@ Claco::Application.routes.draw do
 		#Subscribe/unsubscribe
 		put		'/:username/subscribe'																=> 'teachers#sub'
 		put		'/:username/unsubscribe'															=> 'teachers#unsub'
+		get		'/:username/subscribers'															=> 'teachers#subscribers'
+		get		'/:username/subscriptions'															=> 'teachers#subscriptions'
 
 		post	'/:username/message'																=> 'conversations#createmessage'
 

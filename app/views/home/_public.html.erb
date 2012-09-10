@@ -45,7 +45,7 @@
 
 
 						<div class="namester">
-							<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, :length => 40 - binder.find_owner.full_name.size, :omission => "..."), named_binder_route(binder.parent["id"])) %>
+							<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, :length => 30 - binder.find_owner.full_name.size, :omission => "..."), named_binder_route(binder.parent["id"])) %>
 						</div>
 
 						<div class="contentitem">

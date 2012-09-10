@@ -39,7 +39,7 @@ class AdminController < ApplicationController
 																	"bot" => params[:binder2],
 																	"time" => Time.now.to_i}
 
-		# expire_fragment('publichome')
+		expire_fragment('publichome')
 
 		redirect_to "/admin"
 

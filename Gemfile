@@ -19,6 +19,8 @@ group :assets do
   gem 'uglifier', '>= 1.0.3'
 end
 
+gem "asset_sync"
+
 # group :development do
 #   gem 'linecache19'#, '0.5.13'
 #   gem 'ruby-debug-base19'#, '0.11.26'

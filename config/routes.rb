@@ -41,6 +41,7 @@ Claco::Application.routes.draw do
 
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'
+	get		'/invite'														=> 'home#invite'
 
 	#################
 	# ADMIN ROUTING #

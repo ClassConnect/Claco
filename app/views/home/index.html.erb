@@ -3,11 +3,14 @@
 	<%= render 'home/loggedin' %>
 
 <% else %>
+	<% content_for :headcon do %>
+		<%= stylesheet_link_tag "home/public", :media => "all" %>
+	<% end %>
 
-	<% #cache('publichome') %>
+	<% cache('publichome') do %>
 
 		<%= render 'home/public' %>
 
-	<% #end %>
+	<% end %>
 
 <% end %>

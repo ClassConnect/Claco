@@ -1,7 +1,3 @@
-<% content_for :headcon do %>
-    <%= stylesheet_link_tag    "home/public", :media => "all" %>
-<% end %>
-
 <div class="splashback">
 	<div class="container">
 
@@ -49,7 +45,7 @@
 
 
 						<div class="namester">
-							<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(binder.root, named_binder_route(binder.parent["id"])) %>
+							<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, length => 50 - binder.find_owner.full_name.size), named_binder_route(binder.parent["id"])) %>
 						</div>
 
 						<div class="contentitem">

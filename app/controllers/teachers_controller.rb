@@ -452,6 +452,8 @@ class TeachersController < ApplicationController
 
 		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s)
 
+		render "subscribers", :layout => false
+
 	end
 
 	def subscriptions
@@ -459,6 +461,8 @@ class TeachersController < ApplicationController
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
 		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])} 
+
+		render "subscriptions", :layout => false
 
 	end
 

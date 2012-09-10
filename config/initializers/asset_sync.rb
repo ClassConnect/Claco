@@ -2,7 +2,7 @@ AssetSync.configure do |config|
   config.fog_provider = 'AWS'
   config.aws_access_key_id = 'AKIAIBZWYREXRVNLTJZQ'
   config.aws_secret_access_key = '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'
-  config.fog_directory = "cdn.cla.co"
+  config.fog_directory = "static.cla.co"
   
   # Increase upload performance by configuring your region
   # config.fog_region = 'eu-west-1'

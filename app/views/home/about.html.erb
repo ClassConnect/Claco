@@ -1,5 +1,5 @@
 <% content_for :headcon do %>
-    <%= stylesheet_link_tag    "home/pub/about", :media => "all" %>
+    <%= stylesheet_link_tag    asset_path("home/pub/about"), :media => "all" %>
 <% end %>
 
 <div class="splashback">
@@ -14,7 +14,7 @@
 		<div class="sectr">
 
 			<div class="imgbox" style="float:left;margin-right:30px">
-				<%= image_tag('public/product/prof1.png', :style => "") %>
+				<%= image_tag(asset_path('public/product/prof1.png'), :style => "") %>
 			</div>
 
 			<div class="text" style="margin-top:60px">
@@ -36,7 +36,7 @@
 		<div class="sectr">
 
 			<div class="imgbox" style="float:right;margin-left:30px">
-				<%= image_tag('public/product/binder.png', :style => "") %>
+				<%= image_tag(asset_path('public/product/binder.png'), :style => "") %>
 			</div>
 
 			<div class="text" style="margin-top:70px;padding-left:10px">
@@ -57,7 +57,7 @@
 		<div class="sectr">
 
 			<div class="imgbox" style="float:left;margin-right:30px">
-				<%= image_tag('public/product/share2.png', :style => "") %>
+				<%= image_tag(asset_path('public/product/share2.png'), :style => "") %>
 			</div>
 
 			<div class="text" style="margin-top:50px">

@@ -47,7 +47,7 @@ Claco::Application.configure do
   config.action_controller.asset_host = "http://static.cla.co"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-   config.assets.precompile += ['*.js', '*.css', '*.png', '*.jpg']
+  config.assets.precompile += ['*.js', '*.css', '*.woff', '*.ttf', '*.png', '*.jpg']
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false

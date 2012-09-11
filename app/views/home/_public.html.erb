@@ -36,64 +36,40 @@
 				<div class="feedster">
 
 					<% (Setting.f("fpfeatured").v.nil? ? [] : [Binder.find(Setting.f("fpfeatured").v.last["top"]), Binder.find(Setting.f("fpfeatured").v.last["bot"])]).each do |binder| %>
-					<div class="itemwrap">
-						<div class="imgarea">
-							<a href="/<%= binder.find_owner.username %>">
-								<img src="<%= binder.find_owner.info.avatar.thumb_md %>" />
-							</a>
-						</div>
-
-
-						<div class="namester">
-							<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, :length => 30 - binder.find_owner.full_name.size, :omission => "..."), named_binder_route(binder.parent["id"])) %>
-						</div>
-
-						<div class="contentitem">
-							<div class="preview">
-								<%= link_to(image_tag(get_binder_image(binder)), named_binder_route(binder)) %>
+						<div class="itemwrap">
+							<div class="imgarea">
+								<a href="/<%= binder.find_owner.username %>">
+									<img src="<%= binder.find_owner.info.avatar.thumb_md %>" />
+								</a>
 							</div>
 
 
-							<div class="contitle">
-								<%= link_to(binder.title, named_binder_route(binder)) %>
+							<div class="namester">
+								<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, :length => 30 - binder.find_owner.full_name.size, :omission => "..."), named_binder_route(binder.parent["id"])) %>
 							</div>
 
+							<div class="contentitem">
+								<div class="preview">
+									<%= link_to(image_tag(get_binder_image(binder)), named_binder_route(binder)) %>
+								</div>
 
 
-							<div style="clear:both"></div>
+								<div class="contitle">
+									<%= link_to(binder.title, named_binder_route(binder)) %>
+								</div>
+
+
+
+								<div style="clear:both"></div>
+							</div>
 						</div>
-					</div>
 					<% end %>
 
 				</div>
 
-
-
 			</div>
 
 		</div>
-
-
-
-<!--
-		<div class="vanitybox">
-			<img src="/assets/public/jerry.png" style="float:left" />
-
-			<img src="/assets/public/jennie.jpeg" class="smaller" />
-
-			<img src="/assets/public/jeff.jpg" class="smaller" />
-
-		</div>
-
-		<div class="applybox">
-			<div style="color:#666;font-size:16px; margin-bottom:20px">
-				Find and build curriculum with great educators<br />just like you.
-			</div>
-
-			<a href="/apply" id="apply-btn" class="btn">Request a beta invite</a>
-		</div>
-
-	-->
 
 	</div>
 </div>

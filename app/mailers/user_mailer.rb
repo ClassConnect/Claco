@@ -38,7 +38,7 @@ class UserMailer < ActionMailer::Base
 		@recipient = recipient
 
 		@pre = "Woah - you have a new message!"
-		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a> sent you a <a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">message</a>'
+		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a>'
 		@omission = '<a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">view full message</a>'
 		@limg = @sender.info.avatar.url
 		@body = @message.body.rstrip

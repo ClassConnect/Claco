@@ -281,15 +281,15 @@ class HomeController < ApplicationController
 	end
 
 	def privacy
+		@title = "Privacy Policy"
+
 		render "public/legal.html"#, :status => 200 and return
 	end
 
 	def tos
-		render "public/tos.html"#, :status => 200 and return
-	end
+		@title = "Terms of Service"
 
-	def invite
-		render "invite", :layout => false
+		render "public/tos.html"#, :status => 200 and return
 	end
 
 	def search

@@ -6,7 +6,7 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
-    if params[:key].nil? || params[:key].empty?
+    if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
       redirect_to root_path
     else
       if Ns.where(:code => params[:key]).first.active

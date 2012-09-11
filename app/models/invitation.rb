@@ -4,6 +4,7 @@ class Invitation
 	field :to, :type => String #Email
 	field :from, :type => String #Id
 	field :code, :type => String
+	field :submitted, :type => Integer
 	field :sent_at, :type => Integer
 	field :status, :type => Hash, :default => {	"sent"		=> false,
 												"clicked"	=> false,

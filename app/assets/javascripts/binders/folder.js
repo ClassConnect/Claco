@@ -473,6 +473,7 @@ function editInit() {
 
 
         if (isDropped == false) {
+          dontPjax = true;
           olist = [];
           // save these changes
 

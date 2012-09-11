@@ -143,7 +143,7 @@
 			            <div class="reflink">
 
 			            	<% if binder.type == 1 %>
-			            		<%= image_types "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+			            		<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
 
 			            	<% elsif binder.format == 2  && !binder.current_version.embed %>
 

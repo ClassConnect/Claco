@@ -185,7 +185,7 @@ class TeachersController < ApplicationController
 
 						c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
-						if (subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == current_teacher.id.to_s)
+						if (subs.include? f[:ownerid].to_s) || (signed_in? ? (f[:ownerid].to_s == current_teacher.id.to_s) : false )
 							
 							#debugger
 							if c < 10

@@ -153,7 +153,7 @@ function togglePickFolder(fObj) {
 					daDirWrap.append('<div class="dir" folid="' + val['id'] + '" turl="' + val['path'] + '">\
                 <div class="arrow-right" onclick="togglePickFolder(this)"></div>\
                 <span class="dirtitle" onclick="selectPickFolder(this)">\
-                  <img src="/assets/binders/folder.png" class="foldicon" />\
+                  <img src="<%= asset_path "binders/folder.png" %>" class="foldicon" />\
                   ' + val['name'] + '\
                 </span>\
                 <div class="dirWrap"></div>\

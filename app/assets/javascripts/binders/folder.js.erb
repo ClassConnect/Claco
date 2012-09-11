@@ -57,7 +57,7 @@ $(document).on('pjax:start', function() {
   }
   
   // show loading
-  initAsyc('<img src=\'/assets/miniload.gif\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
+  initAsyc('<img src=\'<%= asset_path "miniload.gif" %>\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
 
 }).on('pjax:end',   function() {
   destroyAsyc();
@@ -720,7 +720,7 @@ function popForm(formID, obje) {
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Copied successfully!');
+            initAsyc('<img src=\'<%= asset_path "success.png"%>\' style=\'float:left; margin-right:15px;\' /> Copied successfully!');
             setTimeout(function() {destroyAsyc();},1500);
 
 
@@ -762,7 +762,7 @@ function popForm(formID, obje) {
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Snapped successfully!');
+            initAsyc('<img src=\'<%= asset_path "success.png"%>\' style=\'float:left; margin-right:15px;\' /> Snapped successfully!');
             setTimeout(function() {destroyAsyc();},1500);
 
 
@@ -798,7 +798,7 @@ function popForm(formID, obje) {
         success: function(retData) {
           if (retData == 1) {
             closefBox();
-            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
+            initAsyc('<img src=\'<%= asset_path "success.png"%>\' style=\'float:left; margin-right:15px;\' /> Moved successfully!');
             setTimeout(function() {destroyAsyc();},1500);
             obje.css('opacity', 1).slideUp(500).animate({ opacity: 0 },{ queue: false, duration: 500});
 

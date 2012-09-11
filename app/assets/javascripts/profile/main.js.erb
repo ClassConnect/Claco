@@ -233,7 +233,7 @@ function popForm(formID, obje) {
         success: function(retData) {
           if (retData == 1) {
 
-            initAsyc('<img src=\'/assets/success.png\' style=\'float:left; margin-right:15px;\' /> Message sent successfully!');
+            initAsyc('<%= image_tag "success.png", :style => "float:left; margin-right:15px;" %> Message sent successfully!');
             setTimeout(function() {destroyAsyc();},1500);
 
             closefBox();

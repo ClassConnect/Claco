@@ -67,7 +67,7 @@ class TeachersController < ApplicationController
 
 
 		# pull the current teacher's subscription IDs
-		subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+		subs = signed_in? ? (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } : []
 
 
 		logs = Tire.search 'logs' do |search|

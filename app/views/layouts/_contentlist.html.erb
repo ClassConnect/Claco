@@ -182,12 +182,12 @@
 						        </div>
 
 			            	<% else %>
-
-				            	<button class="btn snapbtn">
-									<%= image_tag "binders/snap.png" %>
-									<div class="texter">Snap</div>
-								</button>
-
+			            		<% if signed_in? %>
+					            	<button class="btn snapbtn">
+										<%= image_tag "binders/snap.png" %>
+										<div class="texter">Snap</div>
+									</button>
+								<% end %>
 					        <% end %>
 
 			            </div>

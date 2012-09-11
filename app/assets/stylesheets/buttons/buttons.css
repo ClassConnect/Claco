@@ -13,11 +13,11 @@ Enjoy
 	font-family: 'zocial';
 	font-style: normal;
 	font-weight: normal;
-	src: url('zocial-regular-webfont.eot');
-	src: url('zocial-regular-webfont.eot?#iefix') format('embedded-opentype'),
-		url('zocial-regular-webfont.woff') format('woff'),
-		url('zocial-regular-webfont.ttf') format('truetype'),
-		url('zocial-regular-webfont.svg#ZocialRegular') format('svg');
+	src: url('http://www.claco.com/zocial-regular-webfont.eot');
+	src: url('http://www.claco.com/zocial-regular-webfont.eot?#iefix') format('embedded-opentype'),
+		url('http://www.claco.com/zocial-regular-webfont.woff') format('woff'),
+		url('http://www.claco.com/zocial-regular-webfont.ttf') format('truetype'),
+		url('http://www.claco.com/zocial-regular-webfont.svg#ZocialRegular') format('svg');
 	unicode-range:U+0-U+10FFFF;
 }
 

@@ -675,7 +675,7 @@ class BindersController < ApplicationController
 
 					@binder.current_version.file.store!(CarrierWave::Storage::Fog::File.new(@binder.current_version.file, CarrierWave::Storage::Fog.new(@binder.current_version.file), params[:key]))
 
-					@binder.current_version.size = @binder.current_version.file.file.size
+					@binder.current_version.size = @binder.current_version.file.size
 					@binder.total_size = @binder.current_version.size
 
 					if @binder.save

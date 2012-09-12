@@ -35,6 +35,11 @@ class RegistrationsController < Devise::RegistrationsController
     if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
 
       Ns.where(:code => params[:teacher][:code]).first.use
+      i = Invitation.where(:code => params[:teacher][:code]).first
+      unless i.nil?
+        i.status["signed_up"] = true
+        i.save
+      end
 
       if resource.active_for_authentication?
         set_flash_message :notice, :signed_up if is_navigational_format?

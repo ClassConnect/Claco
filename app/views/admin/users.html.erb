@@ -6,18 +6,22 @@
 <td>Name</td>
 <td>Username</td>
 <td>Email</td>
-<td></td>
-<td></td>
-<td></td>
+<td>Beta Code</td>
+<td>Registered At</td>
+<td>Sign ins</td>
+<td>Last Signin</td>
+<td>Binder Count</td>
 </tr>
 <% @teachers.each do |teacher| %>
 <tr>
 <td><%= teacher.full_name %></td>
 <td><a href="/<%= teacher.username %>"><%= teacher.username %></a></td>
 <td><%= teacher.email %></td>
-<td></td>
-<td></td>
-<td></td>
+<td><%= teacher.code %></td>
+<td><%= teacher.registered_at %></td>
+<td><%= teacher.sign_in_count %></td>
+<td><%= teacher.current_sign_in_at %></td>
+<td><%= teacher.binders.where(:"parent.id".ne => "-1").count %></td>
 </tr>
 <% end %>
 </table>

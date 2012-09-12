@@ -1,6 +1,5 @@
 class BindersController < ApplicationController
 	before_filter :authenticate_teacher!, :except => [:show, :index]
-	before_filter :find_binder, :only => [:show, :download, :regen, :update, :rename, :updatetags, :moveitem, :copyitem, :setpub, :destroy]
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -122,6 +121,8 @@ class BindersController < ApplicationController
 
 	def show
 
+		@binder = Binder.find(params[:id])
+
 		@owner = Teacher.find(@binder.owner)
 
 		@root = signed_in? ? current_teacher.binders.root_binders : []
@@ -180,6 +181,8 @@ class BindersController < ApplicationController
 
 	def download
 
+		@binder = Binder.find(params[:id])
+
 		@access = teacher_signed_in? ? @binder.get_access(current_teacher.id) : 0
 
 		if !binder_routing_ok?(@binder, params[:action])
@@ -211,6 +214,8 @@ class BindersController < ApplicationController
 	end
 
 	def regen
+
+		@binder = Binder.find(params[:id])
 
 		@binder.regen
 
@@ -448,6 +453,8 @@ class BindersController < ApplicationController
 
 	def update
 
+		@binder = Binder.find(params[:id])
+
 		errors = []
 
 		if params[:text] != "Type a note..."
@@ -486,6 +493,8 @@ class BindersController < ApplicationController
 
 	def rename
 
+		@binder = Binder.find(params[:id])
+
 		@binder.update_attributes(	:title				=> params[:newtitle][0..49],
 									:last_update		=> Time.now.to_i,
 									:last_updated_by	=> current_teacher.id.to_s)
@@ -517,6 +526,8 @@ class BindersController < ApplicationController
 	end
 
 	def updatetags
+
+		@binder = Binder.find(params[:id])
 
 		#Rails.logger.debug params.to_s
 		#Rails.logger.debug params["standards"].to_s
@@ -865,6 +876,8 @@ class BindersController < ApplicationController
 
 		errors = []
 
+		@binder = Binder.find(params[:id])
+
 		if params[:target] != params[:id]
 
 			src = Mongo.log(current_teacher.id.to_s,
@@ -999,6 +1012,8 @@ class BindersController < ApplicationController
 	def copyitem
 
 		errors = []
+
+		@binder = Binder.find(params[:id])
 
 		@inherited = inherit_from(params[:folid])
 
@@ -1326,6 +1341,8 @@ class BindersController < ApplicationController
 
 		error = ""
 
+		@binder = Binder.find(params[:id])
+
 		# read/write access
 		if @binder.get_access(current_teacher.id.to_s) == 2
 
@@ -1609,6 +1626,8 @@ class BindersController < ApplicationController
 
 		errors = []
 
+		@binder = Binder.find(params[:id])
+
 		if @binder.get_access(current_teacher.id.to_s == 2)
 
 			# preserve parent ID before writing over
@@ -1696,10 +1715,6 @@ class BindersController < ApplicationController
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
 			end
 
-	end
-
-	def find_binder
-		@binder = Binder.find(params[:id])
 	end
 
 

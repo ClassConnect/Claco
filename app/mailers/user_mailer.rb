@@ -57,18 +57,18 @@ class UserMailer < ActionMailer::Base
 
 	def new_invite(invitation)
 
-		@sender = Teacher.find(invitation)
+		if invitation.sender == "0"
 
-		@pre = ""
-		@head = ""
-		@omission = ""
-		@limg = @sender.info.avatar.url
+			@link = "http://www.claco.com/join?key=#{invitation.code}"
 
-		@html_safe = false
+			invitation.status["sent"] = true
 
-		mail(:to => invitation.to, :subject => "FYI - #{@sender.first_last} sent you a message") do |format|
-			format.html {render "message_email"}
-		end		
+			invitation.save
+
+			mail(:to => invitation.to, :subject => "Your Claco Invite") do |format|
+				format.html {render "system_invite"}
+			end
+		end
 
 	end
 

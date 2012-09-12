@@ -5,6 +5,20 @@ class AdminController < ApplicationController
 
 	end
 
+	def sendinvite
+
+		Invitation.new(	:from => "0",
+						:to => params[:to],
+						:submitted => Time.now.to_i)
+
+	end
+
+	def invites
+
+		@invites = Invitation.all
+
+	end
+
 	def viewapps
 
 		@apps = Applicant.all

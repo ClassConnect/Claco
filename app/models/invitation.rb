@@ -34,6 +34,12 @@ class Invitation
 
 	end
 
+	after_create do
+
+		Invitation.delay(:queue => "email").blast(self.id)
+
+	end
+
 	#Delayed methods
 	def self.blast(id)
 
@@ -45,11 +51,12 @@ class Invitation
 
 	end
 
+	#Not used
 	def self.update_status(id, status, value)
 
 		invitation = Invitation.find(id)
 
-		invitation.status[status] = true
+		invitation.status[status] = value
 
 		invitation.save
 

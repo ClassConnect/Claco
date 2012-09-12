@@ -12,6 +12,11 @@ class RegistrationsController < Devise::RegistrationsController
       if Ns.where(:code => params[:key]).first.active
         resource = build_resource({})
         resource.code = params[:key]
+        i = Invitation.where(:code => params[:key]).first
+        unless i.nil?
+          i.status["clicked"] = true
+          i.save
+        end
         respond_with resource
       else
         redirect_to root_path

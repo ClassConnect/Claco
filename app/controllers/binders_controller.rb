@@ -673,11 +673,11 @@ class BindersController < ApplicationController
 					@binder.current_version.file.key = params[:key]
 					# @binder.current_version.remote_file_url = @binder.current_version.file.direct_fog_url # THIS FKIN LINE
 
-					# fogfile = CarrierWave::Storage::Fog::File.new(@binder.current_version.file, CarrierWave::Storage::Fog.new(@binder.current_version.file), params[:key])
+					# CarrierWave::Storage::Fog::File.new(@binder.current_version.file, CarrierWave::Storage::Fog.new(@binder.current_version.file), params[:key])
 
-					@binder.current_version.file.retrieve!(params[:key])
-
-					@binder.current_version.size = @binder.current_version.file.size
+					# @binder.current_version.file.retrieve_from_store!(params[:key])
+					# debugger
+					@binder.current_version.size = CarrierWave::Storage::Fog::File.new(@binder.current_version.file, CarrierWave::Storage::Fog.new(@binder.current_version.file), params[:key]).size
 					@binder.total_size = @binder.current_version.size
 
 					if @binder.save

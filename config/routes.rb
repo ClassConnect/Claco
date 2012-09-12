@@ -48,12 +48,15 @@ Claco::Application.routes.draw do
 	#################
 
 	get		'/admin'														=> 'admin#index'
-	get		'/admin/viewapps'												=> 'admin#viewapps'
-	get		'/admin/viewusers'												=> 'admin#viewusers'
+	get		'/admin/apps'													=> 'admin#apps'
+	get		'/admin/users'													=> 'admin#users'
 	get		'/admin/fpfeatured'												=> 'admin#choosefpfeatured',	:as => 'fpfeatured'
 	post	'/admin/fpfeatured'												=> 'admin#setfpfeatured'
 	get		'/admin/featured'												=> 'admin#choosefeatured',		:as => 'featured'
 	post	'/admin/featured'												=> 'admin#setfeatured'
+	# get		'/admin/invite'													=> 'admin#invite'
+	# post	'/admin/sendinvite'												=> 'admin#sendinvite'
+	# get		'/admin/invites'												=> 'admin#invites'
 
 	##################
 	# TEACHER ROUTING#

@@ -1,15 +1,13 @@
 class AdminController < ApplicationController
 	before_filter :authenticate_admin
 
-	def index
-
-	end
-
 	def sendinvite
 
 		Invitation.new(	:from => "0",
 						:to => params[:to],
-						:submitted => Time.now.to_i)
+						:submitted => Time.now.to_i).save
+
+		redirect_to "/admin"
 
 	end
 
@@ -19,13 +17,13 @@ class AdminController < ApplicationController
 
 	end
 
-	def viewapps
+	def apps
 
 		@apps = Applicant.all
 
 	end
 
-	def viewusers
+	def users
 
 		@teachers = Teacher.all
 

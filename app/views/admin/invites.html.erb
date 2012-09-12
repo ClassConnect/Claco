@@ -1,0 +1,20 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<table>
+<tr>
+<td>Sent By</td>
+<td>To</td>
+<td>Application</td>
+<td>Timestamp</td>
+<td>Status</td>
+</tr>
+<% @invitations.each do |invitation| %>
+<tr>
+<td><%= invitation.from == "0" ? "System" : "" %></td>
+<td><%= invitation.to %></td>
+<td><%= invitation.status %></td>
+<td><%= invitation.timestamp %></td>
+<td><%= invitation.status %></td>
+</tr>
+<% end %>
+</table>

@@ -57,7 +57,7 @@ class UserMailer < ActionMailer::Base
 
 	def new_invite(invitation)
 
-		if invitation.sender == "0"
+		if invitation.from == "0"
 
 			@link = "http://www.claco.com/join?key=#{invitation.code}"
 
@@ -65,9 +65,14 @@ class UserMailer < ActionMailer::Base
 
 			invitation.save
 
-			mail(:to => invitation.to, :subject => "Your Claco Invite") do |format|
+			mail(:to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
 				format.html {render "system_invite"}
 			end
+
+		else
+
+			
+
 		end
 
 	end

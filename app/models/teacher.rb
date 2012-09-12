@@ -589,7 +589,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
-	field :location,			:type => Array, :default => []
+	field :location,			:type => Array
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 

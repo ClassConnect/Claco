@@ -281,7 +281,7 @@ class TeachersController < ApplicationController
 												:city			=> params[:info][:fulllocation].split(', ').first || "",
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",
-												:location		=> [params[:lng].to_f, params[:lat].to_f],
+												:location		=> params[:lng].empty? || params[:lat].empty? ? nil : [params[:lng].to_f, params[:lat].to_f],
 												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size)
 
 		altparams = nil

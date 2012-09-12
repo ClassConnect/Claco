@@ -4,14 +4,13 @@
 
 <div class="errorBox"></div>
 
-<form action="#" class="bodcon">
+<%= form_tag "/invite", {:method => :post, :class => "bodcon"} do %>
   <div class="conitem" style="padding-left:10px">
-    <input name="col1" style="width:260px" type="text" placeholder="1st colleague's email address" />
-    <input name="col2" style="width:260px" type="text" placeholder="2nd colleague's email address" />
-    <input name="col3" style="width:260px" type="text" placeholder="3rd colleague's email address" />
-    <input name="col4" style="width:260px" type="text" placeholder="4th colleague's email address" />
-    <input name="col5" style="width:260px" type="text" placeholder="5th colleague's email address" />
-
+    <%= email_field_tag "invite[]", "#{@invitations[0]}", {:style => "width:260px", :placeholder => "1st colleague's email address"} %>
+    <%= email_field_tag "invite[]", "#{@invitations[1]}", {:style => "width:260px", :placeholder => "2nd colleague's email address"} %>
+    <%= email_field_tag "invite[]", "#{@invitations[2]}", {:style => "width:260px", :placeholder => "3rd colleague's email address"} %>
+    <%= email_field_tag "invite[]", "#{@invitations[3]}", {:style => "width:260px", :placeholder => "4th colleague's email address"} %>
+    <%= email_field_tag "invite[]", "#{@invitations[4]}", {:style => "width:260px", :placeholder => "5th colleague's email address"} %>
   </div>
 
   <div class="buttonbar">
@@ -19,4 +18,4 @@
      <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
   </div>
 
-</form>
+<% end %>

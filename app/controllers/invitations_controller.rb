@@ -9,18 +9,26 @@ class InvitationsController < ApplicationController
 
 	def create
 
-		inv = Invitation.new(	:from	=> current_teacher.id.to_s,
-								:to		=> params[:to])
+		emails = params[:invite]
 
-		if inv.save
+		emails.each do |email|
 
-			Invitation.delay(:queue => "email").blast(inv.id)
+			inv = Invitation.new(	:from	=> current_teacher.id.to_s,
+									:to		=> email)
 
-		else
+			if inv.save
+
+				Invitation.delay(:queue => "email").blast(inv.id.to_s)
+
+			else
 
 
+
+			end
 
 		end
+
+		redirect_to root_path
 
 	end
 

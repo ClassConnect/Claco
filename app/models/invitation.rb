@@ -10,6 +10,7 @@ class Invitation
 												"clicked"	=> false,
 												"signed_up"	=> false}
 
+	validates_format_of :to, :with => /\A[^@]+@([^@\.]+\.)+[^@\.]+\z/
 
 	#should only be called in a delayed method
 	def getcode

@@ -60,8 +60,8 @@
 					<% if !imgarr[1].nil? && !imgarr[1].empty? %>
 
 					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= imgarr[1] %> />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? "/assets/common/nothumb.png" : imgarr[2] %> />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? "/assets/common/nothumb.png" : imgarr[3] %> />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? asset_path("common/nothumb.png") : imgarr[2] %> />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? asset_path("common/nothumb.png") : imgarr[3] %> />
 
 					<% end %>
 

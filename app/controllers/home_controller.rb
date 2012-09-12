@@ -17,6 +17,8 @@ class HomeController < ApplicationController
 
 		if signed_in?
 
+			@invcount = Invitation.where(:from => current_teacher.id.to_s).count
+
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)

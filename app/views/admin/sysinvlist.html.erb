@@ -1,0 +1,20 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<table>
+<tr>
+<td>Email</td>
+<td>Invited?</td>
+<td>Invitation sent at</td>
+<td>Send Invitation</td>
+</tr>
+<% 
+@invs.each do |inv| %>
+<tr>
+<td><%= inv["email"] %></td>
+<td><%= inv["invited"] %></td>
+<td><%= inv["invited_at"] %></td>
+<td></td>
+</tr>
+<% end %>
+</table>

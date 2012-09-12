@@ -18,7 +18,8 @@ class InvitationsController < ApplicationController
 
 			if inv.save
 
-				Invitation.delay(:queue => "email").blast(inv.id.to_s)
+				redirect_to root_path
+				# Invitation.delay(:queue => "email").blast(inv.id.to_s)
 
 			else
 
@@ -28,7 +29,6 @@ class InvitationsController < ApplicationController
 
 		end
 
-		redirect_to root_path
 
 	end
 

@@ -17,6 +17,12 @@ class AdminController < ApplicationController
 
 	end
 
+	def showinv
+
+		@invite = Invitation.find(params[:id])
+
+	end
+
 	def apps
 
 		@apps = Applicant.all
@@ -29,7 +35,9 @@ class AdminController < ApplicationController
 
 	end
 
-	def settings
+	def sysinvlist
+
+		@invs = Setting.f("sys_inv_list")
 
 	end
 

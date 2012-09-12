@@ -5,20 +5,22 @@
 <td>Sent By</td>
 <td>To</td>
 <td>Status</td>
-<td>Timestamp</td>
-<td>Status</td>
+<td>Submitted</td>
+<td>Email sent</td>
+<td>Details</td>
 </tr>
-<% @invitations.each do |invitation| %>
+<% @invites.each do |invitation| %>
 <tr>
-<td><%= invitation.from == "0" ? "System" : "" %></td>
+<td><%= invitation.from == "0" ? "System" : invitation.from %></td>
 <td><%= invitation.to %></td>
 <td>
 <% invitation.status.each do |x,y| %>
-
+	<%= "#{x}: #{y}<br />".html_safe %>
 <% end %>
 </td>
-<td><%= invitation.timestamp %></td>
-<td><%= invitation.status %></td>
+<td><%= invitation.submitted %></td>
+<td><%= invitation.sent_at %></td>
+<td><%= link_to("Details", "/admin/invite/#{invitation.id.to_s}") %></td>
 </tr>
 <% end %>
 </table>

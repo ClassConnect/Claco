@@ -1,0 +1,29 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<table>
+	<tr>
+		<td>Sent By:</td>
+		<td><%= @invite.from == "0" ? "System" : "" %></td>
+	</tr>
+	<tr>
+		<td>Sent to:</td>
+		<td><%= @invite.to %></td>
+	</tr>
+	<tr>
+		<td>Status:</td>
+		<td>
+			<% @invite.status.each do |x,y| %>
+				<%= "#{x}: #{y}<br />".html_safe %>
+			<% end %>
+		</td>
+	</tr>
+	<tr>
+		<td>Submitted at:</td>
+		<td><%= @invite.submitted %></td>
+	</tr>
+	<tr>
+		<td>Email sent at:</td>
+		<td><%= @invite.sent_at %></td>
+	</tr>
+</table>

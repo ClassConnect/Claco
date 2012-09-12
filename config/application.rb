@@ -12,11 +12,12 @@ require "addressable/uri"
 require 'digest/md5'
 require 'zip/zip'
 
-
-require 'log4r'
-require 'log4r/yamlconfigurator'
-require 'log4r/outputter/datefileoutputter'
-include Log4r
+if Rails.env == "development"
+    require 'log4r'
+    require 'log4r/yamlconfigurator'
+    require 'log4r/outputter/datefileoutputter'
+    include Log4r
+end
 
 # API_OPTIONS = {
 #     # Your API token

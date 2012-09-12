@@ -304,7 +304,7 @@ class Teacher
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
 
-				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s).deliver
+				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
 
 			end
 
@@ -324,7 +324,7 @@ class Teacher
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
 
-				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s).deliver
+				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
 
 			end
 

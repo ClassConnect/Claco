@@ -8,9 +8,9 @@ $stdout.sync = true
 
 #Mongoid.logger = Logger.new(STDOUT)
 #Rails.logger = Logger.new(STDOUT)
-if Rails.env == "development"
-	Log4r::Logger.new("Application Log")
-end
+
+Log4r::Logger.new("Application Log")
+
 #Rails.logger = Log4r::Logger.new("Application Log")
 
 #Rails::Initializer.run do |config|

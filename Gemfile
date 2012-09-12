@@ -55,7 +55,7 @@ gem 'dalli'
 gem 'mini_magick'
 gem 'rmagick'
 
-gem 'log4r', '1.1.9', group: [:development]
+gem 'log4r', '1.1.9'
 
 gem 'rest-client'
 gem 'rack-pjax'

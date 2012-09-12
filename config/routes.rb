@@ -51,7 +51,7 @@ Claco::Application.routes.draw do
 
 	# resources :teachers, :only => [:show, :index]
 
-	post	'utils/fetchtitle'												=> 'home#fetchtitle'
+	post	'/utils/fetchtitle'												=> 'home#fetchtitle'
 
 	get		'/legal/tos'													=> 'home#tos'
 	get		'/legal/privacy'												=> 'home#privacy'
@@ -62,7 +62,7 @@ Claco::Application.routes.draw do
 
 	get		'/apply'														=> 'applicants#apply'
 	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
-	get		'/viewapps'														=> 'applicants#viewapps'
+	get		'/viewapps'														=> 'admin#viewapps'
 
 	get		'/gs/:provider'													=> 'home#gs'
 	post	'/done'															=> 'teachers#done'
@@ -83,14 +83,15 @@ Claco::Application.routes.draw do
 	get		'/messages/:id/add'																		=> 'conversations#newmessage',		:as => 'add_message'
 	put		'/messages/:id/add'																		=> 'conversations#createmessage'
 
+	post	'/zcb'																					=> 'zencoder_callbacks#processed'
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
 
 		#Subscribe/unsubscribe
-		put		'/:username/subscribe'											=> 'teachers#sub'
-		put		'/:username/unsubscribe'										=> 'teachers#unsub'
+		put		'/:username/subscribe'																=> 'teachers#sub'
+		put		'/:username/unsubscribe'															=> 'teachers#unsub'
 
-		post '/:username/message'																	=> 'conversations#createmessage'
+		post	'/:username/message'																=> 'conversations#createmessage'
 
 		##################
 		# BINDER ROUTING #

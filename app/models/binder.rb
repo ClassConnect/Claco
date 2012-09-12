@@ -489,6 +489,19 @@ class Binder
 
 	end
 
+	def encode
+
+		r = Zencoder::Job.create({	:input 	=> self.current_version.url,
+									:output => {:url => "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4",
+												:notifications => ["http://dragonrider.claco.com/zcb"]}
+												})
+
+		statushash = self.current_version.zendata
+
+		statushash["id"] = r.body["id"]
+
+	end
+
 	###############################################################################################
 
 	            ####   ##### #       ##   #     # ##### ####          # ##### ####
@@ -504,6 +517,17 @@ class Binder
 	# Delayed Job Methods
 
 	# Do not explicitly call these!  All these methods have very long latency.
+
+	def self.process_zencoder_callback(id, key, data)
+
+		binder = Binder.find(id)
+
+		binder.current_version.zendata["data"] = data
+
+		binder.current_version.zenfile.store!(CarrierWave::Storage::Fog::File.new(binder.current_version.zenfile, CarrierWave::Storage::Fog.new(binder.current_version.zenfile), key))
+
+
+	end
 
 	def self.gen_smartnotebook_thumbnail(id)
 
@@ -1273,6 +1297,16 @@ class Version
 	# 2 - website (horiz fill, crop bottom)
 	# 3 - document (center, no cropping)
 	field :thumbnailgen, :type => Integer, :default => 0
+
+	field :zenvid,	:type => Boolean, :default => false
+	field :zendata,	:type => Hash, :default => {"jobcreated"	=> false,
+												"id"			=> "",
+												"processing"	=> false,
+												"callbacked"	=> false,
+												"ready"			=> false,
+												"data"			=> ""}
+
+	mount_uploader :zenfile, DataUploader
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority

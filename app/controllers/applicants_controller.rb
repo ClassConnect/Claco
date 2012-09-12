@@ -31,18 +31,6 @@ class ApplicantsController < ApplicationController
 
 	end
 
-	def viewapps
-
-		@apps = Applicant.all
-
-		Mongo.log(	current_teacher.id.to_s,
-					__method__.to_s,
-					params[:controller].to_s,
-					nil,
-					params)
-
-	end
-
 	def show
 
 		@app = Applicant.find(params[:id])

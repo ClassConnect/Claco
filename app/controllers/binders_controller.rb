@@ -602,7 +602,7 @@ class BindersController < ApplicationController
 
 				@inherited = inherit_from(params[:id])
 
-				if @inherited[:parent].get_access(current_teacher.id.to_s)
+				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
 					
 					@binder = Binder.new
 

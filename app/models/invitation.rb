@@ -69,7 +69,7 @@ class Invitation
 
 		x = Setting.f("sys_inv_list").v
 
-		y = x.reject{|e| e["invited"] == true}[0..num - 1]
+		y = x.reject{|e| e["invited"] == true}[0..(num - 1)]
 
 		y.each do |e|
 

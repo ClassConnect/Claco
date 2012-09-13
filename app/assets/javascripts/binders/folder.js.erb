@@ -744,7 +744,8 @@ function popForm(formID, obje) {
 
     if (formID == 'snapperform') {
       jQuery.facebox({ div: '#snap-form' });
-      turl = location.protocol+'//'+location.host+location.pathname + "/copy";
+      turl = obje.find('.titler a').attr("href") + "/copy";
+      // turl = location.protocol+'//'+location.host+location.pathname + "/copy";
     } else {
       turl = obje.find('.titler a').attr("href") + "/copy";
     }

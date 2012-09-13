@@ -73,9 +73,13 @@ class Invitation
 
 		y.each do |e|
 
-			Invitation.new(	:from => "0",
-							:to => e["email"],
-							:submitted => Time.now.to_i).save
+			z = Invitation.new(	:from => "0",
+								:to => e["email"],
+								:submitted => Time.now.to_i)
+
+			unless z.save
+				p z.errors
+			end
 
 		end
 

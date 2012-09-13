@@ -67,7 +67,7 @@ class UserMailer < ActionMailer::Base
 
 		if invitation.from == "0"
 
-			mail(from: "claco <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
+			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
 				format.html {render "system_invite"}
 			end
 

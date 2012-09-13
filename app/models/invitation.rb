@@ -38,8 +38,8 @@ class Invitation
 
 	after_create do
 
-		# Invitation.delay(:queue => "email").blast(self.id)
-		Invitation.blast(self.id)
+		Invitation.delay(:queue => "email").blast(self.id)
+		# Invitation.blast(self.id)
 
 	end
 

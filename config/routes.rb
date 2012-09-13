@@ -59,6 +59,8 @@ Claco::Application.routes.draw do
 	post	'/admin/sendinvite'												=> 'admin#sendinvite'
 	get		'/admin/invites'												=> 'admin#invites'
 	get		'/admin/invite/:id'												=> 'admin#showinv'
+	get		'/admin/sysinvlist'												=> 'admin#sysinvlist'
+	post	'/admin/invite/:to'												=> 'admin#sendinvite', :constraints => {:to => /[^\/]+/}
 
 	##################
 	# TEACHER ROUTING#

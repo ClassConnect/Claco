@@ -13,17 +13,17 @@ class InvitationsController < ApplicationController
 
 		emails.each do |email|
 
-			inv = Invitation.new(	:from	=> current_teacher.id.to_s,
-									:to		=> email)
+			inv = Invitation.new(	:from		=> current_teacher.id.to_s,
+									:to			=> email,
+									:submitted	=> Time.now.to_i)
 
 			if inv.save
 
-				redirect_to root_path
-				# Invitation.delay(:queue => "email").blast(inv.id.to_s)
+				redirect_to root_path and return
 
 			else
 
-
+				redirect_to root_path and return
 
 			end
 

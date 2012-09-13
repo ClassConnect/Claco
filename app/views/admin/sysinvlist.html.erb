@@ -14,7 +14,7 @@
 <td><%= inv["email"] %></td>
 <td><%= inv["invited"] %></td>
 <td><%= inv["invited_at"] %></td>
-<td></td>
+<td><%= link_to("Send Invite", "/admin/invite/#{inv["email"]}", :method => :post) %></td>
 </tr>
 <% end %>
 </table>

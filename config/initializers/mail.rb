@@ -6,5 +6,5 @@ ActionMailer::Base.smtp_settings = {
   :domain => 'claco.com',
   :authentication => :plain,
   :user_name => 'teamclaco',
-  :password => 'Sagetlick1'
+  :password => 'cc221g7tx'
 }

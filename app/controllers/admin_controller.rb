@@ -7,17 +7,6 @@ class AdminController < ApplicationController
 						:to => params[:to],
 						:submitted => Time.now.to_i).save
 
-		x = Setting.f("sys_inv_list").v
-
-		y = x.find{|e| e["email"] == params[:to]}
-
-		unless y.nil?
-			y["invited"] = true
-			y["invited_at"] = Time.now.to_i
-
-			Setting.f("sys_inv_list").v = x
-		end
-
 		redirect_to "/admin"
 
 	end

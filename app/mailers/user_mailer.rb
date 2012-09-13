@@ -25,7 +25,7 @@ class UserMailer < ActionMailer::Base
 
 		@body += '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">view profile</a>'
 
-		mail(from: "#{subscriber.first_last} <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
+		mail(from: "#{@subscriber.first_last} <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
 		end
 
@@ -49,7 +49,7 @@ class UserMailer < ActionMailer::Base
 			@body.chomp!(".")
 		end
 
-		mail(from: "#{sender.first_last} <support@claco.com>", to: @recipient.email, subject: "FYI - #{@sender.first_last} sent you a message") do |format|
+		mail(from: "#{@sender.first_last} <support@claco.com>", to: @recipient.email, subject: "FYI - #{@sender.first_last} sent you a message") do |format|
 			format.html {render "message_email"}
 		end
 

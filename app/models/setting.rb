@@ -5,7 +5,7 @@ class Setting
 	field :value
 
 	def self.f(s)
-		Setting.where(:setting => s).first
+		Setting.where(:setting => s).first || Setting.new(:setting => s)
 	end
 
 	def v=(v)

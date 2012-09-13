@@ -347,3 +347,11 @@ position:absolute;
 	float:right;
 	margin-right:-5px;
 }
+
+#paneleft .invitebox{
+	padding:5px;
+	border:3px dotted #ccc;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}

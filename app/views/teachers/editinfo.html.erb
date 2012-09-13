@@ -143,8 +143,8 @@
 			</div>
 
 
-				<input type="hidden" id="lat" name="lat" value="<%= current_teacher.info.location[1] if !current_teacher.info.location.empty? %>" />
-				<input type="hidden" id="lng" name="lng" value="<%= current_teacher.info.location[0] if !current_teacher.info.location.empty? %>" />
+				<input type="hidden" id="lat" name="lat" value="<%= current_teacher.info.location[1] if !current_teacher.info.location.nil? %>" />
+				<input type="hidden" id="lng" name="lng" value="<%= current_teacher.info.location[0] if !current_teacher.info.location.nil? %>" />
 
 
 

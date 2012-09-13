@@ -35,9 +35,29 @@ Claco::Application.routes.draw do
 	get		'/autocomplete'													=> 'home#auto'
 	get		'/dj'															=> 'home#dj'
 	get		'/search'														=> 'home#search'
+	get		'/about'														=> 'home#about'
+	get		'/about/team'													=> 'home#team'
+	get		'/unitedweteach'												=> 'home#united'
 
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'
+	# get		'/invite'														=> 'invitations#invite'
+	# post	'/invite'														=> 'invitations#create'
+
+	#################
+	# ADMIN ROUTING #
+	#################
+
+	get		'/admin'														=> 'admin#index'
+	get		'/admin/apps'													=> 'admin#apps'
+	get		'/admin/users'													=> 'admin#users'
+	get		'/admin/fpfeatured'												=> 'admin#choosefpfeatured',	:as => 'fpfeatured'
+	post	'/admin/fpfeatured'												=> 'admin#setfpfeatured'
+	get		'/admin/featured'												=> 'admin#choosefeatured',		:as => 'featured'
+	post	'/admin/featured'												=> 'admin#setfeatured'
+	# get		'/admin/invite'													=> 'admin#invite'
+	# post	'/admin/sendinvite'												=> 'admin#sendinvite'
+	# get		'/admin/invites'												=> 'admin#invites'
 
 	##################
 	# TEACHER ROUTING#
@@ -62,7 +82,6 @@ Claco::Application.routes.draw do
 
 	get		'/apply'														=> 'applicants#apply'
 	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
-	get		'/viewapps'														=> 'admin#viewapps'
 
 	get		'/gs/:provider'													=> 'home#gs'
 	post	'/done'															=> 'teachers#done'
@@ -90,6 +109,8 @@ Claco::Application.routes.draw do
 		#Subscribe/unsubscribe
 		put		'/:username/subscribe'																=> 'teachers#sub'
 		put		'/:username/unsubscribe'															=> 'teachers#unsub'
+		get		'/:username/subscribers'															=> 'teachers#subscribers'
+		get		'/:username/subscriptions'															=> 'teachers#subscriptions'
 
 		post	'/:username/message'																=> 'conversations#createmessage'
 

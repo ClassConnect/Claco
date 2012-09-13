@@ -11,7 +11,7 @@
           <% if signed_in? %>
 
             <a href="/messages" class="btn top-notch-btn notch-nav">
-              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-5px") %>
+              <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-3px") %>
               <% if current_teacher.get_unread_count != 0 %>
               <div class="notchNum"><%= current_teacher.get_unread_count %></div>
               <% end %>
@@ -61,7 +61,13 @@
 
           <% else %>
 
+
+
             <ul class="nav nav-pills pull-right">
+              <li><a href="/" class="publink">Home</a></li>
+              <li><a href="/about" class="publink">About</a></li>
+              <li><a href="/unitedweteach" class="publink">#UnitedWeTeach</a></li>
+
               <li class="dropdown">
 
                 <button data-toggle="dropdown" class="btn top-notch-btn notch-login">Sign in</button>

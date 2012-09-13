@@ -14,3 +14,5 @@
 /log/*.log
 /tmp
 /public/uploads
+/public/assets
+!/public/assets/manifest.yml

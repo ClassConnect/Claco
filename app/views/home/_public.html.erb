@@ -1,29 +1,74 @@
-<% content_for :headcon do %>
-    <%= stylesheet_link_tag    "home/public", :media => "all" %>
-<% end %>
-
-<div class="whiteback">
+<div class="splashback">
 	<div class="container">
-		<div class="tagline">
-			A home for the world's greatest educators.
-		</div>
 
-
-		<div class="vanitybox">
-			<img src="/assets/public/jerry.png" style="float:left" />
-
-			<img src="/assets/public/jennie.jpeg" class="smaller" />
-
-			<img src="/assets/public/jeff.jpg" class="smaller" />
-
-		</div>
-
-		<div class="applybox">
-			<div style="color:#666;font-size:16px; margin-bottom:20px">
-				Find and build curriculum with great educators<br />just like you.
+		<div class="sectleft">
+			<div class="tagline">
+				Collaborate with the world's greatest educators.
 			</div>
 
-			<a href="/apply" id="apply-btn" class="btn">Request a beta invite</a>
+
+			<div class="addtl">
+				Find, build and share educational resources with great educators just like you — aligned with <%= image_tag('public/core.png', :style => "margin: -2px 3px 0 0;width:130px") %>
+
+				<div style="margin-top:20px;margin-bottom:5px;height:50px">
+					<a href="/about" style="position:absolute;padding:15px 15px 15px 30px;text-decoration:underline">Learn more</a>
+					<a href="/apply" id="apply-btn" class="btn" style="float:right">We're in beta - request an invite!</a>
+				</div>
+
+			</div>
+
+
+		</div>
+
+
+
+
+
+		<div class="sectright">
+
+			<div class="spotlight_feed">
+				<div class="announcer">
+					<%= image_tag('common/plane.png', :style => "margin: -2px 3px 0 0") %>
+					What's happening now
+				</div>
+
+
+				<div class="feedster">
+
+					<% (Setting.f("fpfeatured").v.nil? ? [] : [Binder.find(Setting.f("fpfeatured").v.last["top"]), Binder.find(Setting.f("fpfeatured").v.last["bot"])]).each do |binder| %>
+						<div class="itemwrap">
+							<div class="imgarea">
+								<a href="/<%= binder.find_owner.username %>">
+									<img src="<%= binder.find_owner.info.avatar.thumb_md %>" />
+								</a>
+							</div>
+
+
+							<div class="namester">
+								<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, :length => 30 - binder.find_owner.full_name.size, :omission => "..."), named_binder_route(binder.parent["id"])) %>
+							</div>
+
+							<div class="contentitem">
+								<div class="preview">
+									<%= link_to(image_tag(get_binder_image(binder)), named_binder_route(binder)) %>
+								</div>
+
+
+								<div class="contitle">
+									<%= link_to(binder.title, named_binder_route(binder)) %>
+								</div>
+
+
+
+								<div style="clear:both"></div>
+							</div>
+						</div>
+					<% end %>
+
+				</div>
+
+			</div>
+
 		</div>
 
 	</div>

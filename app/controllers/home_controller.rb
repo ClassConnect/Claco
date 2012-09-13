@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy]
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team]
 
 	def index
 		@title = "Claco"
@@ -16,6 +16,8 @@ class HomeController < ApplicationController
 		@teacher_activity = true
 
 		if signed_in?
+
+			@invcount = Invitation.where(:from => current_teacher.id.to_s).count
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
@@ -270,11 +272,27 @@ class HomeController < ApplicationController
 		redirect_to "/auth/#{params[:provider]}"
 	end
 
+	def about
+		@title = "About"
+	end
+
+	def united
+		@title = "United We Teach"
+	end
+
+	def team
+		@title = "Team"
+	end
+
 	def privacy
+		@title = "Privacy Policy"
+
 		render "public/legal.html"#, :status => 200 and return
 	end
 
 	def tos
+		@title = "Terms of Service"
+
 		render "public/tos.html"#, :status => 200 and return
 	end
 

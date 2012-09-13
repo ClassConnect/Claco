@@ -1,0 +1,8 @@
+<%= form_tag "/admin/sendinvite", :method => :post do %>
+
+	<%= label_tag :to, "Email:" %>
+	<%= email_field_tag :to %>
+
+	<%= submit_tag("Send") %>
+
+<% end %>

@@ -30,26 +30,22 @@
 			    <% end %>
 
 			    <% if imgarr[1].nil? || imgarr[1].empty? %>
-					<img class="thumby1" src="/assets/common/nothumb.png" />
+                	<%= image_tag "common/nothumb.png", :class => "thumby1" %>
 				<% else %>
 					<img class="thumby1" src="<%= imgarr[1] %>" />
 				<% end %>
 
 			    <% if imgarr[2].nil? || imgarr[2].empty? %>
-					<img class="thumby2" src="/assets/common/nothumb.png" />
+                	<%= image_tag "common/nothumb.png", :class => "thumby2" %>
 				<% else %>
 					<img class="thumby2" src="<%= imgarr[2] %>" />
 				<% end %>
 
 			    <% if imgarr[3].nil? || imgarr[3].empty? %>
-					<img class="thumby3" src="/assets/common/nothumb.png" />
+                	<%= image_tag "common/nothumb.png", :class => "thumby3" %>
 				<% else %>
 					<img class="thumby3" src="<%= imgarr[3] %>" />
 				<% end %>
-
-				<!--<img class="thumby1" src="<%= imgarr[2] %>" />
-				<img class="thumby2" src="<%= imgarr[3] %>" />
-				<img class="thumby3" src="/assets/common/nothumb.png" />-->
 
 
 			  	<div class="innerd">
@@ -58,7 +54,7 @@
 			        <div class="reflink">
 
 
-			        	<img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" /><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+			        	<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
 
 
 			        </div>

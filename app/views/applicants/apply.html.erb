@@ -1,7 +1,22 @@
 <% content_for :headcon do %>
-    <%= stylesheet_link_tag    "devise/newuser", :media => "all" %>
+    <%= stylesheet_link_tag    "devise/apply", :media => "all" %>
     <%= javascript_include_tag "editinfo/apply" %>
 <% end %>
+
+
+
+<div class="splashback">
+	<div class="container">
+
+		<div class="tagline">
+			Calling the world's greatest educators:<br />
+			It's time to unite.
+		</div>
+
+	</div>
+</div>
+
+
 
 <div class="container">
 <div class="formbox">
@@ -10,10 +25,10 @@
 
 
 
-	<h2>It's time to unite.</h2>
+	<h2>Be a part of the Claco exclusive beta</h2>
 
-	<div style="color:#999;margin-bottom:15px;line-height:15px">
-		The best educators are scattered around the world with no<br />way to find and collaborate with each other. <strong>Until now.</strong>
+	<div style="color:#777;font-size:14px;margin-bottom:15px;line-height:16px">
+		While we're in beta, we're looking for the most passionate and driven teachers in the world to collaborate on Claco. After requesting an invite, we should be in touch within a week or two. If you want to an invite more quickly, have a friend on Claco send you an invite!
 	</div>
 
 
@@ -28,7 +43,7 @@
 </div>
 
 
-
+<div class="formster">
 		<%= form_for @app do |f| %>
 		<table border="0">
 		<tr>
@@ -49,17 +64,17 @@
 		</tr>
 		<tr>
 			<td class="labeler">About You</td>
-			<td><%= f.text_area :body, :style => "height:100px", :placeholder => "How many years you have taught, your website / blog, links to example resources, etc" %></td>
+			<td><%= f.text_area :body, :style => "height:100px", :placeholder => "Your website / blog, links to example resources, how many years you have taught, etc. Knock our socks off!" %></td>
 		</tr>
 	</table>
 
 
-	<button type="submit" class="btn btn-primary btn-large" style="font-weight:bolder; margin-top:10px; margin-left:117px; width:220px">
+	<button type="submit" class="btn btn-primary btn-large" style="font-weight:bolder; padding: 15px;margin-top:10px; margin-left:135px; width:320px">
 		Request an invite
 	</button>
 
 	<% end %>
-
+</div>
 
 
 

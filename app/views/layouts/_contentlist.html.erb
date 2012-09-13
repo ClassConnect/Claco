@@ -24,7 +24,7 @@
 	                    # is a file/link 
 	                 %> 
 
-					<% if get_binder_image(binder) == "<no image>" %>
+					<% if get_binder_image(binder) == "<no image>" || get_binder_image(binder) == asset_path("placer.png") %>
 
 	                  	<div class="folder-preview">
 							<div class="contype">
@@ -87,7 +87,7 @@
 	    		             </div>
 
 	    		          <div class="contype">
-	                      	<img src="/assets/binders/types/folder.png" style="width:24px" />
+	    		          	<%= image_tag "binders/types/folder.png", :style => "width:24px" %>
 	                      </div>
 
 
@@ -102,7 +102,7 @@
 
 	                    <% else %>
 
-	                    	<img class="thumb1" src="/assets/common/nothumb.png" />
+	                    	<%= image_tag "common/nothumb.png", :class => "thumb1" %>
 
 	                    <% end %>
 
@@ -114,7 +114,7 @@
 
 		                <% else %>
 
-	                    	<img class="thumb2" src="/assets/common/nothumb.png" />
+	                    	<%= image_tag "common/nothumb.png", :class => "thumb2" %>
 
 	                    <% end %>
 
@@ -128,7 +128,7 @@
 
 		                <% else %>
 
-	                    	<img class="thumb3" src="/assets/common/nothumb.png" />
+	                    	<%= image_tag "common/nothumb.png", :class => "thumb3" %>
 
 	                    <% end %>
 
@@ -143,8 +143,7 @@
 			            <div class="reflink">
 
 			            	<% if binder.type == 1 %>
-
-			            		<img src="/assets/binders/file.png" style="margin-top:-3px;margin-right:1px" /><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+			            		<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
 
 			            	<% elsif binder.format == 2  && !binder.current_version.embed %>
 
@@ -183,12 +182,12 @@
 						        </div>
 
 			            	<% else %>
-
-				            	<button class="btn snapbtn">
-									<img src="/assets/binders/snap.png" />
-									<div class="texter">Snap</div>
-								</button>
-
+			            		<% if signed_in? %>
+					            	<button class="btn snapbtn">
+										<%= image_tag "binders/snap.png" %>
+										<div class="texter">Snap</div>
+									</button>
+								<% end %>
 					        <% end %>
 
 			            </div>

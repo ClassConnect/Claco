@@ -51,7 +51,7 @@
 
               <div class="input-prepend" style="margin-left:10px">
                   <span class="add-on" style="margin-right:-14px">
-                    <img src="/assets/binders/link.png" style="height:14px; margin-top:-4px" />
+                    <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
                   </span>
 
                   <input id="normcurs" type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="<%= "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>" readonly="readonly" />
@@ -391,7 +391,7 @@
                   <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
                     <div class="arrow-right" onclick="togglePickFolder(this)"></div>
                     <span class="dirtitle" onclick="selectPickFolder(this)">
-                      <img src="/assets/binders/folder.png" class="foldicon" />
+                      <%= image_tag "binders/folder.png", :class => "foldicon" %>
                       <%= binder.title %>
                     </span>
                     <div class="dirWrap"></div>
@@ -458,7 +458,7 @@
                   <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
                     <div class="arrow-right" onclick="togglePickFolder(this)"></div>
                     <span class="dirtitle" onclick="selectPickFolder(this)">
-                      <img src="/assets/binders/folder.png" class="foldicon" />
+                      <%= image_tag "binders/folder.png", :class => "foldicon" %>
                       <%= binder.title %>
                     </span>
                     <div class="dirWrap"></div>
@@ -522,7 +522,7 @@
               <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
                 <div class="arrow-right" onclick="togglePickFolder(this)"></div>
                 <span class="dirtitle" onclick="selectPickFolder(this)">
-                  <img src="/assets/binders/folder.png" class="foldicon" />
+                  <%= image_tag "binders/folder.png", :class => "foldicon" %>
                   <%= binder.title %>
                 </span>
                 <div class="dirWrap"></div>

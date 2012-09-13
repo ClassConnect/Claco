@@ -6,6 +6,7 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
+<<<<<<< HEAD
     Mongo.log(  current_teacher.id.to_s,
           __method__.to_s,
           params[:controller].to_s,
@@ -13,11 +14,19 @@ class RegistrationsController < Devise::RegistrationsController
           params)
 
     if params[:key].nil? || params[:key].empty?
+=======
+    if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
+>>>>>>> 87c12a83207a4f5c920dab806dea1c5a3fe5ed1b
       redirect_to root_path
     else
       if Ns.where(:code => params[:key]).first.active
         resource = build_resource({})
         resource.code = params[:key]
+        i = Invitation.where(:code => params[:key]).first
+        unless i.nil?
+          i.status["clicked"] = true
+          i.save
+        end
         respond_with resource
       else
         redirect_to root_path
@@ -42,6 +51,11 @@ class RegistrationsController < Devise::RegistrationsController
     if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
 
       Ns.where(:code => params[:teacher][:code]).first.use
+      i = Invitation.where(:code => params[:teacher][:code]).first
+      unless i.nil?
+        i.status["signed_up"] = true
+        i.save
+      end
 
       if resource.active_for_authentication?
         set_flash_message :notice, :signed_up if is_navigational_format?

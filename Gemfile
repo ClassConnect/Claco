@@ -1,5 +1,7 @@
  source 'https://rubygems.org'
 
+ruby '1.9.3'
+
 gem 'rails', '3.2.3'
 
 # Bundle edge Rails instead:
@@ -18,6 +20,8 @@ group :assets do
 
   gem 'uglifier', '>= 1.0.3'
 end
+
+gem "asset_sync"
 
 # group :development do
 #   gem 'linecache19'#, '0.5.13'

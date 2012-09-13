@@ -21,7 +21,7 @@ $(document).ready(function() {
 			alert('You need to choose a file!');
 			return false;
 		} else {
-			$(".buttonbar").after('<div style="margin-left:100px; font-weight:bolder">Uploading...</div> <img src="/assets/miniload.gif" style="float:right" />');
+			$(".buttonbar").after('<div style="margin-left:100px; font-weight:bolder">Uploading...</div> <%= image_tag "miniload.gif", :style => "float:right" %>');
 			$(".buttonbar").hide();
 			$('#stupidfilepicker').hide();
 		}

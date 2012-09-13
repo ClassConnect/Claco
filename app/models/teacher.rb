@@ -70,7 +70,7 @@ class Teacher
 	validate :username_blacklist
 
 	validates_uniqueness_of :username, :case_sensitive => false
-	validates_format_of :username, without: /\s/, :message => "can't have spaces."
+	validates_format_of :username, with: /[-a-z0-9]/i, :message => "has invalid characters."
 	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters", :unless => Proc.new {|user| user.allow_short_username == true}
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."
@@ -231,10 +231,6 @@ class Teacher
 		return self.relationships.find_or_initialize_by(:user_id => id).colleague_status
 	end
 
-	def self.get_subscribers
-		Relationship.where(:subscribed => true)
-	end
-
 	def self.find_first_by_auth_conditions(warden_conditions)
 		conditions = warden_conditions.dup
 		if login = conditions.delete(:login)
@@ -252,6 +248,36 @@ class Teacher
 
 	def to_param
 		username
+	end
+
+	def binders
+		Binder.where(:owner => self.id.to_s)
+	end
+
+	def subs_of_subs
+
+		sos = [] #{"id" => id, "count" => count}
+
+		subs = relationships.where(:subscribed => true).entries.map {|r| Teacher.find(r["user_id"])}
+
+		subs.each do |sub|
+
+			e = sos.find{|s| s["id"] == sub.id.to_s}
+
+			if e.nil?
+
+				sos << {"id" => sub.id.to_s, "count" => 1}
+
+			else
+
+				e["count"] += 1
+
+			end
+
+		end
+
+		return sos
+
 	end
 
 	def self.find_for_authentication(conditions) 
@@ -278,6 +304,8 @@ class Teacher
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
 
+				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
+
 			end
 
 			auth.extra.delete("access_token")
@@ -295,6 +323,8 @@ class Teacher
 			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
 
 				teacher.relationship_by_teacher_id(fteacher.id).subscribe
+
+				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
 
 			end
 
@@ -559,7 +589,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
-	field :location,			:type => Array, :default => []
+	field :location,			:type => Array
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 

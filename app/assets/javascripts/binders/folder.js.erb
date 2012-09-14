@@ -87,8 +87,7 @@ function viewInit() {
 
 
   $('.snapbtn').click(function() {
-    popForm('snap-form', $(this).parent().parent().parent());
-
+    popForm('snap-form', $(this).parent().parent());
   });
   
   // CONTENT SPECIFIC FUNCTIONS GO HERE!
@@ -744,8 +743,7 @@ function popForm(formID, obje) {
 
     if (formID == 'snapperform') {
       jQuery.facebox({ div: '#snap-form' });
-      turl = obje.find('.titler a').attr("href") + "/copy";
-      // turl = location.protocol+'//'+location.host+location.pathname + "/copy";
+      turl = location.protocol+'//'+location.host+location.pathname + "/copy";
     } else {
       turl = obje.find('.titler a').attr("href") + "/copy";
     }

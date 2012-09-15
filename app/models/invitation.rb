@@ -11,6 +11,7 @@ class Invitation
 												"signed_up"	=> false}
 
 	validates_format_of :to, :with => /\A[^@]+@([^@\.]+\.)+[^@\.]+\z/
+	validates_uniqueness_of :to, :case_sensitive => false
 
 	#should only be called in a delayed method
 	def getcode
@@ -37,8 +38,8 @@ class Invitation
 
 	after_create do
 
-		# Invitation.delay(:queue => "email").blast(self.id)
-		Invitation.blast(self.id)
+		Invitation.delay(:queue => "email").blast(self.id)
+		# Invitation.blast(self.id)
 
 	end
 
@@ -49,7 +50,38 @@ class Invitation
 
 		invitation.getcode if invitation.code.nil?
 
+		x = Setting.f("sys_inv_list").v
+
+		y = x.find{|e| e["email"] == invitation.to}
+
+		unless y.nil?
+			y["invited"] = true
+			y["invited_at"] = Time.now.to_i
+
+			Setting.f("sys_inv_list").v = x
+		end
+
 		UserMailer.new_invite(invitation).deliver
+
+	end
+
+	def self.sysblast(num)
+
+		x = Setting.f("sys_inv_list").v
+
+		y = x.reject{|e| e["invited"] == true}[0..(num - 1)]
+
+		y.each do |e|
+
+			z = Invitation.new(	:from => "0",
+								:to => e["email"],
+								:submitted => Time.now.to_i)
+
+			unless z.save
+				p z.errors
+			end
+
+		end
 
 	end
 

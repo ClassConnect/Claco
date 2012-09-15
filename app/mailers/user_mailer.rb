@@ -25,7 +25,7 @@ class UserMailer < ActionMailer::Base
 
 		@body += '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">view profile</a>'
 
-		mail(:to => @subscribee.email, :subject => "FYI - #{@subscriber.first_last} subscribed to you") do |format|
+		mail(from: "#{@subscriber.first_last} <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
 		end
 
@@ -49,7 +49,7 @@ class UserMailer < ActionMailer::Base
 			@body.chomp!(".")
 		end
 
-		mail(:to => @recipient.email, :subject => "FYI - #{@sender.first_last} sent you a message") do |format|
+		mail(from: "#{@sender.first_last} <support@claco.com>", to: @recipient.email, subject: "FYI - #{@sender.first_last} sent you a message") do |format|
 			format.html {render "message_email"}
 		end
 
@@ -57,21 +57,27 @@ class UserMailer < ActionMailer::Base
 
 	def new_invite(invitation)
 
+		@link = "http://www.claco.com/join?key=#{invitation.code}"
+
+		invitation.status["sent"] = true
+
+		invitation.sent_at = Time.now.to_i
+
+		invitation.save
+
 		if invitation.from == "0"
 
-			@link = "http://www.claco.com/join?key=#{invitation.code}"
-
-			invitation.status["sent"] = true
-
-			invitation.save
-
-			mail(:to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
+			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
 				format.html {render "system_invite"}
 			end
 
 		else
 
-			
+			@sender = Teacher.find(invitation.from)
+
+			mail(from: "#{@sender.first_last} <support@claco.com>", to: invitation.to, subject: "Beta invite for claco") do |format|
+				format.html {render "user_invite"}
+			end
 
 		end
 

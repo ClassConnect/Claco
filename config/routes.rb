@@ -42,9 +42,12 @@ Claco::Application.routes.draw do
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'
 
+
 	get		'/mediaserver/:id'												=> 'media_server_api#tokencheck'
-	# get		'/invite'														=> 'invitations#invite'
-	# post	'/invite'														=> 'invitations#create'
+
+	get		'/invite'														=> 'invitations#invite'
+	post	'/invite'														=> 'invitations#create'
+
 
 	#################
 	# ADMIN ROUTING #
@@ -57,9 +60,12 @@ Claco::Application.routes.draw do
 	post	'/admin/fpfeatured'												=> 'admin#setfpfeatured'
 	get		'/admin/featured'												=> 'admin#choosefeatured',		:as => 'featured'
 	post	'/admin/featured'												=> 'admin#setfeatured'
-	# get		'/admin/invite'													=> 'admin#invite'
-	# post	'/admin/sendinvite'												=> 'admin#sendinvite'
-	# get		'/admin/invites'												=> 'admin#invites'
+	get		'/admin/invite'													=> 'admin#invite'
+	post	'/admin/sendinvite'												=> 'admin#sendinvite'
+	get		'/admin/invites'												=> 'admin#invites'
+	get		'/admin/invite/:id'												=> 'admin#showinv'
+	get		'/admin/sysinvlist'												=> 'admin#sysinvlist'
+	post	'/admin/invite/:to'												=> 'admin#sendinvite', :constraints => {:to => /[^\/]+/}
 
 	##################
 	# TEACHER ROUTING#

@@ -5,6 +5,6 @@ ActionMailer::Base.smtp_settings = {
   :port => '25',
   :domain => 'claco.com',
   :authentication => :plain,
-  :user_name => 'classconnectinc',
+  :user_name => 'teamclaco',
   :password => 'cc221g7tx'
 }

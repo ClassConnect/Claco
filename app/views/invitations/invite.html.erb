@@ -6,11 +6,11 @@
 
 <%= form_tag "/invite", {:method => :post, :class => "bodcon"} do %>
   <div class="conitem" style="padding-left:10px">
-    <%= email_field_tag "invite[]", "#{@invitations[0]}", {:style => "width:260px", :placeholder => "1st colleague's email address", :disabled => (@invitations[0].nil? false : !@invitations[0].empty?)} %>
-    <%= email_field_tag "invite[]", "#{@invitations[1]}", {:style => "width:260px", :placeholder => "2nd colleague's email address", :disabled => (@invitations[1].nil? false : !@invitations[1].empty?)} %>
-    <%= email_field_tag "invite[]", "#{@invitations[2]}", {:style => "width:260px", :placeholder => "3rd colleague's email address", :disabled => (@invitations[2].nil? false : !@invitations[2].empty?)} %>
-    <%= email_field_tag "invite[]", "#{@invitations[3]}", {:style => "width:260px", :placeholder => "4th colleague's email address", :disabled => (@invitations[3].nil? false : !@invitations[3].empty?)} %>
-    <%= email_field_tag "invite[]", "#{@invitations[4]}", {:style => "width:260px", :placeholder => "5th colleague's email address", :disabled => (@invitations[4].nil? false : !@invitations[4].empty?)} %>
+    <%= email_field_tag "invite[]", @invitations[0].nil? ? "" : @invitations[0].to, {:style => "width:260px", :placeholder => "1st colleague's email address", :disabled => (@invitations[0].nil? ? false : !@invitations[0].to.empty?)} %>
+    <%= email_field_tag "invite[]", @invitations[1].nil? ? "" : @invitations[1].to, {:style => "width:260px", :placeholder => "2nd colleague's email address", :disabled => (@invitations[1].nil? ? false : !@invitations[1].to.empty?)} %>
+    <%= email_field_tag "invite[]", @invitations[2].nil? ? "" : @invitations[2].to, {:style => "width:260px", :placeholder => "3rd colleague's email address", :disabled => (@invitations[2].nil? ? false : !@invitations[2].to.empty?)} %>
+    <%= email_field_tag "invite[]", @invitations[3].nil? ? "" : @invitations[3].to, {:style => "width:260px", :placeholder => "4th colleague's email address", :disabled => (@invitations[3].nil? ? false : !@invitations[3].to.empty?)} %>
+    <%= email_field_tag "invite[]", @invitations[4].nil? ? "" : @invitations[4].to, {:style => "width:260px", :placeholder => "5th colleague's email address", :disabled => (@invitations[4].nil? ? false : !@invitations[4].to.empty?)} %>
   </div>
 
   <div class="buttonbar">

@@ -359,10 +359,10 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
+		errors = []
+
 		# ignore duplicate requests
 		return if current_teacher.subscribed_to?(@teacher.id.to_s)
-
-		errors = []
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 

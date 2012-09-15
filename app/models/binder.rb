@@ -61,6 +61,8 @@ class Binder
 	field :pub_size, :type => Integer, :default => 0
 	field :priv_size, :type => Integer, :default => 0
 
+
+
 	# number of times this binder is forked
 	field :fork_total, :type => Integer, :default => 0
 	# number of times this binder, or binders below it, are forked
@@ -1292,6 +1294,12 @@ class Version
 	# 3 - document file
 	# 4 - <no image>
 	field :imgclass,	:type => Integer
+
+	#Image server fields
+	# hash of image file, binder ID, private token
+	#TODO: define media server private token -> env variable?
+	# for now, just check token hash directly
+	field :media_server_token, :type => String, :default => ''
 
 	# dimensions of the uncompressed, unprocessed image
 	field :imgdims,		:type => Hash, 	:default => { :width => -1, :height => -1 }

@@ -130,7 +130,7 @@ class BindersController < ApplicationController
 
 		@owner = Teacher.find(@binder.owner)
 
-		Mongo.log(	current_teacher.id.to_s,
+		Mongo.log(	signed_in? ? current_teacher.id.to_s : nil,
 					__method__.to_s,
 					params[:controller].to_s,
 					@binder.id.to_s,
@@ -152,6 +152,8 @@ class BindersController < ApplicationController
 			render "public/403.html", :status => 403 and return
 		end
 
+		#Rails.logger.debug @tags
+		
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
 
@@ -165,8 +167,6 @@ class BindersController < ApplicationController
 				@tags[tag['type']] << tag
 			end		
 		end
-
-		#Rails.logger.debug @tags
 
 		@title = @binder.title
 

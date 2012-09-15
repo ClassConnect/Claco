@@ -44,7 +44,11 @@
                   <li>
                     <%= link_to "Logout", destroy_teacher_session_path, :method => :delete %>
                   </li>
-
+                  <% if current_teacher.admin %>
+                  <li>
+                    <%= link_to "Admin Panel", "/admin" %>
+                  </li>
+                  <% end %>
                 </ul>
               </li>
             </ul>

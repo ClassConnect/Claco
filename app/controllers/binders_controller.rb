@@ -130,17 +130,13 @@ class BindersController < ApplicationController
 
 		@owner = Teacher.find(@binder.owner)
 
-<<<<<<< HEAD
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					@binder.id.to_s,
 					params)
 
-		@root = signed_in? ? Binder.where("parent.id" => "0", :owner => current_teacher.id.to_s) : []
-=======
 		@root = signed_in? ? current_teacher.binders.root_binders : []
->>>>>>> 87c12a83207a4f5c920dab806dea1c5a3fe5ed1b
 
 		@access = signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
 		

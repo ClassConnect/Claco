@@ -5,12 +5,6 @@ class ApplicantsController < ApplicationController
 
 		@app = Applicant.new
 
-		Mongo.log(	current_teacher.id.to_s,
-					__method__.to_s,
-					params[:controller].to_s,
-					@app.id.to_s,
-					params)
-
 	end
 
 	def create
@@ -21,12 +15,6 @@ class ApplicantsController < ApplicationController
 
 		@app.update_attributes(:timestamp => Time.now.to_i)
 
-		Mongo.log(	current_teacher.id.to_s,
-					__method__.to_s,
-					params[:controller].to_s,
-					@app.id.to_s,
-					params)
-
 		render "apply" and return if !@app.errors.empty?
 
 	end
@@ -34,12 +22,6 @@ class ApplicantsController < ApplicationController
 	def show
 
 		@app = Applicant.find(params[:id])
-
-		Mongo.log(	current_teacher.id.to_s,
-					__method__.to_s,
-					params[:controller].to_s,
-					@app.id.to_s,
-					params)
 
 	end
 

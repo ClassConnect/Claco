@@ -148,7 +148,7 @@ function startWizard() {
 
 				guiders.createGuider({
 				  buttons: [{name: "Next"}],
-				  description: '<iframe width="650" height="400" src="http://www.youtube.com/embed/X3oWFV1OIUw?vq=hd720" frameborder="0" allowfullscreen></iframe>',
+				  description: '<iframe width="650" height="400" src="http://www.youtube.com/embed/jcVPbSMOkRg?vq=hd720" frameborder="0" allowfullscreen></iframe>',
 				  id: "first",
 				  next: "second",
 				  title: "Store websites, videos, and files in binders.",

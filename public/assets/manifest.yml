@@ -116,9 +116,10 @@ gen/boxresize.js: gen/boxresize-8a1158f071811d26d63458f03098dffe.js
 gen/cookie.js: gen/cookie-86b7a89dce88107bcd7e4ebebb8af144.js
 gen/guiders.js: gen/guiders-f8f535e621aee252335f2ed2857f3092.js
 gen/sticky.js: gen/sticky-ce2c96f257f6283f039c4e14673d4da8.js
-gen/wizard.js: gen/wizard-2c7a93a8fb6ddd870662087b98ba1761.js
+gen/wizard.js: gen/wizard-12f7b440237c6efa06de60d269a254ba.js
 home/main.js: home/main-0b63a9a3fb4a17dace903db919adee4a.js
 jqueryui.js: jqueryui-712127b33382880ee03651dc2df87b49.js
+media_server_api.js: media_server_api-3af39f1da6f167c2cbf453ed74daff3d.js
 messages/show.js: messages/show-af1bfe6546d966549eb5e11fd056910c.js
 omniauth_callbacks.js: omniauth_callbacks-3af39f1da6f167c2cbf453ed74daff3d.js
 profile/main.js: profile/main-093f030ef668c96a8ede1d38ec502fe1.js
@@ -146,6 +147,7 @@ home/pub/team.css: home/pub/team-a6d7c19a837bc6ba869986617a59f93a.css
 home/pub/uwt.css: home/pub/uwt-d2d5d7627259ec85ab67bd9fe4fd871b.css
 home/public.css: home/public-484e74d59241d42c30f1f1f1b622b87b.css
 jqueryui.css: jqueryui-3e5488d61bcd5d2d63259970ab23b226.css
+media_server_api.css: media_server_api-7270767b2a9e9fff880aa5de378ca791.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
 strap.css: strap-3eb69424da48482ef40877c9436a670c.css

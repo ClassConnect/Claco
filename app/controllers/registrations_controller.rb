@@ -6,17 +6,14 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
-<<<<<<< HEAD
+
     Mongo.log(  current_teacher.id.to_s,
           __method__.to_s,
           params[:controller].to_s,
           nil,
           params)
 
-    if params[:key].nil? || params[:key].empty?
-=======
     if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
->>>>>>> 87c12a83207a4f5c920dab806dea1c5a3fe5ed1b
       redirect_to root_path
     else
       if Ns.where(:code => params[:key]).first.active

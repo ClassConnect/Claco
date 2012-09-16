@@ -6,13 +6,6 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
-
     if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
       redirect_to root_path
     else
@@ -34,12 +27,6 @@ class RegistrationsController < Devise::RegistrationsController
   # POST /resource
   def create
     build_resource
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
 
     resource.code = params[:teacher][:code]
     resource.registered_at = Time.now.to_i

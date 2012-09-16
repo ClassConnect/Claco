@@ -157,8 +157,8 @@ class BindersController < ApplicationController
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
 
-		# this is a hack
-		@binder.tag = Tag.new if !@binder.tag
+		# this is a binder
+		@hack.tag = Tag.new if !@binder.tag
 
 		@tagset = @binder.tag.get_tags()
 
@@ -321,7 +321,7 @@ class BindersController < ApplicationController
 
 					if !((url || embedtourl) && link.empty?)
 
-						if !URI.parse(link).host.include?("teacherspayteachers.com")
+						if (embed ? true : !URI.parse(link).host.include?("teacherspayteachers.com"))
 						
 							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 													:owner				=> current_teacher.id,
@@ -459,8 +459,8 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue RestClient::ResourceNotFound
 			errors << "Invalid URL - Not Found"
-		rescue
-			errors << "Invalid URL"
+		rescue Exception => ex
+			errors << "Invalid URL #{ex} #{ex.backtrace}"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}

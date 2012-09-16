@@ -2,12 +2,6 @@ class PasswordsController < Devise::PasswordsController
 	  # GET /resource/password/new
   def new
     build_resource({})
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
   end
 
   # POST /resource/password
@@ -19,35 +13,17 @@ class PasswordsController < Devise::PasswordsController
     else
       respond_with(resource)
     end
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
   end
 
   # GET /resource/password/edit?reset_password_token=abcdef
   def edit
     self.resource = resource_class.new
     resource.reset_password_token = params[:reset_password_token]
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
   end
 
   # PUT /resource/password
   def update
     self.resource = resource_class.reset_password_by_token(resource_params)
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
 
     if resource.errors.empty?
       flash_message = resource.active_for_authentication? ? :updated : :updated_not_active

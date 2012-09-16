@@ -128,11 +128,11 @@ Claco::Application.routes.draw do
 
 
 		#Binder Index
-		get		'/:username/portfolio'																=> 'binders#index',					:as => 'binders'
+		# get		'/:username/portfolio'																=> 'binders#index',					:as => 'binders'
 
 		#New
 		get		'/:username/portfolio/new'															=> 'binders#new',					:as => 'new_binder'
-		post	'/:username/portfolio'																=> 'binders#create'
+		post	'/:username/portfolio'																=> 'binders#create',				:as => 'binders'
 		
 		#Trash folder
 		get		'/trash'																			=> 'binders#trash',					:as => 'trash'

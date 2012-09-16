@@ -155,6 +155,10 @@ strap.css: strap-3eb69424da48482ef40877c9436a670c.css
 teacher.css: teacher-62601b4f63436bead7ada0c06c260ee3.css
 widgets/icheck.css: widgets/icheck-1fe06c28e81f76d3ca8bbd85b64abbaf.css
 jquery.pjax.js: jquery.pjax-2c35cf880426e66d80cf17ecb18b5c6a.js
+video-js.css: video-js-d6298a2c01966da4403fc968e4b53edb.css
+video-js.png: video-js-dc69ccfbc38a977a032886c4cfa6920e.png
+video-js.swf: video-js-f52e4551cc58ba3396f348370703760a.swf
+video.js: video-2e896bdbb2635967911fc5364924024f.js
 coffee-script.js: coffee-script-deaae424fb919367620c04202e1881b7.js
 jquery-ui.js: jquery-ui-c1e8474d78021c8a0edf89071c1ed6c1.js
 jquery-ui.min.js: jquery-ui.min-54c010000d198d006acfac5349f25fba.js

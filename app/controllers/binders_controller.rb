@@ -157,8 +157,8 @@ class BindersController < ApplicationController
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
 
-		# this is a binder
-		@hack.tag = Tag.new if !@binder.tag
+		# this is a hack
+		@binder.tag = Tag.new if !@binder.tag
 
 		@tagset = @binder.tag.get_tags()
 
@@ -261,7 +261,7 @@ class BindersController < ApplicationController
 			if !doc.at('iframe').nil?
 
 				uri = URI.parse(doc.at('iframe')['src'])
-
+				#Refactor this to also set vidtype
 				if uri.host.include?('youtube.com') && uri.path.include?('embed')
 
 					embedtourl = true
@@ -459,8 +459,8 @@ class BindersController < ApplicationController
 			errors << "Invalid Request"
 		rescue RestClient::ResourceNotFound
 			errors << "Invalid URL - Not Found"
-		rescue Exception => ex
-			errors << "Invalid URL #{ex} #{ex.backtrace}"
+		rescue
+			errors << "Invalid URL"
 		ensure
 			respond_to do |format|
 				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}

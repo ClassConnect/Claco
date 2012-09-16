@@ -602,15 +602,9 @@ class BindersController < ApplicationController
 
 		token = Digest::MD5.hexdigest(@v.data + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
 
-		# @uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}#{request.fullpath}?data=#{@v.data}&key=#{@uploader.key}&time=#{@v.timestamp}&token=#{token}"
-
 		@uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}#{named_binder_route(params[:id], "createfile")}/#{@v.data}/#{@v.timestamp}/#{token}"
 
 		render "cf", :layout => false
-
-		# respond_to do |format|
-			# format.html {render "cf"}
-		# end
 
 	end
 

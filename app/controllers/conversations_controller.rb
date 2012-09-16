@@ -68,13 +68,14 @@ class ConversationsController < ApplicationController
 		@conversation = Conversation.new(	:members	=> members,
 											:unread		=> unread)
 
+
+		@conversation.save
+
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					@conversation.id.to_s,
 					params)
-
-		@conversation.save
 
 		@conversation.new_message(params, current_teacher)
 

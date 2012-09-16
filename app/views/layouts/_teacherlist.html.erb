@@ -5,7 +5,7 @@
 		<% if !t.info.nil? && !t.info.avatar.to_hash[:url].nil? #&& !t.info.avatar.empty? 
 			%>
 		<a href="<%= "/#{t.username}" %>">
-			<img src=<%= t.info.avatar.thumb_md.url.to_s %> class="thumbster" />
+			<img src=<%= (t.info.avatar.url.include? '/assets/') ? 'http://static.cla.co/assets/placer-f92ebf1d40f6c0514181480e15cb3676.png' : t.info.avatar.thumb_md.url.to_s %> class="thumbster" />
 		</a>
 		<% end %>
 		<div class="infowrap">

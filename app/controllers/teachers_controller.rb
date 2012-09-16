@@ -32,7 +32,7 @@ class TeachersController < ApplicationController
 
 		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 
-		Mongo.log(	current_teacher.id.to_s,
+		Mongo.log(	signed_in? ? current_teacher.id.to_s : nil,
 					__method__.to_s,
 					params[:controller].to_s,
 					@teacher.id.to_s,

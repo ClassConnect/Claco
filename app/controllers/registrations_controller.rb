@@ -6,13 +6,6 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
-
     if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
       redirect_to root_path
     else
@@ -34,12 +27,6 @@ class RegistrationsController < Devise::RegistrationsController
   # POST /resource
   def create
     build_resource
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
 
     resource.code = params[:teacher][:code]
     resource.registered_at = Time.now.to_i
@@ -78,13 +65,6 @@ class RegistrationsController < Devise::RegistrationsController
   # GET /resource/edit
   def edit
     render :edit
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
-
   end
 
   # PUT /resource
@@ -92,12 +72,6 @@ class RegistrationsController < Devise::RegistrationsController
   # the current user in place.
   def update
     self.resource = resource_class.to_adapter.get!(send(:"current_#{resource_name}").to_key)
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
 
     if resource.update_with_password(resource_params)
       if is_navigational_format?
@@ -116,13 +90,6 @@ class RegistrationsController < Devise::RegistrationsController
 
   # DELETE /resource
   def destroy
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
-
     resource.destroy
     Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
     set_flash_message :notice, :destroyed if is_navigational_format?
@@ -135,13 +102,6 @@ class RegistrationsController < Devise::RegistrationsController
   # cancel oauth signing in/up in the middle of the process,
   # removing all OAuth session data.
   def cancel
-
-    Mongo.log(  current_teacher.id.to_s,
-          __method__.to_s,
-          params[:controller].to_s,
-          nil,
-          params)
-
     expire_session_data_after_sign_in!
     redirect_to root_path
   end

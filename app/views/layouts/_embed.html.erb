@@ -7,6 +7,8 @@
 	<% content_for :headcon do %>
 		<%= javascript_include_tag "video" %>
 		<%= stylesheet_link_tag "video-js", :media => "all" %>
+		<%= javascript_tag "_V_.options.flash.swf = '#{asset_path "video-js.swf"}'" %>
+    </script>
 	<% end %>
 
 	<center>

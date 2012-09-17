@@ -8,12 +8,10 @@
 		<%= javascript_include_tag "video" %>
 		<%= stylesheet_link_tag "video-js", :media => "all" %>
 		<%= javascript_tag "_V_.options.flash.swf = '#{asset_path "video-js.swf"}'" %>
-    </script>
 	<% end %>
 
 	<center>
-
-	<video id="my_video_1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="my_video_poster.png" data-setup="{}">
+	<video id="<%= @binder.current_version.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="my_video_poster.png" data-setup="{}">
 		<source src="<%= @binder.current_version.video.url %>" type='video/mp4'>
 	</video>
 	</center>

@@ -4,12 +4,6 @@
 
 <% elsif @binder.current_version.vidtype == "zen" %>
 
-	<% content_for :headcon do %>
-		<%= javascript_include_tag "video" %>
-		<%= stylesheet_link_tag "video-js", :media => "all" %>
-		<%= javascript_tag "_V_.options.flash.swf = '#{asset_path "video-js.swf"}'" %>
-	<% end %>
-
 	<center>
 	<video id="<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="<%= @binder.current_version.zendata["output"]["width"] %>" height="<%= @binder.current_version.zendata["output"]["height"] %>" poster="<%= @binder.current_version.video.posterurl %>" data-setup="{}">
 		<source src="<%= @binder.current_version.video.url %>" type='video/mp4'>

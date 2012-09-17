@@ -11,8 +11,8 @@
 	<% end %>
 
 	<center>
-	<video id="<%= @binder.current_version.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="my_video_poster.png" data-setup="{}">
-		<source src="<%= @binder.current_version.video.url.sub(/https:\/\/#{@binder.current_version.video.fog_directory}.s3.amazonaws.com/, @binder.current_version.video.fog_host) %>" type='video/mp4'>
+	<video id="<%= @binder.current_version.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="<%= @binder.current_version.video.posterurl %>" data-setup="{}">
+		<source src="<%= @binder.current_version.video.url) %>" type='video/mp4'>
 	</video>
 	</center>
 

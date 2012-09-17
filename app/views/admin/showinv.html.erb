@@ -4,7 +4,7 @@
 <table>
 	<tr>
 		<td>Sent By:</td>
-		<td><%= @invite.from == "0" ? "System" : "" %></td>
+		<td><%= @invite.from == "0" ? "System" : link_to(Teacher.find(@invite.from).full_name, "/#{Teacher.find(@invite.from).username}") %></td>
 	</tr>
 	<tr>
 		<td>Sent to:</td>

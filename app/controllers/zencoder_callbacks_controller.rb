@@ -107,7 +107,7 @@ class ZencoderCallbacksController < ApplicationController
 
 	def processed
 
-		binder = Binder.where("versions.zendata.id" => params[:job]["id"]).first
+		binder = Binder.where("versions.zendata.jobid" => params[:job]["id"]).first
 		
 		binder.current_version.zendata = params[:zencoder_callback]
 

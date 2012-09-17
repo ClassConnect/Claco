@@ -165,7 +165,11 @@ function contentInit() {
         }
     });
 
-
+  if($(".video-js").length !== 0){
+    _V_(location.pathname.split('/').pop(), {}, function(){
+      // Player (this) is initialized and ready.
+    });
+  }
 
 }
 

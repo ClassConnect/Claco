@@ -50,7 +50,9 @@ class Teacher
 
 	field :omnihash, :type => Hash, :default => {}
 
-	field :emailconfig, :type => Hash, :default => {}
+	field :emailconfig, :type => Hash, :default => {"msg" => true,
+													"col" => true,
+													"sub" => true}
 
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true

@@ -286,8 +286,6 @@ class TeachersController < ApplicationController
 
 	def updateprefs
 
-		debugger
-
 		emailconfig = {	"sub" => params[:sub] == "1",
 						"col" => params[:col] == "1",
 						"msg" => params[:msg] == "1"}

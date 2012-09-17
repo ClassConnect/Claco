@@ -175,6 +175,7 @@ Claco::Application.routes.draw do
 
 		#Show
 		get		'/:username/portfolio(/:root)/:title/:id/download'									=> 'binders#download'
+		get		'/:username/portfolio(/:root)/:title/:id/video'										=> 'binders#zenframe'
 		get		'/:username/portfolio(/:root)/:title/:id'											=> 'binders#show'
 		delete	'/:username/portfolio(/:root)/:title/:id'											=> 'binders#destroy'
 		

@@ -224,6 +224,14 @@ class BindersController < ApplicationController
 
 	end
 
+	def zenframe
+
+		@binder = Binder.find(params[:id])
+
+		render :layout => false
+
+	end
+
 	def regen
 
 		@binder = Binder.find(params[:id])

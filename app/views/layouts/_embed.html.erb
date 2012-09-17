@@ -4,11 +4,7 @@
 
 <% elsif @binder.current_version.vidtype == "zen" %>
 
-	<center>
-	<video id="<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="700" height="390" poster="<%= @binder.current_version.video.posterurl %>" data-setup="{}">
-		<source src="<%= @binder.current_version.video.url %>" type='video/mp4'>
-	</video>
-	</center>
+	<center><iframe width="700" height="390" class="embeddrop" frameborder="0" src="<%= zenframe(@binder) %>"></center>
 
 <% elsif @binder.current_version.youtube? %>
 

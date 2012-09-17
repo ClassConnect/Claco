@@ -51,6 +51,12 @@ class AdminController < ApplicationController
 
 	end
 
+	def choosefpfeatured
+
+		@fpfeatured = Setting.f("fpfeatured").v
+
+	end
+
 	def setfpfeatured
 
 		Setting.f("fpfeatured").v = [] if Setting.f("fpfeatured").v.nil?

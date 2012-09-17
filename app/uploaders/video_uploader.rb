@@ -1,7 +1,7 @@
 class VideoUploader < DataUploader
 
 	def filename
-		model.videofilename
+		"vid.mp4"
 	end
 
 end

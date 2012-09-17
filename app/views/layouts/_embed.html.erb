@@ -2,6 +2,20 @@
 
 	<center><iframe id="crocFrame" width="700" height="600" class="embeddrop" frameborder="0" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe></center>
 
+<% elsif @binder.current_version.vidtype == "zen" %>
+
+	<% content_for :headcon do %>
+		<%= javascript_include_tag "video" %>
+		<%= stylesheet_link_tag "video-js", :media => "all" %>
+	<% end %>
+
+	<center>
+
+	<video id="my_video_1" class="video-js vjs-default-skin" controls preload="auto" width="640" height="264" poster="my_video_poster.png" data-setup="{}">
+		<source src="<%= @binder.current_version.video.url %>" type='video/mp4'>
+	</video>
+	</center>
+
 <% elsif @binder.current_version.youtube? %>
 
 	<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= @binder.current_version.get_youtube_id %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>

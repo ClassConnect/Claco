@@ -467,6 +467,7 @@ class Binder
 
 	end
 
+	#To be delayed
 	def encode
 
 		r = Zencoder::Job.create({	:input 	=> self.current_version.file.url,
@@ -476,7 +477,7 @@ class Binder
 
 		statushash = self.current_version.zendata
 
-		statushash["id"] = r.body["id"]
+		statushash["jobid"] = r.body["id"]
 
 	end
 
@@ -1276,15 +1277,11 @@ class Version
 	# 3 - document (center, no cropping)
 	field :thumbnailgen, :type => Integer, :default => 0
 
-	field :zenvid,	:type => Boolean, :default => false
-	field :zendata,	:type => Hash, :default => {"jobcreated"	=> false,
-												"id"			=> "",
-												"processing"	=> false,
-												"callbacked"	=> false,
-												"ready"			=> false,
-												"data"			=> ""}
+	field :zendata,	:type => Hash, :default => {}
 
-	mount_uploader :zenfile, DataUploader
+	mount_uploader :video, VideoUploader
+
+	field :vidtype, :type => String
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority
@@ -1314,8 +1311,6 @@ class Version
 													 	:img_contentview => { :generated => false },
 													 	:img_thumb_lg => 	{ :generated => false },
 														:img_thumb_sm => 	{ :generated => false } }
-
-	field :vid_processed, :type => Boolean, :default => false
 
 	# the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
 	mount_uploader :imgfile, 		ImageUploader

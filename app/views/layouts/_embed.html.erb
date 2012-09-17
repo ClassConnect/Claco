@@ -11,7 +11,7 @@
 	<% end %>
 
 	<center>
-	<video id="<%= @binder.current_version.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="<%= @binder.current_version.zendata["output"]["width"] %>" height="<%= @binder.current_version.zendata["output"]["height"] %>" poster="<%= @binder.current_version.video.posterurl %>" data-setup="{}">
+	<video id="<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" width="<%= @binder.current_version.zendata["output"]["width"] %>" height="<%= @binder.current_version.zendata["output"]["height"] %>" poster="<%= @binder.current_version.video.posterurl %>" data-setup="{}">
 		<source src="<%= @binder.current_version.video.url %>" type='video/mp4'>
 	</video>
 	</center>

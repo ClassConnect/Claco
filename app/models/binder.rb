@@ -473,8 +473,7 @@ class Binder
 		r = Zencoder::Job.create({	:input 	=> self.current_version.file.url,
 									:outputs => [{:url => "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4",
 												:notifications => ["http://dragonrider.claco.com/zcb"]},
-												{:thumbnails => [{	:number => 1,
-																	:label => "poster"}]}]
+												{:thumbnails => {:number => 1}}]
 												})
 
 		statushash = self.current_version.zendata

@@ -473,8 +473,8 @@ class Binder
 		r = Zencoder::Job.create({	:input 	=> self.current_version.file.url,
 									:outputs => [{:url => "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4",
 												:notifications => ["http://dragonrider.claco.com/zcb"]},
-												{:thumbnails => {	:number => 1,
-																	:url => "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vidthumb.png",}}]
+												{:thumbnails => [{	:number => 1,
+																	:label => "poster"}]}]
 												})
 
 		statushash = self.current_version.zendata
@@ -500,17 +500,6 @@ class Binder
 	# Delayed Job Methods
 
 	# Do not explicitly call these!  All these methods have very long latency.
-
-	def self.process_zencoder_callback(id, key, data)
-
-		binder = Binder.find(id)
-
-		binder.current_version.zendata["data"] = data
-
-		binder.current_version.zenfile.store!(CarrierWave::Storage::Fog::File.new(binder.current_version.zenfile, CarrierWave::Storage::Fog.new(binder.current_version.zenfile), key))
-
-
-	end
 
 	def self.gen_smartnotebook_thumbnail(id)
 

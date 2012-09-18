@@ -492,9 +492,7 @@ class Binder
 									:outputs => [{	:url			=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/vid.mp4",
 													:notifications	=> ["http://dragonrider.claco.com/zcb"]},
 												{	:thumbnails		=> {:number		=> 1,
-																		:base_url	=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/",
-																		:filename	=> "poster",
-																		:format		=> "jpg"}}]
+																		:url		=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/poster.jpg"}}]
 												})
 
 		statushash = binder.current_version.zendata

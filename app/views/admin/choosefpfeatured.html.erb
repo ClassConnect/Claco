@@ -31,12 +31,16 @@
 			<%= time_ago_in_words(Time.at(f["time"]).to_datetime) %> ago
 		</td>
 		<td>
-			<%= link_to f["top"], named_binder_route(f["top"]) %><br />
-			<%= Binder.find(f["top"]).username %>
+			<% if f["top"] %>
+				<%= link_to f["top"], named_binder_route(f["top"]) %><br />
+				<%= Binder.find(f["top"]).username %>
+			<% end %>
 		</td>
 		<td>
-			<%= link_to f["bot"], named_binder_route(f["bot"]) %><br />
-			<%= Binder.find(f["bot"]).username %>
+			<% if f["bot"] %>
+				<%= link_to f["bot"], named_binder_route(f["bot"]) %><br />
+				<%= Binder.find(f["bot"]).username %>
+			<% end %>
 		</td>
 	</tr>
 

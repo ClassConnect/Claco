@@ -115,6 +115,8 @@ class ZencoderCallbacksController < ApplicationController
 
 			binder.current_version.vidtype = "zen"
 
+			Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id, binder.current_version.video.posterurl)
+
 		end
 
 		if binder.save

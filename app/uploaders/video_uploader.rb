@@ -11,9 +11,9 @@ class VideoUploader < DataUploader
 
   def posterurl
   	if fog_public
-      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{store_dir}/poster.png").public_url
+      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{store_dir}/poster.jpg").public_url
 	else
-      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{store_dir}/poster.png").authenticated_url.sub(/https:\/\/#{self.fog_directory}.s3.amazonaws.com/, self.fog_host)
+      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{store_dir}/poster.jpg").authenticated_url.sub(/https:\/\/#{self.fog_directory}.s3.amazonaws.com/, self.fog_host)
 	end
     fog_uri
   end

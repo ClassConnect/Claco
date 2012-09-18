@@ -56,7 +56,7 @@
         <% end %>
         <% end %>
 
-        <a id="<%= "messbtn" if signed_in? %>" class="btn btn-medium" href="<%= "/apply" unless signed_in? %>">
+        <a id="<%= "messbtn" if signed_in? %>" class="btn btn-medium" href="<%= signed_in? ? "#" : "/apply" %>">
           <%= image_tag("profile/message.png", :style => "float:left;height:14px;margin:2px 5px 0 0") %>
           Message
         </a>

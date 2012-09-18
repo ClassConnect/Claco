@@ -1,4 +1,24 @@
-<h2>app/views/applicants/<%= params[:action] %></h2>
-<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "devise/apply", :media => "all" %>
+    <%= javascript_include_tag "editinfo/apply" %>
+<% end %>
 
-<h1>THANKS FOR APPLYING!!!!!!!</h1>
+
+
+<div class="splashback">
+	<div class="container">
+
+		<div class="tagline">
+			Thanks for applying!<br /><br />
+			We'll be in touch soon.
+		</div>
+
+	</div>
+</div>
+
+
+
+<div class="container">
+	<br /><br />
+	<center><%= link_to "Back to home page", root_path %></center>
+</div>

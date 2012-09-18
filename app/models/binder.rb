@@ -467,25 +467,6 @@ class Binder
 
 	end
 
-	#To be delayed
-	def encode
-
-		r = Zencoder::Job.create({	:input 	=> self.current_version.file.url,
-									:outputs => [{	:url			=> "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4",
-													:notifications	=> ["http://dragonrider.claco.com/zcb"]},
-												{:thumbnails => {	:number		=> 1,
-																	:base_url	=> "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/",
-																	:filename	=> "poster",
-																	:format		=> "jpg"}}]
-												})
-
-		statushash = self.current_version.zendata
-
-		statushash["jobid"] = r.body["id"]
-
-		self.save
-
-	end
 
 	###############################################################################################
 
@@ -502,6 +483,31 @@ class Binder
 	# Delayed Job Methods
 
 	# Do not explicitly call these!  All these methods have very long latency.
+
+	def self.encode(id)
+
+		binder = Binder.find(id)
+
+		r = Zencoder::Job.create({	:input 	=> binder.current_version.file.url,
+									:outputs => [{	:url			=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/vid.mp4",
+													:notifications	=> ["http://dragonrider.claco.com/zcb"]},
+												{	:thumbnails		=> {:number		=> 1,
+																		:base_url	=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/",
+																		:filename	=> "poster",
+																		:format		=> "jpg"}}]
+												})
+
+		statushash = binder.current_version.zendata
+
+		statushash["jobid"] = r.body["id"]
+
+		unless binder.save
+
+			raise "Zencoder::Job#create Failed"
+
+		end
+
+	end
 
 	def self.gen_smartnotebook_thumbnail(id)
 

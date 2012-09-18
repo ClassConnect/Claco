@@ -4,7 +4,7 @@
 
 <% elsif @binder.current_version.vidtype == "zen" %>
 
-	<center><iframe width="700" height="390" class="embeddrop" frameborder="0" src="<%= zenframe(@binder) %>"></iframe></center>
+	<center><iframe width="700" height="390" class="embeddrop" frameborder="0" src="<%= zenframe(@binder) %>" allowfullscreen ></iframe></center>
 
 <% elsif @binder.current_version.youtube? %>
 

@@ -118,7 +118,8 @@ class ZencoderCallbacksController < ApplicationController
 			stathash = binder.current_version.imgstatus
 			stathash[:imgfile][:retrieved] = true
 
-			Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id, binder.current_version.video.posterurl)
+			# Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id, binder.current_version.video.posterurl)
+			Binder.get_thumbnail_from_url(binder.id, binder.current_version.video.posterurl)
 
 		end
 

@@ -228,6 +228,10 @@ class BindersController < ApplicationController
 
 		@binder = Binder.find(params[:id])
 
+		if @binder.current_version.vidtype != "zen"
+			render "public/404.html", :status => 404 and return
+		end
+
 		render :layout => false
 
 	end
@@ -768,6 +772,10 @@ class BindersController < ApplicationController
 
 								# DELAYTAG
 								#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
+							elsif ZENCODER_SUPPORTED_VIDEO_EXTS.include? @binder.current_version.ext.downcase
+
+								Binder.delay(:queue => 'encode').encode(@binder.id.to_s)
 
 							elsif @binder.current_version.ext.downcase == ".notebook"
 

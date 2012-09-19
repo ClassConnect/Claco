@@ -52,8 +52,8 @@ YOUTUBE_IMG_FILE = "/0.jpg"
 
 CLACO_SUPPORTED_THUMBNAIL_FILETYPES = %w[doc .doc docx .docx ppt .ppt pptx .pptx pdf .pdf jpg .jpg jpeg .jpeg png .png gif .gif xls .xls xlsx .xlsx notebook .notebook]
 CLACO_VALID_IMAGE_FILETYPES = %w[jpg .jpg jpeg .jpeg png .png gif .gif]
-
-
+ZENCODER_SUPPORTED_VIDEO_EXTS = %w[mp4 .mp4 wmv .wmv mov .mov avi .avi flv .flv mpg .mpg mpeg .mpeg 3gp .3gp 3gpp .3gpp mkv .mkv]
+CLACO_SUPPORTED_THUMBNAIL_FILETYPES = CLACO_SUPPORTED_THUMBNAIL_FILETYPES | ZENCODER_SUPPORTED_VIDEO_EXTS
 # THUMBNAIL GENERATION
  
 # Size to scale down the full image before smart thumbnail generation

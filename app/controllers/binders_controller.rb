@@ -381,6 +381,7 @@ class BindersController < ApplicationController
 									# YOUTUBE
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
+									@binder.current_version.vidtype = "youtube"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -389,6 +390,7 @@ class BindersController < ApplicationController
 									# VIMEO
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
+									@binder.current_version.vidtype = "vimeo"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -397,6 +399,7 @@ class BindersController < ApplicationController
 									# EDUCREATIONS
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
+									@binder.current_version.vidtype = "educreations"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -405,6 +408,7 @@ class BindersController < ApplicationController
 									# SCHOOLTUBE
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
+									@binder.current_version.vidtype = "schooltube"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -413,6 +417,7 @@ class BindersController < ApplicationController
 									# SHOWME
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
+									@binder.current_version.vidtype = "showme"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 

@@ -1,5 +1,5 @@
 class BindersController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:show, :index]
+	before_filter :authenticate_teacher!, :except => [:show, :index, :video]
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename

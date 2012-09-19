@@ -2,29 +2,35 @@
 
 	<center><iframe id="crocFrame" width="700" height="600" class="embeddrop" frameborder="0" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe></center>
 
-<% elsif @binder.current_version.vidtype == "zen" %>
+<% elsif !@bincer.current_version.vidtype.empty? %>
 
-	<center><iframe width="700" height="390" class="embeddrop" frameborder="0" src="<%= zenframe(@binder) %>" allowfullscreen ></iframe></center>
+	<% if @binder.current_version.vidtype == "zen" %>
 
-<% elsif @binder.current_version.youtube? %>
+		<center><iframe width="700" height="390" class="embeddrop" frameborder="0" src="<%= zenframe(@binder) %>" allowfullscreen ></iframe></center>
 
-	<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= @binder.current_version.get_youtube_id %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>
+	<% elsif @binder.current_version.vidtype == "youtube" %>
 
-<% elsif @binder.current_version.educreations? %>
+		<center><iframe width="700" height="390" src="http://www.youtube.com/embed/<%= @binder.current_version.get_youtube_id %>?modestbranding=1&wmode=transparent" frameborder="0" class="embeddrop" allowfullscreen></iframe></center>
 
-	<center><iframe width="700" height="390" src="http://www.educreations.com/lesson/embed/<%= @binder.current_version.get_educreations_id %>" class="embeddrop" frameborder="0" allowfullscreen></iframe></center>
+	<% elsif @binder.current_version.vidtype == "educreations" %>
 
-<% elsif @binder.current_version.vimeo? %>
+		<center><iframe width="700" height="390" src="http://www.educreations.com/lesson/embed/<%= @binder.current_version.get_educreations_id %>" class="embeddrop" frameborder="0" allowfullscreen></iframe></center>
 
-	<center><iframe src="http://player.vimeo.com/video/<%= @binder.current_version.get_vimeo_id %>" width="700" height="390" class="embeddrop" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></center>
+	<% elsif @binder.current_version.vidtype = "vimeo" %>
 
-<% elsif @binder.current_version.schooltube? %>
+		<center><iframe src="http://player.vimeo.com/video/<%= @binder.current_version.get_vimeo_id %>" width="700" height="390" class="embeddrop" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></center>
 
-	<center><iframe width="700" height="390" src="http://www.schooltube.com/embed/<%= @binder.current_version.get_schooltube_id %>" frameborder="0" class="embeddrop" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe></center>
+	<% elsif @binder.current_version.vidtype == "schooltube" %>
 
-<% elsif @binder.current_version.showme? %>
+		<center><iframe width="700" height="390" src="http://www.schooltube.com/embed/<%= @binder.current_version.get_schooltube_id %>" frameborder="0" class="embeddrop" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe></center>
 
-	<center><iframe src="http://www.showme.com/sma/embed/?s=<%= @binder.current_version.get_showme_id %>&w=700&h=390" width="700" height="390" frameborder="0" class="embeddrop" ></iframe></center>
+	<% elsif @binder.current_version.vidtype == "showme" %>
+
+		<center><iframe src="http://www.showme.com/sma/embed/?s=<%= @binder.current_version.get_showme_id %>&w=700&h=390" width="700" height="390" frameborder="0" class="embeddrop" ></iframe></center>
+
+	<% end %>
+
+<% end %>
 
 <% elsif @binder.current_version.img? %>
 

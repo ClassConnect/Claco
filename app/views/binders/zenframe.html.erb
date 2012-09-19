@@ -8,11 +8,6 @@
 			body, html {
 			overflow:hidden;
 			}
-			.vidobj{
-				position:fixed;
-				top:0;
-				left:0;
-			}
 		</style>
 	</head>
 	<body>
@@ -24,6 +19,7 @@
 		$(document).ready(function() {
 		$("#vidobj").attr('width', $(document).width());
 		$("#vidobj").attr('height', $(document).height());
+		$("#vidobj").attr('style', "position:fixed;top:0;left:0;");
 		$("#vidobj").width($(document).width());
 		$("#vidobj").height($(document).height());
 		});

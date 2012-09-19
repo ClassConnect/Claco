@@ -4,6 +4,11 @@
 		<%= javascript_include_tag "video" %>
 		<%= stylesheet_link_tag "video-js", :media => "all" %>
 		<%= javascript_tag "_V_.options.flash.swf = '#{asset_path "video-js.swf"}'" %>
+		<style type="text/css">
+			body, html {
+			overflow:hidden;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="vid">
@@ -13,14 +18,14 @@
 		</div>
 	</body>
 	<script type="text/javascript">
-$(document).ready(function() {
+		$(document).ready(function() {
 
-$("#<%= @binder.id.to_s %>").attr('width', $(document).width());
-$("#<%= @binder.id.to_s %>").attr('height', $(document).height());
-$("#<%= @binder.id.to_s %>").width($(document).width());
-$("#<%= @binder.id.to_s %>").height($(document).height());
+		$("#<%= @binder.id.to_s %>").attr('width', $(document).width());
+		$("#<%= @binder.id.to_s %>").attr('height', $(document).height());
+		$("#<%= @binder.id.to_s %>").width($(document).width());
+		$("#<%= @binder.id.to_s %>").height($(document).height());
 
 
-});
-</script>
+		});
+	</script>
 </html>

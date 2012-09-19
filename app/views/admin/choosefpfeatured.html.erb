@@ -28,7 +28,7 @@
 
 	<tr>
 		<td>
-			<% unless f["time"].empty? %>
+			<% unless f["time"].nil? %>
 			<%= time_ago_in_words(Time.at(f["time"]).to_datetime) %> ago
 			<% end %>
 		</td>

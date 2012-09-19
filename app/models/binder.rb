@@ -490,7 +490,7 @@ class Binder
 
 		r = Zencoder::Job.create({	:input 	=> binder.current_version.file.url,
 									:outputs => [{	:url			=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/vid.mp4",
-													:notifications	=> ["http://dragonrider.claco.com/zcb"]},
+													:notifications	=> ["http://www.claco.com/zcb"]},
 												{	:thumbnails		=> {:number		=> 1,
 																		:base_url	=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/",
 																		:filename	=> "poster",

@@ -489,12 +489,12 @@ class Binder
 		binder = Binder.find(id)
 
 		r = Zencoder::Job.create({	:input 	=> binder.current_version.file.url,
-									:outputs => [{	:url			=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/vid.mp4",
-													:notifications	=> ["http://www.claco.com/zcb"]},
+									:outputs => [{	:url			=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/vid.mp4"},
 												{	:thumbnails		=> {:number		=> 1,
 																		:base_url	=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/",
 																		:filename	=> "poster",
-																		:format		=> "jpg"}}]
+																		:format		=> "jpg"}}],
+								:notifications	=> ["http://www.claco.com/zcb"]
 												})
 
 		statushash = binder.current_version.zendata

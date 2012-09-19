@@ -1282,7 +1282,7 @@ class Version
 
 	mount_uploader :video, VideoUploader
 
-	field :vidtype, :type => String
+	field :vidtype, :type => String, :default => ""
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority

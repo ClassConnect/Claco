@@ -8,20 +8,25 @@
 			body, html {
 			overflow:hidden;
 			}
+			.v<%= @binder.id.to_s %>{
+				position:fixed;
+				top:0;
+				left:0;
+			}
 		</style>
 	</head>
 	<body>
-		<video id="<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390" style="position:fixed;top:0;left:0;">
+		<video id="v<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390">
 			<source src="<%= @binder.current_version.video.url.html_safe %>" type='video/mp4'>
 		</video>
 	</body>
 	<script type="text/javascript">
 		$(document).ready(function() {
 
-		$("#<%= @binder.id.to_s %>").attr('width', $(document).width());
-		$("#<%= @binder.id.to_s %>").attr('height', $(document).height());
-		$("#<%= @binder.id.to_s %>").width($(document).width());
-		$("#<%= @binder.id.to_s %>").height($(document).height());
+		$("#v<%= @binder.id.to_s %>").attr('width', $(document).width());
+		$("#v<%= @binder.id.to_s %>").attr('height', $(document).height());
+		$("#v<%= @binder.id.to_s %>").width($(document).width());
+		$("#v<%= @binder.id.to_s %>").height($(document).height());
 
 
 		});

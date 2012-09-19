@@ -11,15 +11,16 @@
 		</style>
 	</head>
 	<body>
-		<video id="vidobj" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390">
-			<source src="<%= @binder.current_version.video.url.html_safe %>" type='video/mp4'>
-		</video>
+		<div style="position:fixed; top:0; left:0">
+			<video id="vidobj" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390">
+				<source src="<%= @binder.current_version.video.url.html_safe %>" type='video/mp4'>
+			</video>
+		</div>
 	</body>
 	<script type="text/javascript">
 		$(document).ready(function() {
 		$("#vidobj").attr('width', $(document).width());
 		$("#vidobj").attr('height', $(document).height());
-		$("#vidobj").attr('style', "position:fixed;top:0;left:0;");
 		$("#vidobj").width($(document).width());
 		$("#vidobj").height($(document).height());
 		});

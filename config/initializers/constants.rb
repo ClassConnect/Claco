@@ -108,6 +108,8 @@ FEED_COLLAPSE_TIME = 30.minutes.to_i
 
 Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"
 
+Zencoder.api_key = ENV['ZENCODER_API_KEY'] if Rails.env = "production"
+
 Twitter.configure do |config|
   config.consumer_key = 'RAlHtL8ZSNBg16RaYiDBQ'
   config.consumer_secret = 'In2ol36fFfI6GRnyDZQxLpGFf1QIhMUJlFpeYG4zo'

@@ -11,11 +11,9 @@
 		</style>
 	</head>
 	<body>
-		<div id="vid">
-			<video id="<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390">
-				<source src="<%= @binder.current_version.video.url.html_safe %>" type='video/mp4'>
-			</video>
-		</div>
+		<video id="<%= @binder.id.to_s %>" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390" style="position:fixed;top:0;left:0;">
+			<source src="<%= @binder.current_version.video.url.html_safe %>" type='video/mp4'>
+		</video>
 	</body>
 	<script type="text/javascript">
 		$(document).ready(function() {

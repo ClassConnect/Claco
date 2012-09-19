@@ -11,7 +11,7 @@ PATH_STATUS = "/document/status"
 PATH_SESSION = "/session/create"
 PATH_TEXTGRAB = "/download/text"
 
-CROC_VALID_FILE_FORMATS = %w[doc .doc docx .docx pdf .pdf ppt .ppt pptx .pptx xls .xls xlsx .xlsx]
+CROC_VALID_FILE_FORMATS = %w[doc .doc docx .docx ppt .ppt pptx .pptx pdf .pdf xls .xls xlsx .xlsx]
 
 CROC_API_OPTIONS = {
 	# Your API token
@@ -52,7 +52,7 @@ YOUTUBE_IMG_FILE = "/0.jpg"
 
 CLACO_VALID_IMAGE_FILETYPES = %w[jpg .jpg jpeg .jpeg png .png gif .gif]
 ZENCODER_SUPPORTED_VIDEO_EXTS = %w[mp4 .mp4 m4v .m4v wmv .wmv mov .mov avi .avi flv .flv mpg .mpg mpeg .mpeg 3gp .3gp 3gpp .3gpp mkv .mkv]
-CLACO_SUPPORTED_THUMBNAIL_FILETYPES = %w[doc .doc docx .docx ppt .ppt pptx .pptx pdf .pdf jpg .jpg jpeg .jpeg png .png gif .gif xls .xls xlsx .xlsx notebook .notebook] + ZENCODER_SUPPORTED_VIDEO_EXTS
+CLACO_SUPPORTED_THUMBNAIL_FILETYPES = %w[notebook .notebook] + CROC_VALID_FILE_FORMATS + CLACO_VALID_IMAGE_FILETYPES + ZENCODER_SUPPORTED_VIDEO_EXTS
 # THUMBNAIL GENERATION
  
 # Size to scale down the full image before smart thumbnail generation

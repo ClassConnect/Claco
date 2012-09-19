@@ -28,16 +28,18 @@
 
 	<tr>
 		<td>
+			<% unless f["time"].empty? %>
 			<%= time_ago_in_words(Time.at(f["time"]).to_datetime) %> ago
+			<% end %>
 		</td>
 		<td>
-			<% if f["top"] %>
+			<% unless f["top"].empty? %>
 				<%= link_to f["top"], named_binder_route(f["top"]) %><br />
 				<%= Binder.find(f["top"]).username %>
 			<% end %>
 		</td>
 		<td>
-			<% if f["bot"] %>
+			<% unless f["bot"].empty? %>
 				<%= link_to f["bot"], named_binder_route(f["bot"]) %><br />
 				<%= Binder.find(f["bot"]).username %>
 			<% end %>

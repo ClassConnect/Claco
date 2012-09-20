@@ -240,10 +240,6 @@ class HomeController < ApplicationController
 		render "public/tos.html"#, :status => 200 and return
 	end
 
-	def blitz
-		render :text => "42"
-	end
-
 	def search
 
 		if params[:q].present?

@@ -2,14 +2,9 @@
 	<% #if !signed_in? || (t.id.to_s != current_teacher.id.to_s)
 	%>
 	<div class="listitem">
-		<% if !t.info.nil? && !t.info.avatar.to_hash[:url].nil? #&& !t.info.avatar.empty? 
-			%>
-		<% if !(t.info.avatar.url.include? '/assets/') %>
 		<a href="<%= "/#{t.username}" %>">
-			<img src=<%= t.info.avatar.thumb_md.url.to_s %> class="thumbster" />
+			<img src="<%= t.thumb_md %>" class="thumbster" />
 		</a>
-		<% end %>
-		<% end %>
 		<div class="infowrap">
 			<div class="bigtitle">
 				<a href="<%= "/#{t.username}" %>"><%= "#{t.fname} #{t.lname}" %></a> <a href="<%= "/#{t.username}" %>"><span class="uname">(<%= t.username.to_s %>)</span></a>

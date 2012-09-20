@@ -126,7 +126,8 @@ class Teacher
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
+			indexes :info, :type => 'object', :properties => { 	:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
+																:avatar 		=> { :type => 'object',	:enabled => false },
 																:size 			=> { :type => 'object', :enabled => false },
 																:ext 			=> { :type => 'object', :enabled => false },
 																:data 			=> { :type => 'object', :enabled => false },
@@ -149,6 +150,36 @@ class Teacher
 	def self
     	#to_indexed_json.as_json
     	to_indexed_json.to_json
+	end
+
+	def thumbready?
+
+		return !self.info.nil? && !self.info.thumbnails.nil? && !self.info.thumbnails.first.nil? && !self.info.thumbnails.first.empty?
+
+	end
+
+	def thumb_lg
+
+		return self.thumbready? ? self.info.thumbnails[0] : asset_path("placer.png")
+
+	end
+
+	def thumb_mg
+
+		return self.thumbready? ? self.info.thumbnails[1] : asset_path("placer.png")
+
+	end
+
+	def thumb_md
+
+		return self.thumbready? ? self.info.thumbnails[2] : asset_path("placer.png")
+
+	end
+
+	def thumb_sm
+
+		return self.thumbready? ? self.info.thumbnails[3] : asset_path("placer.png")
+
 	end
 
 	# def to_indexed_json
@@ -577,6 +608,8 @@ class Info
 	#validates_with InfoValidator
 
 	mount_uploader :avatar, AvatarUploader
+
+	field :thumbnails, :type => Array, :default => [nil,nil,nil,nil]
 
 	field :size, 				:type => Integer, :default => 0
 	field :ext, 				:type => String, :default => ""

@@ -3,9 +3,11 @@
 	<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 		<div class="thecontent">
 			<% if !@subscribee.info.nil? %>
-				<% if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") %>
-					<div class="previmg" style="background-image: url('<%= @subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
-				<% end %>
+				<% #if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") 
+				%>
+				
+				<div class="previmg" style="background-image: url('<%= @subscribee.thumb_mg %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+				
 
 				<% if !@subscribee.info.bio.nil? && !@subscribee.info.bio.empty? %>
 					<div class="txtcon">
@@ -49,9 +51,11 @@
 		<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 			<div class="thecontent">
 				<% if !@subscribee.info.nil? %>
-					<% if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") %>
-						<div class="previmg" style="background-image: url('<%= @subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
-					<% end %>
+					<% #if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") 
+					%>
+
+					<div class="previmg" style="background-image: url('<%= @subscribee.thumb_mg %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+
 
 					<% if !@subscribee.info.bio.nil? && !@subscribee.info.bio.empty? %>
 						<div class="txtcon">

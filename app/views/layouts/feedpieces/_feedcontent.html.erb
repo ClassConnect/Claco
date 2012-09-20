@@ -33,7 +33,13 @@
 			<div class="txtcon">
 				<div class="contitle"><%= @f[:model].title %></div>
 				<div class="condesc">
-					<%= truncate(strip_tags(@f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% if !@f[:model].body.empty? %>
+            		<%= truncate(strip_tags(@f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% elsif !@f[:model].current_version.nil? &&!@f[:model].current_version.doctext.nil? && !@f[:model].current_version.doctext.empty? %>
+            		<%= truncate(strip_tags(@f[:model].current_version.doctext), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% else %>
+            		<%= "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe %>
+            	<% end %>
 				</div>
 			</div>
 			<div style="clear:both"></div>
@@ -77,7 +83,13 @@
 			<div class="txtcon">
 				<div class="contitle"><%= g[:model].title %></div>
 				<div class="condesc">
-					<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% if !g[:model].body.empty? %>
+            		<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% elsif !g[:model].current_version.nil? &&!g[:model].current_version.doctext.nil? && !g[:model].current_version.doctext.empty? %>
+            		<%= truncate(strip_tags(g[:model].current_version.doctext), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% else %>
+            		<%= "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe %>
+            	<% end %>
 				</div>
 			</div>
 			<div style="clear:both"></div>

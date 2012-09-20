@@ -57,7 +57,7 @@
 
             <a href="/<%= current_teacher.username %>">
             <div id="namester">
-                <img src="<%= current_teacher.info.avatar.thumb_sm if !current_teacher.info.nil? && !current_teacher.info.avatar.nil? %>" class="myprofpic" />
+                <img src="<%= current_teacher.thumb_sm %>" class="myprofpic" />
                 <div class="fname"><%= current_teacher.full_name %></div>
             </div>
             </a>

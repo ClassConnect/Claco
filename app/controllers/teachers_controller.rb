@@ -258,6 +258,20 @@ class TeachersController < ApplicationController
 												:location		=> params[:lng].empty? || params[:lat].empty? ? nil : [params[:lng].to_f, params[:lat].to_f],
 												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size)
 
+		#debugger
+
+		storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
+
+		datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
+
+		response = RestClient.post('localhost:3001/api',{ :storedir => storedir.to_s,
+														:class => 'avatar',
+														:url => current_teacher.info.avatar.url.to_s,
+														:model => [current_teacher.id.to_s],
+														:datahash => datahash.to_s })
+
+		#debugger
+
 		altparams = nil
 
 		if !params[:info][:avatar].nil?

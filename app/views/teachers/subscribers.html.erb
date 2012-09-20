@@ -1,7 +1,7 @@
 <ul>
 <% @subscribers.each do |sub| %>
 <li>
-<div><%= image_tag(sub.info.avatar.thumb_md.url) %></div>
+<div><%= image_tag(sub.thumb_md) %></div>
 <div><%= link_to(sub.full_name, sub.username) %></div>
 <div><%= sub.info.bio %></div>
 </li>

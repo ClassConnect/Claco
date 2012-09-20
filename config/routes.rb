@@ -44,6 +44,8 @@ Claco::Application.routes.draw do
 
 
 	get		'/mediaserver/:id'												=> 'media_server_api#tokencheck'
+	get		'/mediaservertest'												=> 'media_server_api#mediaserver'
+	post	'/mediaserver/thumbs'											=> 'media_server_api#addthumbs'
 
 	get		'/invite'														=> 'invitations#invite'
 	post	'/invite'														=> 'invitations#create'

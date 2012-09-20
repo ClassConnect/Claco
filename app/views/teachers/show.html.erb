@@ -8,7 +8,7 @@
 
 <div class="container">
   <div class="profile-avatar-wrap">
-    <img src="<%= @teacher.info.avatar.thumb_lg.url %>">
+    <img src="<%= @teacher.thumb_lg %>">
     <% #<span class="clips">
       #<strong>4,204</strong> snaps
     #</span>
@@ -121,10 +121,10 @@
         Subscriptions 
       </h3>
       <ul class="profile-avatars">
-        <% @subscriptions.shuffle.sort_by{|t| t.info.avatar.file.nil? ? 1 : 0}[0..5].shuffle.each do |sub| %>
+        <% @subscriptions.shuffle.sort_by{|t| t.thumbready? ? 1 : 0}[0..5].shuffle.each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
-              <img src="<%= sub.info.avatar.thumb_md.url %>">
+              <img src="<%= sub.thumb_md %>">
             </a>
           </li>
         <% end %>
@@ -136,10 +136,10 @@
         Subscribers 
       </h3>
       <ul class="profile-avatars">
-        <% @subscribers.shuffle.sort_by{|t| t.info.avatar.file.nil? ? 1 : 0}[0..5].shuffle.each do |sub| %>
+        <% @subscribers.shuffle.sort_by{|t| t.thumbready? ? 1 : 0}[0..5].shuffle.each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
-              <img src="<%= sub.info.avatar.thumb_md.url %>">
+              <img src="<%= sub.thumb_md %>">
             </a>
           </li>
         <% end %>

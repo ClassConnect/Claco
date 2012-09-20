@@ -112,6 +112,8 @@ Claco::Application.routes.draw do
 
 	post	'/zcb'																					=> 'zencoder_callbacks#processed'
 
+	get		'/mu-43c0e7df-28b26f3a-b2c0e5a5-6cdca93a'												=> 'home#blitz' #Blitz
+
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
 
 		#Subscribe/unsubscribe

@@ -1,214 +1,128 @@
 <div class="content-list">
 
+	<% if @children.empty? %>
 
-	     <% if @children.empty? %>
-				<div class="emptyfolder">
-					We couldn't find anything here...yet!
+	<div class="emptyfolder">We couldn't find anything here...yet!</div>
+
+	<% else %>
+
+	<% @children.each do |binder| %>
+
+	<% imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 %>
+	<div id="<%= binder.id %>" class="content-item<%= ' folder-item droppable' if binder.type == 1 %>">
+
+	    <% if binder.type != 1 %> 
+
+		<% if !Binder.thumbready?(binder) %>
+
+	  	<div class="folder-preview">
+			<div class="contype"><img src="<%= get_contype_icon(binder) %>" style="width:24px" /></div>
+	      	<div class="dyncon">
+	      		<div class="gen-file">
+	      			<div class="filebox">
+	      				<div class="filext">
+	      					<%= binder.current_version.ext.sub('.','') if binder.format == 1 %>
+	      					<%= "www" if binder.format == 2 %>
+	      				</div>
+	      			</div>
+	      		</div>
+			</div>
+		</div>
+
+		<% else %>
+
+		<div class="folder-preview">
+			<div class="single-hold" style="margin-top:-1px;background-image:url('<%= Binder.thumb_lg(binder) %>');"></div>
+			<div class="contype"><img src="<%= get_contype_icon(binder) %>" style="width:24px" /></div>
+	    </div>
+
+	    <% end %>
+
+	  	<% else  %>
+
+	  	<div class="folder-preview">
+	  	
+	  		<% if binder.thumbimgids.reject{ |f| f==""||f.nil? }.empty? %>
+
+			<div class="dyncon">
+
+				<div class="empty-folder">
+					<div class="nubfol"></div>
+					<div class="mainfol"></div>
 				</div>
 
-			<% else %>
-				<% @children.each do |binder| %>
+			</div>
 
-          <% imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 %>
+	  		<% else %>
+	       
+	      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');"></div>
+			<div class="contype"><%= image_tag "binders/types/folder.png", :style => "width:24px" %></div>
 
-          <%
-            # imgarr is an array of length 0 to 3 that contains the URLs of the images
-            # the first image is the large thumbnail, the second and third are the small thumbnails
-            #imgarr[0]
-          %>
-
-				<div id="<%= binder.id %>" class="content-item<%= ' folder-item droppable' if binder.type == 1 %>">
-
-
-	                <% if binder.type != 1 
-	                    # is a file/link 
-	                 %> 
-
-					<% if get_binder_image(binder) == "<no image>" || get_binder_image(binder) == asset_path("placer.png") %>
-
-	                  	<div class="folder-preview">
-							<div class="contype">
-								<img src="<%= get_contype_icon(binder) %>" style="width:24px" />
-							</div>
-		                  	<div class="dyncon">
-
-		                  		<div class="gen-file">
-		                  			<div class="filebox">
-		                  				<div class="filext">
-		                  					<%= binder.current_version.ext.sub('.','') if binder.format == 1 %>
-		                  					<%= "www" if binder.format == 2 %>
-		                  				</div>
-		                  			</div>
-		                  		</div>
-
-							</div>
-						</div>
-
-					<% else %>
-
-						<div class="folder-preview">
-							<div class="single-hold" style="margin-top:-1px;background-image:url('<%= get_binder_image(binder) %>');">
-							</div>
-							<div class="contype">
-								<img src="<%= get_contype_icon(binder) %>" style="width:24px" />
-	                      	</div>
-	                    </div>
-
-                    <% end %>
-
-                  <% else 
-                    # is a folder
-                  %>
-
-
-                  	<div class="folder-preview">
-                  	
-                  	<% if binder.thumbimgids.reject{|f| f==""}.empty?
-                  	#binder.children.count == 0 ||  
-                  	%>
-
-							<div class="dyncon">
-
-								<div class="empty-folder">
-									<div class="nubfol"></div>
-									<div class="mainfol"></div>
-								</div>
-
-							</div>
-
-
-              	  	<% else %>
-
-    		            
-
-	                      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');<%= #raw("background-position: -25px;") if !imgarr[2].to_s.empty?  
-	                      	%>">
-
-	    		             </div>
-
-	    		          <div class="contype">
-	    		          	<%= image_tag "binders/types/folder.png", :style => "width:24px" %>
-	                      </div>
-
-
-    		        <% end %>
-
-    		    </div> <!-- end of fold prevew -->
-
-
-    		            <% if !imgarr[1].nil? && !imgarr[1].empty? %>
-
-	                          <img class="thumb1" src="<%= imgarr[1].to_s %>" />
-
-	                    <% else %>
-
-	                    	<%= image_tag "common/nothumb.png", :class => "thumb1" %>
-
-	                    <% end %>
-
-
-	                    <% if !imgarr[2].nil? && !imgarr[2].empty? %>
-
-
-		                    <img class="thumb2" src="<%= imgarr[2].to_s %>" />
-
-		                <% else %>
-
-	                    	<%= image_tag "common/nothumb.png", :class => "thumb2" %>
-
-	                    <% end %>
-
-
-
-
-	                    <% if !imgarr[3].nil? && !imgarr[3].empty? %>
-
-
-		                    <img class="thumb3" src="<%= imgarr[3].to_s %>" />
-
-		                <% else %>
-
-	                    	<%= image_tag "common/nothumb.png", :class => "thumb3" %>
-
-	                    <% end %>
-
-
-
-
-                  <% end %>
-
-                  	<div class="innerd">
-			            <div class="titler"><%= link_to binder.title[0..50], named_binder_route(binder), :class => "pjax linkster" %></div>
-
-			            <div class="reflink">
-
-			            	<% if binder.type == 1 %>
-			            		<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
-
-			            	<% elsif binder.format == 2  && !binder.current_version.embed %>
-
-			            		<%= URI.parse(binder.current_version.data).host.sub(/www\./, "") %>
-
-		            		<% else %>
-
-								<%= binder.current_version.ext %> &bull; <%= number_to_human_size(binder.total_size) %>
-
-			            	<% end %>
-
-			            </div>
-
-			            <div class="descarea">
-		            	<% if !binder.body.empty? %>
-		            		<%= truncate(strip_tags(binder.body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-		            	<% elsif !binder.current_version.nil? &&!binder.current_version.doctext.nil? && !binder.current_version.doctext.empty? %>
-		            		<%= truncate(strip_tags(binder.current_version.doctext), :length => 250, :omission => "... <u>see more</u>").html_safe %>
-		            	<% else %>
-		            		<%= "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe %>
-		            	<% end %>
-			            </div>
-			        </div>
-
-			        <div class="lastupdate">Last updated by <%= link_to "#{binder.fname} #{binder.lname}", "/#{binder.user}" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
-
-			            <div class="drop-tog">
-
-			            	<% if @is_self %>
-			            	
-				            	<div class="btn-group">
-
-						          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
-						          <div class="tog-arrow"></div>
-						          </button>
-
-						          <ul class="dropdown-menu">
-						            <li><a id="rename-act" class="modaction">Rename</a></li>
-						            <li><a id="copy-act" class="modaction">Copy</a></li>
-						            <li><a id="move-act" class="modaction">Move</a></li>
-						            <li><a id="delete-act" class="modaction">Delete</a></li>
-						          </ul>
-
-						        </div>
-
-			            	<% else %>
-			            		<% if signed_in? %>
-					            	<button class="btn snapbtn">
-										<%= image_tag "binders/snap.png" %>
-										<div class="texter">Snap</div>
-									</button>
-								<% end %>
-					        <% end %>
-
-			            </div>
-
-
-			        </div>
-
-
-
-
-				<% end %>
-			<% end %>
-
+	    	<% end %>
 
 		</div>
+
+		<img class="thumb1" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
+	    <img class="thumb2" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
+	    <img class="thumb3" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
+
+		<% end %>
+
+	  	<div class="innerd">
+	        <div class="titler"><%= link_to binder.title[0..50], named_binder_route(binder), :class => "pjax linkster" %></div>
+	        <div class="reflink">
+	        	<% if binder.type == 1 %>
+	    		<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+	        	<% elsif binder.format == 2  && !binder.current_version.embed %>
+	    		<%= URI.parse(binder.current_version.data).host.sub(/www\./, "") %>
+	    		<% else %>
+				<%= binder.current_version.ext %> &bull; <%= number_to_human_size(binder.total_size) %>
+	        	<% end %>
+	        </div>
+
+	        <div class="descarea">
+		    	<% if !binder.body.empty? %>
+	    		<%= truncate(strip_tags(binder.body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+		    	<% elsif !binder.current_version.nil? &&!binder.current_version.doctext.nil? && !binder.current_version.doctext.empty? %>
+	    		<%= truncate(strip_tags(binder.current_version.doctext), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+		    	<% else %>
+	    		<%= "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe %>
+		    	<% end %>
+	        </div>
+	    </div>
+
+	    <div class="lastupdate">Last updated by <%= link_to "#{binder.fname} #{binder.lname}", "/#{binder.user}" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
+	    <div class="drop-tog">
+
+	    	<% if @is_self %>
+
+			<div class="btn-group">
+				<button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
+					<div class="tog-arrow"></div>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a id="rename-act" class="modaction">Rename</a></li>
+					<li><a id="copy-act" class="modaction">Copy</a></li>
+					<li><a id="move-act" class="modaction">Move</a></li>
+					<li><a id="delete-act" class="modaction">Delete</a></li>
+				</ul>
+			</div>
+
+	    	<% else %>
+
+			<% if signed_in? %>
+
+	    	<button class="btn snapbtn">
+				<%= image_tag "binders/snap.png" %>
+				<div class="texter">Snap</div>
+			</button>
+
+			<% end %>
+
+	        <% end %>
+	    </div>
+    </div>
+	<% end %>
+	<% end %>
+</div>
 

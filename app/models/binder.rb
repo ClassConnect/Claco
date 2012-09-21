@@ -89,35 +89,36 @@ class Binder
 
 	embeds_one :imageset
 
-	def thumbready?
+	########################################
 
-		return !self.current_version.nil? && !self.current_version.thumbnails.nil? && !self.current_version.thumbnails.first.nil? && !self.current_version.thumbnails.first.empty?
+	def self.thumbready? (binder)
 
-	end
-
-	def thumb_lg
-
-		return self.thumbready? ? self.current_version.thumbnails[0] : asset_path("common/nothumb.png")
-
-	end
-
-	def thumb_mg
-
-		return self.thumbready? ? self.current_version.thumbnails[1] : asset_path("common/nothumb.png")
+		return 	!binder.nil? && 
+				!binder.current_version.nil? && 
+				!binder.current_version.thumbnails.nil? && 
+				!binder.current_version.thumbnails.first.nil? && 
+				!binder.current_version.thumbnails.first.empty?
 
 	end
 
-	def thumb_md
+	def self.contentview (binder)
 
-		return self.thumbready? ? self.current_version.thumbnails[2] : asset_path("common/nothumb.png")
+		return Binder.thumbready?(binder) ? binder.current_version.thumbnails[0] : "/assets/common/nothumb.png"
+
+	end
+
+	def self.thumb_lg (binder)
+
+		return Binder.thumbready?(binder) ? binder.current_version.thumbnails[1] : "/assets/common/nothumb.png"
 
 	end
 
-	def thumb_sm
+	def self.thumb_sm (binder)
 
-		return self.thumbready? ? self.current_version.thumbnails[3] : asset_path("common/nothumb.png")
+		return Binder.thumbready?(binder) ? binder.current_version.thumbnails[2] : "/assets/common/nothumb.png"
 
 	end
+
 
 	# returns array of URLs of images, in order of size
 	def self.get_folder_array(id)
@@ -126,23 +127,29 @@ class Binder
 
 		retarr = Array.new
 
-		#Rails.logger.debug "Thumbimbids array: #{binder.thumbimgids.to_s}"
+		# retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
+		# retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
+		# retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
+		# retarr << Binder.find(binder.thumbimgids[3].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
 
-		# retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if !binder.thumbimgids[0].empty?
-		# retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
-		# retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
+		begin 
+			retarr << Binder.find(binder.thumbimgids[0].to_s)#.current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
+			retarr << Binder.find(binder.thumbimgids[1].to_s)#.current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
+			retarr << Binder.find(binder.thumbimgids[2].to_s)#.current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
+			retarr << Binder.find(binder.thumbimgids[3].to_s)#.current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
+		rescue
 
-		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
-		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
-		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
-		retarr << Binder.find(binder.thumbimgids[3].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
-
-		#Rails.logger.debug "Return array: #{retarr.to_s}"
+		ensure
+			(4-retarr.size).times { retarr << nil }
+		end			
 
 		return retarr
 
+		#return binder.thumbimgids.map { |f| Binder.find(f.to_s) }
+
 	end
 
+	# unused
 	def self.get_folder_feed_array(id)
 
 		binder = Binder.find(id.to_s)
@@ -212,6 +219,7 @@ class Binder
 		# technically not necessary to save until reaching the top node
 		binder.save
 
+		# recurse
 		Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(binder.parent["id"] || binder.parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
 
 	end
@@ -1422,6 +1430,8 @@ class Version
 	mount_uploader :img_thumb_sm, 	ImageUploader
 
 	embedded_in :binder
+
+
 
 	def thumbnailgen
 

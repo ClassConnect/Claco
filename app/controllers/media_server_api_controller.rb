@@ -31,7 +31,17 @@ class MediaServerApiController < ApplicationController
 			end
 		else
 
-			model.update_attributes(:thumbnails => params[:thumbs])
+			#model.update_attributes(:thumbnails => params[:thumbs])
+
+
+			case params[:model][0]
+			when 'binder'
+				model.update_attributes(:thumbnails => params[:thumbs])
+			when 'teacher'
+				# must call save on the root class to enable ElasticSearch callbacks
+				model.thumbnails = params[:thumbs]
+				model.teacher.save
+			end
 
 			respond_to do |format|
 				#format.html {render :text => "PARAMS: #{params.to_s}, taskid: #{task.id.to_s}" }

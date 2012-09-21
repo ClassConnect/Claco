@@ -118,5 +118,10 @@ end
 TX_PRIVATE_KEY = "4660adcf8a7e13d2215b7596da5e6c13"
 RX_PRIVATE_KEY = "0a591a51998e86c2f83fffb66f954bff"
 
-MEDIASERVER_API_URL = 'localhost:3001/api'
-APPSERVER_API_URL = 'localhost:5000/mediaserver/thumbs'
+if Rails.env == "development"
+	MEDIASERVER_API_URL = 'localhost:5001/api'
+	APPSERVER_API_URL = 'localhost:5000/mediaserver/thumbs'
+else
+	MEDIASERVER_API_URL = '184.73.195.113/api'
+	APPSERVER_API_URL = 'http://claco.com/mediaserver/thumbs'
+end

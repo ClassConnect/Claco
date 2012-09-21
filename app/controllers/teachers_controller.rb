@@ -174,15 +174,10 @@ class TeachersController < ApplicationController
 						# there is a similar event, combine in feed array
 						else	
 
-							if (f[:model].to_s=='binders' && 
-									(f[:model].thumbimgids[0].nil? || 
-									f[:model].thumbimgids[0].empty?)) || 
-								(f[:model].to_s=='teachers' && 
-									(f[:model].info.nil? || 
-									f[:model].info.avatar.nil? || 
-									f[:model].info.avatar.url.nil? || 
-									f[:model].info.avatar.url.empty? || 
-									(f[:model].info.avatar.url.to_s.include? "/assets/")))
+							if (f[:model].to_s=='binders' && Binder.thumbready?(f[:model])) ||
+									# (f[:model].thumbimgids[0].nil? || 
+									# f[:model].thumbimgids[0].empty?)) || 
+								(f[:model].to_s=='teachers' && Teacher.thumbready?(f[:model]))
 
 								@subsfeed[duplist[similar]['index']] << f
 
@@ -236,6 +231,8 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
+		#debugger
+
 		current_teacher.info = Info.new if current_teacher.info.nil?
 
 		if current_teacher.fname!=params[:teacher][:fname] || current_teacher.lname!=params[:teacher][:lname]
@@ -244,6 +241,8 @@ class TeachersController < ApplicationController
 									:lname => params[:teacher][:lname])
 			end
 		end
+
+		#debugger
 
 		current_teacher.update_attributes(params[:teacher])
 
@@ -264,7 +263,7 @@ class TeachersController < ApplicationController
 
 		datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
 
-		response = RestClient.post('localhost:3001/api',{ :storedir => storedir.to_s,
+		response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir.to_s,
 														:class => 'avatar',
 														:url => current_teacher.info.avatar.url.to_s,
 														:model => [current_teacher.id.to_s],

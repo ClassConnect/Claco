@@ -246,12 +246,12 @@ module ApplicationHelper
 			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
 			#	return "<no profile picture>"
 			#else
-				return image_tag( "#{teacher.thumb_lg}", options )
+				return image_tag( "#{Teacher.thumb_lg(teacher)}", options )
 			#end
 		elsif options[:thumb_sm]
 			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
 			#else
-				return image_tag( "#{teacher.thumb_sm}", options )
+				return image_tag( "#{Teacher.thumb_sm(teacher)}", options )
 			#end
 		else
 			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0

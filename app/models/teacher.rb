@@ -61,7 +61,7 @@ class Teacher
 
 	embeds_one :tag#, autobuild: true #, validate: false
 
-	has_one :feed
+	#has_one :feed
 
 	embeds_many :relationships#, validate: false
 
@@ -126,21 +126,23 @@ class Teacher
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :info, :type => 'object', :properties => { 	:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
-																:avatar 		=> { :type => 'object',	:enabled => false },
-																:size 			=> { :type => 'object', :enabled => false },
-																:ext 			=> { :type => 'object', :enabled => false },
-																:data 			=> { :type => 'object', :enabled => false },
-																:facebookurl	=> { :type => 'object', :enabled => false },
-																:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
-																:website 		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:twitterhandle 	=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
+			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => {:type => 'string', :analyzer => 'ngram_analyzer' }}}}
+			indexes :info, 		:type => 'object', 	:properties => {:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
+																	:avatar 		=> { :type => 'object',	:enabled => false },
+																	:size 			=> { :type => 'object', :enabled => false },
+																	:ext 			=> { :type => 'object', :enabled => false },
+																	:data 			=> { :type => 'object', :enabled => false },
+																	#:facebookurl	=> { :type => 'object', :enabled => false },
+																	:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																	:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																	:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
+																	:website 		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	#:omnihash		=> { :type => 'string',	:analyzer => 'ngram_analyzer' },
+																	#:twitterhandle 	=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
 		end
 	end
 
@@ -152,33 +154,40 @@ class Teacher
     	to_indexed_json.to_json
 	end
 
-	def thumbready?
+	# these clases are not defined on instances of Teacher because they are not available to ElasticSearch result objects,
+	# which are indistinguishable from mongo result objects
 
-		return !self.info.nil? && !self.info.thumbnails.nil? && !self.info.thumbnails.first.nil? && !self.info.thumbnails.first.empty?
+	def self.thumbready? (teacher)
 
-	end
-
-	def thumb_lg
-
-		return self.thumbready? ? self.info.thumbnails[0] : asset_path("placer.png")
-
-	end
-
-	def thumb_mg
-
-		return self.thumbready? ? self.info.thumbnails[1] : asset_path("placer.png")
+		return 	!teacher.nil? && 
+				!teacher.info.nil? && 
+				!teacher.info.thumbnails.nil? && 
+				!teacher.info.thumbnails.first.nil? && 
+				!teacher.info.thumbnails.first.empty?
 
 	end
 
-	def thumb_md
+	def self.thumb_lg (teacher)
 
-		return self.thumbready? ? self.info.thumbnails[2] : asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
-	def thumb_sm
+	def self.thumb_mg (teacher)
 
-		return self.thumbready? ? self.info.thumbnails[3] : asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.thumb_md (teacher)
+
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.thumb_sm (teacher)
+
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
@@ -395,98 +404,6 @@ class Teacher
 
 end
 
-class Feed
-	include Mongoid::Document
-
-
-	# elements that appear in this teacher's main feed
-	field :main_feed, :type => Array, :default => []
-
-	# elements that appear in this teacher's subscribed feed
-	field :subsc_feed, :type => Array, :default => []
-
-	# elements that appear in this teacher's profile feed
-	field :personal_feed, :type => Array, :default => []
-
-
-	belongs_to :teacher
-
-	# passed an array of new log values, and the identifier for which feed to push it on
-	def multipush(newvals,feedid = 0)
-
-		# bail if a nonexistant feed field is specified
-		raise "Invalid feed identifier!" and return if !([0,1,2].include? feedid)
-
-		feedlength = (feedid==0 ? MAIN_FEED_STORAGE : feedid==1 ? SUBSC_FEED_STORAGE : PERSONAL_FEED_STORAGE)
-
-		# retrieve old values
-		case feedid
-			when 0
-				oldvals = self.main_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
-			when 1
-				oldvals = self.subsc_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
-			when 2
-				oldvals = self.personal_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
-		end
-
-		# assume that newvals are sorted in descending order by time
-		feedarr = []
-
-		feedarr = ((newvals.map{ |f| [f[0].peel,f[1]] }) + ((oldvals.map{ |f| [f,Binder.find(f['modelid'].to_s)] }).sort_by{ |f| f[0]['timestamp'] }.reverse)).reject{ |f| !(f[1].is_pub?) || !(f[1].parent!={'id'=>'0','title'=>''}) }.uniq.first(feedlength)#.reverse
-
-		#feedarr.reverse!
-
-		case feedid
-			when 0
-				self.update_attributes( :main_feed => feedarr.map{ |f| f[0] })
-			when 1
-				self.update_attributes( :subsc_feed => feedarr.map{ |f| f[0] })
-			when 2
-				self.update_attributes( :personal_feed => feedarr.map{ |f| f[0] })
-		end			
-
-		# return array to be used in the view
-		return feedarr#.reverse
-
-	end
-
-	# returns the timestamp of the head of the queue (most recent time)
-	def headtime(feedid = 0)
-
-		case feedid
-			when 0
-				size = self.main_feed.size
-			when 1
-				size = self.subsc_feed.size
-			when 2
-				size = self.personal_feed.size
-			else
-				raise "Invalid feed identifier!" and return
-		end
-
-		if size < 1
-			return -1
-		else
-			case feedid
-				when 0
-					#return self.main_feed[0].timestamp.to_i
-					#return self.main_feed[0]['timestamp']
-					#return self.main_feed.last['timestamp']
-					return self.main_feed.first['timestamp']
-				when 1
-					#return self.subsc_feed[0].timestamp.to_i
-					#return self.subsc_feed[0]['timestamp']
-					#return self.subsc_feed.last['timestamp']
-					return self.subsc_feed.first['timestamp']
-				when 2
-					#return self.personal_feed[0].timestamp.to_i
-					#return self.personal_feed[0]['timestamp']
-					#return self.personal_feed.last['timestamp']
-					return self.personal_feed.first['timestamp']
-			end
-		end
-	end
-end
 
 class Tag
 	include Mongoid::Document
@@ -589,8 +506,8 @@ end
 
 class Info
 	include Mongoid::Document
-	# include Tire::Model::Search
-	# include Tire::Model::Callbacks
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 

@@ -24,37 +24,37 @@ class AvatarUploader < CarrierWave::Uploader::Base
   #   end
   # end
 
-  version :thumb_lg do
-    process resize_to_fill: [AVATAR_LDIM,AVATAR_LDIM]
-    process :convert => "png"
-    def full_filename(for_file = model.avatar.file)
-      "thumb_lg.png"
-    end
-  end
+  # version :thumb_lg do
+  #   process resize_to_fill: [AVATAR_LDIM,AVATAR_LDIM]
+  #   process :convert => "png"
+  #   def full_filename(for_file = model.avatar.file)
+  #     "thumb_lg.png"
+  #   end
+  # end
 
-  version :thumb_mg do
-    process resize_to_fill: [AVATAR_MGDIM,AVATAR_MGDIM]
-    process :convert => "png"
-    def full_filename(for_file = model.avatar.file)
-      "thumb_mg.png"
-    end
-  end
+  # version :thumb_mg do
+  #   process resize_to_fill: [AVATAR_MGDIM,AVATAR_MGDIM]
+  #   process :convert => "png"
+  #   def full_filename(for_file = model.avatar.file)
+  #     "thumb_mg.png"
+  #   end
+  # end
 
-  version :thumb_md, :from_version => :thumb_lg do
-    process resize_to_fill: [AVATAR_MDIM,AVATAR_MDIM]
-    process :convert => "png"
-    def full_filename(for_file = model.avatar.file)
-      "thumb_md.png"
-    end
-  end
+  # version :thumb_md, :from_version => :thumb_lg do
+  #   process resize_to_fill: [AVATAR_MDIM,AVATAR_MDIM]
+  #   process :convert => "png"
+  #   def full_filename(for_file = model.avatar.file)
+  #     "thumb_md.png"
+  #   end
+  # end
 
-  version :thumb_sm, :from_version => :thumb_md do
-    process resize_to_fill: [AVATAR_SDIM,AVATAR_SDIM]
-    process :convert => "png"
-    def full_filename(for_file = model.avatar.file)
-      "thumb_sm.png"
-    end
-  end
+  # version :thumb_sm, :from_version => :thumb_md do
+  #   process resize_to_fill: [AVATAR_SDIM,AVATAR_SDIM]
+  #   process :convert => "png"
+  #   def full_filename(for_file = model.avatar.file)
+  #     "thumb_sm.png"
+  #   end
+  # end
 
 
   # Override the directory where uploaded files will be stored.

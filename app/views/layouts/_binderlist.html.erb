@@ -7,7 +7,7 @@
 		<% imgarr = Binder.get_folder_array(binder.id.to_s) %>
 
 			<div id="<%= binder.id.to_s %>" class="content-item folder-item">
-				<% if binder.thumbimgids.reject{|f| f==""}.empty? %>
+				<% if binder.thumbimgids.reject{|f| f==""||f.nil?}.empty? %>
 
           		<div class="folder-preview">
 					<div class="dyncon">
@@ -23,29 +23,15 @@
 				<% else %>
 
 				<div class="folder-preview">
-			        <div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0] %>')"></div>
+			        <div class="single-hold" style="margin-top:-1px;background-image:url('<%= Binder.thumb_lg(imgarr[0]) %>')"></div>
 
 			    </div> <!-- end of fold prevew -->
 
 			    <% end %>
 
-			    <% if imgarr[1].nil? || imgarr[1].empty? %>
-                	<%= image_tag "common/nothumb.png", :class => "thumby1" %>
-				<% else %>
-					<img class="thumby1" src="<%= imgarr[1] %>" />
-				<% end %>
-
-			    <% if imgarr[2].nil? || imgarr[2].empty? %>
-                	<%= image_tag "common/nothumb.png", :class => "thumby2" %>
-				<% else %>
-					<img class="thumby2" src="<%= imgarr[2] %>" />
-				<% end %>
-
-			    <% if imgarr[3].nil? || imgarr[3].empty? %>
-                	<%= image_tag "common/nothumb.png", :class => "thumby3" %>
-				<% else %>
-					<img class="thumby3" src="<%= imgarr[3] %>" />
-				<% end %>
+				<img class="thumby1" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
+				<img class="thumby2" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
+				<img class="thumby3" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
 
 
 			  	<div class="innerd">
@@ -67,27 +53,18 @@
 			    <div class="drop-tog">
 
 				<% if @is_self %>
-			    	<div class="btn-group">
-
-					          <button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
-					          <div class="tog-arrow"></div>
-					          </button>
-
-					          <ul class="dropdown-menu">
-					            <li><a id="rename-act" class="modaction">Rename</a></li>
-					            <li><a id="delete-act" class="modaction">Delete</a></li>
-					          </ul>
-
-			        </div>
+					<div class="btn-group">
+						<button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
+							<div class="tog-arrow"></div>
+						</button>
+						<ul class="dropdown-menu">
+							<li><a id="rename-act" class="modaction">Rename</a></li>
+							<li><a id="delete-act" class="modaction">Delete</a></li>
+						</ul>
+					</div>
 			    <% end %>
-
-
 			    </div>
-
-
 			</div>
-
 		<% end %>
 	<% end %>
-
 </div>

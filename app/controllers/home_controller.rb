@@ -120,15 +120,12 @@ class HomeController < ApplicationController
 								# there is a similar event, combine in feed array
 								else	
 
-									if (f[:model].to_s=='binders' && 
+									# insert into array dependent on whether or not a thumbnail exists
+									if (f[:log].model.to_s=='binders' && 
 											(f[:model].thumbimgids[0].nil? || 
 											f[:model].thumbimgids[0].empty?)) || 
-										(f[:model].to_s=='teachers' && 
-											(f[:model].info.nil? || 
-											f[:model].info.avatar.nil? || 
-											f[:model].info.avatar.url.nil? || 
-											f[:model].info.avatar.url.empty? || 
-											(f[:model].info.avatar.url.to_s.include? "/assets/")))
+										(f[:log].model.to_s=='teachers' && 
+											!Teacher.thumbready?(f[:model]))
 
 										@subsfeed[duplist[similar]['index']] << f
 
@@ -260,16 +257,12 @@ class HomeController < ApplicationController
 
 			@teachers=@teachers.results.to_a
 
-			debugger
-
 			if @teachers.map { |f| f.id.to_s }.include? current_teacher.id.to_s
 				@teachers = @teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )
 			end
 		else
 			@teachers = []#Teacher.all
 		end
-
-		#debugger
 
 		#@teachers = Teacher.all[0..2]
 

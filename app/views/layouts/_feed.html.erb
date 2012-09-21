@@ -85,7 +85,7 @@
 		<div class="newsitem">
 			<div class="imgarea">
 				<a href="<%= "/#{f[:owner].username}" %>">
-					<img src="<%= f[:owner].thumb_md %>" >
+					<img src="<%= Teacher.thumb_md(f[:owner]) %>" >
 				</a>
 			</div>
 			<% 

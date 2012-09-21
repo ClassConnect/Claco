@@ -48,18 +48,20 @@
 
 
 
-
-
-		<%= javascript_include_tag "application" %>
+		<% if signed_in? %>
 		<%= javascript_include_tag "jqueryui" %>
-		<%= javascript_include_tag "dropdown" %>
-		<%= javascript_include_tag "facebox" %>
-		<%= javascript_include_tag "tooltip" %>
-		<%= javascript_include_tag "tabs" %>
 		<%= javascript_include_tag "gen/cookie" %>
 		<%= javascript_include_tag "gen/sticky" %>
 		<%= javascript_include_tag "gen/boxresize" %>
+		<%= javascript_include_tag "facebox" %>
+		<%= javascript_include_tag "tabs" %>
 		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]');$.pjax.defaults.timeout = 5000;$.pjax.defaults.maxCacheLength=0;" %>
+		<%= javascript_include_tag "tooltip" %>
+
+		<% end %>
+
+		<%= javascript_include_tag "application" %>
+		<%= javascript_include_tag "dropdown" %>
 		<%= javascript_tag "page = '#{params[:controller]}##{params[:action]}'; loggedin = #{signed_in?}" %>
 
 		<script type="text/javascript">

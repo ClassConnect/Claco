@@ -370,8 +370,8 @@ class BindersController < ApplicationController
 										params)
 
 							if url || embedtourl
-
 								uri = URI.parse(link)
+								# debugger
 
 								stathash = @binder.current_version.imgstatus
 								stathash[:imgfile][:retrieved] = true
@@ -431,6 +431,8 @@ class BindersController < ApplicationController
 								end
 
 							end
+
+							@binder.save
 
 							@binder.create_binder_tags(params,current_teacher.id)
 

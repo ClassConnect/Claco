@@ -494,7 +494,7 @@ class Binder
 																		:base_url	=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/",
 																		:filename	=> "poster",
 																		:format		=> "jpg"}}],
-								:notifications	=> ["http://www.claco.com/zcb"]
+									:notifications	=> ["http://www.claco.com/zcb"]
 												})
 
 		statushash = binder.current_version.zendata

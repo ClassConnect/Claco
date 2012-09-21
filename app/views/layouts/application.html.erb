@@ -60,8 +60,8 @@
 
 		<% end %>
 
-		<%= javascript_include_tag "application" %>
-		<%= javascript_include_tag "dropdown" %>
+		<%= javascript_include_tag "application", :defer => "defer" %>
+		<%= javascript_include_tag "dropdown", :defer => "defer" %>
 		<%= javascript_tag "page = '#{params[:controller]}##{params[:action]}'; loggedin = #{signed_in?}" %>
 
 		<script type="text/javascript">

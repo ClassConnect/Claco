@@ -122,17 +122,15 @@ class Teacher
 		}
 	} 	do
 		mapping do
-			#indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => {:type => 'string', :analyzer => 'ngram_analyzer' }}}}
+			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' }}}}
 			indexes :info, 		:type => 'object', 	:properties => {:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
 																	:avatar 		=> { :type => 'object',	:enabled => false },
 																	:size 			=> { :type => 'object', :enabled => false },
 																	:ext 			=> { :type => 'object', :enabled => false },
 																	:data 			=> { :type => 'object', :enabled => false },
-																	#:facebookurl	=> { :type => 'object', :enabled => false },
 																	:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
 																	:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
 																	:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
@@ -140,9 +138,7 @@ class Teacher
 																	:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																	:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																	:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																	#:omnihash		=> { :type => 'string',	:analyzer => 'ngram_analyzer' },
-																	#:twitterhandle 	=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																	:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
+																	:location		=> { :type => 'geo_point', :default => [] } }
 		end
 	end
 
@@ -294,31 +290,84 @@ class Teacher
 		Binder.where(:owner => self.id.to_s)
 	end
 
-	def subs_of_subs
+	# recursively aggregates teacher subscription network
+	# degree of 1 represents teacher's immediate subscriptions
+	def subscriptions (degree = 1)
 
-		sos = [] #{"id" => id, "count" => count}
-
-		subs = relationships.where(:subscribed => true).entries.map {|r| Teacher.find(r["user_id"])}
-
-		subs.each do |sub|
-
-			e = sos.find{|s| s["id"] == sub.id.to_s}
-
-			if e.nil?
-
-				sos << {"id" => sub.id.to_s, "count" => 1}
-
-			else
-
-				e["count"] += 1
-
+		ret = {}
+		if degree>0
+			self.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
+				f.subscriptions(degree-1).each do |g|
+					ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+				end
 			end
-
 		end
+		ret
+	end
 
-		return sos
+	def twitter_friends (degree = 1)
+
+		ret = {}
+		if degree>0
+			#self.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+			#self.omnihash['twitter']['fids'].map { |f| Teacher.find(f.omnihash['twitter']['uid'].to_s) }
+			#Teacher.where('omnihash.twitter.uid'.in => self.omnihash['twitter']['fids']).each do |f|
+			Teacher.any_in('omnihash.twitter.uid' => self.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
+				f.twitter_friends(degree-1).each do |g|
+					ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+				end
+			end
+		end
+		ret
 
 	end
+
+	def facebook_friends (degree = 1)
+
+
+
+	end
+
+	def recommends (count = 5)
+
+		subs = self.subscriptions(2)
+
+
+
+	end
+
+
+
+	# this does not work
+	# def subs_of_subs
+
+	# 	sos = [] #{"id" => id, "count" => count}
+
+	# 	subs = relationships.where(:subscribed => true).entries.map {|r| Teacher.find(r["user_id"])}
+
+	# 	debugger
+
+	# 	subs.each do |sub|
+
+	# 		e = sos.find{|s| s["id"] == sub.id.to_s}
+
+	# 		if e.nil?
+
+	# 			sos << {"id" => sub.id.to_s, "count" => 1}
+
+	# 		else
+
+	# 			e["count"] += 1
+
+	# 		end
+
+	# 	end
+
+	# 	return sos
+
+	# end
 
 	def self.find_for_authentication(conditions) 
 		conditions[:login].downcase!

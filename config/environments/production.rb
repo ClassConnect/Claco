@@ -44,7 +44,8 @@ Claco::Application.configure do
   config.cache_store = :dalli_store
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
-  config.action_controller.asset_host = "http://static.cla.co"
+  # config.action_controller.asset_host = "http://static.cla.co"
+  config.action_controller.asset_host = "http://static%d.claco.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
   config.assets.precompile += ['*.js', '*.css', '*.eot', '*.svg', '*.woff', '*.ttf', '*.png', '*.jpg']

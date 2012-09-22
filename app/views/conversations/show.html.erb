@@ -1,8 +1,9 @@
 <% content_for :headcon do %>
-	<%= javascript_include_tag "messages/show" %>
     <%= stylesheet_link_tag    "messages/main", :media => "all" %>
 <% end %>
-
+<% content_for :botcon do %>
+	<%= javascript_include_tag "messages/show" %>
+<% end %>
 <div class="container">
 
 

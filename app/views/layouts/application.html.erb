@@ -13,15 +13,11 @@
 		<%= yield :headcon %>
 		<%= csrf_meta_tags %>
 
-
-
 		<% if signed_in? && current_teacher.getting_started %>
 
 			<%= stylesheet_link_tag    "gen/guiders", :media => "all" %>
-			<%= javascript_include_tag "gen/guiders" %>
-			<%= javascript_include_tag "gen/wizard" %>
-
 		<% end %>
+
 
 
 
@@ -54,9 +50,17 @@
 
 
 
-		<%= javascript_include_tag "application", :defer => "defer" %>
+		<%= javascript_include_tag "application" %>
 		<% #javascript_include_tag "dropdown", :defer => "defer" %>
+		<% if signed_in? && current_teacher.getting_started %>
+
+			<%= stylesheet_link_tag    "gen/guiders", :media => "all" %>
+			<%= javascript_include_tag "gen/guiders" %>
+			<%= javascript_include_tag "gen/wizard" %>
+
+		<% end %>
 		<% if signed_in? %>
+		<%= yield :botcon %>
 		<%= javascript_include_tag "jqueryui" %>
 		<%= javascript_include_tag "gen/cookie" %>
 		<%= javascript_include_tag "gen/sticky" %>

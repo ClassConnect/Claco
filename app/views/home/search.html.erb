@@ -1,8 +1,9 @@
 <% content_for :headcon do %>
-	<%= javascript_include_tag "search/main" %>
     <%= stylesheet_link_tag    "search/main", :media => "all" %>
 <% end %>
-
+<% content_for :botcon do %>
+	<%= javascript_include_tag "search/main" %>
+<% end %>
 <div class="container">
 
 	<div class="leftbox">

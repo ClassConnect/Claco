@@ -306,13 +306,112 @@ class Teacher
 		ret
 	end
 
+	def self.vectors (id, degree = 1, vec = {})
+
+		if degree>0
+			id = id.to_s
+			ids = []
+			teacher = Teacher.find(id.to_s)
+			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+				if !vec[id]
+					vec[id] = { f.id.to_s => 0x8 }
+					ids << f.id.to_s
+				elsif !vec[id][f.id.to_s]
+					vec[id][f.id.to_s] = 0x8
+					ids << f.id.to_s
+				else
+					vec[id][f.id.to_s] |= 0x8
+				end
+			end
+			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			# ids.each do |g|
+			# 	vec = Teacher.vectors(g,degree-1,vec)
+			# end
+			ids = []
+			if teacher.omnihash && teacher.omnihash['twitter'] && teacher.omnihash['twitter']['fids']
+				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x4 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x4
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x4
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+			if teacher.omnihash && teacher.omnihash['facebook'] && teacher.omnihash['facebook']['fids']
+				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x2 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x2
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x2
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+		end
+		vec
+
+	end
+
+	# def vectors (degree = 1, vectors = {})
+
+	# 	if degree>0
+	# 		ret = {}
+	# 		self.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+				
+	# 			if !ret[self.id.to_s]
+	# 				ret[self.id.to_s] = { f.id.to_s => 0x8 }
+	# 			elsif !ret[self.id.to_s][f.id.to_s]
+	# 				ret[self.id.to_s][f.id.to_s] = 0x8
+	# 			else
+	# 				ret[self.id.to_s][f.id.to_s] |= 0x8
+	# 			end
+	# 			# f.vectors(degree-1).each do |g|
+	# 			# 	#ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+	# 			# 	if !ret[self.id.to_s][g.id.to_s]
+	# 			# 		ret[self.id.to_d][g.id.to_s] = 0x8
+	# 			# 	else
+	# 			# 		ret[self.id.to_s][g.id.to_s] |= 0x8
+	# 			# 	end
+	# 			# end
+	# 		end
+	# 		Teacher.any_in('omnihash.twitter.uid' => self.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+	# 			if !ret[self.id.to_s]
+	# 				ret[self.id.to_s] = { f.id.to_s => 0x4 }
+	# 			elsif !ret[self.id.to_s][f.id.to_s]
+	# 				ret[self.id.to_s][f.id.to_s] = 0x4
+	# 			else
+	# 				ret[self.id.to_s][f.id.to_s] |= 0x4
+	# 			end
+	# 		end
+	# 		Teacher.any_in('omnihash.facebook.uid' => self.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+	# 			if !ret[self.id.to_s]
+	# 				ret[self.id.to_s] = { f.id.to_s => 0x2 }
+	# 			elsif !ret[self.id.to_s][f.id.to_s]
+	# 				ret[self.id.to_s][f.id.to_s] = 0x2
+	# 			else
+	# 				ret[self.id.to_s][f.id.to_s] |= 0x2
+	# 			end
+	# 		end
+	# 	end
+	# 	vectors
+
+	# end
+
 	def twitter_friends (degree = 1)
 
 		ret = {}
-		if degree>0
-			#self.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
-			#self.omnihash['twitter']['fids'].map { |f| Teacher.find(f.omnihash['twitter']['uid'].to_s) }
-			#Teacher.where('omnihash.twitter.uid'.in => self.omnihash['twitter']['fids']).each do |f|
+		if degree>0 && self.omnihash['twitter']
 			Teacher.any_in('omnihash.twitter.uid' => self.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
 				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
 				f.twitter_friends(degree-1).each do |g|
@@ -326,13 +425,65 @@ class Teacher
 
 	def facebook_friends (degree = 1)
 
+		ret = {}
+		if degree>0 && self.omnihash['facebook']
+			Teacher.any_in('omnihash.facebook.uid' => self.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
+				f.facebook_friends(degree-1).each do |g|
+					ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+				end
+			end
+		end
+		ret
 
+	end
 
+	def self.teacherweb (degree = 1, ret = {})
+
+		if degree>0
+			ret.merge!(self.subscriptions.merge!(self.twitter_friends.merge!(self.facebook_friends))).each do |f|
+				ret = Teacher.teacherweb(degree-1,ret)
+			end
+		end
+		ret
+
+	end
+
+	def teacherweb (degree = 1, ret = {})
+
+		if degree>0
+			ret.merge!(self.subscriptions.merge!(self.twitter_friends.merge!(self.facebook_friends))).each do |f|
+				ret = self.teacherweb(degree-1,ret)
+			end
+		end
+		ret
+
+	end
+
+	def build_network(degree = 2, network = {})
+
+		network.each do |f|
+			network = self.network
+		end
+		network
+
+	end
+
+	def add_paths(neighbors,network,bitmap)
+
+		neighbors.each do |f|
+			if !network[self.id.to_s]
+				network[self.id.to_s] = { "#{f.id.to_s}" => bitmap }
+			else
+				network[self.id.to_s][f.id.to_s] |= bitmap
+			end
+		end
+		network
 	end
 
 	def recommends (count = 5)
 
-		subs = self.subscriptions(2)
+		subs = self.subscriptions(2) - self.subscriptions(1)
 
 
 

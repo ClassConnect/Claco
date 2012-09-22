@@ -2,12 +2,12 @@
 <html>
 	<head>
 		<title><%= @title %></title>
-		<%= stylesheet_link_tag    "application", :media => "all" %>
-		<!-- 
-		<%= stylesheet_link_tag    "box", :media => "all" %>
-		<%= stylesheet_link_tag    "buttons/buttons", :media => "all" %>
- -->
 		<%= stylesheet_link_tag    "strap", :media => "all" %>
+		<%= stylesheet_link_tag    "application", :media => "all" %>
+
+		<% #stylesheet_link_tag    "box", :media => "all" %>
+		<% #stylesheet_link_tag    "buttons/buttons", :media => "all" %>
+
 		<%= stylesheet_link_tag    "jqueryui", :media => "all" %>
 
 		<%= yield :headcon %>
@@ -53,6 +53,9 @@
 
 
 
+
+		<%= javascript_include_tag "application", :defer => "defer" %>
+		<% #javascript_include_tag "dropdown", :defer => "defer" %>
 		<% if signed_in? %>
 		<%= javascript_include_tag "jqueryui" %>
 		<%= javascript_include_tag "gen/cookie" %>
@@ -64,9 +67,6 @@
 		<%= javascript_include_tag "tooltip" %>
 
 		<% end %>
-
-		<%= javascript_include_tag "application", :defer => "defer" %>
-		<%= javascript_include_tag "dropdown", :defer => "defer" %>
 		<%= javascript_tag "page = '#{params[:controller]}##{params[:action]}'; loggedin = #{signed_in?}" %>
 
 		<script type="text/javascript">

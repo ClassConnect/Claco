@@ -54,7 +54,6 @@
 		<% #javascript_include_tag "dropdown", :defer => "defer" %>
 		<% if signed_in? && current_teacher.getting_started %>
 
-			<%= stylesheet_link_tag    "gen/guiders", :media => "all" %>
 			<%= javascript_include_tag "gen/guiders" %>
 			<%= javascript_include_tag "gen/wizard" %>
 

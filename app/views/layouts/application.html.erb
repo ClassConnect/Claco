@@ -58,7 +58,7 @@
 			<%= javascript_include_tag "gen/wizard" %>
 
 		<% end %>
-		<% if params[:controller] != "home" %>
+		<% if params[:controller] != "home" || signed_in? %>
 		<%= yield :botcon %>
 		<%= javascript_include_tag "jqueryui" %>
 		<%= javascript_include_tag "gen/cookie" %>

@@ -392,11 +392,15 @@ class Teacher
 
 			teacher.binders.root_binders.each do |binder|
 
-				teacher.total_size += teacher_total_size
-				teacher.pub_size += teacher_pub_size
-				teacher.priv_size += teacher_priv_size
+				teacher_total_size += binder.total_size
+				teacher_pub_size += binder.pub_size
+				teacher_priv_size += binder.priv_size
 
 			end
+			
+			teacher.total_size = teacher_total_size
+			teacher.pub_size = teacher_pub_size
+			teacher.priv_size = teacher_priv_size
 
 			teacher.save
 

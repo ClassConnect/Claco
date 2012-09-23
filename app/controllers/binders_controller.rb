@@ -812,6 +812,10 @@ class BindersController < ApplicationController
 							end
 						end
 
+						current_teacher.total_size += @binder.total_size
+						current_teacher.pub_size += @binder.total_size if @binder.is_pub?
+						current_teacher.priv_size += @binder.total_size unless @binder.is_pub?
+
 						Binder.find(pids.last).inc(:children,1) if pids.last != "0"
 
 					else
@@ -1758,6 +1762,11 @@ class BindersController < ApplicationController
 												:priv_size	=> parent.priv_size + @binder.priv_size)
 				end
 			end
+
+			current_teacher.total_size -= @binder.total_size
+			current_teacher.pub_size -= @binder.total_size if @binder.is_pub?
+			current_teacher.priv_size -= @binder.total_size unless @binder.is_pub?
+
 
 			Rails.logger.debug "generating parent "
 

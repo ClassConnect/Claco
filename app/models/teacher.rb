@@ -486,44 +486,39 @@ class Teacher
 		# end
 
 		pathhash = {}
-		uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
 
-		#debugger
-
-	
-		# set initial distances 
-		uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
-
-		# import first layer of distance data
-		#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
-
-		debugger
+		network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
 
 		current_nodeid = tid
 		last_nodeid = nil
 
-		# will be performing exactly pathhash.size minpath reductions
 		pathhash.size.times do
-			# iterate through next node's outgoing links
+
+			#debugger
+			pathhash[current_nodeid][:visited]==true if current_nodeid!=tid
 
 			if !network[current_nodeid].nil? || current_nodeid==tid
 
-				pathhash_copy = pathhash.clone
+				debugger #if current_nodeid=='F'
 
-				#begin
+				pathhash_copy = pathhash.clone
 
 				network[current_nodeid].each do |g|
 
 					newdist = g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
 
-					if (current_nodeid==tid || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=tid #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
+					if (current_nodeid==tid || newdist < Teacher.lastdistance(pathhash_copy,g[0].to_s)) && g[0].to_s!=tid
 						pathhash[g[0].to_s][:dist] = newdist
-						pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
+						pathhash[g[0].to_s][:from] = current_nodeid
 					end
 				end
 			end
 
-			min = Teacher.minpath(pathhash)[0].to_s
+			begin
+				min = Teacher.minpath(pathhash,current_nodeid)[0].to_s
+			rescue
+				debugger
+			end
 			pathhash[min][:visited] = true
 			last_nodeid = current_nodeid
 			current_nodeid = min
@@ -532,16 +527,6 @@ class Teacher
 		pathhash
 
 	end
-
-	# def self.minsrcpath(network,src_id)
-
-	# 	min = nil
-	# 	network.each do |f|
-	# 		min = f if ((min.nil?) || (f[1][:dist]<min[1][:dist] && !f[1][:visited])) && src_id.to_s==f[0].to_s
-	# 	end
-	# 	min
-
-	# end
 
 	# returns the minimum distance for the given src_id
 	# if no instance exists, return an infinite distance
@@ -558,12 +543,12 @@ class Teacher
 	end
 
 	# returns the minimum node
-	def self.minpath (network)
+	def self.minpath (network,src_id)
 
 		min = nil #network.first
 		network.each do |f|
 			#debugger
-			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && !f[1][:visited] && !f[1][:from].nil? # && (id.empty? || id.to_s==f[0].to_s)
+			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && !f[1][:visited] && src_id.to_s!=f[0].to_s #&& !f[1][:from].nil? # && (id.empty? || id.to_s==f[0].to_s)
 		end
 		#debugger
 		min

@@ -298,7 +298,7 @@ position:absolute;
 	font-size:14px;
 	font-weight:bolder;
 	text-shadow: 0 1px 0 #fff;
-	margin:0 0 5px 5px;
+	padding:8px;
 }
 
 #paneleft .whitebox{
@@ -349,7 +349,6 @@ position:absolute;
 }
 
 #paneleft .invitebox{
-	padding:5px;
 	border:3px dotted #ccc;
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;

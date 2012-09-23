@@ -426,7 +426,7 @@ a:hover {
 }
 
 p {
-  margin: 0 0 9px;
+  margin: 0 0 4px;
 }
 
 p small {
@@ -533,7 +533,7 @@ h6 {
 ul,
 ol {
   padding: 0;
-  margin: 0 0 9px 25px;
+  margin: 0 0 6px 25px;
 }
 
 ul ul,
@@ -594,10 +594,10 @@ dd {
 }
 
 hr {
-  margin: 18px 0;
+  margin: 2px 0 4px;
   border: 0;
-  border-top: 1px solid #eeeeee;
-  border-bottom: 1px solid #ffffff;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #eee;
 }
 
 strong {
@@ -4100,11 +4100,14 @@ input[type="submit"].btn.btn-mini {
 }
 
 .pager {
-  margin-bottom: 18px;
   margin-left: 0;
   text-align: center;
   list-style: none;
   *zoom: 1;
+}
+
+.pager li {
+  display:inline;
 }
 
 .pager:before,
@@ -4115,10 +4118,6 @@ input[type="submit"].btn.btn-mini {
 
 .pager:after {
   clear: both;
-}
-
-.pager li {
-  display: inline;
 }
 
 .pager a {
@@ -4656,8 +4655,7 @@ a.badge:hover {
 }
 
 .progress {
-  height: 18px;
-  margin-bottom: 18px;
+  height: 20px;
   overflow: hidden;
   background-color: #f7f7f7;
   background-image: -moz-linear-gradient(top, #f5f5f5, #f9f9f9);

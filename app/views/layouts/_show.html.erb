@@ -1,11 +1,13 @@
 <% content_for :headcon do %>
-	<%= javascript_include_tag "wy/advanced" %>
-	<%= javascript_include_tag "wy/wysi5" %>
-	<%= javascript_include_tag "binders/pretags" %>
-	<%= javascript_include_tag "binders/folder" %>
-	<%= javascript_include_tag "binders/taginit" %>
-  <%= javascript_include_tag "binders/icheck" %>
   <%= stylesheet_link_tag    "widgets/icheck", :media => "all" %>
+<% end %>
+<% content_for :botcon do %>
+  <%= javascript_include_tag "wy/advanced" %>
+  <%= javascript_include_tag "wy/wysi5" %>
+  <%= javascript_include_tag "binders/pretags" %>
+  <%= javascript_include_tag "binders/folder" %>
+  <%= javascript_include_tag "binders/taginit" %>
+  <%= javascript_include_tag "binders/icheck" %>
 <% end %>
 
 <div class="container">

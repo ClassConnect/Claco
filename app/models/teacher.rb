@@ -70,7 +70,7 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig, :pub_size, :priv_size, :total_size
 	
 	validate :username_blacklist
 

@@ -223,11 +223,10 @@ class Teacher
 		end
 
 		# iterate through single-line content items
-		[{:type => 'subjects', 	:content => info.subjects},
-		{:type => 'location', 	:content => "#{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
-		{:type => 'subjects', 	:content => info.subjects},
-		{:type => 'grades', 	:content => info.grades},
-		{:type => 'website', 	:content => info.website}].each do |f|
+		[{:type => 'location', 	:content => "From #{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
+		{:type => 'subjects', 	:content => "Subjects taught: #{info.subjects.join(', ')}"},
+		{:type => 'grades', 	:content => "Grades taught: #{info.grades.join(', ')}"},
+		{:type => 'website', 	:content => "Website: #{info.website}"}].each do |f|
 
 			retarr << f if !f[:content].nil? && !f[:content].empty?
 
@@ -306,6 +305,7 @@ class Teacher
 		ret
 	end
 
+	# convert these to ElasticSearch queries!
 	def self.vectors (id, degree = 1, vec = {})
 
 		if degree>0
@@ -324,9 +324,6 @@ class Teacher
 				end
 			end
 			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-			# ids.each do |g|
-			# 	vec = Teacher.vectors(g,degree-1,vec)
-			# end
 			ids = []
 			if teacher.omnihash && teacher.omnihash['twitter'] && teacher.omnihash['twitter']['fids']
 				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
@@ -363,50 +360,17 @@ class Teacher
 
 	end
 
-	# def vectors (degree = 1, vectors = {})
+	def self.add_path(src_id,dest_id,network,bitmap)
 
-	# 	if degree>0
-	# 		ret = {}
-	# 		self.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
-				
-	# 			if !ret[self.id.to_s]
-	# 				ret[self.id.to_s] = { f.id.to_s => 0x8 }
-	# 			elsif !ret[self.id.to_s][f.id.to_s]
-	# 				ret[self.id.to_s][f.id.to_s] = 0x8
-	# 			else
-	# 				ret[self.id.to_s][f.id.to_s] |= 0x8
-	# 			end
-	# 			# f.vectors(degree-1).each do |g|
-	# 			# 	#ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
-	# 			# 	if !ret[self.id.to_s][g.id.to_s]
-	# 			# 		ret[self.id.to_d][g.id.to_s] = 0x8
-	# 			# 	else
-	# 			# 		ret[self.id.to_s][g.id.to_s] |= 0x8
-	# 			# 	end
-	# 			# end
-	# 		end
-	# 		Teacher.any_in('omnihash.twitter.uid' => self.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
-	# 			if !ret[self.id.to_s]
-	# 				ret[self.id.to_s] = { f.id.to_s => 0x4 }
-	# 			elsif !ret[self.id.to_s][f.id.to_s]
-	# 				ret[self.id.to_s][f.id.to_s] = 0x4
-	# 			else
-	# 				ret[self.id.to_s][f.id.to_s] |= 0x4
-	# 			end
-	# 		end
-	# 		Teacher.any_in('omnihash.facebook.uid' => self.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
-	# 			if !ret[self.id.to_s]
-	# 				ret[self.id.to_s] = { f.id.to_s => 0x2 }
-	# 			elsif !ret[self.id.to_s][f.id.to_s]
-	# 				ret[self.id.to_s][f.id.to_s] = 0x2
-	# 			else
-	# 				ret[self.id.to_s][f.id.to_s] |= 0x2
-	# 			end
-	# 		end
-	# 	end
-	# 	vectors
-
-	# end
+		neighbors.each do |f|
+			if !network[self.id.to_s]
+				network[self.id.to_s] = { "#{f.id.to_s}" => bitmap }
+			else
+				network[self.id.to_s][f.id.to_s] |= bitmap
+			end
+		end
+		network
+	end
 
 	def twitter_friends (degree = 1)
 
@@ -438,52 +402,178 @@ class Teacher
 
 	end
 
-	def self.teacherweb (degree = 1, ret = {})
-
-		if degree>0
-			ret.merge!(self.subscriptions.merge!(self.twitter_friends.merge!(self.facebook_friends))).each do |f|
-				ret = Teacher.teacherweb(degree-1,ret)
-			end
-		end
-		ret
-
-	end
-
-	def teacherweb (degree = 1, ret = {})
-
-		if degree>0
-			ret.merge!(self.subscriptions.merge!(self.twitter_friends.merge!(self.facebook_friends))).each do |f|
-				ret = self.teacherweb(degree-1,ret)
-			end
-		end
-		ret
-
-	end
-
-	def build_network(degree = 2, network = {})
+	# returns ordered list of teacher IDs
+	def dijkstra (network)
 
 		network.each do |f|
-			network = self.network
+			f[1].each do |g|
+				network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+				#g[1] = (16-g[1]).to_i
+			end
 		end
-		network
+
+		pathhash = {}
+		uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
+
+		#debugger
+
+	
+		# set initial distances 
+		uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= self.id.to_s }
+
+		# import first layer of distance data
+		#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
+
+		#debugger
+
+		current_nodeid = self.id.to_s
+		last_nodeid = nil
+
+		# will be performing exactly pathhash.size minpath reductions
+		pathhash.size.times do
+			# iterate through next node's outgoing links
+
+			if !network[current_nodeid].nil? || current_nodeid==self.id.to_s
+
+				pathhash_copy = pathhash.clone
+
+				#begin
+
+				network[current_nodeid].each do |g|
+
+					# pathhash[nextid] 	-> 	set of node's outgoing links
+					# g[0] 				-> 	id of destination node
+					# g[1] 				-> 	the inverse distance to that path
+					# 
+
+					# conditional if a link to it exists
+					#newdist = #[:dist]  #Teacher.minsrcpath(pathhash,current_nodeid)[1][:dist] #16-pathhash[g[0]][:dist]+g[1]
+
+					#lastdist = 
+					newdist = 16-g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
+
+					if (current_nodeid==self.id.to_s || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=self.id.to_s #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
+						pathhash[g[0].to_s][:dist] = newdist
+						pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
+					end
+				end
+			end
+
+			#rescue 
+			#	debugger
+			#end
+
+			#debugger
+
+			min = Teacher.minpath(pathhash)[0].to_s
+			pathhash[min][:visited] = true
+			last_nodeid = current_nodeid
+			current_nodeid = min
+		end		
+
+		pathhash
 
 	end
 
-	def add_paths(neighbors,network,bitmap)
+	# returns ordered list of teacher IDs
+	def self.dijkstra (network,tid)
 
-		neighbors.each do |f|
-			if !network[self.id.to_s]
-				network[self.id.to_s] = { "#{f.id.to_s}" => bitmap }
-			else
-				network[self.id.to_s][f.id.to_s] |= bitmap
+		# network.each do |f|
+		# 	f[1].each do |g|
+		# 		network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+		# 		#g[1] = (16-g[1]).to_i
+		# 	end
+		# end
+
+		pathhash = {}
+		uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
+
+		#debugger
+
+	
+		# set initial distances 
+		uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
+
+		# import first layer of distance data
+		#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
+
+		debugger
+
+		current_nodeid = tid
+		last_nodeid = nil
+
+		# will be performing exactly pathhash.size minpath reductions
+		pathhash.size.times do
+			# iterate through next node's outgoing links
+
+			if !network[current_nodeid].nil? || current_nodeid==tid
+
+				pathhash_copy = pathhash.clone
+
+				#begin
+
+				network[current_nodeid].each do |g|
+
+					newdist = g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
+
+					if (current_nodeid==tid || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=tid #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
+						pathhash[g[0].to_s][:dist] = newdist
+						pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
+					end
+				end
 			end
+
+			min = Teacher.minpath(pathhash)[0].to_s
+			pathhash[min][:visited] = true
+			last_nodeid = current_nodeid
+			current_nodeid = min
+		end		
+
+		pathhash
+
+	end
+
+	# def self.minsrcpath(network,src_id)
+
+	# 	min = nil
+	# 	network.each do |f|
+	# 		min = f if ((min.nil?) || (f[1][:dist]<min[1][:dist] && !f[1][:visited])) && src_id.to_s==f[0].to_s
+	# 	end
+	# 	min
+
+	# end
+
+	# returns the minimum distance for the given src_id
+	# if no instance exists, return an infinite distance
+	def self.lastdistance(network,src_id)
+
+		return 0 if src_id.nil?
+
+		min = nil
+		network.each do |f|
+			#min = f if ((min.nil?) || (f[1][:dist]<min[1][:dist] && !f[1][:visited])) && src_id.to_s==f[0].to_s
+			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && src_id.to_s==f[1][:from].to_s
 		end
-		network
+		(min.nil? ? INFINITY : min[1][:dist])
+	end
+
+	# returns the minimum node
+	def self.minpath (network)
+
+		min = nil #network.first
+		network.each do |f|
+			#debugger
+			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && !f[1][:visited] && !f[1][:from].nil? # && (id.empty? || id.to_s==f[0].to_s)
+		end
+		#debugger
+		min
 	end
 
 	def recommends (count = 5)
 
-		subs = self.subscriptions(2) - self.subscriptions(1)
+		#subs = self.subscriptions(2) - self.subscriptions(1)
+
+		network = Teacher.vectors(self.id.to_s,2)
 
 
 

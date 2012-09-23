@@ -125,3 +125,7 @@ else
 	MEDIASERVER_API_URL = '184.73.195.113/api'
 	APPSERVER_API_URL = 'http://claco.com/mediaserver/thumbs'
 end
+
+# dijkstra
+# allows for doubling while remaining a 4B variable
+INFINITY = 1<<30

@@ -47,9 +47,9 @@ class Teacher
 	field :fname, :type => String
 	field :lname, :type => String
 	field :username, :type => String
-	field :pub_size, :type => Integer
-	field :priv_size, :type => Integer
-	field :total_size, :type => Integer
+	field :pub_size, :type => Integer, :default => 0
+	field :priv_size, :type => Integer, :default => 0
+	field :total_size, :type => Integer, :default => 0
 
 	field :omnihash, :type => Hash, :default => {}
 

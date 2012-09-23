@@ -364,7 +364,7 @@ class Teacher
 							b.total_size = b.current_version.file.size
 
 							b.pub_size = b.total_size if b.is_pub?
-							b.priv_size = b.total_size if b.is_pub?
+							b.priv_size = b.total_size unless b.is_pub?
 
 							b.save
 

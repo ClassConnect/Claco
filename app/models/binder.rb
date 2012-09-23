@@ -62,7 +62,6 @@ class Binder
 	field :priv_size, :type => Integer, :default => 0
 
 
-
 	# number of times this binder is forked
 	field :fork_total, :type => Integer, :default => 0
 	# number of times this binder, or binders below it, are forked

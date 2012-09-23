@@ -50,6 +50,7 @@ class Teacher
 	field :pub_size, :type => Integer, :default => 0
 	field :priv_size, :type => Integer, :default => 0
 	field :total_size, :type => Integer, :default => 0
+	field :size_cap, :type => Integer, :default => 300.megabytes
 
 	field :omnihash, :type => Hash, :default => {}
 

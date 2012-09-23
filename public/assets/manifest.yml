@@ -54,6 +54,7 @@ public/nasa.jpg: public/nasa-360489e091b9147989805e9a450e621e.jpg
 public/nbc.png: public/nbc-bd61436100abd7bd465b2e456f6b877d.png
 public/product/bg.jpg: public/product/bg-04f0fa0e928e9eb3518c4c230b24f935.jpg
 public/product/binder.png: public/product/binder-c9f9896961a8088f4270a18160de7fe3.png
+public/product/bk.jpg: public/product/bk-ffaa5a6d5bf9cf5c6574f098cb13d720.jpg
 public/product/new.png: public/product/new-0d58bf05774fb4b1a3904cac299192bc.png
 public/product/prof1.png: public/product/prof1-74be8803cb0b220917940ff18eebea49.png
 public/product/share2.png: public/product/share2-f798b99a47e24972d5a2231d468505d9.png
@@ -141,7 +142,7 @@ devise/newuser.css: devise/newuser-bae1fe6623a62e3ccf89675e17aed940.css
 editinfo.css: editinfo-7f91d7e2fc8e6b9c909c97164aa3292b.css
 gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
 home/main.css: home/main-6d29de280b90f6c3ac76435b5b48ffdc.css
-home/pub/about.css: home/pub/about-4a1e653ed2db0049c27cdb606b6ab75a.css
+home/pub/about.css: home/pub/about-c9bddc9e0be78cd859df410d778bf6bb.css
 home/pub/team.css: home/pub/team-ce1e43f72a8d96a8b08ce936c64f0aaf.css
 home/pub/uwt.css: home/pub/uwt-1e8baecc5f7a535e85a2df14dad531cf.css
 home/public.css: home/public-4866b9377b156ac75ffc12af38ffb43f.css
@@ -149,7 +150,7 @@ jqueryui.css: jqueryui-3e5488d61bcd5d2d63259970ab23b226.css
 media_server_api.css: media_server_api-7270767b2a9e9fff880aa5de378ca791.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
-strap.css: strap-feccc81bccd9d638b768bd02bcdec5ca.css
+strap.css: strap-a080b46d95f5e51627a49caee64b2fc0.css
 teacher.css: teacher-8c6c06d902faa2d2d0799dc18f8d3361.css
 widgets/icheck.css: widgets/icheck-9f8386150ad015fa20947d4a7971e1fb.css
 jquery.pjax.js: jquery.pjax-7b0904f82bd59dce01ee7711ebc10d35.js

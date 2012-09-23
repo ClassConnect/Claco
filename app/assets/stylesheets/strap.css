@@ -434,6 +434,11 @@ p small {
   color: #999999;
 }
 
+span small {
+  font-size: 11px;
+  color: #999999;
+}
+
 .lead {
   margin-bottom: 18px;
   font-size: 20px;

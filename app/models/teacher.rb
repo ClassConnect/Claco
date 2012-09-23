@@ -47,6 +47,9 @@ class Teacher
 	field :fname, :type => String
 	field :lname, :type => String
 	field :username, :type => String
+	field :pub_size, :type => Integer
+	field :priv_size, :type => Integer
+	field :total_size, :type => Integer
 
 	field :omnihash, :type => Hash, :default => {}
 
@@ -339,6 +342,61 @@ class Teacher
 	def self.newsub_email(subscriber, subscribee)
 
 		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && Teacher.find(subscribee).emailconfig["sub"]
+
+	end
+
+	def self.seedsizes
+
+		Teacher.all.each do |teacher|
+
+			teacher.binders.sort_by{|binder| binder.parents.length}.reverse.each do |binder|
+
+				binder_total_size = 0
+				binder_pub_size = 0
+				binder_priv_size = 0
+
+				binder.subtree.each do |b|
+
+					if b.type == 2
+
+						b.total_size = b.current_version.file.size
+
+						b.pub_size = b.total_size
+						b.priv_size = b.total_size
+
+						b.save
+
+					end
+
+					binder_total_size += b.total_size
+					binder_pub_size += b.pub_size
+					binder_priv_size += b.priv_size
+
+				end
+
+				binder.total_size = binder_total_size
+				binder.pub_size = binder_pub_size
+				binder.priv_size = binder_priv_size
+
+				binder.save
+
+			end
+
+			teacher_total_size = 0
+			teacher_pub_size = 0
+			teacher_priv_size = 0
+
+			teacher.binders.root_binders.each do |binder|
+
+				teacher.total_size += teacher_total_size
+				teacher.pub_size += teacher_pub_size
+				teacher.priv_size += teacher_priv_size
+
+			end
+
+			teacher.save
+
+		end
 
 	end
 

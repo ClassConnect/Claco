@@ -355,7 +355,7 @@ class Teacher
 				binder_pub_size = 0
 				binder_priv_size = 0
 
-				binder.subtree.each do |b|
+				binder.children.each do |b|
 
 					if b.parents.first["id"] == "0"
 

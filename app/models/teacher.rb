@@ -357,7 +357,7 @@ class Teacher
 
 				binder.subtree.each do |b|
 
-					if b.parent["id"] == "0"
+					if b.parents.first["id"] == "0"
 
 						if b.type == 2
 

@@ -38,6 +38,8 @@ Claco::Application.routes.draw do
 	get		'/about'														=> 'home#about'
 	get		'/about/team'													=> 'home#team'
 	get		'/unitedweteach'												=> 'home#united'
+	get		'/pioneers'														=> 'home#pioneers'
+	get		'/pioneers/show'												=> 'home#pioneersshow'
 
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'

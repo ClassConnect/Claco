@@ -357,20 +357,24 @@ class Teacher
 
 				binder.subtree.each do |b|
 
-					if b.type == 2
+					if b.parent["id"] == "0"
 
-						b.total_size = b.current_version.file.size
+						if b.type == 2
 
-						b.pub_size = b.total_size
-						b.priv_size = b.total_size
+							b.total_size = b.current_version.file.size
 
-						b.save
+							b.pub_size = b.total_size if b.is_pub?
+							b.priv_size = b.total_size if b.is_pub?
+
+							b.save
+
+						end
+
+						binder_total_size += b.total_size
+						binder_pub_size += b.pub_size
+						binder_priv_size += b.priv_size
 
 					end
-
-					binder_total_size += b.total_size
-					binder_pub_size += b.pub_size
-					binder_priv_size += b.priv_size
 
 				end
 

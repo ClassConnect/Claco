@@ -403,7 +403,80 @@ class Teacher
 	end
 
 	# returns ordered list of teacher IDs
-	def dijkstra (network)
+	# def dijkstra (network)
+
+	# 	network.each do |f|
+	# 		f[1].each do |g|
+	# 			network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+	# 			#g[1] = (16-g[1]).to_i
+	# 		end
+	# 	end
+
+	# 	pathhash = {}
+	# 	uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
+
+	# 	#debugger
+
+	
+	# 	# set initial distances 
+	# 	uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= self.id.to_s }
+
+	# 	# import first layer of distance data
+	# 	#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
+
+	# 	#debugger
+
+	# 	current_nodeid = self.id.to_s
+	# 	last_nodeid = nil
+
+	# 	# will be performing exactly pathhash.size minpath reductions
+	# 	pathhash.size.times do
+	# 		# iterate through next node's outgoing links
+
+	# 		if !network[current_nodeid].nil? || current_nodeid==self.id.to_s
+
+	# 			pathhash_copy = pathhash.clone
+
+	# 			#begin
+
+	# 			network[current_nodeid].each do |g|
+
+	# 				# pathhash[nextid] 	-> 	set of node's outgoing links
+	# 				# g[0] 				-> 	id of destination node
+	# 				# g[1] 				-> 	the inverse distance to that path
+	# 				# 
+
+	# 				# conditional if a link to it exists
+	# 				#newdist = #[:dist]  #Teacher.minsrcpath(pathhash,current_nodeid)[1][:dist] #16-pathhash[g[0]][:dist]+g[1]
+
+	# 				#lastdist = 
+	# 				newdist = 16-g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
+
+	# 				if (current_nodeid==self.id.to_s || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=self.id.to_s #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
+	# 					pathhash[g[0].to_s][:dist] = newdist
+	# 					pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
+	# 				end
+	# 			end
+	# 		end
+
+	# 		#rescue 
+	# 		#	debugger
+	# 		#end
+
+	# 		#debugger
+
+	# 		min = Teacher.minpath(pathhash)[0].to_s
+	# 		pathhash[min][:visited] = true
+	# 		last_nodeid = current_nodeid
+	# 		current_nodeid = min
+	# 	end		
+
+	# 	pathhash
+
+	# end
+
+	# returns ordered list of teacher IDs
+	def self.dijkstra (network,tid)
 
 		network.each do |f|
 			f[1].each do |g|
@@ -413,100 +486,16 @@ class Teacher
 		end
 
 		pathhash = {}
-		uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
-
-		#debugger
-
-	
-		# set initial distances 
-		uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= self.id.to_s }
-
-		# import first layer of distance data
-		#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
-
-		#debugger
-
-		current_nodeid = self.id.to_s
-		last_nodeid = nil
-
-		# will be performing exactly pathhash.size minpath reductions
-		pathhash.size.times do
-			# iterate through next node's outgoing links
-
-			if !network[current_nodeid].nil? || current_nodeid==self.id.to_s
-
-				pathhash_copy = pathhash.clone
-
-				#begin
-
-				network[current_nodeid].each do |g|
-
-					# pathhash[nextid] 	-> 	set of node's outgoing links
-					# g[0] 				-> 	id of destination node
-					# g[1] 				-> 	the inverse distance to that path
-					# 
-
-					# conditional if a link to it exists
-					#newdist = #[:dist]  #Teacher.minsrcpath(pathhash,current_nodeid)[1][:dist] #16-pathhash[g[0]][:dist]+g[1]
-
-					#lastdist = 
-					newdist = 16-g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
-
-					if (current_nodeid==self.id.to_s || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=self.id.to_s #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
-						pathhash[g[0].to_s][:dist] = newdist
-						pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
-					end
-				end
-			end
-
-			#rescue 
-			#	debugger
-			#end
-
-			#debugger
-
-			min = Teacher.minpath(pathhash)[0].to_s
-			pathhash[min][:visited] = true
-			last_nodeid = current_nodeid
-			current_nodeid = min
-		end		
-
-		pathhash
-
-	end
-
-	# returns ordered list of teacher IDs
-	def self.dijkstra (network,tid)
-
-		# network.each do |f|
-		# 	f[1].each do |g|
-		# 		network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
-		# 		#g[1] = (16-g[1]).to_i
-		# 	end
-		# end
-
-		pathhash = {}
-
 		network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
-
 		current_nodeid = tid
 		last_nodeid = nil
 
 		pathhash.size.times do
-
-			#debugger
 			pathhash[current_nodeid][:visited]==true if current_nodeid!=tid
-
 			if !network[current_nodeid].nil? || current_nodeid==tid
-
-				debugger #if current_nodeid=='F'
-
 				pathhash_copy = pathhash.clone
-
 				network[current_nodeid].each do |g|
-
 					newdist = g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
-
 					if (current_nodeid==tid || newdist < Teacher.lastdistance(pathhash_copy,g[0].to_s)) && g[0].to_s!=tid
 						pathhash[g[0].to_s][:dist] = newdist
 						pathhash[g[0].to_s][:from] = current_nodeid
@@ -514,11 +503,7 @@ class Teacher
 				end
 			end
 
-			begin
-				min = Teacher.minpath(pathhash,current_nodeid)[0].to_s
-			rescue
-				debugger
-			end
+			min = Teacher.minpath(pathhash,current_nodeid)[0].to_s
 			pathhash[min][:visited] = true
 			last_nodeid = current_nodeid
 			current_nodeid = min

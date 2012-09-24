@@ -68,13 +68,14 @@ class ConversationsController < ApplicationController
 		@conversation = Conversation.new(	:members	=> members,
 											:unread		=> unread)
 
+
+		@conversation.save
+
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					@conversation.id.to_s,
 					params)
-
-		@conversation.save
 
 		@conversation.new_message(params, current_teacher)
 
@@ -103,12 +104,6 @@ class ConversationsController < ApplicationController
 
 		@conversation = Conversation.find(params[:id]) if !params[:id].nil?
 
-		Mongo.log(	current_teacher.id.to_s,
-					__method__.to_s,
-					params[:controller].to_s,
-					@conversation.id.to_s,
-					params)
-
 		if @conversation.nil?
 			unread = {current_teacher.id.to_s => 0, recipient.id.to_s => 1}
 
@@ -117,6 +112,12 @@ class ConversationsController < ApplicationController
 
 			@conversation.save
 		end
+
+		Mongo.log(	current_teacher.id.to_s,
+					__method__.to_s,
+					params[:controller].to_s,
+					@conversation.id.to_s,
+					params)
 
 		@conversation.new_message(params, current_teacher)
 

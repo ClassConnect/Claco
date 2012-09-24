@@ -27,4 +27,10 @@ module BinderHelper
 			return "/500.html"
 		end
 	end
+
+	def zenframe(binder)
+
+		return "#{named_binder_route(binder)}/video"
+
+	end
 end

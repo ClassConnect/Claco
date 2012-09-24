@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<%= javascript_include_tag "video" %>
+		<%= stylesheet_link_tag "video-js", :media => "all" %>
+		<%= javascript_tag "_V_.options.flash.swf = '#{asset_path "video-js.swf"}'" %>
+		<style type="text/css">
+			body, html {
+			overflow:hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="position:fixed; top:0; left:0">
+			<video id="vidobj" class="video-js vjs-default-skin" controls preload="auto" poster="<%= @binder.current_version.video.posterurl.html_safe %>" data-setup="{}" width="700" height="390">
+				<source src="<%= @binder.current_version.video.url.html_safe %>" type='video/mp4'>
+			</video>
+		</div>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#vidobj").attr('width', $(document).width());
+			$("#vidobj").attr('height', $(document).height());
+			$("#vidobj").width($(document).width());
+			$("#vidobj").height($(document).height());
+		});
+	</script>
+
+	</body>
+
+</html>

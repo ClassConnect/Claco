@@ -505,18 +505,6 @@ class Binder
 
 	end
 
-	def encode
-
-		r = Zencoder::Job.create({	:input 	=> self.current_version.url,
-									:output => {:url => "s3://#{self.current_version.file.fog_directory}/#{self.current_version.file.store_dir}/vid.mp4",
-												:notifications => ["http://dragonrider.claco.com/zcb"]}
-												})
-
-		statushash = self.current_version.zendata
-
-		statushash["id"] = r.body["id"]
-
-	end
 
 	###############################################################################################
 
@@ -534,14 +522,28 @@ class Binder
 
 	# Do not explicitly call these!  All these methods have very long latency.
 
-	def self.process_zencoder_callback(id, key, data)
+	def self.encode(id)
 
 		binder = Binder.find(id)
 
-		binder.current_version.zendata["data"] = data
+		r = Zencoder::Job.create({	:input 	=> binder.current_version.file.url,
+									:outputs => [{	:url			=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/vid.mp4"},
+												{	:thumbnails		=> {:number		=> 1,
+																		:base_url	=> "s3://#{binder.current_version.file.fog_directory}/#{binder.current_version.file.store_dir}/",
+																		:filename	=> "poster",
+																		:format		=> "jpg"}}],
+									:notifications	=> ["http://www.claco.com/zcb"]
+												})
 
-		binder.current_version.zenfile.store!(CarrierWave::Storage::Fog::File.new(binder.current_version.zenfile, CarrierWave::Storage::Fog.new(binder.current_version.zenfile), key))
+		statushash = binder.current_version.zendata
 
+		statushash["jobid"] = r.body["id"]
+
+		unless binder.save
+
+			raise "Zencoder::Job#create Failed"
+
+		end
 
 	end
 
@@ -1380,15 +1382,11 @@ class Version
 	# 3 - document (center, no cropping)
 	field :thumbnailgen, :type => Integer, :default => 0
 
-	field :zenvid,	:type => Boolean, :default => false
-	field :zendata,	:type => Hash, :default => {"jobcreated"	=> false,
-												"id"			=> "",
-												"processing"	=> false,
-												"callbacked"	=> false,
-												"ready"			=> false,
-												"data"			=> ""}
+	field :zendata,	:type => Hash, :default => {}
 
-	mount_uploader :zenfile, DataUploader
+	mount_uploader :video, VideoUploader
+
+	field :vidtype, :type => String, :default => ""
 
 	# imgclass represents how the file will be pulled into folder views
 	# integers are in order of priority
@@ -1419,9 +1417,11 @@ class Version
 													 	:img_thumb_lg => 	{ :generated => false },
 														:img_thumb_sm => 	{ :generated => false } }
 
+
 	field :vid_processed, :type => Boolean, :default => false
 
 	field :thumbnails, :type => Array, :default => [nil,nil,nil]
+
 
 	# the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
 	mount_uploader :imgfile, 		ImageUploader

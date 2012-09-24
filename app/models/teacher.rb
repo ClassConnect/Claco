@@ -50,7 +50,9 @@ class Teacher
 
 	field :omnihash, :type => Hash, :default => {}
 
-	field :emailconfig, :type => Hash, :default => {}
+	field :emailconfig, :type => Hash, :default => {"msg" => true,
+													"col" => true,
+													"sub" => true}
 
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
@@ -70,7 +72,8 @@ class Teacher
 	validate :username_blacklist
 
 	validates_uniqueness_of :username, :case_sensitive => false
-	validates_format_of :username, with: /[-a-z0-9]/i, :message => "has invalid characters."
+	validates_format_of :username, with: /[-a-z0-9]+/i, :message => "has invalid characters."
+	validates_format_of :username, without: /\s/, :message => "has invalid characters."
 	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters", :unless => Proc.new {|user| user.allow_short_username == true}
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."

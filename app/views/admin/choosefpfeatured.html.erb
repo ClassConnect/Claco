@@ -10,3 +10,41 @@
 <br />
 <button type="submit">Change</button>
 <% end %>
+
+<table>
+
+	<tr>
+		<td>
+			Set:
+		</td>
+		<td>
+			Top:
+		</td>
+		<td>
+			Bottom:
+		</td>
+	</tr>
+<% @fpfeatured.each do |f| %>
+
+	<tr>
+		<td>
+			<% unless f["time"].nil? %>
+			<%= time_ago_in_words(Time.at(f["time"]).to_datetime) %> ago
+			<% end %>
+		</td>
+		<td>
+			<% unless f["top"].empty? %>
+				<%= link_to f["top"], named_binder_route(f["top"]) %><br />
+				<%= Binder.find(f["top"]).username %>
+			<% end %>
+		</td>
+		<td>
+			<% unless f["bot"].empty? %>
+				<%= link_to f["bot"], named_binder_route(f["bot"]) %><br />
+				<%= Binder.find(f["bot"]).username %>
+			<% end %>
+		</td>
+	</tr>
+
+<% end %>
+</table>

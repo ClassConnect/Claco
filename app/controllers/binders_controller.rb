@@ -1,5 +1,5 @@
 class BindersController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:show, :index]
+	before_filter :authenticate_teacher!, :except => [:show, :index, :zenframe]
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -225,6 +225,18 @@ class BindersController < ApplicationController
 
 	end
 
+	def zenframe
+
+		@binder = Binder.find(params[:id])
+
+		if @binder.current_version.vidtype != "zen"
+			render "public/404.html", :status => 404 and return
+		end
+
+		render :layout => false
+
+	end
+
 	def regen
 
 		@binder = Binder.find(params[:id])
@@ -262,7 +274,7 @@ class BindersController < ApplicationController
 			if !doc.at('iframe').nil?
 
 				uri = URI.parse(doc.at('iframe')['src'])
-
+				#Refactor this to also set vidtype
 				if uri.host.include?('youtube.com') && uri.path.include?('embed')
 
 					embedtourl = true
@@ -322,7 +334,7 @@ class BindersController < ApplicationController
 
 					if !((url || embedtourl) && link.empty?)
 
-						if !URI.parse(link).host.include?("teacherspayteachers.com")
+						if (embed ? true : !URI.parse(link).host.include?("teacherspayteachers.com"))
 						
 							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 													:owner				=> current_teacher.id,
@@ -359,8 +371,8 @@ class BindersController < ApplicationController
 										params)
 
 							if url || embedtourl
-
 								uri = URI.parse(link)
+								# debugger
 
 								stathash = @binder.current_version.imgstatus
 								stathash[:imgfile][:retrieved] = true
@@ -370,6 +382,7 @@ class BindersController < ApplicationController
 									# YOUTUBE
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
+									@binder.current_version.vidtype = "youtube"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -378,6 +391,7 @@ class BindersController < ApplicationController
 									# VIMEO
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
+									@binder.current_version.vidtype = "vimeo"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -386,6 +400,7 @@ class BindersController < ApplicationController
 									# EDUCREATIONS
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
+									@binder.current_version.vidtype = "educreations"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -394,6 +409,7 @@ class BindersController < ApplicationController
 									# SCHOOLTUBE
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
+									@binder.current_version.vidtype = "schooltube"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -402,6 +418,7 @@ class BindersController < ApplicationController
 									# SHOWME
 									# DELAYTAG
 									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
+									@binder.current_version.vidtype = "showme"
 
 									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
@@ -415,6 +432,8 @@ class BindersController < ApplicationController
 								end
 
 							end
+
+							@binder.save
 
 							@binder.create_binder_tags(params,current_teacher.id)
 
@@ -603,15 +622,9 @@ class BindersController < ApplicationController
 
 		token = Digest::MD5.hexdigest(@v.data + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
 
-		# @uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}#{request.fullpath}?data=#{@v.data}&key=#{@uploader.key}&time=#{@v.timestamp}&token=#{token}"
-
 		@uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}#{named_binder_route(params[:id], "createfile")}/#{@v.data}/#{@v.timestamp}/#{token}"
 
 		render "cf", :layout => false
-
-		# respond_to do |format|
-			# format.html {render "cf"}
-		# end
 
 	end
 
@@ -767,6 +780,10 @@ class BindersController < ApplicationController
 
 								# DELAYTAG
 								#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
+
+							elsif ZENCODER_SUPPORTED_VIDEO_EXTS.include? @binder.current_version.ext.downcase
+
+								Binder.delay(:queue => 'encode').encode(@binder.id.to_s)
 
 							elsif @binder.current_version.ext.downcase == ".notebook"
 

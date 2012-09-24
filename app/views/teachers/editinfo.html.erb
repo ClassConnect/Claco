@@ -1,7 +1,14 @@
 <% content_for :headcon do %>
+	<%= stylesheet_link_tag    "editinfo", :media => "all" %>
+<% end %>
+<% content_for :botcon do %>
 	<%= javascript_include_tag "editinfo/main" %>
 	<%= javascript_include_tag "binders/pretags" %>
-	<%= stylesheet_link_tag    "editinfo", :media => "all" %>
+	<%= javascript_tag "
+$('#myTab a').click(function (e) {
+  e.preventDefault();
+  $(this).tab('show');
+})" %>
 <% end %>
 
 
@@ -278,9 +285,4 @@
 
 
 
-<script>
-$('#myTab a').click(function (e) {
-  e.preventDefault();
-  $(this).tab('show');
-})
-</script>
+

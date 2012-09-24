@@ -4,7 +4,10 @@
       <div class="navbar-inner">
         <div class="container">
 
-          <a class="brand" href="/"><%= image_tag("claco.png", :style => "height:24px") %></a>
+          <a class="brand" href="/">
+            <!-- <%= image_tag("claco.png", :style => "height:24px") %> -->
+            <%= render 'layouts/logo' %>
+          </a>
           <div class="nav-collapse">
 
 
@@ -70,7 +73,7 @@
             <ul class="nav nav-pills pull-right">
               <li><a href="/" class="publink">Home</a></li>
               <li><a href="/about" class="publink">About</a></li>
-              <li><a href="/unitedweteach" class="publink">#UnitedWeTeach</a></li>
+              <li><a href="/about/team" class="publink">Team Claco</a></li>
 
               <li class="dropdown">
 

@@ -316,6 +316,7 @@ class Teacher
 			ids = []
 			teacher = Teacher.find(id.to_s)
 			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+				next if f.id.to_s==id
 				if !vec[id]
 					vec[id] = { f.id.to_s => 0x8 }
 					ids << f.id.to_s
@@ -330,6 +331,7 @@ class Teacher
 			ids = []
 			if teacher.omnihash && teacher.omnihash['twitter'] && teacher.omnihash['twitter']['fids']
 				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+					next if f.id.to_s==id
 					if !vec[id]
 						vec[id] = { f.id.to_s => 0x4 }
 						ids << f.id.to_s
@@ -345,6 +347,7 @@ class Teacher
 			end
 			if teacher.omnihash && teacher.omnihash['facebook'] && teacher.omnihash['facebook']['fids']
 				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+					next if f.id.to_s==id
 					if !vec[id]
 						vec[id] = { f.id.to_s => 0x2 }
 						ids << f.id.to_s
@@ -481,33 +484,105 @@ class Teacher
 	# returns ordered list of teacher IDs
 	def self.dijkstra (network,tid)
 
+		# debugger
+
+		#if invert
 		network.each do |f|
 			f[1].each do |g|
 				network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
 				#g[1] = (16-g[1]).to_i
 			end
 		end
+		#end
 
 		pathhash = {}
-		network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
+
+		#debugger
+
+		(network.map { |f| f[1].map { |g| g[0].to_s } } + network.map{ |f| f[0].to_s }).flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
+		#network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
+
+		#debugger
+
 		current_nodeid = tid
 		last_nodeid = nil
 
+		p "pathhash of size #{pathhash.size}"
+
 		pathhash.size.times do
-			pathhash[current_nodeid][:visited]==true if current_nodeid!=tid
+
+			#pathhash[current_nodeid][:visited]==true if current_nodeid!=tid
+
+			#debugger if current_nodeid == '502d3d5c2fc6100002000084'
+
+			debugger
+
+			p "now operating on node #{current_nodeid}"
+			p ""
+			p "network[current_nodeid]:"
+			p "#{network[current_nodeid]}"
+			p ""
+
 			if !network[current_nodeid].nil? || current_nodeid==tid
+
 				pathhash_copy = pathhash.clone
 				network[current_nodeid].each do |g|
-					newdist = g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
-					if (current_nodeid==tid || newdist < Teacher.lastdistance(pathhash_copy,g[0].to_s)) && g[0].to_s!=tid
+
+					debugger if g[0].to_s == '502d3d5c2fc6100002000084'
+
+					p "    now operating on connection #{g}"
+
+					if g[0].to_s==tid
+						p "        g[0] matches tid, skip! (#{g[0]},#{tid})}"
+						next
+					end
+
+					#debugger if g[0].to_s=='502d3d5c2fc6100002000084'
+
+					lastdist = lastdistance(pathhash_copy,last_nodeid)
+					lastdist = 0 if lastdist == INFINITY
+
+					newdist = g[1] +  lastdist#ance(pathhash_copy,last_nodeid)
+
+					#debugger if newdist == 14
+					#p newdist
+
+					p "        shortest path calculation:"
+					p "        newdist = g[1] +  lastdistance(pathhash_copy,last_nodeid)"
+					p "        g[1]:     #{g[1]}" 
+					p "        lastnode: #{lastdistance(pathhash_copy,last_nodeid)}"
+					p ""
+					p "        newdist:  #{newdist}"
+					p "        g[0]dist: #{lastdistance(pathhash_copy,g[0].to_s)}"
+					p ""
+					p "        update if newdist < g[0]dist"
+
+					if (current_nodeid==tid || newdist < lastdistance(pathhash_copy,g[0].to_s))# && g[0].to_s!=tid 
+
+						p "            passed! updating shortest path"
+						p "            old: #{pathhash[g[0].to_s]}"
+
 						pathhash[g[0].to_s][:dist] = newdist
 						pathhash[g[0].to_s][:from] = current_nodeid
+						
+						p "            new: #{pathhash[g[0].to_s]}"
 					end
 				end
 			end
 
-			min = Teacher.minpath(pathhash,current_nodeid)[0].to_s
-			pathhash[min][:visited] = true
+			min = minpath(pathhash,current_nodeid)[0].to_s
+
+			p "pathhash: "
+			p "-----------------------"
+			pp pathhash
+			p "-----------------------"
+			p "min: #{min}"
+			p "pathhash[min] will be set to visited"
+			p ""
+			p ""
+			p ""
+
+			pathhash[min][:visited] = true# if !pathhash[min][:from].nil?
 			last_nodeid = current_nodeid
 			current_nodeid = min
 		end		
@@ -532,6 +607,8 @@ class Teacher
 
 	# returns the minimum node
 	def self.minpath (network,src_id)
+
+		
 
 		min = nil #network.first
 		network.each do |f|

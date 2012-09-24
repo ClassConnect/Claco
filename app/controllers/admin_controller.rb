@@ -41,6 +41,18 @@ class AdminController < ApplicationController
 
 	end
 
+	def choosepibinder
+
+		@pibinder = Setting.f("pioneer").v
+
+	end
+
+	def setpibinder
+
+		Setting.f("pioneer").v = params[:binder]
+
+	end
+
 	def setfeatured
 
 		Setting.f("featured").v = [] if Setting.f("featured").v.nil?

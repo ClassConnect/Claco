@@ -3,9 +3,11 @@
 	<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 		<div class="thecontent">
 			<% if !@subscribee.info.nil? %>
-				<% if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") %>
-					<div class="previmg" style="background-image: url('<%= @subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
-				<% end %>
+				<% #if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") 
+				%>
+				
+				<div class="previmg" style="background-image: url('<%= Teacher.thumb_mg(@subscribee) %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+				
 
 				<% if !@subscribee.info.bio.nil? && !@subscribee.info.bio.empty? %>
 					<div class="txtcon">
@@ -44,14 +46,17 @@
 
 	<% @f[:array].each do |g| %>
 
-		<% @subscribee = Teacher.where(:username => /^#{Rege6xp.escape(g[:log].params['username'].to_s)}$/i).first %>
+		<% @subscribee = Teacher.find(g[:log]["modelid"]) %>
+
 
 		<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 			<div class="thecontent">
 				<% if !@subscribee.info.nil? %>
-					<% if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") %>
-						<div class="previmg" style="background-image: url('<%= @subscribee.info.avatar.thumb_mg.url.to_s %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
-					<% end %>
+					<% #if !(@subscribee.info.avatar.nil? || @subscribee.info.avatar.url=="/assets/placer.png") 
+					%>
+
+					<div class="previmg" style="background-image: url('<%= Teacher.thumb_mg(@subscribee) %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+
 
 					<% if !@subscribee.info.bio.nil? && !@subscribee.info.bio.empty? %>
 						<div class="txtcon">

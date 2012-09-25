@@ -117,3 +117,19 @@ end
 
 SIZE_PER_INVITE = 300.megabytes
 SIZE_SOFT_CAP = 10.gigabytes
+
+# must be swapped from what exists on image server
+TX_PRIVATE_KEY = "4660adcf8a7e13d2215b7596da5e6c13"
+RX_PRIVATE_KEY = "0a591a51998e86c2f83fffb66f954bff"
+
+if Rails.env == "development"
+	MEDIASERVER_API_URL = 'localhost:5001/api'
+	APPSERVER_API_URL = 'localhost:5000/mediaserver/thumbs'
+else
+	MEDIASERVER_API_URL = '184.73.195.113/api'
+	APPSERVER_API_URL = 'http://claco.com/mediaserver/thumbs'
+end
+
+# dijkstra
+# allows for doubling while remaining a 4B variable
+INFINITY = 1<<30

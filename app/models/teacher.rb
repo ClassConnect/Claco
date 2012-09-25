@@ -67,7 +67,7 @@ class Teacher
 
 	embeds_one :tag#, autobuild: true #, validate: false
 
-	has_one :feed
+	#has_one :feed
 
 	embeds_many :relationships#, validate: false
 
@@ -130,24 +130,23 @@ class Teacher
 		}
 	} 	do
 		mapping do
-			#indexes :_id,		:type => 'string',	:index => 'not_analyzed', :include_in_all => false
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :info, :type => 'object', :properties => { 	:avatar 		=> { :type => 'object',	:enabled => false },
-																:size 			=> { :type => 'object', :enabled => false },
-																:ext 			=> { :type => 'object', :enabled => false },
-																:data 			=> { :type => 'object', :enabled => false },
-																:facebookurl	=> { :type => 'object', :enabled => false },
-																:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
-																:website 		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:twitterhandle 	=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																:location		=> { :type => 'geo_point', :default => [] } }#, :enabled => 'false'
+			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' }}}}
+			indexes :info, 		:type => 'object', 	:properties => {:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
+																	:avatar 		=> { :type => 'object',	:enabled => false },
+																	:size 			=> { :type => 'object', :enabled => false },
+																	:ext 			=> { :type => 'object', :enabled => false },
+																	:data 			=> { :type => 'object', :enabled => false },
+																	:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																	:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																	:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
+																	:website 		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:location		=> { :type => 'geo_point', :default => [] } }
 		end
 	end
 
@@ -157,6 +156,52 @@ class Teacher
 	def self
     	#to_indexed_json.as_json
     	to_indexed_json.to_json
+	end
+
+	# these clases are not defined on instances of Teacher because they are not available to ElasticSearch result objects,
+	# which are indistinguishable from mongo result objects
+
+	def self.thumbready? (teacher)
+
+		# return 	!teacher.nil? && 
+		# 		!teacher.info.nil? && 
+		# 		!teacher.info.thumbnails.nil? && 
+		# 		!teacher.info.thumbnails.first.nil? && 
+		# 		!teacher.info.thumbnails.first.empty?
+
+		return 	!teacher.nil? &&
+				!teacher.info.nil? && 
+				!teacher.info.avatar.nil? &&
+				!teacher.info.avatar.thumb_sm.nil?
+
+	end
+
+	def self.thumb_lg (teacher)
+
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.thumb_mg (teacher)
+
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.thumb_md (teacher)
+
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.thumb_sm (teacher)
+
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
 	end
 
 	# def to_indexed_json
@@ -195,11 +240,10 @@ class Teacher
 		end
 
 		# iterate through single-line content items
-		[{:type => 'subjects', 	:content => info.subjects},
-		{:type => 'location', 	:content => "#{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
-		{:type => 'subjects', 	:content => info.subjects},
-		{:type => 'grades', 	:content => info.grades},
-		{:type => 'website', 	:content => info.website}].each do |f|
+		[{:type => 'location', 	:content => "From #{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
+		{:type => 'subjects', 	:content => "Subjects taught: #{info.subjects.join(', ')}"},
+		{:type => 'grades', 	:content => "Grades taught: #{info.grades.join(', ')}"},
+		{:type => 'website', 	:content => "Website: #{info.website}"}].each do |f|
 
 			retarr << f if !f[:content].nil? && !f[:content].empty?
 
@@ -262,31 +306,353 @@ class Teacher
 		Binder.where(:owner => self.id.to_s)
 	end
 
-	def subs_of_subs
+	# recursively aggregates teacher subscription network
+	# degree of 1 represents teacher's immediate subscriptions
+	def subscriptions (degree = 1)
 
-		sos = [] #{"id" => id, "count" => count}
-
-		subs = relationships.where(:subscribed => true).entries.map {|r| Teacher.find(r["user_id"])}
-
-		subs.each do |sub|
-
-			e = sos.find{|s| s["id"] == sub.id.to_s}
-
-			if e.nil?
-
-				sos << {"id" => sub.id.to_s, "count" => 1}
-
-			else
-
-				e["count"] += 1
-
+		ret = {}
+		if degree>0
+			self.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
+				f.subscriptions(degree-1).each do |g|
+					ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+				end
 			end
-
 		end
+		ret
+	end
 
-		return sos
+	# convert these to ElasticSearch queries!
+	def self.vectors (id, degree = 1, vec = {})
+
+		if degree>0
+			id = id.to_s
+			ids = []
+			teacher = Teacher.find(id.to_s)
+			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
+				next if f.id.to_s==id
+				if !vec[id]
+					vec[id] = { f.id.to_s => 0x8 }
+					ids << f.id.to_s
+				elsif !vec[id][f.id.to_s]
+					vec[id][f.id.to_s] = 0x8
+					ids << f.id.to_s
+				else
+					vec[id][f.id.to_s] |= 0x8
+				end
+			end
+			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			ids = []
+			if teacher.omnihash && teacher.omnihash['twitter'] && teacher.omnihash['twitter']['fids']
+				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x4 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x4
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x4
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+			if teacher.omnihash && teacher.omnihash['facebook'] && teacher.omnihash['facebook']['fids']
+				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x2 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x2
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x2
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+		end
+		vec
 
 	end
+
+	def self.add_path(src_id,dest_id,network,bitmap)
+
+		neighbors.each do |f|
+			if !network[self.id.to_s]
+				network[self.id.to_s] = { "#{f.id.to_s}" => bitmap }
+			else
+				network[self.id.to_s][f.id.to_s] |= bitmap
+			end
+		end
+		network
+	end
+
+	def twitter_friends (degree = 1)
+
+		ret = {}
+		if degree>0 && self.omnihash['twitter']
+			Teacher.any_in('omnihash.twitter.uid' => self.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
+				f.twitter_friends(degree-1).each do |g|
+					ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+				end
+			end
+		end
+		ret
+
+	end
+
+	def facebook_friends (degree = 1)
+
+		ret = {}
+		if degree>0 && self.omnihash['facebook']
+			Teacher.any_in('omnihash.facebook.uid' => self.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+				ret[f.id.to_s] = ret[f.id.to_s] ? ret[f.id.to_s]+1 : 1
+				f.facebook_friends(degree-1).each do |g|
+					ret[g[0].to_s] = (ret[g[0].to_s] ? g[1]+1 : 1)
+				end
+			end
+		end
+		ret
+
+	end
+
+	# returns ordered list of teacher IDs
+	# def dijkstra (network)
+
+	# 	network.each do |f|
+	# 		f[1].each do |g|
+	# 			network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+	# 			#g[1] = (16-g[1]).to_i
+	# 		end
+	# 	end
+
+	# 	pathhash = {}
+	# 	uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
+
+	# 	#debugger
+
+	
+	# 	# set initial distances 
+	# 	uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= self.id.to_s }
+
+	# 	# import first layer of distance data
+	# 	#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
+
+	# 	#debugger
+
+	# 	current_nodeid = self.id.to_s
+	# 	last_nodeid = nil
+
+	# 	# will be performing exactly pathhash.size minpath reductions
+	# 	pathhash.size.times do
+	# 		# iterate through next node's outgoing links
+
+	# 		if !network[current_nodeid].nil? || current_nodeid==self.id.to_s
+
+	# 			pathhash_copy = pathhash.clone
+
+	# 			#begin
+
+	# 			network[current_nodeid].each do |g|
+
+	# 				# pathhash[nextid] 	-> 	set of node's outgoing links
+	# 				# g[0] 				-> 	id of destination node
+	# 				# g[1] 				-> 	the inverse distance to that path
+	# 				# 
+
+	# 				# conditional if a link to it exists
+	# 				#newdist = #[:dist]  #Teacher.minsrcpath(pathhash,current_nodeid)[1][:dist] #16-pathhash[g[0]][:dist]+g[1]
+
+	# 				#lastdist = 
+	# 				newdist = 16-g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
+
+	# 				if (current_nodeid==self.id.to_s || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=self.id.to_s #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
+	# 					pathhash[g[0].to_s][:dist] = newdist
+	# 					pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
+	# 				end
+	# 			end
+	# 		end
+
+	# 		#rescue 
+	# 		#	debugger
+	# 		#end
+
+	# 		#debugger
+
+	# 		min = Teacher.minpath(pathhash)[0].to_s
+	# 		pathhash[min][:visited] = true
+	# 		last_nodeid = current_nodeid
+	# 		current_nodeid = min
+	# 	end		
+
+	# 	pathhash
+
+	# end
+
+	# returns ordered list of teacher IDs
+	def self.dijkstra (network,tid)
+
+		# debugger
+
+		#if invert
+		network.each do |f|
+			f[1].each do |g|
+				network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+				#g[1] = (16-g[1]).to_i
+			end
+		end
+		#end
+
+		pathhash = {}
+
+		#debugger
+
+		(network.map { |f| f[1].map { |g| g[0].to_s } } + network.map{ |f| f[0].to_s }).flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
+		#network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= tid }
+
+		#debugger
+
+		current_nodeid = tid
+		last_nodeid = nil
+
+		pathhash.size.times do
+
+			if !network[current_nodeid].nil? || current_nodeid==tid
+
+				pathhash_copy = pathhash.clone
+				network[current_nodeid].each do |g|
+
+					if g[0].to_s==tid
+						next
+					end
+
+					#debugger if g[0].to_s=='502d3d5c2fc6100002000084'
+
+					lastdist = lastdistance(pathhash_copy,last_nodeid)
+					lastdist = 0 if lastdist == INFINITY
+
+					newdist = g[1] +  lastdist#ance(pathhash_copy,last_nodeid)
+
+					if (current_nodeid==tid || newdist < lastdistance(pathhash_copy,g[0].to_s))# && g[0].to_s!=tid 
+
+						pathhash[g[0].to_s][:dist] = newdist
+						pathhash[g[0].to_s][:from] = current_nodeid
+
+					end
+				end
+			end
+
+			min = minpath(pathhash,current_nodeid)[0].to_s
+
+			pathhash[min][:visited] = true# if !pathhash[min][:from].nil?
+			last_nodeid = current_nodeid
+			current_nodeid = min
+		end		
+
+		pathhash
+
+	end
+
+	# returns the minimum distance for the given src_id
+	# if no instance exists, return an infinite distance
+	def self.lastdistance(network,src_id)
+
+		return 0 if src_id.nil?
+
+		#debugger if src_id=="502ca22b6cd2cb0002000011"
+
+		min = nil
+		network.each do |f|
+			#min = f if ((min.nil?) || (f[1][:dist]<min[1][:dist] && !f[1][:visited])) && src_id.to_s==f[0].to_s
+			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && src_id.to_s==f[0].to_s#f[1][:from].to_s
+		end
+		(min.nil? ? INFINITY : min[1][:dist])
+	end
+
+	# returns the minimum node
+	def self.minpath (network,src_id)
+
+		
+
+		min = nil #network.first
+		network.each do |f|
+			#debugger
+			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && !f[1][:visited] && src_id.to_s!=f[0].to_s #&& !f[1][:from].nil? # && (id.empty? || id.to_s==f[0].to_s)
+		end
+		#debugger
+		min
+	end
+
+	def recommends (count = 5)
+
+		#subs = self.subscriptions(2) - self.subscriptions(1)
+
+		# pre-seed!
+
+		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
+
+		debugger
+
+		vectors = Teacher.vectors(self.id.to_s,2)
+
+		recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
+
+		# erin   : 502d3edd2fc61000020000bf
+		# jerry  : 502d3b822fc6100002000012
+		# joan   : 5049718bf5d9ab00020000a7
+		# steven : 503bfe25fafac30002000011
+		# spang  : 505ce7fae274d70002000019
+		# NASA   : 502cab3378de86000200006d
+
+		(['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs)-subs
+
+		#recs
+
+		#recs << ['502ca11eaa1d2a000200000b',{:dist => 1}]
+
+		#recs.reject!{ |f| subs.include? f[0].to_s }
+
+
+		#list
+
+	end
+
+
+
+	# this does not work
+	# def subs_of_subs
+
+	# 	sos = [] #{"id" => id, "count" => count}
+
+	# 	subs = relationships.where(:subscribed => true).entries.map {|r| Teacher.find(r["user_id"])}
+
+	# 	debugger
+
+	# 	subs.each do |sub|
+
+	# 		e = sos.find{|s| s["id"] == sub.id.to_s}
+
+	# 		if e.nil?
+
+	# 			sos << {"id" => sub.id.to_s, "count" => 1}
+
+	# 		else
+
+	# 			e["count"] += 1
+
+	# 		end
+
+	# 	end
+
+	# 	return sos
+
+	# end
 
 	def self.find_for_authentication(conditions) 
 		conditions[:login].downcase!
@@ -457,98 +823,6 @@ class Teacher
 
 end
 
-class Feed
-	include Mongoid::Document
-
-
-	# elements that appear in this teacher's main feed
-	field :main_feed, :type => Array, :default => []
-
-	# elements that appear in this teacher's subscribed feed
-	field :subsc_feed, :type => Array, :default => []
-
-	# elements that appear in this teacher's profile feed
-	field :personal_feed, :type => Array, :default => []
-
-
-	belongs_to :teacher
-
-	# passed an array of new log values, and the identifier for which feed to push it on
-	def multipush(newvals,feedid = 0)
-
-		# bail if a nonexistant feed field is specified
-		raise "Invalid feed identifier!" and return if !([0,1,2].include? feedid)
-
-		feedlength = (feedid==0 ? MAIN_FEED_STORAGE : feedid==1 ? SUBSC_FEED_STORAGE : PERSONAL_FEED_STORAGE)
-
-		# retrieve old values
-		case feedid
-			when 0
-				oldvals = self.main_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
-			when 1
-				oldvals = self.subsc_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
-			when 2
-				oldvals = self.personal_feed.clone#.sort_by{ |f| f['timestamp'] }.reverse
-		end
-
-		# assume that newvals are sorted in descending order by time
-		feedarr = []
-
-		feedarr = ((newvals.map{ |f| [f[0].peel,f[1]] }) + ((oldvals.map{ |f| [f,Binder.find(f['modelid'].to_s)] }).sort_by{ |f| f[0]['timestamp'] }.reverse)).reject{ |f| !(f[1].is_pub?) || !(f[1].parent!={'id'=>'0','title'=>''}) }.uniq.first(feedlength)#.reverse
-
-		#feedarr.reverse!
-
-		case feedid
-			when 0
-				self.update_attributes( :main_feed => feedarr.map{ |f| f[0] })
-			when 1
-				self.update_attributes( :subsc_feed => feedarr.map{ |f| f[0] })
-			when 2
-				self.update_attributes( :personal_feed => feedarr.map{ |f| f[0] })
-		end			
-
-		# return array to be used in the view
-		return feedarr#.reverse
-
-	end
-
-	# returns the timestamp of the head of the queue (most recent time)
-	def headtime(feedid = 0)
-
-		case feedid
-			when 0
-				size = self.main_feed.size
-			when 1
-				size = self.subsc_feed.size
-			when 2
-				size = self.personal_feed.size
-			else
-				raise "Invalid feed identifier!" and return
-		end
-
-		if size < 1
-			return -1
-		else
-			case feedid
-				when 0
-					#return self.main_feed[0].timestamp.to_i
-					#return self.main_feed[0]['timestamp']
-					#return self.main_feed.last['timestamp']
-					return self.main_feed.first['timestamp']
-				when 1
-					#return self.subsc_feed[0].timestamp.to_i
-					#return self.subsc_feed[0]['timestamp']
-					#return self.subsc_feed.last['timestamp']
-					return self.subsc_feed.first['timestamp']
-				when 2
-					#return self.personal_feed[0].timestamp.to_i
-					#return self.personal_feed[0]['timestamp']
-					#return self.personal_feed.last['timestamp']
-					return self.personal_feed.first['timestamp']
-			end
-		end
-	end
-end
 
 class Tag
 	include Mongoid::Document
@@ -651,8 +925,8 @@ end
 
 class Info
 	include Mongoid::Document
-	# include Tire::Model::Search
-	# include Tire::Model::Callbacks
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 
@@ -670,6 +944,8 @@ class Info
 	#validates_with InfoValidator
 
 	mount_uploader :avatar, AvatarUploader
+
+	field :thumbnails, :type => Array, :default => [nil,nil,nil,nil]
 
 	field :size, 				:type => Integer, :default => 0
 	field :ext, 				:type => String, :default => ""

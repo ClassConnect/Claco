@@ -30,7 +30,7 @@
 					<li class=<%= "messelect" if conversation.unread[current_teacher.id.to_s] != 0%>>
 						<a href="/messages/<%= conversation.id.to_s %>">
 
-							<img src="<%= Teacher.find(conversation.get_other(current_teacher.id.to_s)).info.avatar.thumb_md %>" class="profpic" />
+							<img src="<%= Teacher.thumb_md(Teacher.find(conversation.get_other(current_teacher.id.to_s))) %>" class="profpic" />
 
 							<div class="mescon">
 								<div class="personname">

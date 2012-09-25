@@ -6,18 +6,18 @@
 
 				<% imgarr = Binder.get_folder_array(@f[:model].id.to_s) %>
 
-				<% if !imgarr[0].nil? && !imgarr[0].empty? %>
+				<% if !imgarr[0].nil? %>
 
 				<div style="float:left; margin-right: 10px;">
 					<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-						<img src=<%= imgarr[0] %> />
+						<img src="<%= Binder.thumb_lg(imgarr[0]) %>" />
 					</div>
 
-					<% if !imgarr[1].nil? && !imgarr[1].empty? %>
+					<% if !imgarr[1].nil? %>
 
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= imgarr[1] %> />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? asset_path("common/nothumb.png") : imgarr[2] %> />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? asset_path("common/nothumb.png") : imgarr[3] %> />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
 
 					<% end %>
 
@@ -26,14 +26,20 @@
 				<% end %>
 
 			<% else %>
-				<% if !@f[:model].current_version.nil? && @f[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-					<div class="previmg" style="background-image: url('<%= @f[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
+				<% if Binder.thumbready?(@f[:model]) %>
+					<div class="previmg" style="background-image: url('<%= Binder.thumb_lg(@f[:model]) %>');background-repeat: no-repeat;background-position: center;"></div>
 				<% end %>
 			<% end %>
 			<div class="txtcon">
 				<div class="contitle"><%= @f[:model].title %></div>
 				<div class="condesc">
-					<%= truncate(strip_tags(@f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% if !@f[:model].body.empty? %>
+            		<%= truncate(strip_tags(@f[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% elsif !@f[:model].current_version.nil? &&!@f[:model].current_version.doctext.nil? && !@f[:model].current_version.doctext.empty? %>
+            		<%= truncate(strip_tags(@f[:model].current_version.doctext), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% else %>
+            		<%= "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe %>
+            	<% end %>
 				</div>
 			</div>
 			<div style="clear:both"></div>
@@ -50,18 +56,18 @@
 
 				<% imgarr = Binder.get_folder_array(g[:model].id.to_s) %>
 
-				<% if !imgarr[0].nil? && !imgarr[0].empty? %>
+				<% if !imgarr[0].nil? %>
 
 				<div style="float:left; margin-right: 10px;">
 					<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-						<img src=<%= imgarr[0] %> />
+						<img src="<%= Binder.thumb_lg(imgarr[0]) %>" />
 					</div>
 
-					<% if !imgarr[1].nil? && !imgarr[1].empty? %>
+					<% if !imgarr[1].nil? %>
 
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= imgarr[1] %> />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[2].nil? || imgarr[2].empty?) ? asset_path("common/nothumb.png") : imgarr[2] %> />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src=<%= (imgarr[3].nil? || imgarr[3].empty?) ? asset_path("common/nothumb.png") : imgarr[3] %> />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
 
 					<% end %>
 
@@ -70,14 +76,20 @@
 				<% end %>
 
 			<% else %>
-				<% if !g[:model].current_version.nil? && g[:model].current_version.imgstatus["img_thumb_lg"]["generated"] %>
-					<div class="previmg" style="background-image: url('<%= g[:model].current_version.img_thumb_lg.url %>');background-repeat: no-repeat;background-position: center;"></div>
+				<% if Binder.thumbready?(g[:model]) %>
+					<div class="previmg" style="background-image: url('<%= Binder.thumb_lg(g[:model]) %>');background-repeat: no-repeat;background-position: center;"></div>
 				<% end %>
 			<% end %>
 			<div class="txtcon">
 				<div class="contitle"><%= g[:model].title %></div>
 				<div class="condesc">
-					<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% if !g[:model].body.empty? %>
+            		<%= truncate(strip_tags(g[:model].body), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% elsif !g[:model].current_version.nil? &&!g[:model].current_version.doctext.nil? && !g[:model].current_version.doctext.empty? %>
+            		<%= truncate(strip_tags(g[:model].current_version.doctext), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+            	<% else %>
+            		<%= "<span style='font-style:italic;color:#aaa'>No description</span>".html_safe %>
+            	<% end %>
 				</div>
 			</div>
 			<div style="clear:both"></div>

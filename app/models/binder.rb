@@ -88,6 +88,72 @@ class Binder
 
 	embeds_one :imageset
 
+	########################################
+
+	def self.thumbready? (binder,image='img_thumb_lg')
+
+		# if binder.current_version.imgstatus[image].nil?
+		# 	Rails.logger.fatal "invalid image designator"
+		# 	return false
+		# end
+
+		# return 	!binder.nil? && 
+		# 		!binder.current_version.nil? && 
+		# 		!binder.current_version.thumbnails.nil? && 
+		# 		!binder.current_version.thumbnails.first.nil? && 
+		# 		!binder.current_version.thumbnails.first.empty?
+ 
+		return 	!binder.nil? && 
+				!binder.current_version.nil? &&
+				!binder.current_version.imgfile.nil? &&
+				!binder.current_version.img_thumb_lg.nil? &&
+				!binder.current_version.img_thumb_lg.url.nil? &&
+				#!binder.current_version.imgstatus.nil? &&
+				#!binder.current_version.imgstatus[image].nil? &
+				binder.current_version.imgstatus[image]['generated']
+
+	end
+
+	def self.contentview (binder)
+
+		# return Binder.thumbready?(binder) ? binder.current_version.thumbnails[0] : "/assets/common/nothumb.png"
+		# begin
+		# 	return binder.current_version.img_contentview.url.to_s
+		# rescue
+		# 	return "/assets/common/nothumb.png"
+		# end
+		#binder.current_version.imgstatus['img_contentview']['generated'] ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
+
+	end
+
+	def self.thumb_lg (binder)
+
+		# return Binder.thumbready?(binder) ? binder.current_version.thumbnails[1] : "/assets/common/nothumb.png"
+		# begin
+		# 	return binder.current_version.img_thumb_lg.url.to_s
+		# rescue
+		# 	return "/assets/common/nothumb.png"
+		# end
+		#binder.current_version.imgstatus['img_thumb_lg']['generated'] ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
+	end
+
+
+	def self.thumb_sm (binder)
+
+		# return Binder.thumbready?(binder) ? binder.current_version.thumbnails[2] : "/assets/common/nothumb.png"
+		# begin
+		# 	return binder.current_version.img_thumb_sm.url.to_s
+		# rescue
+		# 	return "/assets/common/nothumb.png"
+		# end
+		#binder.current_version.imgstatus['img_thumb_sm']['generated'] ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
+
+	end
+
+
 	# returns array of URLs of images, in order of size
 	def self.get_folder_array(id)
 
@@ -95,23 +161,29 @@ class Binder
 
 		retarr = Array.new
 
-		#Rails.logger.debug "Thumbimbids array: #{binder.thumbimgids.to_s}"
+		# retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
+		# retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
+		# retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
+		# retarr << Binder.find(binder.thumbimgids[3].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
 
-		# retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.imgfile.thumb_lg.url if !binder.thumbimgids[0].empty?
-		# retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[1].empty?
-		# retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.imgfile.thumb_sm.url if !binder.thumbimgids[2].empty?
+		begin 
+			retarr << Binder.find(binder.thumbimgids[0].to_s)#.current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
+			retarr << Binder.find(binder.thumbimgids[1].to_s)#.current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
+			retarr << Binder.find(binder.thumbimgids[2].to_s)#.current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
+			retarr << Binder.find(binder.thumbimgids[3].to_s)#.current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
+		rescue
 
-		retarr << Binder.find(binder.thumbimgids[0].to_s).current_version.img_thumb_lg.url if !(binder.thumbimgids[0].nil?) && !(binder.thumbimgids[0].empty?)
-		retarr << Binder.find(binder.thumbimgids[1].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[1].nil?) && !(binder.thumbimgids[1].empty?)
-		retarr << Binder.find(binder.thumbimgids[2].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[2].nil?) && !(binder.thumbimgids[2].empty?)
-		retarr << Binder.find(binder.thumbimgids[3].to_s).current_version.img_thumb_sm.url if !(binder.thumbimgids[3].nil?) && !(binder.thumbimgids[3].empty?)
-
-		#Rails.logger.debug "Return array: #{retarr.to_s}"
+		ensure
+			(4-retarr.size).times { retarr << nil }
+		end			
 
 		return retarr
 
+		#return binder.thumbimgids.map { |f| Binder.find(f.to_s) }
+
 	end
 
+	# unused
 	def self.get_folder_feed_array(id)
 
 		binder = Binder.find(id.to_s)
@@ -171,7 +243,6 @@ class Binder
 			(4 - binder.thumbimgids.size).times do |i|
 				binder.thumbimgids << imageset.flatten[i].to_s
 			end
-			#end
 		end
 
 		# fill up extra space so there are always 3 entries
@@ -182,6 +253,7 @@ class Binder
 		# technically not necessary to save until reaching the top node
 		binder.save
 
+		# recurse
 		Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(binder.parent["id"] || binder.parent[:id])# if parent['id'] == "0" || parent[:id] == "0"
 
 	end
@@ -338,6 +410,7 @@ class Binder
 		return Binder.where("parents.id" => self.id.to_s)
 	end
 
+	# when versions are implemented, this needs to be rewritten!!!!
 	def current_version
 		versions.each {|v| return v if v.active}
 
@@ -540,6 +613,26 @@ class Binder
 
 		binder = Binder.find(id.to_s)
 
+		# BEGIN IMAGE SERVER
+
+		# binder = Binder.find(id.to_s)
+
+		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+		# url = binder.current_version.imgfile.url.to_s
+
+		# model = [binder.id.to_s,binder.current_version.id.to_s]
+
+		# datahash = Digest::MD5.hexdigest(storedir + 'url' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+		# 												:class => 'url',
+		# 												:url => url,
+		# 												:model => model,
+		# 												:datahash => datahash })
+
+		# END IMAGE SERVER
+
 		origimg = Magick::ImageList.new
 
 		# retrieve fullsize image from S3 store, read into an ImageList object
@@ -588,6 +681,26 @@ class Binder
 
 		binder = Binder.find(id.to_s)
 
+		# BEGIN IMAGE SERVER
+
+		# binder = Binder.find(id.to_s)
+
+		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+		# url = binder.current_version.imgfile.url.to_s
+
+		# model = [binder.id.to_s,binder.current_version.id.to_s]
+
+		# datahash = Digest::MD5.hexdigest(storedir + 'video' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+		# 												:class => 'video',
+		# 												:url => url,
+		# 												:model => model,
+		# 												:datahash => datahash })
+
+		# END IMAGE SERVER
+
 		origimg = Magick::ImageList.new
 
 		# retrieve fullsize image from S3 store, read into an ImageList object
@@ -620,6 +733,30 @@ class Binder
 	end
 
 	def self.gen_croc_thumbnails(id)
+
+		#Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
+
+		#debugger
+
+		# BEGIN IMAGE SERVER
+
+		# binder = Binder.find(id.to_s)
+
+		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+		# url = binder.current_version.imgfile.url.to_s
+
+		# model = [binder.id.to_s,binder.current_version.id.to_s]
+
+		# datahash = Digest::MD5.hexdigest(storedir + 'croc' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+		# 												:class => 'croc',
+		# 												:url => url,
+		# 												:model => model,
+		# 												:datahash => datahash })
+
+		# END IMAGE SERVER
 
 		binder = Binder.find(id.to_s)
 
@@ -675,6 +812,28 @@ class Binder
 	def self.gen_smart_thumbnails(id)
 
 		#include Magick
+
+		#debugger
+
+		# BEGIN IMAGE SERVER
+
+		# binder = Binder.find(id.to_s)
+
+		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+		# url = binder.current_version.imgfile.url.to_s
+
+		# model = [binder.id.to_s,binder.current_version.id.to_s]
+
+		# datahash = Digest::MD5.hexdigest(storedir + 'image' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+		# 												:class => 'image',
+		# 												:url => url,
+		# 												:model => model,
+		# 												:datahash => datahash })
+
+		# END IMAGE SERVER
 
 		if true
 
@@ -1067,7 +1226,11 @@ class Binder
 			#GC.start
 		end
 
+		# BEGIN IMAGE SERVER
+
 		Binder.generate_folder_thumbnail(id)
+
+		# END IMAGE SERVER
 
 	end
 
@@ -1312,6 +1475,12 @@ class Version
 													 	:img_thumb_lg => 	{ :generated => false },
 														:img_thumb_sm => 	{ :generated => false } }
 
+
+	field :vid_processed, :type => Boolean, :default => false
+
+	field :thumbnails, :type => Array, :default => [nil,nil,nil]
+
+
 	# the explicit thumbnail uploaders will be used when ImageMagick is fully utilized
 	mount_uploader :imgfile, 		ImageUploader
 	mount_uploader :img_contentview,ImageUploader
@@ -1319,6 +1488,8 @@ class Version
 	mount_uploader :img_thumb_sm, 	ImageUploader
 
 	embedded_in :binder
+
+
 
 	def thumbnailgen
 

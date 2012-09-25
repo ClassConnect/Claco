@@ -24,6 +24,7 @@ class BindersController < ApplicationController
 		@tags = [[],[],[],[]]
 	end
 
+
 	#Add Folder Function
 	def create
 
@@ -153,7 +154,7 @@ class BindersController < ApplicationController
 		end
 
 		#Rails.logger.debug @tags
-		
+
 		# sort the tags into an array
 		@tags = [[],[],[],[]]
 

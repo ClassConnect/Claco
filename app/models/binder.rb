@@ -91,31 +91,66 @@ class Binder
 
 	########################################
 
-	def self.thumbready? (binder)
+	def self.thumbready? (binder,image='img_thumb_lg')
 
+		# if binder.current_version.imgstatus[image].nil?
+		# 	Rails.logger.fatal "invalid image designator"
+		# 	return false
+		# end
+
+		# return 	!binder.nil? && 
+		# 		!binder.current_version.nil? && 
+		# 		!binder.current_version.thumbnails.nil? && 
+		# 		!binder.current_version.thumbnails.first.nil? && 
+		# 		!binder.current_version.thumbnails.first.empty?
+ 
 		return 	!binder.nil? && 
-				!binder.current_version.nil? && 
-				!binder.current_version.thumbnails.nil? && 
-				!binder.current_version.thumbnails.first.nil? && 
-				!binder.current_version.thumbnails.first.empty?
+				!binder.current_version.nil? &&
+				!binder.current_version.imgfile.nil? &&
+				!binder.current_version.img_thumb_lg.nil? &&
+				!binder.current_version.img_thumb_lg.url.nil? &&
+				#!binder.current_version.imgstatus.nil? &&
+				#!binder.current_version.imgstatus[image].nil? &
+				binder.current_version.imgstatus[image]['generated']
 
 	end
 
 	def self.contentview (binder)
 
-		return Binder.thumbready?(binder) ? binder.current_version.thumbnails[0] : "/assets/common/nothumb.png"
+		# return Binder.thumbready?(binder) ? binder.current_version.thumbnails[0] : "/assets/common/nothumb.png"
+		# begin
+		# 	return binder.current_version.img_contentview.url.to_s
+		# rescue
+		# 	return "/assets/common/nothumb.png"
+		# end
+		#binder.current_version.imgstatus['img_contentview']['generated'] ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
 
 	end
 
 	def self.thumb_lg (binder)
 
-		return Binder.thumbready?(binder) ? binder.current_version.thumbnails[1] : "/assets/common/nothumb.png"
-
+		# return Binder.thumbready?(binder) ? binder.current_version.thumbnails[1] : "/assets/common/nothumb.png"
+		# begin
+		# 	return binder.current_version.img_thumb_lg.url.to_s
+		# rescue
+		# 	return "/assets/common/nothumb.png"
+		# end
+		#binder.current_version.imgstatus['img_thumb_lg']['generated'] ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
 	end
+
 
 	def self.thumb_sm (binder)
 
-		return Binder.thumbready?(binder) ? binder.current_version.thumbnails[2] : "/assets/common/nothumb.png"
+		# return Binder.thumbready?(binder) ? binder.current_version.thumbnails[2] : "/assets/common/nothumb.png"
+		# begin
+		# 	return binder.current_version.img_thumb_sm.url.to_s
+		# rescue
+		# 	return "/assets/common/nothumb.png"
+		# end
+		#binder.current_version.imgstatus['img_thumb_sm']['generated'] ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
 
 	end
 
@@ -577,6 +612,8 @@ class Binder
 
 	def self.gen_url_thumbnails(id)
 
+		binder = Binder.find(id.to_s)
+
 		# BEGIN IMAGE SERVER
 
 		# binder = Binder.find(id.to_s)
@@ -642,6 +679,8 @@ class Binder
 	end
 
 	def self.gen_video_thumbnails(id)
+
+		binder = Binder.find(id.to_s)
 
 		# BEGIN IMAGE SERVER
 

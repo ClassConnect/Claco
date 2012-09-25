@@ -7,7 +7,9 @@
 		<% imgarr = Binder.get_folder_array(binder.id.to_s) %>
 
 			<div id="<%= binder.id.to_s %>" class="content-item folder-item">
-				<% if binder.thumbimgids.reject{|f| f==""||f.nil?}.empty? %>
+				<% #if binder.thumbimgids.reject{|f| f==""||f.nil?}.empty? 
+				%>
+				<% if binder.type==1 && !Binder.thumbready?(imgarr[0],'img_thumb_lg') %>
 
           		<div class="folder-preview">
 					<div class="dyncon">
@@ -28,6 +30,9 @@
 			    </div> <!-- end of fold prevew -->
 
 			    <% end %>
+
+			    <% #debugger if binder.current_version.nil? 
+			    %>
 
 				<img class="thumby1" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
 				<img class="thumby2" src="<%= Binder.thumb_sm(imgarr[2]) %>" />

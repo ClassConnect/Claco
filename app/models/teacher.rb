@@ -158,35 +158,44 @@ class Teacher
 
 	def self.thumbready? (teacher)
 
-		return 	!teacher.nil? && 
+		# return 	!teacher.nil? && 
+		# 		!teacher.info.nil? && 
+		# 		!teacher.info.thumbnails.nil? && 
+		# 		!teacher.info.thumbnails.first.nil? && 
+		# 		!teacher.info.thumbnails.first.empty?
+
+		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
-				!teacher.info.thumbnails.nil? && 
-				!teacher.info.thumbnails.first.nil? && 
-				!teacher.info.thumbnails.first.empty?
+				!teacher.info.avatar.nil? &&
+				!teacher.info.avatar.thumb_sm.nil?
 
 	end
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : "/assets/placer.png"
+		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
@@ -579,9 +588,33 @@ class Teacher
 
 		#subs = self.subscriptions(2) - self.subscriptions(1)
 
-		network = Teacher.vectors(self.id.to_s,2)
+		# pre-seed!
+
+		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
+
+		debugger
+
+		vectors = Teacher.vectors(self.id.to_s,2)
+
+		recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
+
+		# erin   : 502d3edd2fc61000020000bf
+		# jerry  : 502d3b822fc6100002000012
+		# joan   : 5049718bf5d9ab00020000a7
+		# steven : 503bfe25fafac30002000011
+		# spang  : 505ce7fae274d70002000019
+		# NASA   : 502cab3378de86000200006d
+
+		(['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs)-subs
+
+		#recs
+
+		#recs << ['502ca11eaa1d2a000200000b',{:dist => 1}]
+
+		#recs.reject!{ |f| subs.include? f[0].to_s }
 
 
+		#list
 
 	end
 

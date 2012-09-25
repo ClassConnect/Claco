@@ -23,11 +23,9 @@
 
 		<iframe style="border-radius: 6px !important;" width="675" height="400" src="http://www.youtube.com/embed/<%= @current.current_version.get_youtube_id %>" frameborder="0" allowfullscreen></iframe>
 
-		<div class="pname">Jennie Dougherty <span style="color:#999; font-weight:normal">Pioneer Chat</span></div>
+		<div class="pname"><%= @current.title %> <span style="color:#999; font-weight:normal">Pioneer Chat</span></div>
 
-		<div class="well">Jennie is a 9th grade english teacher from New York. She is the founder of edUpgrade, a revolutionary project that is connecting educators with much needed technology.<br /><br />
-			<h2><a href="#" style="font-weight:bolder">Visit Jennie Dougherty!</a></h2>
-		</div>
+		<div class="well"><%= @current.body.html_safe %></div>
 
 	</div>
 

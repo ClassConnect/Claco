@@ -16,8 +16,43 @@ footer {
   color:#666;
 }
 
+.bodcon {
+  display: none;
+  text-align: center;
+}
+
+.bodcon input[type=text] {
+  min-width:80%;
+}
+
+.bodcon input[type=text]:last-child {
+  opacity: 0.4;
+}
+
 .invite-btn {
   padding-top:5px;
+}
+
+.invite-btn-grp {
+  text-align: center;
+  padding: 2px 0;
+}
+
+.invite-btn-grp a {
+  margin-right: 3px;
+}
+
+.invite-btn-grp a:last-child {
+  margin-right: 0;
+}
+
+.url-container {
+  text-align:center;
+}
+.url-container input[type=text]{
+  min-width: 80%;
+  margin-left:10px;
+  background:#fff;
 }
 
 .inlay {

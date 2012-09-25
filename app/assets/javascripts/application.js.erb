@@ -19,7 +19,6 @@ $(document).ready(function() {
 	$(".noclose").on("click", function(e){
 	    e.stopPropagation();
 	});
-
 	$("#top-notch-btn").on("click", function(e){
 		if (!$(".noclose").is(":visible")) {
 
@@ -29,9 +28,24 @@ $(document).ready(function() {
 	    
 	});
 
+	fieldAdder();
+
 });
 
-
+function fieldAdder () {
+    $('#bodcon input[type=email]').last()
+        .on('focus',
+            function () {
+                if($('#bodcon input[type=email]').last().prev().val() != '') {
+                    
+                    $('#bodcon .buttonbar').first()
+                        .before('<input id="invite_" name="invite[]" placeholder="Enter email address" type="email" value="">');
+                    }
+                    $('#bodcon input[type=email]').off('focus');
+                    fieldAdder();
+                
+            });
+}
 
 
 function initAsyc(content) {

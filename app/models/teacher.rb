@@ -515,7 +515,7 @@ class Teacher
 
 			#debugger if current_nodeid == '502d3d5c2fc6100002000084'
 
-			debugger
+			#debugger
 
 			p "now operating on node #{current_nodeid}"
 			p ""
@@ -528,7 +528,7 @@ class Teacher
 				pathhash_copy = pathhash.clone
 				network[current_nodeid].each do |g|
 
-					debugger if g[0].to_s == '502d3d5c2fc6100002000084'
+					#debugger if g[0].to_s == '502d3d5c2fc6100002000084'
 
 					p "    now operating on connection #{g}"
 
@@ -597,10 +597,12 @@ class Teacher
 
 		return 0 if src_id.nil?
 
+		#debugger if src_id=="502ca22b6cd2cb0002000011"
+
 		min = nil
 		network.each do |f|
 			#min = f if ((min.nil?) || (f[1][:dist]<min[1][:dist] && !f[1][:visited])) && src_id.to_s==f[0].to_s
-			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && src_id.to_s==f[1][:from].to_s
+			min = f if (min.nil? || f[1][:dist]<min[1][:dist]) && src_id.to_s==f[0].to_s#f[1][:from].to_s
 		end
 		(min.nil? ? INFINITY : min[1][:dist])
 	end

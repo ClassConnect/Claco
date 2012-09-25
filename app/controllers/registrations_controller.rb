@@ -6,12 +6,12 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
-    if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
+    if Ns.where(:code => params[:key]).first.nil? && Teacher.where(:_id => params[:ref]).first.nil?
       redirect_to root_path
     else
-      if Ns.where(:code => params[:key]).first.active
+      if !Teacher.where(:_id => params[:ref]).first.nil? || Ns.where(:code => params[:key]).first.active
         resource = build_resource({})
-        resource.code = params[:key]
+        resource.code = params[:key] || params[:ref]
         i = Invitation.where(:code => params[:key]).first
         unless i.nil?
           i.status["clicked"] = true

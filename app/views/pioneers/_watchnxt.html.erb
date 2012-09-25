@@ -1,0 +1,18 @@
+	<div class="watchnxt">
+
+		<div class="nounce">
+			Meet more pioneers
+		</div>
+
+		<% @pibinders.each do |binder| %>
+		<li>
+			<a href="<%= pioneer_route(binder) %>">
+				<center>
+					<img src="<%= get_binder_image(binder) %>" />
+					<div><%= binder.title %></div>
+				</center>
+			</a>
+		</li>
+		<% end %>
+
+	</div>

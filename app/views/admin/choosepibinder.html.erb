@@ -1,0 +1,10 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<br />
+<%= form_tag pioneer_path, :method => :post do %>
+
+	<%= label_tag :binder, "Pioneer Chats Binder ID" %>
+	<%= text_field_tag :binder %>
+<br />
+<button type="submit">Change</button>
+<% end %>

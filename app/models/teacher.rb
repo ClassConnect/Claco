@@ -81,6 +81,7 @@ class Teacher
 	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters", :unless => Proc.new {|user| user.allow_short_username == true}
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."
+	validates_numericality_of :size_cap, less_than_or_equal_to: 10.gigabytes
 	
 	attr_accessor :login
 
@@ -410,9 +411,31 @@ class Teacher
 
 	end
 
+	def incsizecap(size_in_mb = 300)
+
+		self.inc(:size_cap, size_in_mb.megabytes)
+
+	end
+
 	after_create do
 
 		self.info = Info.new
+
+		if self.code.length == 24
+
+			inviter = Teacher.find(self.code)
+
+		elsif self.code.length == 32
+
+			inviter = Teacher.find(Invitation.where(:code => self.code).first.from)
+
+		end
+
+		unless inviter.nil?
+
+			inviter.incsizecap
+
+		end
 
 	end
 

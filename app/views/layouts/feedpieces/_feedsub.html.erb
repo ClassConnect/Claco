@@ -44,7 +44,7 @@
 
 	<% @f[:array].each do |g| %>
 
-		<% @subscribee = Teacher.where(:username => /^#{Regexp.escape(g[:log].params['username'].to_s)}$/i).first %>
+		<% @subscribee = Teacher.where(:username => /^#{Rege6xp.escape(g[:log].params['username'].to_s)}$/i).first %>
 
 		<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 			<div class="thecontent">

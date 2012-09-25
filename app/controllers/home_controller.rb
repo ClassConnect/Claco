@@ -162,8 +162,6 @@ class HomeController < ApplicationController
 		#debugger
 	end
 
-
-
 	def fetchtitle
 		
 		f = Nokogiri::HTML(params[:url]).at('iframe')

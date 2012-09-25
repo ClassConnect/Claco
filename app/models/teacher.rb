@@ -507,33 +507,14 @@ class Teacher
 		current_nodeid = tid
 		last_nodeid = nil
 
-		p "pathhash of size #{pathhash.size}"
-
 		pathhash.size.times do
-
-			#pathhash[current_nodeid][:visited]==true if current_nodeid!=tid
-
-			#debugger if current_nodeid == '502d3d5c2fc6100002000084'
-
-			#debugger
-
-			p "now operating on node #{current_nodeid}"
-			p ""
-			p "network[current_nodeid]:"
-			p "#{network[current_nodeid]}"
-			p ""
 
 			if !network[current_nodeid].nil? || current_nodeid==tid
 
 				pathhash_copy = pathhash.clone
 				network[current_nodeid].each do |g|
 
-					#debugger if g[0].to_s == '502d3d5c2fc6100002000084'
-
-					p "    now operating on connection #{g}"
-
 					if g[0].to_s==tid
-						p "        g[0] matches tid, skip! (#{g[0]},#{tid})}"
 						next
 					end
 
@@ -544,43 +525,16 @@ class Teacher
 
 					newdist = g[1] +  lastdist#ance(pathhash_copy,last_nodeid)
 
-					#debugger if newdist == 14
-					#p newdist
-
-					p "        shortest path calculation:"
-					p "        newdist = g[1] +  lastdistance(pathhash_copy,last_nodeid)"
-					p "        g[1]:     #{g[1]}" 
-					p "        lastnode: #{lastdistance(pathhash_copy,last_nodeid)}"
-					p ""
-					p "        newdist:  #{newdist}"
-					p "        g[0]dist: #{lastdistance(pathhash_copy,g[0].to_s)}"
-					p ""
-					p "        update if newdist < g[0]dist"
-
 					if (current_nodeid==tid || newdist < lastdistance(pathhash_copy,g[0].to_s))# && g[0].to_s!=tid 
-
-						p "            passed! updating shortest path"
-						p "            old: #{pathhash[g[0].to_s]}"
 
 						pathhash[g[0].to_s][:dist] = newdist
 						pathhash[g[0].to_s][:from] = current_nodeid
-						
-						p "            new: #{pathhash[g[0].to_s]}"
+
 					end
 				end
 			end
 
 			min = minpath(pathhash,current_nodeid)[0].to_s
-
-			p "pathhash: "
-			p "-----------------------"
-			pp pathhash
-			p "-----------------------"
-			p "min: #{min}"
-			p "pathhash[min] will be set to visited"
-			p ""
-			p ""
-			p ""
 
 			pathhash[min][:visited] = true# if !pathhash[min][:from].nil?
 			last_nodeid = current_nodeid

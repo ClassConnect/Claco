@@ -259,15 +259,19 @@ class TeachersController < ApplicationController
 
 		#debugger
 
-		storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
+		# BEGIN IMAGE SERVER
 
-		datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
+		# storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
 
-		response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir.to_s,
-														:class => 'avatar',
-														:url => current_teacher.info.avatar.url.to_s,
-														:model => [current_teacher.id.to_s],
-														:datahash => datahash.to_s })
+		# datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
+
+		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir.to_s,
+		# 												:class => 'avatar',
+		# 												:url => current_teacher.info.avatar.url.to_s,
+		# 												:model => [current_teacher.id.to_s],
+		# 												:datahash => datahash.to_s })
+
+		# END IMAGE SERVER
 
 		#debugger
 

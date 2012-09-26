@@ -196,7 +196,7 @@ class TeachersController < ApplicationController
 					end
 				end
 
-				break if @subsfeed.size == SUBSC_FEED_LENGTH
+				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 			end
 		end
 

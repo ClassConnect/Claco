@@ -981,7 +981,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
-	field :location,			:type => Array,    				spacial: true
+	field :location,			:type => Array,  spacial: {lat: :latitude, lng: :longitude, return_array: true }#  				spacial: true
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 

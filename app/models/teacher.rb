@@ -431,22 +431,22 @@ class Teacher
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
 				ids = []
 			end
-			if !teacher.info.nil? && !teacher.info.location.nil? && teacher.info.location!={:lng=>0.0, :lat=>0.0}
-				Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
-					next if f.id.to_s==id
-					if !vec[id]
-						vec[id] = { f.id.to_s => 0x1 }
-						ids << f.id.to_s
-					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x1
-						ids << f.id.to_s
-					else
-						vec[id][f.id.to_s] |= 0x1
-					end
-				end
-				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-				ids = []
-			end
+			# if !teacher.info.nil? && !teacher.info.location.nil? && teacher.info.location!={:lng=>0.0, :lat=>0.0}
+			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
+			# 		next if f.id.to_s==id
+			# 		if !vec[id]
+			# 			vec[id] = { f.id.to_s => 0x1 }
+			# 			ids << f.id.to_s
+			# 		elsif !vec[id][f.id.to_s]
+			# 			vec[id][f.id.to_s] = 0x1
+			# 			ids << f.id.to_s
+			# 		else
+			# 			vec[id][f.id.to_s] |= 0x1
+			# 		end
+			# 	end
+			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			# 	ids = []
+			# end
 		end
 		vec
 
@@ -949,7 +949,7 @@ class Info
 	include Mongoid::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
-	include Mongoid::Spacial::Document
+	# include Mongoid::Spacial::Document
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 
@@ -981,7 +981,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
-	field :location,			:type => Array,  spacial: {lat: :latitude, lng: :longitude, return_array: true }#  				spacial: true
+	field :location,			:type => Array#,  spacial: {lat: :latitude, lng: :longitude, return_array: true }#  				spacial: true
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 

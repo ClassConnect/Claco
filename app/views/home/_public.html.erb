@@ -99,7 +99,7 @@
 
 					<div class="conr">
 						<center>
-							<img class="pcht" src="http://img.cla.co/1b6ced3671b8773496f2c3961e2ae536/thumb_lg.png" />
+							<img class="pcht" src="<%= get_binder_image(Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).first) %>" />
 							<div class="tname"></div>
 						</center>
 					</div>

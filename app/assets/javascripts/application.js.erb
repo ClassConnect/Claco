@@ -28,20 +28,22 @@ $(document).ready(function() {
 	    
 	});
 
-	fieldAdder();
+	$(document).bind('reveal.facebox', function() {
+		fieldAdder();
+	});
 
 });
 
 function fieldAdder () {
-    $('#bodcon input[type=email]').last()
+    $('#facebox input#invite_').last()
         .on('focus',
             function () {
-                if($('#bodcon input[type=email]').last().prev().val() != '') {
+                if($('#facebox input#invite_').last().prev().val() != '') {
                     
-                    $('#bodcon .buttonbar').first()
+                    $('#facebox .buttonbar').first()
                         .before('<input id="invite_" name="invite[]" placeholder="Enter email address" type="email" value="">');
                     }
-                    $('#bodcon input[type=email]').off('focus');
+                    $('#facebox input#invite_').off('focus');
                     fieldAdder();
                 
             });

@@ -36,16 +36,18 @@ $(document).ready(function() {
 
 function fieldAdder () {
     $('#facebox input#invite_').last()
+    	.css('opacity', 0.4);
+
+	$('#facebox input#invite_').last()
         .on('focus',
             function () {
                 if($('#facebox input#invite_').last().prev().val() != '') {
-                    
                     $('#facebox .buttonbar').first()
-                        .before('<input id="invite_" name="invite[]" placeholder="Enter email address" type="email" value="">');
+                        .before('<input id="invite_" name="invite[]" placeholder="Enter Colleague\'s email" type="email" value="">');
                     }
                     $('#facebox input#invite_').off('focus');
-                    fieldAdder();
-                
+                    $('#facebox input#invite_').css('opacity', 1);
+    				fieldAdder();
             });
 }
 

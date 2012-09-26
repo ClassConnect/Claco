@@ -323,7 +323,6 @@ $(document).ready(function() {
 	    });
 
 		$('.starting-section').css('opacity', 1).slideUp(400).animate({ opacity: 0 },{ queue: false, duration: 400});
-		$('.findppl').css('opacity', 1).slideUp(400).animate({ opacity: 0 },{ queue: false, duration: 400});
 	});
 
 

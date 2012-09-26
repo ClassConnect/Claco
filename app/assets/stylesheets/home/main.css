@@ -72,7 +72,7 @@
 	font-size:14px;
 	font-weight:bolder;
 	text-shadow: 0 1px 0 #fff;
-	margin:0 0 5px 5px;
+	margin:8px 0 5px 5px;
 }
 
 #paneright .whitebox{
@@ -90,50 +90,94 @@
   background: #fff;
 }
 
-#paneright .whitebox .findppl{
+#paneright .findppl{
 	background:#fff;
-	padding:10px;
 	-webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
     margin-bottom:15px;
-
+    padding:5px;
     -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 50px rgba(0, 0, 0, 0.05);  
     -moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.2), inset 0 0 50px rgba(0, 0, 0, 0.05);  
     box-shadow: 0 0px 3px rgba(0, 0, 0, 0.2), inset 0 0 50px rgba(0, 0, 0, 0.05); 
 }
 
-#paneright .whitebox .findppl .maintxt{
-	font-size:14px;
+#paneright .findppl .maintxt{
+	margin-top:-35px;
+	padding:5px;
+	font-size:12px;
 	color:#888;
 	font-weight:bolder;
 	text-shadow: 0 1px 0 #fff;
 }
 
-#paneright .whitebox .findppl .boxyleft{
-	padding: 5px 10px 10px 20px;
+#paneright .findppl .maintxt a{
+	font-size:11px;
+
+}
+
+#paneright .findppl .boxyleft{
+	padding-top:5px;
+}
+
+#paneright .findppl .mid {
+	margin: 0 10px;
+}
+
+#paneright .findppl .listitem{
 	float:left;
-	width:225px;
+  padding:4px;
+  width:190px;
+  border-right:1px solid #eee;
 }
 
-#paneright .whitebox .findppl .boxyright{
-	padding: 5px 10px 10px 40px;
-	float:left;
-	width:300px;
-	border-left:1px solid #eee;
-}
-
-#paneright .whitebox .findppl .boxyright .imghold {
-	margin-top:5px;
-}
-
-#paneright .whitebox .findppl .boxyright .imghold img{
-	margin-right:7px;
-	margin-top:7px;
-	-webkit-border-radius: 4px;
+#paneright .findppl .listitem .thumbster{
+  float:left;
+  -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
 }
+
+#paneright .findppl .listitem .infowrap {
+  float:left;
+  margin-left:14px;
+  width:125px;
+}
+
+#paneright .findppl .listitem .bigtitle{
+  font-size:13px;
+  font-weight:bolder;
+}
+
+#paneright .findppl .listitem .bigtitle .uname{
+  color:#888 !important;
+  font-size:13px !important;
+  font-weight:normal !important;
+  text-decoration: none !important;
+}
+
+#paneright .findppl .listitem .biotxt{
+  font-size:13px;
+  color:#666;
+  font-style: italic;
+}
+
+#paneright .findppl .listitem .medata {
+  margin-top:6px;
+}
+
+#paneright .findppl .listitem .medata span{
+  color:#777;
+  font-size:12px;
+}
+
+#paneright .findppl .listitem .medata span img{
+  margin-top:-4px;
+  margin-right:3px;
+  opacity: 0.50;
+  filter: alpha(opacity=50);
+}
+
 
 .connectbtns {
 	font-size:13px;

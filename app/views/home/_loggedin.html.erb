@@ -126,6 +126,8 @@
 
 		<% educators = current_teacher.recommends[0..15].shuffle[0..2].map{ |f| Teacher.find(f.to_s) } %>
 	
+		<% if !educators[0].nil? %>
+
 		<div class="listitem" style="margin-left:15px">
 			
 			<a href="/<%= educators[0].username %>">
@@ -150,6 +152,10 @@
 			<div style="clear:both"></div>
 		</div>
 
+		<% end %>
+
+		<% if !educators[1].nil? %>
+
 		<div class="listitem mid">
 			
 			<a href="/<%= educators[1].username %>">
@@ -173,6 +179,10 @@
 
 			<div style="clear:both"></div>
 		</div>
+
+		<% end %>
+
+		<% if !educators[2].nil? %>
 
 		<div class="listitem" style="border-right:none">
 			
@@ -199,6 +209,8 @@
 		</div>
 
 		<div style="clear:both"></div>
+
+		<% end %>
 
 	
 

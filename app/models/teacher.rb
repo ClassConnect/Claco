@@ -655,10 +655,10 @@ class Teacher
 
 		recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
 
-		# erin   : 502d3edd2fc61000020000bf
-		# jerry  : 502d3b822fc6100002000012
-		# joan   : 5049718bf5d9ab00020000a7
 		# steven : 503bfe25fafac30002000011
+		# jerry  : 502d3b822fc6100002000012
+		# erin   : 502d3edd2fc61000020000bf
+		# joan   : 5049718bf5d9ab00020000a7
 		# spang  : 505ce7fae274d70002000019
 		# NASA   : 502cab3378de86000200006d
 

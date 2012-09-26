@@ -41,7 +41,7 @@ Claco::Application.routes.draw do
 
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'
-
+	get		'/educators'													=> 'home#educators'
 
 	get		'/mediaserver/:id'												=> 'media_server_api#tokencheck'
 	get		'/mediaservertest'												=> 'media_server_api#mediaserver'

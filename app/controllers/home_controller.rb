@@ -159,6 +159,14 @@ class HomeController < ApplicationController
 		#debugger
 	end
 
+	def educators
+
+		@crb = rand(2..50)
+
+		render 'educators'
+
+	end 
+
 	def fetchtitle
 		
 		f = Nokogiri::HTML(params[:url]).at('iframe')

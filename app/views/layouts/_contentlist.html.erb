@@ -92,37 +92,61 @@
 	    </div>
 
 	    <div class="lastupdate">Last updated by <%= link_to "#{binder.fname} #{binder.lname}", "/#{binder.user}" %> <span title="<%= Time.at(binder.last_update).to_datetime %>"><%= time_ago_in_words(Time.at(binder.last_update).to_datetime) %> ago</span></div>
-	    <div class="drop-tog">
-
-	    	<% if @is_self %>
-
-			<div class="btn-group">
-				<button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
-					<div class="tog-arrow"></div>
-				</button>
-				<ul class="dropdown-menu">
-					<li><a id="rename-act" class="modaction">Rename</a></li>
-					<li><a id="copy-act" class="modaction">Copy</a></li>
-					<li><a id="move-act" class="modaction">Move</a></li>
-					<li><a id="delete-act" class="modaction">Delete</a></li>
-				</ul>
+	    <div class="pull-right">
+	    	<!-- <span class="badge badge-inverse pull-right"><img src="<%= get_contype_icon(binder) %>" style="width:24px" /><%= binder.fork_total %></span> -->
+	    	<div class="pagination fork-count">
+			  <ul>
+			    <li class="disabled"><a>Snaps</a></li>
+			    <li class="active"><a><%= binder.fork_total %></a></li>
+			  </ul>
 			</div>
 
-	    	<% else %>
+		    <div class="drop-tog">
 
-			<% if signed_in? %>
+		    	<% if @is_self %>
 
-	    	<button class="btn snapbtn">
-				<%= image_tag "binders/snap.png" %>
-				<div class="texter">Snap</div>
-			</button>
+				<div class="btn-group">
+					<button id="droptog-btn" data-toggle="dropdown" class="btn dropdown-toggle">
+						<div class="tog-arrow"></div>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a id="rename-act" class="modaction">Rename</a></li>
+						<li><a id="copy-act" class="modaction">Copy</a></li>
+						<li><a id="move-act" class="modaction">Move</a></li>
+						<li><a id="delete-act" class="modaction">Delete</a></li>
+					</ul>
+				</div>
 
-			<% end %>
+		    	<% else %>
 
-	        <% end %>
+				<% if signed_in? %>
+
+	 	    	<!-- <button class="btn snapbtn">
+					<%= image_tag "binders/snap.png" %>
+					<div class="texter">Snap</div>
+				</button> -->
+
+				<div class="btn-group">
+	                <button class="btn <%= "btn-info" unless current_teacher.binders.binders.where(:forked_from => binder.id.to_s).count == 0 %> snapbtn">
+	                	<%= image_tag "binders/snap.png" %>
+						<div class="texter" <%= 'style="width:80px"'.html_safe unless current_teacher.binders.binders.where(:forked_from => binder.id.to_s).count == 0%>><%= current_teacher.binders.binders.where(:forked_from => binder.id.to_s).count == 0 ? "Snap" : "Snapped!" %> </div>
+	                </button>
+	                <!-- <button class="btn <%= "btn-info" unless current_teacher.binders.binders.where(:forked_from => binder.id.to_s).count == 0 %> dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+	                <ul class="dropdown-menu">
+	                  <li><a href="#">Action</a></li>
+	                  <li><a href="#">Another action</a></li>
+	                  <li><a href="#">Something else here</a></li>
+	                  <li class="divider"></li>
+	                  <li><a href="#">Separated link</a></li>
+	                </ul> -->
+	              </div>
+
+				<% end %>
+
+		        <% end %>
+		    </div>
 	    </div>
     </div>
 	<% end %>
 	<% end %>
 </div>
-

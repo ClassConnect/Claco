@@ -106,9 +106,9 @@ FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove',
 
 FEED_COLLAPSE_TIME = 30.minutes.to_i
 
-Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"
+Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env == "development"
 
-Zencoder.api_key = ENV['ZENCODER_API_KEY'] if Rails.env = "production"
+Zencoder.api_key = ENV['ZENCODER_API_KEY'] if Rails.env == "production"
 
 Twitter.configure do |config|
   config.consumer_key = 'RAlHtL8ZSNBg16RaYiDBQ'

@@ -345,18 +345,20 @@ module ApplicationHelper
 
 	def get_contype_icon(binder)
 
-		if binder.current_version.croc?
-			return asset_path("binders/types/file.png")
-		elsif !binder.current_version.vidtype.empty?
-			return asset_path("binders/types/video.png")
-		elsif binder.current_version.img?
-			return asset_path("binders/types/pic.png")
-		elsif binder.type == 1
-			return asset_path("binders/types/folder.png")
-		elsif binder.format == 2
-			return asset_path("binders/types/web.png")
-		else
-			return asset_path("binders/types/file.png")
+		unless binder.current_version.nil?
+			if binder.current_version.croc?
+				return asset_path("binders/types/file.png")
+			elsif !binder.current_version.vidtype.empty?
+				return asset_path("binders/types/video.png")
+			elsif binder.current_version.img?
+				return asset_path("binders/types/pic.png")
+			elsif binder.type == 1
+				return asset_path("binders/types/folder.png")
+			elsif binder.format == 2
+				return asset_path("binders/types/web.png")
+			else
+				return asset_path("binders/types/file.png")
+			end
 		end
 			
 

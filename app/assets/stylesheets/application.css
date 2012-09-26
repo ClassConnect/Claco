@@ -26,6 +26,7 @@ footer {
 }
 
 #emailInviter input[type=text]:last-of-type {
+
   opacity: 0.4;
 }
 

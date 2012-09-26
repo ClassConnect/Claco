@@ -556,6 +556,10 @@ class Binder
 
 	# Do not explicitly call these!  All these methods have very long latency.
 
+	def self.sendforkemail(id, forkerid)
+		
+	end
+
 	def self.encode(id)
 
 		binder = Binder.find(id)

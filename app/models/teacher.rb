@@ -797,9 +797,10 @@ class Teacher
 
 	end
 
-	def incsizecap(size_in_mb = 300)
+	def incsizecap(size_in_mb = SIZE_PER_INVITE)
 
-		self.inc(:size_cap, size_in_mb.megabytes)
+		self.size_cap += size_in_mb
+		self.save
 
 	end
 

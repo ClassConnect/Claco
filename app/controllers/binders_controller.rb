@@ -1466,11 +1466,15 @@ class BindersController < ApplicationController
 
 					if params[:enabled]=="true"
 						h.pub_size = h.pub_size + h.priv_size
+						current_teacher.pub_size += h.priv_size
 						h.priv_size = 0
 					else
 						h.priv_size = h.priv_size + h.pub_size
+						current_teacher.priv_size += h.pub_size
 						h.pub_size = 0
 					end
+
+					current_teacher.save
 
 					h.save
 
@@ -1558,11 +1562,15 @@ class BindersController < ApplicationController
 
 						if params[:enabled]=="true"
 							h.pub_size = h.pub_size + h.priv_size
+							current_teacher.pub_size += h.priv_size
 							h.priv_size = 0
 						else
 							h.priv_size = h.priv_size + h.pub_size
+							current_teacher.priv_size += h.pub_size
 							h.pub_size = 0
 						end
+
+						current_teacher.save
 
 						h.save
 

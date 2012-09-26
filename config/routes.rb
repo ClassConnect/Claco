@@ -5,7 +5,7 @@ Claco::Application.routes.draw do
 	# DEVISE ROUTING #
 	##################
 
-	devise_for :teachers, :path => "", :skip => [:sessions, :registrations, :passwords, :media_server_api], controllers: {omniauth_callbacks: "omniauth_callbacks"}
+	devise_for :teachers, :path => "", :skip => [:sessions, :registrations, :passwords], controllers: {omniauth_callbacks: "omniauth_callbacks"}
 
 	as :teacher do
 

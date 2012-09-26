@@ -115,7 +115,7 @@ Twitter.configure do |config|
   config.consumer_secret = 'In2ol36fFfI6GRnyDZQxLpGFf1QIhMUJlFpeYG4zo'
 end
 
-SIZE_PER_INVITE = 300.megabytes
+SIZE_PER_INVITE = 200.megabytes
 SIZE_SOFT_CAP = 10.gigabytes
 
 # must be swapped from what exists on image server

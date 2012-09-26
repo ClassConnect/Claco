@@ -86,9 +86,18 @@ class UserMailer < ActionMailer::Base
 
 	end
 
-	def fork_notification
+	def fork_notification(ogbinder, forkedbinder, forker, forkee)
 
-		# mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "Someone forked") do |format|
+		#All params are actual objects
+		@pre = "Someone has snapped your content!"
+		@head = '<a href="http://www.claco.com/' + forker.username + '" style="font-weight:bolder">' + forker.first_last + '</a>'
+		@omission = ''#'<a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">view full message</a>'
+		@limg = forker.info.avatar.url
+		@body = ""
+
+		@html_safe = false
+
+		# mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "Someone forked") do |format|
 		# 		format.html {render "user_invite"}
 		# end
 

@@ -16,16 +16,16 @@ footer {
   color:#666;
 }
 
-.bodcon {
+#emailInviter {
   display: none;
   text-align: center;
 }
 
-.bodcon input[type=text] {
+#emailInviter input[type=text] {
   min-width:80%;
 }
 
-.bodcon input[type=text]:last-child {
+#emailInviter input[type=text]:last-of-type {
   opacity: 0.4;
 }
 

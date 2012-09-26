@@ -95,7 +95,7 @@
 	<div class="invite-btn">
 		<ul class="pager">
 			<li class="next">
-				<a href="#" onclick="jQuery.facebox($('#inviteForm'));$('#inviteForm').show();return false">Invite Colleagues&rarr;</a>
+				<a href="#" onclick="jQuery.facebox($('#inviteForm').html());return false">Invite Colleagues&rarr;</a>
 			</li>
 		</ul>
 	</div>
@@ -171,7 +171,7 @@
         <small>You both get 300MB extra storage for free.</small>
       </blockquote>
     </div>
-    <div id="url-inviter">
+    <div id="urlInviter">
       <div class="input-prepend url-container" style="">
         <span class="add-on" style="margin-right:-14px">
           <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
@@ -182,15 +182,15 @@
       <div class="invite-btn-grp">
         <a class="zocial twitter" href="https://twitter.com/intent/tweet?text=Connect+with+me+on+Claco%3A&url=<%=u "http://www.claco.com/join?ref=#{current_teacher.id.to_s}" %>&via=TeamClaco" onclick="if( !navigator.userAgent.toLowerCase().match( /(iphone|ipad|ipod|android|mini|mobi)/i ) ){window.open('https://twitter.com/intent/tweet?text=Connect+with+me+on+Claco%3A&url=<%=u "http://www.claco.com/join?ref=#{current_teacher.id.to_s}" %>&via=TeamClaco','','scrollbars=yes,width=660,height=328');return false;}" title="Twitter" target="_blank">Tweet</a>
         <a class="zocial facebook" href="http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Btitle%5D=Connect+with+me+on+Claco%3A&amp;p%5Burl%5D=<%=u "http://www.claco.com/join?ref=#{current_teacher.id.to_s}" %>&amp;p%5Bsummary%5D=Collaborate+with+the+world's+greatest+educators." onclick="if( !navigator.userAgent.toLowerCase().match( /(iphone|ipad|ipod|android|mini|mobi)/i ) ){window.open('http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Btitle%5D=Connect+with+me+on+Claco%3A&amp;p%5Burl%5D=<%=u "http://www.claco.com/join?ref=#{current_teacher.id.to_s}" %>&amp;p%5Bsummary%5D=Collaborate+with+the+world\'s+greatest+educators.','','scrollbars=yes,width=660,height=328');return false;}" title="Share on Facebook" target="_blank">Share</a>
-        <a class="zocial email" href="#" onclick="$('#url-inviter').hide();$('#bodcon').show();return false;">Email</a>
+        <a class="zocial email" href="#" onclick="$('#facebox #urlInviter').hide();$('#facebox #emailInviter').show();return false;">Email</a>
       </div>
     </div>
-    <form action="/invite" accept-charset="UTF-8" method="post" class="bodcon" id="bodcon">
+    <form action="/invite" accept-charset="UTF-8" method="post" class="bodcon" id="emailInviter">
         <input id="invite_" name="invite[]" placeholder="Enter email address" type="email" value="">
         <input id="invite_" name="invite[]" placeholder="Enter email address" type="email" value="">
         <div class="buttonbar">
            <button class="btn btn-primary btn-small" type="submit">Send invites!</button>
-           <button class="btn btn-small" onclick="$('#bodcon').hide();$('#url-inviter').show();return false;">Cancel</button>
+           <button class="btn btn-small" onclick="$('#facebox #emailInviter').hide();$('#facebox #urlInviter').show();return false;">Cancel</button>
         </div>
 
     </form>

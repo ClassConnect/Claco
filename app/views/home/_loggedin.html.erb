@@ -115,12 +115,133 @@
 	</div>
 
 	<div id="paneright">
+
+
+		<div class="announcer">
+			Educators you may know
+		</div>
+
+			<div class="findppl">
+				<div class="boxyleft">
+
+	
+		<div class="listitem" style="margin-left:15px">
+			
+			<a href="/kleinerin">
+				<img src="http://img.cla.co/30196e0ca58be4c89f26fcbf608262fb/thumb_md.png" class="thumbster" />
+			</a>
+			
+			<div class="infowrap">
+				<div class="bigtitle">
+					<a href="/kleinerin">Marissa Simonson</a>
+				</div>
+
+				<div class="medata">
+					<span>
+						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
+						5th Science
+					</span>
+				</div>
+			</div>
+
+			<div style="clear:both"></div>
+		</div>
+
+		<div class="listitem mid">
+			
+			<a href="/kleinerin">
+				<img src="http://img.cla.co/30196e0ca58be4c89f26fcbf608262fb/thumb_md.png" class="thumbster" />
+			</a>
+			
+			<div class="infowrap">
+				<div class="bigtitle">
+					<a href="/kleinerin">Marissa Simonson</a>
+				</div>
+
+				<div class="medata">
+					<span>
+						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
+						5th Science
+					</span>
+				</div>
+			</div>
+
+			<div style="clear:both"></div>
+		</div>
+
+		<div class="listitem" style="border-right:none">
+			
+			<a href="/kleinerin">
+				<img src="http://img.cla.co/30196e0ca58be4c89f26fcbf608262fb/thumb_md.png" class="thumbster" />
+			</a>
+			
+			<div class="infowrap">
+				<div class="bigtitle">
+					<a href="/kleinerin">Marissa Simonson</a>
+				</div>
+
+				<div class="medata">
+					<span>
+						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
+						5th Science
+					</span>
+				</div>
+			</div>
+
+			<div style="clear:both"></div>
+		</div>
+
+		<div style="clear:both"></div>
+
+	
+
+<ul class="pager">
+			<li class="next">
+				<a href="/educators" style="font-weight:bolder;font-size:18px;margin-right:15px;margin-top:10px">View all&rarr;</a>
+			</li>
+		</ul>
+				<% if current_teacher.omnihash["facebook"].nil? || current_teacher.omnihash["twitter"].nil? %>
+
+					<div class="maintxt">
+							Find colleagues &nbsp;&nbsp;&nbsp;
+						
+
+						<% if current_teacher.omnihash["twitter"].nil? %>
+							<a href="/gs/twitter" class="zocial twitter">Connect with Twitter</a>
+						<% end %>
+					
+
+					
+						<% if current_teacher.omnihash["facebook"].nil? %>
+							<a href="/gs/facebook" class="zocial facebook">Connect with Facebook</a>
+						<% end %>
+
+
+					</div>
+
+					<% end %>
+					
+					
+
+				</div>
+
+				
+				<div style="clear:both"></div>
+			</div>
+
+
+
+<% if current_teacher.relationships.where(:subscribed => true) %>
 		<div class="announcer">
 			<%= image_tag('common/plane.png', :style => "margin: -2px 3px 0 0") %>
 			What's happening now
 		</div>
 
 			<%= render 'layouts/feed' %>
+
+<% end %>
+
+
 
 	</div>
 

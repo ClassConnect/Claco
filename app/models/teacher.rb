@@ -814,7 +814,9 @@ class Teacher
 
 		elsif self.code.length == 32
 
-			inviter = Teacher.find(Invitation.where(:code => self.code).first.from)
+			invitation = Invitation.where(:code => self.code).first
+
+			inviter = invitation.from == "0" ? nil : Teacher.find(invitation.from)
 
 		end
 

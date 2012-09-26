@@ -174,7 +174,7 @@
     <div id="url-inviter">
       <div class="input-prepend url-container" style="">
         <span class="add-on" style="margin-right:-14px">
-          <img alt="Link" src="/assets/binders/link.png" style="height:14px; margin-top:-4px">
+          <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
         </span>
 
         <input type="text" onclick="$(this).select();" style="" value="http://www.claco.com/join?ref=<%= current_teacher.id.to_s %>" readonly="readonly">

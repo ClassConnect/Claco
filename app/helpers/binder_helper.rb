@@ -3,6 +3,7 @@ module BinderHelper
 	#	current_teacher.tag.grade_levels[index]
 	#end
 
+
 	#Function that returns routing given a binder object and action
 	#Only works for routes in the format of: /username/portfolio(/root)/title/id/action(s)
 	#Binder objects preferred over ids

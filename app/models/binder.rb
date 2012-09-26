@@ -1,5 +1,7 @@
 class Binder
 	include Mongoid::Document
+	include Sprockets::Helpers::RailsHelper
+	include Sprockets::Helpers::IsolatedHelper
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -123,7 +125,7 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_contentview']['generated'] ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : nil #asset_path("common/nothumb.png")
 
 	end
 
@@ -136,7 +138,7 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_thumb_lg']['generated'] ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : nil #asset_path("common/nothumb.png")
 	end
 
 
@@ -149,7 +151,7 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_thumb_sm']['generated'] ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : nil #asset_path("common/nothumb.png")
 
 	end
 

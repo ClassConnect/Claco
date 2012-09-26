@@ -85,6 +85,9 @@ gem 'yajl-ruby'
 
 gem 'kaminari'
 
+gem 'mongoid_spacial'
+
+
 # Soulmate
 # gem 'rack-contrib'
 

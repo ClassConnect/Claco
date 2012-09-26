@@ -2,6 +2,9 @@ class Teacher
 	include Mongoid::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
+	include Sprockets::Helpers::RailsHelper
+	include Sprockets::Helpers::IsolatedHelper
+	include Mongoid::Spacial::Document
 
 	# Include default devise modules. Others available are:
 	# :token_authenticatable, :confirmable,
@@ -178,28 +181,28 @@ class Teacher
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
@@ -329,6 +332,39 @@ class Teacher
 			id = id.to_s
 			ids = []
 			teacher = Teacher.find(id.to_s)
+			if !teacher.info.nil? && !teacher.info.grades.nil? && !teacher.info.grades.empty?
+				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x20 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x20
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x20
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+			if !teacher.info.nil? && !teacher.info.subjects.nil? && !teacher.info.subjects.empty?
+				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x10 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x10
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x10
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+
 			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 				next if f.id.to_s==id
 				if !vec[id]
@@ -370,6 +406,22 @@ class Teacher
 						ids << f.id.to_s
 					else
 						vec[id][f.id.to_s] |= 0x2
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+			if !teacher.info.nil? && !teacher.info.location.nil? && teacher.info.location!={:lng=>0.0, :lat=>0.0}
+				Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x1 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x1
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x1
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -503,7 +555,7 @@ class Teacher
 		#if invert
 		network.each do |f|
 			f[1].each do |g|
-				network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+				network[f[0].to_s][g[0].to_s] = (64-g[1]).to_i
 				#g[1] = (16-g[1]).to_i
 			end
 		end
@@ -597,7 +649,7 @@ class Teacher
 
 		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
 
-		debugger
+		#debugger
 
 		vectors = Teacher.vectors(self.id.to_s,2)
 
@@ -610,7 +662,7 @@ class Teacher
 		# spang  : 505ce7fae274d70002000019
 		# NASA   : 502cab3378de86000200006d
 
-		(['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs)-subs
+		(['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
 
 		#recs
 
@@ -927,6 +979,7 @@ class Info
 	include Mongoid::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
+	include Mongoid::Spacial::Document
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 
@@ -958,7 +1011,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
-	field :location,			:type => Array
+	field :location,			:type => Array,    				spacial: true
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 
@@ -969,24 +1022,7 @@ class Info
 	# 	tire.update_index
 	# end
 
-	# mapping do
-	# 	indexes :bio
-	# end
-
 	# # Class Methods
-
-	# def self
- #    	to_indexed_json.as_json
-	# end
-	
-	# def self
- #    	#to_indexed_json.as_json
- #    	to_indexed_json.to_json
-	# end
-	
-	# def to_indexed_json
- #    	self.as_json
-	# end
 
 	def fulllocation
 		"#{city}, #{state}, #{country}"

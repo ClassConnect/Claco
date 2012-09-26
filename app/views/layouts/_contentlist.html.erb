@@ -32,7 +32,7 @@
 		<% else %>
 
 		<div class="folder-preview">
-			<div class="single-hold" style="margin-top:-1px;background-image:url('<%= Binder.thumb_lg(binder) %>');"></div>
+			<div class="single-hold" style="margin-top:-1px;background-image:url('<%= binder_thumb_lg(binder) %>');"></div>
 			<div class="contype"><img src="<%= get_contype_icon(binder) %>" style="width:24px" /></div>
 	    </div>
 
@@ -62,9 +62,9 @@
 
 		</div>
 
-		<img class="thumb1" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
-	    <img class="thumb2" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
-	    <img class="thumb3" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
+		<img class="thumb1" src="<%= binder_thumb_sm(imgarr[1]) %>" />
+	    <img class="thumb2" src="<%= binder_thumb_sm(imgarr[2]) %>" />
+	    <img class="thumb3" src="<%= binder_thumb_sm(imgarr[3]) %>" />
 
 		<% end %>
 

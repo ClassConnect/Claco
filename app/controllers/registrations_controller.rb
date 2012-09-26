@@ -32,9 +32,9 @@ class RegistrationsController < Devise::RegistrationsController
     resource.registered_at = Time.now.to_i
     resource.registered_ip = request.ip
     
-    if (Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active) && resource.save
+    if (!Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active) && resource.save
 
-      Ns.where(:code => params[:teacher][:code]).first.use
+      Ns.where(:code => params[:teacher][:code]).first.use unless !Teacher.where(:_id => params[:teacher][:code]).first.nil?
       i = Invitation.where(:code => params[:teacher][:code]).first
       unless i.nil?
         i.status["signed_up"] = true
@@ -51,7 +51,7 @@ class RegistrationsController < Devise::RegistrationsController
         respond_with resource, :location => after_inactive_sign_up_path_for(resource)
       end
     else
-      if Ns.where(:code => params[:teacher][:code]).first.active
+      if !Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active
         @title = "Join the beta"
         resource.code = params[:teacher][:code]
         clean_up_passwords resource

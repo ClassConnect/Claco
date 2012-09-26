@@ -332,6 +332,26 @@ class Teacher
 			id = id.to_s
 			ids = []
 			teacher = Teacher.find(id.to_s)
+			# if !teacher.code.nil? && !teacher.code.empty? #&& teacher.code.to_s!="0"
+			# 	t_id = nil
+			# 	if teacher.code.to_s.length==24
+			# 		t_id = teacher.code.to_s
+			# 	else
+			# 		invitation = Invitation.where(:code => teacher.code.to_s).first
+			# 		t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+			# 	end
+			# 	if !vec[id]
+			# 		vec[id] = { t_id => 0x40 }
+			# 		ids << t_id
+			# 	elsif !vec[id][t_id]
+			# 		vec[id][t_id] = 0x40
+			# 		ids << t_id
+			# 	else
+			# 		vec[id][t_id] |= 0x40
+			# 	end
+			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			# 	ids = []
+			# end
 			if !teacher.info.nil? && !teacher.info.grades.nil? && !teacher.info.grades.empty?
 				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
 					next if f.id.to_s==id
@@ -475,87 +495,19 @@ class Teacher
 	end
 
 	# returns ordered list of teacher IDs
-	# def dijkstra (network)
-
-	# 	network.each do |f|
-	# 		f[1].each do |g|
-	# 			network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
-	# 			#g[1] = (16-g[1]).to_i
-	# 		end
-	# 	end
-
-	# 	pathhash = {}
-	# 	uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
-
-	# 	#debugger
-
-	
-	# 	# set initial distances 
-	# 	uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= self.id.to_s }
-
-	# 	# import first layer of distance data
-	# 	#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
-
-	# 	#debugger
-
-	# 	current_nodeid = self.id.to_s
-	# 	last_nodeid = nil
-
-	# 	# will be performing exactly pathhash.size minpath reductions
-	# 	pathhash.size.times do
-	# 		# iterate through next node's outgoing links
-
-	# 		if !network[current_nodeid].nil? || current_nodeid==self.id.to_s
-
-	# 			pathhash_copy = pathhash.clone
-
-	# 			#begin
-
-	# 			network[current_nodeid].each do |g|
-
-	# 				# pathhash[nextid] 	-> 	set of node's outgoing links
-	# 				# g[0] 				-> 	id of destination node
-	# 				# g[1] 				-> 	the inverse distance to that path
-	# 				# 
-
-	# 				# conditional if a link to it exists
-	# 				#newdist = #[:dist]  #Teacher.minsrcpath(pathhash,current_nodeid)[1][:dist] #16-pathhash[g[0]][:dist]+g[1]
-
-	# 				#lastdist = 
-	# 				newdist = 16-g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
-
-	# 				if (current_nodeid==self.id.to_s || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=self.id.to_s #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
-	# 					pathhash[g[0].to_s][:dist] = newdist
-	# 					pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
-	# 				end
-	# 			end
-	# 		end
-
-	# 		#rescue 
-	# 		#	debugger
-	# 		#end
-
-	# 		#debugger
-
-	# 		min = Teacher.minpath(pathhash)[0].to_s
-	# 		pathhash[min][:visited] = true
-	# 		last_nodeid = current_nodeid
-	# 		current_nodeid = min
-	# 	end		
-
-	# 	pathhash
-
-	# end
-
-	# returns ordered list of teacher IDs
+	#def self.dijkstra (network_orig,tid)
 	def self.dijkstra (network,tid)
+
 
 		# debugger
 
+		#network = network_orig.clone
+
 		#if invert
+		#network_orig.each do |f|
 		network.each do |f|
 			f[1].each do |g|
-				network[f[0].to_s][g[0].to_s] = (64-g[1]).to_i
+				network[f[0].to_s][g[0].to_s] = (128-g[1]).to_i
 				#g[1] = (16-g[1]).to_i
 			end
 		end
@@ -662,7 +614,23 @@ class Teacher
 		# spang  : 505ce7fae274d70002000019
 		# NASA   : 502cab3378de86000200006d
 
-		(['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
+		# (['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
+
+		recs = recs.flatten.uniq - subs
+
+		if recs.size < 5
+			recs = (['503bfe25fafac30002000011',
+					'502d3b822fc6100002000012',
+					'502d3edd2fc61000020000bf',
+					'5049718bf5d9ab00020000a7',
+					'505ce7fae274d70002000019',
+					'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+		end
+
+		recs
+
+		
+
 
 		#recs
 

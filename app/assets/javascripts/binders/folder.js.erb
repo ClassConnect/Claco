@@ -87,7 +87,7 @@ function viewInit() {
 
 
   $('.snapbtn').click(function() {
-    popForm('snap-form', $(this).parent().parent().parent());
+    popForm('snap-form', $(this).closest('.content-item'));
   });
   
   // CONTENT SPECIFIC FUNCTIONS GO HERE!
@@ -225,16 +225,16 @@ function editInit() {
   $('.modaction').click(function() {
     // if we're doing a rename
     if ($(this).attr('id') == 'rename-act') {
-      popForm('rename-form', $(this).parent().parent().parent().parent().parent());
+      popForm('rename-form', $(this).closest('.content-item'));
 
     } else if ($(this).attr('id') == 'delete-act') {
-      popForm('delete-form', $(this).parent().parent().parent().parent().parent());
+      popForm('delete-form', $(this).closest('.content-item'));
 
     } else if ($(this).attr('id') == 'copy-act') {
-      popForm('copy-form', $(this).parent().parent().parent().parent().parent());
+      popForm('copy-form', $(this).closest('.content-item'));
 
     } else if ($(this).attr('id') == 'move-act') {
-      popForm('move-form', $(this).parent().parent().parent().parent().parent());
+      popForm('move-form', $(this).closest('.content-item'));
 
     }
 

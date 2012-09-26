@@ -9,7 +9,7 @@
 	<% @children.each do |binder| %>
 
 	<% imgarr = Binder.get_folder_array(binder.id.to_s) if binder.type == 1 %>
-	<div id="<%= binder.id %>" class="content-item<%= ' folder-item droppable' if binder.type == 1 %>">
+	<div id="<%= binder.id %>" data-id="<%= binder.id %>" class="content-item<%= ' folder-item droppable' if binder.type == 1 %>">
 
 	    <% if binder.type != 1 %> 
 

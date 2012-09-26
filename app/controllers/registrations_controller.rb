@@ -6,12 +6,12 @@ class RegistrationsController < Devise::RegistrationsController
   def new
     @title = "Join the beta"
 
-    if params[:key].nil? || params[:key].empty? || Ns.where(:code => params[:key]).first.nil?
+    if Ns.where(:code => params[:key]).first.nil? && Teacher.where(:_id => params[:ref]).first.nil?
       redirect_to root_path
     else
-      if Ns.where(:code => params[:key]).first.active
+      if !Teacher.where(:_id => params[:ref]).first.nil? || Ns.where(:code => params[:key]).first.active
         resource = build_resource({})
-        resource.code = params[:key]
+        resource.code = params[:key] || params[:ref]
         i = Invitation.where(:code => params[:key]).first
         unless i.nil?
           i.status["clicked"] = true
@@ -32,9 +32,9 @@ class RegistrationsController < Devise::RegistrationsController
     resource.registered_at = Time.now.to_i
     resource.registered_ip = request.ip
     
-    if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
+    if (!Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active) && resource.save
 
-      Ns.where(:code => params[:teacher][:code]).first.use
+      Ns.where(:code => params[:teacher][:code]).first.use unless !Teacher.where(:_id => params[:teacher][:code]).first.nil?
       i = Invitation.where(:code => params[:teacher][:code]).first
       unless i.nil?
         i.status["signed_up"] = true
@@ -51,7 +51,7 @@ class RegistrationsController < Devise::RegistrationsController
         respond_with resource, :location => after_inactive_sign_up_path_for(resource)
       end
     else
-      if Ns.where(:code => params[:teacher][:code]).first.active
+      if !Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active
         @title = "Join the beta"
         resource.code = params[:teacher][:code]
         clean_up_passwords resource

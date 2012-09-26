@@ -60,7 +60,7 @@
 
             <a href="/<%= current_teacher.username %>">
             <div id="namester">
-                <img src="<%= Teacher.thumb_sm(current_teacher) %>" class="myprofpic" />
+                <img src="<%= teacher_thumb_sm(current_teacher) %>" class="myprofpic" />
                 <div class="fname"><%= current_teacher.full_name %></div>
             </div>
             </a>
@@ -73,6 +73,7 @@
             <ul class="nav nav-pills pull-right">
               <li><a href="/" class="publink">Home</a></li>
               <li><a href="/about" class="publink">About</a></li>
+              <li><a href="/pioneers" class="publink">Pioneers</a></li>
               <li><a href="/about/team" class="publink">Team Claco</a></li>
 
               <li class="dropdown">

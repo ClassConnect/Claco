@@ -1,6 +1,42 @@
 module ApplicationHelper
 
 
+
+	def teacher_thumb_lg(teacher)
+		ret = Teacher.thumb_lg(teacher)
+		ret.nil? ? asset_path("placer.png") : ret
+	end
+
+	def teacher_thumb_mg(teacher)
+		ret = Teacher.thumb_mg(teacher)
+		ret.nil? ? asset_path("placer.png") : ret
+	end
+
+	def teacher_thumb_md(teacher)
+		ret = Teacher.thumb_md(teacher)
+		ret.nil? ? asset_path("placer.png") : ret
+	end
+
+	def teacher_thumb_sm(teacher)
+		ret = Teacher.thumb_sm(teacher)
+		ret.nil? ? asset_path("placer.png") : ret
+	end
+
+	def binder_contentview(binder)
+		ret = Binder.contentview(binder)
+		ret.nil? ? asset_path("common/nothumb.png") : ret
+	end
+
+	def binder_thumb_lg(binder)
+		ret = Binder.thumb_lg(binder)
+		ret.nil? ? asset_path("common/nothumb.png") : ret
+	end
+
+	def binder_thumb_sm(binder)
+		ret = Binder.thumb_sm(binder)
+		ret.nil? ? asset_path("common/nothumb.png") : ret
+	end
+
 	# passed the index of the checkbox and the type of checkbox
 	# returns a boolean representing if the checkbox should be checked or not
 	def binder_check_box_value(index,type)
@@ -246,12 +282,12 @@ module ApplicationHelper
 			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
 			#	return "<no profile picture>"
 			#else
-				return image_tag( "#{Teacher.thumb_lg(teacher)}", options )
+				return image_tag( "#{teacher_thumb_lg(teacher)}", options )
 			#end
 		elsif options[:thumb_sm]
 			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0
 			#else
-				return image_tag( "#{Teacher.thumb_sm(teacher)}", options )
+				return image_tag( "#{teacher_thumb_sm(teacher)}", options )
 			#end
 		else
 			#if teacher.info.nil? || teacher.info.avatar.nil?#.size==0

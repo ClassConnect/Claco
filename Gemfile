@@ -18,8 +18,8 @@ group :assets do
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
   gem 'therubyracer', :platform => :ruby
 
-  gem 'uglifier', '>= 1.3.0'
 end
+gem 'uglifier', '>= 1.3.0'
 
 gem "asset_sync"
 
@@ -84,6 +84,9 @@ gem 'yajl-ruby'
 #gem 'will_paginate'#, '~> 3.0'
 
 gem 'kaminari'
+
+gem 'mongoid_spacial'
+
 
 # Soulmate
 # gem 'rack-contrib'

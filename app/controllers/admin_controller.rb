@@ -35,6 +35,9 @@ class AdminController < ApplicationController
 
 	end
 
+	# Concurrency fix
+	# Setting.f("sys_inv_list").v = Setting.f("sys_inv_list").v.map{|e| i = Invitation.where(:to => e["email"]).first; e["invited_at"] = i.submitted unless i.nil?; e["invited"] = true unless i.nil?; e}
+	
 	def sysinvlist
 
 		@invs = Setting.f("sys_inv_list").v
@@ -50,6 +53,8 @@ class AdminController < ApplicationController
 	def setpibinder
 
 		Setting.f("pioneer").v = params[:binder]
+
+		redirect_to "/admin"
 
 	end
 

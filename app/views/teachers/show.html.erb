@@ -10,7 +10,7 @@
 
 <div class="container">
   <div class="profile-avatar-wrap">
-    <img src="<%= Teacher.thumb_lg(@teacher) %>">
+    <img src="<%= teacher_thumb_lg(@teacher) %>">
     <% #<span class="clips">
       #<strong>4,204</strong> snaps
     #</span>
@@ -126,7 +126,7 @@
         <% @subscriptions.shuffle.sort_by{|t| Teacher.thumbready?(t) ? 1 : 0}[0..5].shuffle.each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
-              <img src="<%= Teacher.thumb_md(sub) %>">
+              <img src="<%= teacher_thumb_md(sub) %>">
             </a>
           </li>
         <% end %>
@@ -141,7 +141,7 @@
         <% @subscribers.shuffle.sort_by{|t| Teacher.thumbready?(t) ? 1 : 0}[0..5].shuffle.each do |sub| %>
           <li>
             <a href="/<%= sub.username %>">
-              <img src="<%= Teacher.thumb_md(sub) %>">
+              <img src="<%= teacher_thumb_md(sub) %>">
             </a>
           </li>
         <% end %>

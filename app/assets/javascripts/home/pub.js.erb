@@ -1,0 +1,14 @@
+$(document).ready(function() {
+
+	$.ajax({
+		url : "http://api.tumblr.com/v2/blog/blog.claco.com/posts/text?api_key=eXygZaU3C4eh2cJeaiMem4E44J4HtRaNqkuwPTutBjo9wVInHc&limit=1",
+		dataType : "jsonp",
+		timeout : 10000,
+		success: function(retData) {
+			$(".blogt").hide().text(retData['response']['posts'][0]['title']).fadeIn(500);
+			$(".blogtext").hide().text(retData['response']['posts'][0]['body'].replace(/<(?:.|\n)*?>/gm, '').substring(0, 410) + "...").fadeIn(500);
+		}
+	});
+
+
+});

@@ -1,5 +1,7 @@
 class Binder
 	include Mongoid::Document
+	include Sprockets::Helpers::RailsHelper
+	include Sprockets::Helpers::IsolatedHelper
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -60,7 +62,6 @@ class Binder
 	field :total_size, :type => Integer, :default => 0
 	field :pub_size, :type => Integer, :default => 0
 	field :priv_size, :type => Integer, :default => 0
-
 
 
 	# number of times this binder is forked
@@ -124,7 +125,7 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_contentview']['generated'] ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : nil #asset_path("common/nothumb.png")
 
 	end
 
@@ -137,7 +138,7 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_thumb_lg']['generated'] ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : nil #asset_path("common/nothumb.png")
 	end
 
 
@@ -150,7 +151,7 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_thumb_sm']['generated'] ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
+		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : nil #asset_path("common/nothumb.png")
 
 	end
 
@@ -556,6 +557,24 @@ class Binder
 	# Delayed Job Methods
 
 	# Do not explicitly call these!  All these methods have very long latency.
+
+	def self.sendforkemail(ogid, npid)
+
+		ogbinder = Binder.find(ogid)
+
+		forkee = Teacher.find(ogbinder.owner)
+
+		if forkee.emailconfig["fork"]
+
+			forkedbinder = Binder.find(npid)
+
+			forker = Teacher.find(forkedbinder.owner)
+
+			UserMailer.fork_notification(ogbinder, forkedbinder, forker, forkee).deliver
+
+		end
+
+	end
 
 	def self.encode(id)
 

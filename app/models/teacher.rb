@@ -2,6 +2,9 @@ class Teacher
 	include Mongoid::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
+	include Sprockets::Helpers::RailsHelper
+	include Sprockets::Helpers::IsolatedHelper
+	include Mongoid::Spacial::Document
 
 	# Include default devise modules. Others available are:
 	# :token_authenticatable, :confirmable,
@@ -47,6 +50,10 @@ class Teacher
 	field :fname, :type => String
 	field :lname, :type => String
 	field :username, :type => String
+	field :pub_size, :type => Integer, :default => 0
+	field :priv_size, :type => Integer, :default => 0
+	field :total_size, :type => Integer, :default => 0
+	field :size_cap, :type => Integer, :default => 300.megabytes
 
 	field :omnihash, :type => Hash, :default => {}
 
@@ -67,7 +74,7 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig, :pub_size, :priv_size, :total_size
 	
 	validate :username_blacklist
 
@@ -77,6 +84,7 @@ class Teacher
 	validates_length_of :username, minimum: 5, maximum: 16, :message => "must be at least 5 characters", :unless => Proc.new {|user| user.allow_short_username == true}
 	validates_presence_of :fname, :message => "Please enter a first name."
 	validates_presence_of :lname, :message => "Please enter a last name."
+	validates_numericality_of :size_cap, less_than_or_equal_to: 10.gigabytes
 	
 	attr_accessor :login
 
@@ -173,28 +181,28 @@ class Teacher
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : "/assets/placer.png"
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
@@ -324,6 +332,59 @@ class Teacher
 			id = id.to_s
 			ids = []
 			teacher = Teacher.find(id.to_s)
+			# if !teacher.code.nil? && !teacher.code.empty? #&& teacher.code.to_s!="0"
+			# 	t_id = nil
+			# 	if teacher.code.to_s.length==24
+			# 		t_id = teacher.code.to_s
+			# 	else
+			# 		invitation = Invitation.where(:code => teacher.code.to_s).first
+			# 		t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+			# 	end
+			# 	if !vec[id]
+			# 		vec[id] = { t_id => 0x40 }
+			# 		ids << t_id
+			# 	elsif !vec[id][t_id]
+			# 		vec[id][t_id] = 0x40
+			# 		ids << t_id
+			# 	else
+			# 		vec[id][t_id] |= 0x40
+			# 	end
+			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			# 	ids = []
+			# end
+			if !teacher.info.nil? && !teacher.info.grades.nil? && !teacher.info.grades.empty?
+				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x20 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x20
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x20
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+			if !teacher.info.nil? && !teacher.info.subjects.nil? && !teacher.info.subjects.empty?
+				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => 0x10 }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = 0x10
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] |= 0x10
+					end
+				end
+				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				ids = []
+			end
+
 			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 				next if f.id.to_s==id
 				if !vec[id]
@@ -370,6 +431,22 @@ class Teacher
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
 				ids = []
 			end
+			# if !teacher.info.nil? && !teacher.info.location.nil? && teacher.info.location!={:lng=>0.0, :lat=>0.0}
+			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
+			# 		next if f.id.to_s==id
+			# 		if !vec[id]
+			# 			vec[id] = { f.id.to_s => 0x1 }
+			# 			ids << f.id.to_s
+			# 		elsif !vec[id][f.id.to_s]
+			# 			vec[id][f.id.to_s] = 0x1
+			# 			ids << f.id.to_s
+			# 		else
+			# 			vec[id][f.id.to_s] |= 0x1
+			# 		end
+			# 	end
+			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			# 	ids = []
+			# end
 		end
 		vec
 
@@ -418,87 +495,19 @@ class Teacher
 	end
 
 	# returns ordered list of teacher IDs
-	# def dijkstra (network)
-
-	# 	network.each do |f|
-	# 		f[1].each do |g|
-	# 			network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
-	# 			#g[1] = (16-g[1]).to_i
-	# 		end
-	# 	end
-
-	# 	pathhash = {}
-	# 	uniques = network.map { |f| f[1].map { |g| g[0].to_s } }.flatten.uniq
-
-	# 	#debugger
-
-	
-	# 	# set initial distances 
-	# 	uniques.each { |f| pathhash[f.to_s] = { :dist => INFINITY, :visited => false, :from => nil } if f.to_s!= self.id.to_s }
-
-	# 	# import first layer of distance data
-	# 	#network[self.id.to_s].each { |f| pathhash[f[0].to_s][:distance] = 16-(f[1].to_i) }
-
-	# 	#debugger
-
-	# 	current_nodeid = self.id.to_s
-	# 	last_nodeid = nil
-
-	# 	# will be performing exactly pathhash.size minpath reductions
-	# 	pathhash.size.times do
-	# 		# iterate through next node's outgoing links
-
-	# 		if !network[current_nodeid].nil? || current_nodeid==self.id.to_s
-
-	# 			pathhash_copy = pathhash.clone
-
-	# 			#begin
-
-	# 			network[current_nodeid].each do |g|
-
-	# 				# pathhash[nextid] 	-> 	set of node's outgoing links
-	# 				# g[0] 				-> 	id of destination node
-	# 				# g[1] 				-> 	the inverse distance to that path
-	# 				# 
-
-	# 				# conditional if a link to it exists
-	# 				#newdist = #[:dist]  #Teacher.minsrcpath(pathhash,current_nodeid)[1][:dist] #16-pathhash[g[0]][:dist]+g[1]
-
-	# 				#lastdist = 
-	# 				newdist = 16-g[1] + Teacher.lastdistance(pathhash_copy,last_nodeid)
-
-	# 				if (current_nodeid==self.id.to_s || newdist < Teacher.lastdistance(pathhash_copy,current_nodeid)) && g[0].to_s!=self.id.to_s #|| pathhash[current_nodeid][:from].nil? #|| newdist < pathhash[] #(16-Teacher.minsrcpath(pathhash,g[0].to_s))
-	# 					pathhash[g[0].to_s][:dist] = newdist
-	# 					pathhash[g[0].to_s][:from] = current_nodeid #g[0].to_s
-	# 				end
-	# 			end
-	# 		end
-
-	# 		#rescue 
-	# 		#	debugger
-	# 		#end
-
-	# 		#debugger
-
-	# 		min = Teacher.minpath(pathhash)[0].to_s
-	# 		pathhash[min][:visited] = true
-	# 		last_nodeid = current_nodeid
-	# 		current_nodeid = min
-	# 	end		
-
-	# 	pathhash
-
-	# end
-
-	# returns ordered list of teacher IDs
+	#def self.dijkstra (network_orig,tid)
 	def self.dijkstra (network,tid)
+
 
 		# debugger
 
+		#network = network_orig.clone
+
 		#if invert
+		#network_orig.each do |f|
 		network.each do |f|
 			f[1].each do |g|
-				network[f[0].to_s][g[0].to_s] = (16-g[1]).to_i
+				network[f[0].to_s][g[0].to_s] = (128-g[1]).to_i
 				#g[1] = (16-g[1]).to_i
 			end
 		end
@@ -592,20 +601,36 @@ class Teacher
 
 		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
 
-		debugger
+		#debugger
 
 		vectors = Teacher.vectors(self.id.to_s,2)
 
 		recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
 
-		# erin   : 502d3edd2fc61000020000bf
-		# jerry  : 502d3b822fc6100002000012
-		# joan   : 5049718bf5d9ab00020000a7
 		# steven : 503bfe25fafac30002000011
+		# jerry  : 502d3b822fc6100002000012
+		# erin   : 502d3edd2fc61000020000bf
+		# joan   : 5049718bf5d9ab00020000a7
 		# spang  : 505ce7fae274d70002000019
 		# NASA   : 502cab3378de86000200006d
 
-		(['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs)-subs
+		# (['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
+
+		recs = recs.flatten.uniq - subs
+
+		if recs.size < 5
+			recs = (['503bfe25fafac30002000011',
+					'502d3b822fc6100002000012',
+					'502d3edd2fc61000020000bf',
+					'5049718bf5d9ab00020000a7',
+					'505ce7fae274d70002000019',
+					'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+		end
+
+		recs
+
+		
+
 
 		#recs
 
@@ -709,9 +734,96 @@ class Teacher
 
 	end
 
+	def self.seedsizes
+
+		Teacher.all.each do |teacher|
+
+			teacher.binders.sort_by{|binder| binder.parents.length}.reverse.each do |binder|
+
+				binder_total_size = 0
+				binder_pub_size = 0
+				binder_priv_size = 0
+
+				binder.children.each do |b|
+
+					if b.parents.first["id"] == "0"
+
+						if b.type == 2
+
+							b.total_size = b.current_version.file.size
+
+							b.pub_size = b.total_size if b.is_pub?
+							b.priv_size = b.total_size unless b.is_pub?
+
+							b.save
+
+						end
+
+						binder_total_size += b.total_size
+						binder_pub_size += b.pub_size
+						binder_priv_size += b.priv_size
+
+					end
+
+				end
+
+				binder.total_size = binder_total_size
+				binder.pub_size = binder_pub_size
+				binder.priv_size = binder_priv_size
+
+				binder.save
+
+			end
+
+			teacher_total_size = 0
+			teacher_pub_size = 0
+			teacher_priv_size = 0
+
+			teacher.binders.root_binders.each do |binder|
+
+				teacher_total_size += binder.total_size
+				teacher_pub_size += binder.pub_size
+				teacher_priv_size += binder.priv_size
+
+			end
+			
+			teacher.total_size = teacher_total_size
+			teacher.pub_size = teacher_pub_size
+			teacher.priv_size = teacher_priv_size
+
+			teacher.save
+
+		end
+
+	end
+
+	def incsizecap(size_in_mb = SIZE_PER_INVITE)
+
+		self.size_cap += size_in_mb
+		self.save
+
+	end
+
 	after_create do
 
 		self.info = Info.new
+
+		if self.code.length == 24
+
+			inviter = Teacher.find(self.code)
+
+		elsif self.code.length == 32
+
+			inviter = Teacher.find(Invitation.where(:code => self.code).first.from)
+
+		end
+
+		unless inviter.nil?
+
+			inviter.incsizecap
+			self.incsizecap
+
+		end
 
 	end
 
@@ -837,6 +949,7 @@ class Info
 	include Mongoid::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
+	# include Mongoid::Spacial::Document
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
 
@@ -868,7 +981,7 @@ class Info
 	field :city,				:type => String, :default => ""
 	field :state,				:type => String, :default => ""
 	field :country,				:type => String, :default => ""
-	field :location,			:type => Array
+	field :location,			:type => Array#,  spacial: {lat: :latitude, lng: :longitude, return_array: true }#  				spacial: true
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 
@@ -879,24 +992,7 @@ class Info
 	# 	tire.update_index
 	# end
 
-	# mapping do
-	# 	indexes :bio
-	# end
-
 	# # Class Methods
-
-	# def self
- #    	to_indexed_json.as_json
-	# end
-	
-	# def self
- #    	#to_indexed_json.as_json
- #    	to_indexed_json.to_json
-	# end
-	
-	# def to_indexed_json
- #    	self.as_json
-	# end
 
 	def fulllocation
 		"#{city}, #{state}, #{country}"

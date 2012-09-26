@@ -813,6 +813,12 @@ class BindersController < ApplicationController
 							end
 						end
 
+						current_teacher.total_size += @binder.total_size
+						current_teacher.pub_size += @binder.total_size if @binder.is_pub?
+						current_teacher.priv_size += @binder.total_size unless @binder.is_pub?
+
+						current_teacher.save
+
 						Binder.find(pids.last).inc(:children,1) if pids.last != "0"
 
 					else
@@ -1079,29 +1085,6 @@ class BindersController < ApplicationController
 			fav = !params[:favorite].nil?
 			fork = @inherited[:parent].owner != @binder.owner
 
-			# due to shared functionality, define method var
-			
-			if fav
-				method = "favorite"
-
-				@binder.inc(:fav_total, 1)
-			elsif fork
-				method = "forkitem"
-				# fork_total is 
-				@binder.inc(:fork_total, 1)
-
-				# cascade upwards
-				@binder.parents.each do |f|
-					Binder.find(f['id'].to_s).inc(:owned_fork_total,1) if f['id'].to_i>0
-				end
-			else
-				method = __method__.to_s
-			end
-
-			#@binder.inc(:fork_total, 1) if fork
-
-			#recurse upwards
-
 			@parent_child_count = @inherited[:parent_child_count]
 
 			@ppers = @binder.parent_permissions
@@ -1147,135 +1130,160 @@ class BindersController < ApplicationController
 
 			#TODO: copy related images?
 
-			@new_parent.save
+			if @new_parent.save
 
-			src = Mongo.log(current_teacher.id.to_s,
+				# due to shared functionality, define method var
+
+				if fav
+					method = "favorite"
+
+					@binder.inc(:fav_total, 1)
+				elsif fork
+					method = "forkitem"
+					# fork_total is 
+					@binder.inc(:fork_total, 1)
+
+					Binder.delay(:queue => "email").sendforkemail(@binder.id.to_s, @new_parent.id.to_s)
+
+					# cascade upwards
+					@binder.parents.each do |f|
+						Binder.find(f['id'].to_s).inc(:owned_fork_total,1) if f['id'].to_i>0
+					end
+				else
+					method = __method__.to_s
+				end
+
+				src = Mongo.log(current_teacher.id.to_s,
+								method.to_s,
+								params[:controller].to_s,
+								@binder.id.to_s,
+								params)
+
+				Mongo.log(	current_teacher.id.to_s,
 							method.to_s,
 							params[:controller].to_s,
-							@binder.id.to_s,
-							params)
+							@new_parent.id.to_s,
+							params,
+							{ :copy => @binder.id.to_s, :src => src })
 
-			Mongo.log(	current_teacher.id.to_s,
-						method.to_s,
-						params[:controller].to_s,
-						@new_parent.id.to_s,
-						params,
-						{ :copy => @binder.id.to_s, :src => src })
+				@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
 
-			@new_parent.tag = Tag.new(	:node_tags => @binder.tag.node_tags)
+				@new_parent.update_parent_tags()
 
-			@new_parent.update_parent_tags()
-
-			#Hash table for oldid => newid lookups
-			@hash_index = {params[:id] => @new_parent.id.to_s}
+				#Hash table for oldid => newid lookups
+				@hash_index = {params[:id] => @new_parent.id.to_s}
 
 
-			#If directory, deal with the children
-			if @binder.type == 1 #Eventually will apply to type == 3 too
+				#If directory, deal with the children
+				if @binder.type == 1 #Eventually will apply to type == 3 too
 
-				@index = @binder.parents.length
+					@index = @binder.parents.length
 
-				#Select old children, order by parents.length
-				@children = @binder.subtree.sort_by {|binder| binder.parents.length}.reject{|binder| binder.id == @new_parent.id}
+					#Select old children, order by parents.length
+					@children = @binder.subtree.sort_by {|binder| binder.parents.length}.reject{|binder| binder.id == @new_parent.id}
 
-				#Spawn new children, These children need to have updated parent ids
-				@children.each do |h|
+					#Spawn new children, These children need to have updated parent ids
+					@children.each do |h|
 
-					Mongo.log(	current_teacher.id.to_s,
-								method.to_s,
-								params[:controller].to_s,
-								h.id.to_s,
-								params,
-								{ :src => src })
+						Mongo.log(	current_teacher.id.to_s,
+									method.to_s,
+									params[:controller].to_s,
+									h.id.to_s,
+									params,
+									{ :src => src })
 
-					@node_parent = {"id"	=> @hash_index[h.parent["id"]],
-									"title"	=> h.parent["title"]}
+						@node_parent = {"id"	=> @hash_index[h.parent["id"]],
+										"title"	=> h.parent["title"]}
 
-					@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
+						@node_parents = Binder.find(@hash_index[h.parent["id"]]).parents << @node_parent
 
-					@old_permissions = h.parent_permissions
+						@old_permissions = h.parent_permissions
 
-					@ppers.each {|p| @old_permissions.delete(p)}
+						@ppers.each {|p| @old_permissions.delete(p)}
 
-					#Swap old folder ids with new folder ids
-					@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
+						#Swap old folder ids with new folder ids
+						@old_permissions.each {|op| op["folder_id"] = @hash_index[op["folder_id"]]}
 
-					h.inc(:fork_total, 1) if fork
+						h.inc(:fork_total, 1) if fork
 
-					@new_node = Binder.new(	:title				=> h.title,
-											:body				=> h.body,
-											:parent				=> @node_parent,
-											:parents			=> fav ? [{ 'id'=>'-2', 'title'=>'' }] + (h.parents - {'id'=>'0','title'=>''}) : @node_parents,
-											:permissions		=> fav ? [] : h.permissions,
-											:parent_permissions	=> fav ? @parentperarr : @parentperarr + @old_permissions,
-											:owner				=> current_teacher.id,
-											:username			=> current_teacher.username,
-											:fname				=> current_teacher.fname,
-											:lname				=> current_teacher.lname,
-											:last_update		=> Time.now.to_i,
-											:last_updated_by	=> current_teacher.id,
-											:type				=> h.type,
-											:format				=> (h.type != 1 ? h.format : nil),
-											:files				=> h.files,
-											:folders			=> h.folders,
-											:forked_from		=> fork ? h.id.to_s : nil,
-											:fork_stamp			=> fork ? Time.now.to_i : nil,
-											:total_size			=> h.total_size,
-											:pub_size			=> h.pub_size,
-											:priv_size			=> h.priv_size,
-											:fav_total			=> h.fav_total,
-											:thumbimgids		=> @binder.thumbimgids,)
-	
-					# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
-					# 									:file_hash	=> h.current_version.file_hash,
-					# 									:timestamp	=> h.current_version.timestamp,
-					# 									:size		=> h.current_version.size,
-					# 									:ext		=> h.current_version.ext,
-					# 									:data		=> h.current_version.data,
-					# 									:croc_uuid	=> h.current_version.croc_uuid,
-					# 									:imgfile	=> h.current_version.imgfile,
-					# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
+						@new_node = Binder.new(	:title				=> h.title,
+												:body				=> h.body,
+												:parent				=> @node_parent,
+												:parents			=> fav ? [{ 'id'=>'-2', 'title'=>'' }] + (h.parents - {'id'=>'0','title'=>''}) : @node_parents,
+												:permissions		=> fav ? [] : h.permissions,
+												:parent_permissions	=> fav ? @parentperarr : @parentperarr + @old_permissions,
+												:owner				=> current_teacher.id,
+												:username			=> current_teacher.username,
+												:fname				=> current_teacher.fname,
+												:lname				=> current_teacher.lname,
+												:last_update		=> Time.now.to_i,
+												:last_updated_by	=> current_teacher.id,
+												:type				=> h.type,
+												:format				=> (h.type != 1 ? h.format : nil),
+												:files				=> h.files,
+												:folders			=> h.folders,
+												:forked_from		=> fork ? h.id.to_s : nil,
+												:fork_stamp			=> fork ? Time.now.to_i : nil,
+												:total_size			=> h.total_size,
+												:pub_size			=> h.pub_size,
+												:priv_size			=> h.priv_size,
+												:fav_total			=> h.fav_total,
+												:thumbimgids		=> @binder.thumbimgids,)
+		
+						# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
+						# 									:file_hash	=> h.current_version.file_hash,
+						# 									:timestamp	=> h.current_version.timestamp,
+						# 									:size		=> h.current_version.size,
+						# 									:ext		=> h.current_version.ext,
+						# 									:data		=> h.current_version.data,
+						# 									:croc_uuid	=> h.current_version.croc_uuid,
+						# 									:imgfile	=> h.current_version.imgfile,
+						# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
-					
-					@new_node.versions << h.current_version
+						
+						@new_node.versions << h.current_version
 
-					#TODO: copy related images?
+						#TODO: copy related images?
 
-					@new_node.save
+						@new_node.save
 
-					Mongo.log(	current_teacher.id.to_s,
-								method.to_s,
-								params[:controller].to_s,
-								@new_node.id.to_s,
-								params,
-								{ :copy => h.id.to_s, :src => src })
+						Mongo.log(	current_teacher.id.to_s,
+									method.to_s,
+									params[:controller].to_s,
+									@new_node.id.to_s,
+									params,
+									{ :copy => h.id.to_s, :src => src })
 
-					@new_node.tag = Tag.new(:node_tags => h.tag.node_tags)
+						@new_node.tag = Tag.new(:node_tags => h.tag.node_tags)
 
-					@new_node.update_parent_tags()
+						@new_node.update_parent_tags()
 
-					@hash_index[h.id.to_s] = @new_node.id.to_s
+						@hash_index[h.id.to_s] = @new_node.id.to_s
+					end
+
 				end
 
-			end
+				#Update parents' folder/file/size counts
+				@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
 
-			#Update parents' folder/file/size counts
-			@parents = @new_parent.parents.collect {|x| x["id"] || x[:id]}
+				@parents.each do |pid|
+					if pid != "0"
+						parent = Binder.find(pid)
 
-			@parents.each do |pid|
-				if pid != "0"
-					parent = Binder.find(pid)
-
-					parent.update_attributes(	:files		=> parent.files + @new_parent.files,
-												:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
-												:total_size	=> parent.total_size + @new_parent.total_size,
-												:pub_size	=> parent.pub_size + @new_parent.pub_size,
-												:priv_size	=> parent.priv_size + @new_parent.priv_size)
+						parent.update_attributes(	:files		=> parent.files + @new_parent.files,
+													:folders	=> parent.folders + @new_parent.folders + (@new_parent.type == 1 ? 1 : 0),
+													:total_size	=> parent.total_size + @new_parent.total_size,
+													:pub_size	=> parent.pub_size + @new_parent.pub_size,
+													:priv_size	=> parent.priv_size + @new_parent.priv_size)
+					end
 				end
-			end
 
-			# DELAYTAG
-			Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@new_parent.id)
+				# DELAYTAG
+				Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@new_parent.id)
+
+			else
+
+			end
 
 		else
 
@@ -1458,11 +1466,15 @@ class BindersController < ApplicationController
 
 					if params[:enabled]=="true"
 						h.pub_size = h.pub_size + h.priv_size
+						current_teacher.pub_size += h.priv_size
 						h.priv_size = 0
 					else
 						h.priv_size = h.priv_size + h.pub_size
+						current_teacher.priv_size += h.pub_size
 						h.pub_size = 0
 					end
+
+					current_teacher.save
 
 					h.save
 
@@ -1550,11 +1562,15 @@ class BindersController < ApplicationController
 
 						if params[:enabled]=="true"
 							h.pub_size = h.pub_size + h.priv_size
+							current_teacher.pub_size += h.priv_size
 							h.priv_size = 0
 						else
 							h.priv_size = h.priv_size + h.pub_size
+							current_teacher.priv_size += h.pub_size
 							h.pub_size = 0
 						end
+
+						current_teacher.save
 
 						h.save
 
@@ -1759,6 +1775,13 @@ class BindersController < ApplicationController
 												:priv_size	=> parent.priv_size + @binder.priv_size)
 				end
 			end
+
+			current_teacher.total_size -= @binder.total_size
+			current_teacher.pub_size -= @binder.total_size if @binder.is_pub?
+			current_teacher.priv_size -= @binder.total_size unless @binder.is_pub?
+
+			current_teacher.save
+
 
 			Rails.logger.debug "generating parent "
 

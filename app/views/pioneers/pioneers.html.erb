@@ -1,0 +1,33 @@
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "home/pub/pioneers", :media => "all" %>
+<% end %>
+
+
+<div class="splashback">
+	<div class="container">
+
+		<div class="tagline">
+			Meet the educators that are revolutionizing<br />classrooms around the world.
+		</div>
+
+	</div>
+</div>
+
+
+<div class="container">
+
+	<%= render "pioneers/watchnxt" %>
+
+
+	<div class="vidbox">
+
+		<iframe style="border-radius: 6px !important;" width="675" height="400" src="http://www.youtube.com/embed/<%= @current.current_version.get_youtube_id %>" frameborder="0" allowfullscreen></iframe>
+
+		<div class="pname"><%= @current.title %> <span style="color:#999; font-weight:normal">Pioneer Chat</span></div>
+
+		<div class="well"><%= @current.body.html_safe %></div>
+
+	</div>
+
+
+</div>

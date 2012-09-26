@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team]
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow]
 
 	def index
 		@title = "Claco"
@@ -18,6 +18,7 @@ class HomeController < ApplicationController
 		if signed_in?
 
 			@invcount = Invitation.where(:from => current_teacher.id.to_s).count
+			@size_percent_used = (current_teacher.priv_size / current_teacher.size_cap.to_f) * 100
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
@@ -158,7 +159,13 @@ class HomeController < ApplicationController
 		#debugger
 	end
 
+	def educators
 
+		@crb = rand(2..50)
+
+		render 'educators'
+
+	end 
 
 	def fetchtitle
 		

@@ -16,6 +16,57 @@ footer {
   color:#666;
 }
 
+#emailInviter {
+  display: none;
+  text-align: center;
+}
+
+#emailInviter input[type=text] {
+  min-width:80%;
+}
+
+#emailInviter input[type=text]:last-of-type {
+
+  opacity: 0.4;
+}
+
+.invite-btn {
+  padding-top:5px;
+}
+
+.invite-btn-grp {
+  text-align: center;
+  padding: 2px 0;
+}
+
+.invite-btn-grp a {
+  margin-right: 3px;
+}
+
+.invite-btn-grp a:last-child {
+  margin-right: 0;
+}
+
+.url-container {
+  text-align:center;
+}
+.url-container input[type=text]{
+  min-width: 80%;
+  margin-left:10px;
+  background:#fff;
+}
+
+.inlay {
+  margin-top:-2px;
+  text-align:right;
+  display:block;
+}
+
+.inlay small {
+  color:#999;
+  text-shadow:0 1px 0 #eee;
+}
+
 .publink {
   font-weight:bolder;
   color:#fff !important;

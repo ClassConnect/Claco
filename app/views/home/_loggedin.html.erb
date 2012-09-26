@@ -84,7 +84,22 @@
 
 
 
-<div class="announcer invitebox"><%= @invcount %>/5 Invites Used <a href="#" style="float:right" onclick="jQuery.facebox({ ajax: '/invite' });return false">Send invites</a></div>
+<div class="announcer invitebox">
+	<div class="progress <%= "progress-danger" if @size_percent_used > 60 %>"><div class="bar" style="width:<%= @size_percent_used %>%;"></div>
+	</div>
+	<span class="inlay"><small><%= @size_percent_used.to_i %>% of <%= number_to_human_size(current_teacher.size_cap) %> used.</small></span>
+	<hr />
+	<p>Looking for Free Storage?</p>
+<!-- 	<%= @invcount %> Invites Used --><!-- 
+	<a href="#" style="float:right" onclick="jQuery.facebox({ ajax: '/invite' });return false">Invite Colleagues</a> -->
+	<div class="invite-btn">
+		<ul class="pager">
+			<li class="next">
+				<a href="#" onclick="jQuery.facebox($('#inviteForm').html());return false">Invite Colleagues&rarr;</a>
+			</li>
+		</ul>
+	</div>
+</div>
 
 
 
@@ -100,12 +115,140 @@
 	</div>
 
 	<div id="paneright">
+
+
+		<div class="announcer">
+			Educators you may know
+		</div>
+
+			<div class="findppl">
+				<div class="boxyleft">
+
+		<% educators = current_teacher.recommends[0..15].shuffle[0..2].map{ |f| Teacher.find(f.to_s) } %>
+	
+		<div class="listitem" style="margin-left:15px">
+			
+			<a href="/<%= educators[0].username %>">
+				<img src="<%= teacher_thumb_md(educators[0]) %>" class="thumbster" />
+			</a>
+			
+			<div class="infowrap">
+				<div class="bigtitle">
+					<a href="/<%= educators[0].username %>"><%= "#{educators[0].fname} #{educators[0].lname}" %></a>
+				</div>
+
+				<% if !educators[0].info.nil? && !educators[0].info.subjects.nil? && !educators[0].info.subjects.empty? %>
+				<div class="medata">
+					<span>
+						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
+						<%= educators[0].info.subjects.first %>
+					</span>
+				</div>
+				<% end %>
+			</div>
+
+			<div style="clear:both"></div>
+		</div>
+
+		<div class="listitem mid">
+			
+			<a href="/<%= educators[1].username %>">
+				<img src="<%= teacher_thumb_md(educators[1]) %>" class="thumbster" />
+			</a>
+			
+			<div class="infowrap">
+				<div class="bigtitle">
+					<a href="/<%= educators[1].username %>"><%= "#{educators[1].fname} #{educators[1].lname}" %></a>
+				</div>
+
+				<% if !educators[1].info.nil? && !educators[1].info.subjects.nil? && !educators[1].info.subjects.empty? %>
+				<div class="medata">
+					<span>
+						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
+						<%= educators[1].info.subjects.first %>
+					</span>
+				</div>
+				<% end %>
+			</div>
+
+			<div style="clear:both"></div>
+		</div>
+
+		<div class="listitem" style="border-right:none">
+			
+			<a href="/<%= educators[2].username %>">
+				<img src="<%= teacher_thumb_md(educators[2]) %>" class="thumbster" />
+			</a>
+			
+			<div class="infowrap">
+				<div class="bigtitle">
+					<a href="/<%= educators[2].username %>"><%= "#{educators[2].fname} #{educators[2].lname}" %></a>
+				</div>
+
+				<% if !educators[2].info.nil? && !educators[2].info.subjects.nil? && !educators[2].info.subjects.empty? %>
+				<div class="medata">
+					<span>
+						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
+						<%= educators[2].info.subjects.first %>
+					</span>
+				</div>
+				<% end %>
+			</div>
+
+			<div style="clear:both"></div>
+		</div>
+
+		<div style="clear:both"></div>
+
+	
+
+<ul class="pager">
+			<li class="next">
+				<a href="/educators" style="font-weight:bolder;font-size:18px;margin-right:15px;margin-top:10px">View all&rarr;</a>
+			</li>
+		</ul>
+				<% if current_teacher.omnihash["facebook"].nil? || current_teacher.omnihash["twitter"].nil? %>
+
+					<div class="maintxt">
+							Find colleagues &nbsp;&nbsp;&nbsp;
+						
+
+						<% if current_teacher.omnihash["twitter"].nil? %>
+							<a href="/gs/twitter" class="zocial twitter">Connect with Twitter</a>
+						<% end %>
+					
+
+					
+						<% if current_teacher.omnihash["facebook"].nil? %>
+							<a href="/gs/facebook" class="zocial facebook">Connect with Facebook</a>
+						<% end %>
+
+
+					</div>
+
+					<% end %>
+					
+					
+
+				</div>
+
+				
+				<div style="clear:both"></div>
+			</div>
+
+
+
+<% if current_teacher.relationships.where(:subscribed => true) %>
 		<div class="announcer">
 			<%= image_tag('common/plane.png', :style => "margin: -2px 3px 0 0") %>
 			What's happening now
 		</div>
 
 			<%= render 'layouts/feed' %>
+
+<% end %>
+
+
 
 	</div>
 
@@ -140,3 +283,44 @@
 
     </form>
   </div>
+
+  <div id="inviteForm" style="display: none;">
+  <div class="headtitle">
+    Invite colleagues
+    <a href="#" onClick="closefBox()" class="btn btn-mini pull-right">X</a>
+  </div>
+
+  <div class="errorBox"></div>
+  <div class="conitem">
+    <%= image_tag("invite.png", {:style => "margin:auto;display:block"}) %>
+    <div style="overflow: hidden;">
+      <blockquote>
+        <p>Invite people, get free storage.</p>
+        <small>You both get 300MB extra storage for free.</small>
+      </blockquote>
+    </div>
+    <div id="urlInviter">
+      <div class="input-prepend url-container" style="">
+        <span class="add-on" style="margin-right:-14px">
+          <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
+        </span>
+
+        <input type="text" onclick="$(this).select();" style="" value="<%= "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>" readonly="readonly">
+      </div>
+      <div class="invite-btn-grp">
+        <a class="zocial twitter" href="https://twitter.com/intent/tweet?text=Connect+with+me+on+Claco%3A&url=<%=u "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>&via=TeamClaco" onclick="if( !navigator.userAgent.toLowerCase().match( /(iphone|ipad|ipod|android|mini|mobi)/i ) ){window.open('https://twitter.com/intent/tweet?text=Connect+with+me+on+Claco%3A&url=<%=u "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>&via=TeamClaco','','scrollbars=yes,width=660,height=328');return false;}" title="Twitter" target="_blank">Tweet</a>
+        <a class="zocial facebook" href="http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Btitle%5D=Connect+with+me+on+Claco%3A&amp;p%5Burl%5D=<%=u "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>&amp;p%5Bsummary%5D=Collaborate+with+the+world's+greatest+educators." onclick="if( !navigator.userAgent.toLowerCase().match( /(iphone|ipad|ipod|android|mini|mobi)/i ) ){window.open('http://www.facebook.com/sharer/sharer.php?s=100&amp;p%5Btitle%5D=Connect+with+me+on+Claco%3A&amp;p%5Burl%5D=<%=u "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>&amp;p%5Bsummary%5D=Collaborate+with+the+world\'s+greatest+educators.','','scrollbars=yes,width=660,height=328');return false;}" title="Share on Facebook" target="_blank">Share</a>
+        <a class="zocial email" href="#" onclick="$('#facebox #urlInviter').hide();$('#facebox #emailInviter').show();return false;">Email</a>
+      </div>
+    </div>
+    <form action="/invite" accept-charset="UTF-8" method="post" class="bodcon" id="emailInviter">
+        <input id="invite_" name="invite[]" placeholder="Enter Colleague's email" type="email" value="">
+        <input id="invite_" name="invite[]" placeholder="Enter Colleague's email" type="email" value="">
+        <div class="buttonbar">
+           <button class="btn btn-primary btn-small" type="submit">Send invites!</button>
+           <button class="btn btn-small" onclick="$('#facebox #emailInviter').hide();$('#facebox #urlInviter').show();return false;">Cancel</button>
+        </div>
+
+    </form>
+  </div>
+</div>

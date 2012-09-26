@@ -25,7 +25,7 @@
 				<% else %>
 
 				<div class="folder-preview">
-			        <div class="single-hold" style="margin-top:-1px;background-image:url('<%= Binder.thumb_lg(imgarr[0]) %>')"></div>
+			        <div class="single-hold" style="margin-top:-1px;background-image:url('<%= binder_thumb_lg(imgarr[0]) %>')"></div>
 
 			    </div> <!-- end of fold prevew -->
 
@@ -34,9 +34,9 @@
 			    <% #debugger if binder.current_version.nil? 
 			    %>
 
-				<img class="thumby1" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
-				<img class="thumby2" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
-				<img class="thumby3" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
+				<img class="thumby1" src="<%= binder_thumb_sm(imgarr[1]) %>" />
+				<img class="thumby2" src="<%= binder_thumb_sm(imgarr[2]) %>" />
+				<img class="thumby3" src="<%= binder_thumb_sm(imgarr[3]) %>" />
 
 
 			  	<div class="innerd">

@@ -5,7 +5,7 @@ Claco::Application.routes.draw do
 	# DEVISE ROUTING #
 	##################
 
-	devise_for :teachers, :path => "", :skip => [:sessions, :registrations, :passwords, :media_server_api], controllers: {omniauth_callbacks: "omniauth_callbacks"}
+	devise_for :teachers, :path => "", :skip => [:sessions, :registrations, :passwords], controllers: {omniauth_callbacks: "omniauth_callbacks"}
 
 	as :teacher do
 
@@ -41,7 +41,7 @@ Claco::Application.routes.draw do
 
 	get		'/teachersearch'												=> 'home#teachersearch'
 	get		'/subscribedlog'												=> 'home#subscribedlog'
-
+	get		'/educators'													=> 'home#educators'
 
 	get		'/mediaserver/:id'												=> 'media_server_api#tokencheck'
 	get		'/mediaservertest'												=> 'media_server_api#mediaserver'
@@ -68,6 +68,8 @@ Claco::Application.routes.draw do
 	get		'/admin/invite/:id'												=> 'admin#showinv'
 	get		'/admin/sysinvlist'												=> 'admin#sysinvlist'
 	post	'/admin/invite/:to'												=> 'admin#sendinvite', :constraints => {:to => /[^\/]+/}
+	get		'/admin/pioneer'												=> 'admin#choosepibinder'
+	post	'/admin/pioneer'												=> 'admin#setpibinder',			:as => 'pioneer'
 
 	##################
 	# TEACHER ROUTING#
@@ -115,6 +117,14 @@ Claco::Application.routes.draw do
 	post	'/zcb'																					=> 'zencoder_callbacks#processed'
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
+
+		#########################
+		# PIONEER CHATS ROUTING #
+		#########################
+
+		get		'/pioneers'																			=> 'pioneers#index'
+		get		'/pioneers/:title/:id'																=> 'pioneers#show'
+
 
 		#Subscribe/unsubscribe
 		put		'/:username/subscribe'																=> 'teachers#sub'

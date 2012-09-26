@@ -2,6 +2,8 @@ class PioneersController < ApplicationController
 
 	def index
 
+		@title = "Pioneers"
+
 		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index)
 
 		@current = @pibinders.first
@@ -11,6 +13,8 @@ class PioneersController < ApplicationController
 	end
 
 	def show
+
+		@title = "Pioneers"
 
 		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index)
 

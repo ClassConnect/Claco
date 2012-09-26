@@ -161,6 +161,8 @@ class HomeController < ApplicationController
 
 	def educators
 
+		@title = "Educators you may know"
+
 		@crb = rand(2..50)
 
 		render 'educators'

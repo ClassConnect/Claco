@@ -619,7 +619,7 @@ class Teacher
 		recs = recs.flatten.uniq - subs
 
 		if recs.size < 5
-			if Rails.env=='development'
+			if Rails.env.development?
 				recs = (['503bfe25fafac30002000011',
 						'502d3b822fc6100002000012',
 						'502d3edd2fc61000020000bf',
@@ -629,7 +629,7 @@ class Teacher
 			end
 		end
 
-		recs
+		recs[0..40]
 
 		
 

@@ -32,7 +32,7 @@ class RegistrationsController < Devise::RegistrationsController
     resource.registered_at = Time.now.to_i
     resource.registered_ip = request.ip
     
-    if Ns.where(:code => params[:teacher][:code]).first.active && resource.save
+    if (Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active) && resource.save
 
       Ns.where(:code => params[:teacher][:code]).first.use
       i = Invitation.where(:code => params[:teacher][:code]).first

@@ -7,6 +7,8 @@
 		Educators you may know
 	</div>
 
+	<% if false %>
+
 	<div class="listitem">
 		<a href="/kleinerin">
 			<img src="http://img.cla.co/30196e0ca58be4c89f26fcbf608262fb/thumb_md.png" class="thumbster">
@@ -18,7 +20,7 @@
 			<div class="biotxt">
 				I have my Master's of Education in Curriculum and Instruction and teach second grade. I've taught first, sixth, and seventh grade.
 
-I'm the technology co-chairperson for the Michigan Reading Association, a national A Plus Workshop Presenter, SMART Technologies Exemplary Educator, Really Good Stuff Monthly Blogger, Edutopia Guest Blogger, National Writing Project member, Teaching Blog Addict Business Manager and award-winning EduTech Blogger.
+				I'm the technology co-chairperson for the Michigan Reading Association, a national A Plus Workshop Presenter, SMART Technologies Exemplary Educator, Really Good Stuff Monthly Blogger, Edutopia Guest Blogger, National Writing Project member, Teaching Blog Addict Business Manager and award-winning EduTech Blogger.
 			</div>
 			<div class="medata">
 			</div>
@@ -26,6 +28,45 @@ I'm the technology co-chairperson for the Michigan Reading Association, a nation
 
 		<div style="clear:both"></div>
 	</div>
+
+	<% end %>
+
+	<% current_teacher.recommends.each do |f| %>
+
+	<% @rec = Teacher.find(f.to_s) %>
+
+	<div class="listitem">
+		<a href="/<%= @rec.username %>">
+			<img src="<%= teacher_thumb_md(@rec) %>" class="thumbster">
+		</a>
+		<div class="infowrap">
+			<div class="bigtitle">
+				<a href="/<%= @rec.username %>"><%= "#{@rec.fname} #{@rec.lname}" %></a> <a href="/<%= @rec.username %>"><span class="uname">(<%= @rec.username %>)</span></a>
+			</div>
+			<div class="biotxt">
+				<%= @rec.info.bio %>
+			</div>
+			<div class="medata">
+				<% if @rec.info.subjects.any? %>
+				<span>
+					<%= image_tag("profile/subject.png") %>
+					<%= "#{@rec.info.subjects[0]}#{", #{@rec.info.subjects[1]}" if @rec.info.subjects.size > 1}#{", and #{@rec.info.subjects.size-2} more" if @rec.info.subjects.size > 2}" %>
+				</span>
+				&nbsp;&nbsp;
+				<% end %>
+				<% if !@rec.info.city.empty? || !@rec.info.state.empty? || !@rec.info.country.empty? %>
+				<span>
+					<%= image_tag("profile/point.png", :style => "margin-right:0px") %>
+					<%= "#{@rec.info.city}#{', ' if !@rec.info.city.empty?}#{@rec.info.state}#{', ' if !@rec.info.city.empty? || !@rec.info.state.empty?}#{@rec.info.country}" %>
+				</span>
+				<% end %>
+			</div>
+		</div>
+
+		<div style="clear:both"></div>
+	</div>
+
+	<% end %>
 
 
 </div>

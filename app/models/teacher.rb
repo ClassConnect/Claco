@@ -852,6 +852,7 @@ class Teacher
 		unless inviter.nil?
 
 			inviter.incsizecap
+			self.incsizecap
 
 		end
 

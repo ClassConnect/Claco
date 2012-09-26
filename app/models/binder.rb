@@ -558,6 +558,24 @@ class Binder
 
 	# Do not explicitly call these!  All these methods have very long latency.
 
+	def self.sendforkemail(ogid, npid)
+
+		ogbinder = Binder.find(ogid)
+
+		forkee = Teacher.find(ogbinder.owner)
+
+		if forkee.emailconfig["fork"]
+
+			forkedbinder = Binder.find(npid)
+
+			forker = Teacher.find(forkedbinder.owner)
+
+			UserMailer.fork_notification(ogbinder, forkedbinder, forker, forkee).deliver
+
+		end
+
+	end
+
 	def self.encode(id)
 
 		binder = Binder.find(id)

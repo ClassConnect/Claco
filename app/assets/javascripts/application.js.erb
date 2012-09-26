@@ -19,7 +19,6 @@ $(document).ready(function() {
 	$(".noclose").on("click", function(e){
 	    e.stopPropagation();
 	});
-
 	$("#top-notch-btn").on("click", function(e){
 		if (!$(".noclose").is(":visible")) {
 
@@ -29,9 +28,26 @@ $(document).ready(function() {
 	    
 	});
 
+	$(document).bind('reveal.facebox', function() {
+		fieldAdder();
+	});
+
 });
 
-
+function fieldAdder () {
+    $('#facebox input#invite_').last()
+        .on('focus',
+            function () {
+                if($('#facebox input#invite_').last().prev().val() != '') {
+                    
+                    $('#facebox .buttonbar').first()
+                        .before('<input id="invite_" name="invite[]" placeholder="Enter email address" type="email" value="">');
+                    }
+                    $('#facebox input#invite_').off('focus');
+                    fieldAdder();
+                
+            });
+}
 
 
 function initAsyc(content) {

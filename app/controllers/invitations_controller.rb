@@ -13,22 +13,19 @@ class InvitationsController < ApplicationController
 
 		emails.each do |email|
 
-			inv = Invitation.new(	:from		=> current_teacher.id.to_s,
-									:to			=> email,
-									:submitted	=> Time.now.to_i)
+			unless email.empty?
 
-			if inv.save
+				inv = Invitation.new(	:from		=> current_teacher.id.to_s,
+										:to			=> email,
+										:submitted	=> Time.now.to_i)
 
-				redirect_to root_path and return
-
-			else
-
-				redirect_to root_path and return
+				inv.save
 
 			end
 
 		end
-
+		
+		redirect_to root_path and return
 
 	end
 

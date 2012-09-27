@@ -63,9 +63,9 @@ class AvatarUploader < CarrierWave::Uploader::Base
     Digest::MD5.hexdigest(model.teacher.id.to_s + model.size.to_s + model.data.to_s)
   end
 
-  def default_url
-    asset_path "placer.png"
-  end
+  # def default_url
+  #   asset_path "placer.png"
+  # end
 
   def fog_directory
     # if Rails.env == "production"

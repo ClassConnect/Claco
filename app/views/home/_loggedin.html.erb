@@ -317,7 +317,7 @@
           <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
         </span>
 
-        <input type="text" onclick="$(this).select();" style="" value="<%= "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>" readonly="readonly">
+        <input type="text" onclick="$(this).select();" style="cursor:default;" value="<%= "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>" readonly="readonly">
       </div>
       <div class="invite-btn-grp">
         <a class="zocial twitter" href="https://twitter.com/intent/tweet?text=Connect+with+me+on+Claco%3A&url=<%=u "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>&via=TeamClaco" onclick="if( !navigator.userAgent.toLowerCase().match( /(iphone|ipad|ipod|android|mini|mobi)/i ) ){window.open('https://twitter.com/intent/tweet?text=Connect+with+me+on+Claco%3A&url=<%=u "#{request.protocol}#{request.host_with_port}/join?ref=#{current_teacher.id.to_s}" %>&via=TeamClaco','','scrollbars=yes,width=660,height=328');return false;}" title="Twitter" target="_blank">Tweet</a>

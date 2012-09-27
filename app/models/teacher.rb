@@ -112,6 +112,23 @@ class Teacher
 	# standard:    					brown, 			cow's, 	part_no, 		a.bc123, 			456, 	joe, 			bloggs.com
 	# snowball (English):   		brown, 			cow, 	part_no, 		a.bc123, 			456, 	joe, 			bloggs.com
 
+	after_save do
+
+		#debugger
+
+		keys = Rails.cache.read(self.id.to_s)
+
+		return if keys.nil?
+
+		keys.each do |f|
+			#Rails.cache.delete(f.to_s)
+			#Rails.cache.expire_fragment(f.to_s)
+			Rails.cache.write(f.to_s,true)			
+		end
+
+		Rails.cache.delete(self.id.to_s)
+
+	end
 
 
 	settings analysis: {
@@ -619,12 +636,14 @@ class Teacher
 		recs = recs.flatten.uniq - subs
 
 		if recs.size < 5
-			recs = (['503bfe25fafac30002000011',
-					'502d3b822fc6100002000012',
-					'502d3edd2fc61000020000bf',
-					'5049718bf5d9ab00020000a7',
-					'505ce7fae274d70002000019',
-					'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+			if Rails.env.production?
+				recs = (['503bfe25fafac30002000011',
+						'502d3b822fc6100002000012',
+						'502d3edd2fc61000020000bf',
+						'5049718bf5d9ab00020000a7',
+						'505ce7fae274d70002000019',
+						'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+			end
 		end
 
 		recs[0..40]
@@ -988,6 +1007,24 @@ class Info
 	field :facebookurl,			:type => String, :default => ""
 
 	embedded_in :teacher
+
+	after_save do
+
+		#debugger
+
+		keys = Rails.cache.read(self.teacher.id.to_s)
+
+		return if keys.nil?
+
+		keys.each do |f|
+			#Rails.cache.delete(f.to_s)
+			#Rails.cache.expire_fragment(f.to_s)			
+			Rails.cache.write(f.to_s,true)
+		end
+
+		Rails.cache.delete(self.teacher.id.to_s)
+
+	end
 
 	# after_save do
 	# 	Rails.logger.debug "AFTER_SAVE_INFO"

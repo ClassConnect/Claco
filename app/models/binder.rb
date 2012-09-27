@@ -90,6 +90,25 @@ class Binder
 
 	embeds_one :imageset
 
+
+	after_save do
+
+		#debugger
+
+		keys = Rails.cache.read(self.id.to_s)
+
+		return if keys.nil?
+
+		keys.each do |f|
+			#Rails.cache.delete(f.to_s)
+			#Rails.cache.expire_fragment(f.to_s)
+			Rails.cache.write(f.to_s,true)			
+		end
+
+		Rails.cache.delete(self.id.to_s)
+
+	end
+
 	########################################
 
 	def self.thumbready? (binder,image='img_thumb_lg')
@@ -818,6 +837,8 @@ class Binder
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
+		debugger
+
 		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(filled_sm.to_blob).set_filename(STHUMB_FILENAME),
 													:imgstatus => stathash)
 
@@ -1510,6 +1531,23 @@ class Version
 	embedded_in :binder
 
 
+	after_save do
+
+		debugger
+
+		keys = Rails.cache.read(self.binder.id.to_s)
+
+		return if keys.nil?
+
+		keys.each do |f|
+			#Rails.cache.delete(f.to_s)	
+			#Rails.cache.expire_fragment(f.to_s)
+			Rails.cache.write(f.to_s,true)		
+		end
+
+		Rails.cache.delete(self.binder.id.to_s)
+
+	end
 
 	def thumbnailgen
 

@@ -26,7 +26,11 @@
 
 				<div class="feedcontent">
 
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/createfileheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedcontent' %>
 
@@ -36,7 +40,11 @@
 
 				<div class="feedcontent">
 
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/createcontentheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedcontent' %>
 
@@ -46,7 +54,11 @@
 
 				<div class="feedcontent">
 					
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/updateheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedcontent' if !f[:array] %>
 
@@ -56,7 +68,11 @@
 
 				<div class="feedcontent">
 
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/forkitemheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedcontent' %>
 
@@ -66,7 +82,11 @@
 
 				<div class="feedcontent">
 
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/favoriteheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedcontent' %>
 
@@ -76,7 +96,11 @@
 
 				<div class="feedcontent">
 
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/setpubheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedcontent' %>
 
@@ -84,11 +108,17 @@
 
 			<% when 'sub' %>
 
-				<% @subscribee = Teacher.where(:username => /^#{Regexp.escape(f[:log].params['username'].to_s)}$/i).first %>
+				<% # fix this!!! 
+				
+				@subscribee = Teacher.where(:username => /^#{Regexp.escape(f[:log].params['username'].to_s)}$/i).first %>
 
 				<div class="feedcontent">
 
+					<% cache("#{current_teacher}#{f[:log].id}", :expires_in => 1.minutes) do %>
+
 					<%= render 'layouts/feedpieces/subheader' %>
+
+					<% end %>
 
 					<%= render 'layouts/feedpieces/feedsub' %>
 

@@ -1,5 +1,17 @@
 <% if !@f[:array] %>
 
+	<% 
+	# if !Rails.cache.read(@f[:log].id.to_s).nil?
+	# 	expire_fragment(@f[:log].id.to_s) 
+	# 	Rails.cache.delete(@f[:log].id.to_s)
+	# end
+	%>
+
+	<% #expire_fragment(@f[:log].id.to_s) if Rails.cache.read(@f[:log].id.to_s) 
+	%>
+
+	<% cache("#{@f[:log].id}", :expires_in => 15.minutes) do %>
+
 	<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 		<div class="thecontent">
 			<% if !@subscribee.info.nil? %>
@@ -42,12 +54,27 @@
 		</div>
 	</a>
 
+	<% end %>
+
+	<% #debugger 
+	%>
+
+	<% map_to_model(@f[:model].id.to_s,@f[:log].id.to_s) %>
+
 <% else %>
 
 	<% @f[:array].each do |g| %>
 
-		<% @subscribee = Teacher.find(g[:log]["modelid"]) %>
+		<% 
+		# if !Rails.cache.read(g[:log].id.to_s).nil? 
+		# 	expire_fragment(g[:log].id.to_s) 
+		# 	Rails.cache.delete(g[:log].id.to_s)
+		# end
+		%>
 
+		<% cache("#{g[:log].id}", :expires_in => 15.minutes) do %>
+
+		<% @subscribee = Teacher.find(g[:log]["modelid"]) %>
 
 		<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
 			<div class="thecontent">
@@ -90,6 +117,10 @@
 				<div style="clear:both"></div>
 			</div>
 		</a>
+	<% end %>
+
+	<% map_to_model(g[:model].id.to_s,g[:log].id.to_s) %>
+
 	<% end %>
 
 <% end %>

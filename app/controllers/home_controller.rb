@@ -142,6 +142,10 @@ class HomeController < ApplicationController
 									duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
 								end
+								if !Rails.cache.read(f[:log].id.to_s).nil? 
+									expire_fragment(f[:log].id.to_s) 
+									Rails.cache.delete(f[:log].id.to_s)
+								end
 							end
 						end
 					end

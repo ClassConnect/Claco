@@ -1,6 +1,27 @@
 module ApplicationHelper
 
+	def map_to_model(modelid,cachekey)
 
+		#debugger
+
+		keys = Rails.cache.read(modelid.to_s)
+
+		#return if keys.nil?
+
+		#debugger
+
+		if keys.nil?
+			Rails.cache.write(modelid.to_s,[cachekey])
+		elsif !keys.include?(cachekey.to_s)
+			keys << cachekey.to_s
+			Rails.cache.write(modelid.to_s,keys)
+		end
+		
+		#debugger
+
+		#test = 1
+
+	end
 
 	def teacher_thumb_lg(teacher)
 		ret = Teacher.thumb_lg(teacher)

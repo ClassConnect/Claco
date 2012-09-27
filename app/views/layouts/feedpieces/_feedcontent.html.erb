@@ -1,5 +1,14 @@
 <% if !@f[:array] %>
 
+	<% 
+	# if !Rails.cache.read(@f[:log].id.to_s).nil?
+	# 	expire_fragment(@f[:log].id.to_s) 
+	# 	Rails.cache.delete(@f[:log].id.to_s)
+	# end
+	%>
+
+	<% cache("#{@f[:log].id}", :expires_in => 15.minutes) do %>
+
 	<a href="<%= named_binder_route(@f[:model]) %>" class="conlink">
 		<div class="thecontent">
 			<% if @f[:model].type==1 %>
@@ -10,14 +19,14 @@
 
 				<div style="float:left; margin-right: 10px;">
 					<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-						<img src="<%= Binder.thumb_lg(imgarr[0]) %>" />
+						<img src="<%= binder_thumb_lg(imgarr[0]) %>" />
 					</div>
 
 					<% if !imgarr[1].nil? %>
 
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= binder_thumb_sm(imgarr[1]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= binder_thumb_sm(imgarr[2]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= binder_thumb_sm(imgarr[3]) %>" />
 
 					<% end %>
 
@@ -27,7 +36,7 @@
 
 			<% else %>
 				<% if Binder.thumbready?(@f[:model]) %>
-					<div class="previmg" style="background-image: url('<%= Binder.thumb_lg(@f[:model]) %>');background-repeat: no-repeat;background-position: center;"></div>
+					<div class="previmg" style="background-image: url('<%= binder_thumb_lg(@f[:model]) %>');background-repeat: no-repeat;background-position: center;"></div>
 				<% end %>
 			<% end %>
 			<div class="txtcon">
@@ -46,9 +55,25 @@
 		</div>
 	</a>
 
+	<% end %>
+
+	<% #debugger 
+	%>
+
+	<% map_to_model(@f[:model].id.to_s,@f[:log].id.to_s) %>
+
 <% else %>
 
 	<% @f[:array].each do |g| %>
+
+	<% 
+	# if !Rails.cache.read(g[:log].id.to_s).nil? 
+	# 	expire_fragment(g[:log].id.to_s) 
+	# 	Rails.cache.delete(g[:log].id.to_s)
+	# end
+	%>
+
+	<% cache("#{g[:log].id}", :expires_in => 15.minutes) do %>
 
 	<a href="<%= named_binder_route(g[:model]) %>" class="conlink">
 		<div class="thecontent">
@@ -60,14 +85,14 @@
 
 				<div style="float:left; margin-right: 10px;">
 					<div style="height:122px;width:180px;display:block;overflow:hidden;position:relative;">
-						<img src="<%= Binder.thumb_lg(imgarr[0]) %>" />
+						<img src="<%= binder_thumb_lg(imgarr[0]) %>" />
 					</div>
 
 					<% if !imgarr[1].nil? %>
 
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[1]) %>" />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[2]) %>" />
-					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= Binder.thumb_sm(imgarr[3]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= binder_thumb_sm(imgarr[1]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= binder_thumb_sm(imgarr[2]) %>" />
+					<img style="height:48px;width:55px;overflow:hidden;margin-top:4px;border:1px solid #EEE;" src="<%= binder_thumb_sm(imgarr[3]) %>" />
 
 					<% end %>
 
@@ -77,7 +102,7 @@
 
 			<% else %>
 				<% if Binder.thumbready?(g[:model]) %>
-					<div class="previmg" style="background-image: url('<%= Binder.thumb_lg(g[:model]) %>');background-repeat: no-repeat;background-position: center;"></div>
+					<div class="previmg" style="background-image: url('<%= binder_thumb_lg(g[:model]) %>');background-repeat: no-repeat;background-position: center;"></div>
 				<% end %>
 			<% end %>
 			<div class="txtcon">
@@ -95,5 +120,10 @@
 			<div style="clear:both"></div>
 		</div>
 	</a>
+
+	<% end %>
+
+	<% map_to_model(g[:model].id.to_s,g[:log].id.to_s) %>
+
 	<% end %>
 <% end %>

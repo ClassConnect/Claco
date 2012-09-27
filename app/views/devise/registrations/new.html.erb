@@ -3,6 +3,7 @@
 <% end %>
 <% content_for :botcon do %>
     <%= javascript_include_tag "editinfo/newuser" %>
+	<%= javascript_include_tag "binders/pretags" %>
 <% end %>
 
 
@@ -48,6 +49,16 @@
 			<td class="labeler">Last Name</td>
 			<td><%= f.text_field :lname %></td>
 		</tr>
+		<%= fields_for :info do |g| %>
+			<tr>
+				<td class="labeler">Grades</td>
+				<td><%= g.text_field :grades %></td>
+			</tr>
+			<tr>
+				<td class="labeler">Subjects</td>
+				<td><%= g.text_field :subjects %></td>
+			</tr>
+		<% end %>
 	</table>
 
 	<div style="color:#666;font-size:11px;margin-left:145px">You agree to our <a href="/legal/tos" target="_blank">terms of service</a> and <a href="/legal/privacy" target="_blank">privacy policy</a>.</div>

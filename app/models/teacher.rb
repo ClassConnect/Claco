@@ -713,14 +713,6 @@ class Teacher
 
 			teacher.omnihash[auth.provider]["fids"] = fids
 
-			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |fteacher|
-
-				teacher.relationship_by_teacher_id(fteacher.id).subscribe
-
-				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
-
-			end
-
 			auth.extra.delete("access_token")
 			teacher.omnihash[auth.provider]["data"] = auth
 
@@ -732,14 +724,6 @@ class Teacher
 			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{teacher.omnihash["facebook"]["data"]["credentials"]["token"]}"))["data"].collect{|f| f["id"]}
 
 			teacher.omnihash[auth.provider]["fids"] = fids
-
-			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
-
-				teacher.relationship_by_teacher_id(fteacher.id).subscribe
-
-				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
-
-			end
 
 		end
 		teacher
@@ -824,8 +808,6 @@ class Teacher
 	end
 
 	after_create do
-
-		self.info = Info.new
 
 		if self.code.length == 24
 

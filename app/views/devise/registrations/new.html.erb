@@ -38,16 +38,18 @@
 			<td><%= f.email_field :email %></td>
 		</tr>
 		<tr>
-			<td class="labeler">Title</td>
-			<td><%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] )) %></td>
+			<td class="labeler">Name</td>
+			<td>
+				<div class="controls controls-row">
+	  				<%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] ), {}, {:style => "width:auto"}) %>
+	  				<%= f.text_field :fname, {:class => "span1o5"} %>
+	  				<%= f.text_field :lname, {:class => "span1o5"} %>
+				</div>
+			</td>
 		</tr>
 		<tr>
-			<td class="labeler">First Name</td>
-			<td><%= f.text_field :fname %></td>
-		</tr>
-		<tr>
-			<td class="labeler">Last Name</td>
-			<td><%= f.text_field :lname %></td>
+				<td class="labeler"><span class="label">Optional</span></td>
+				<td><hr></td>
 		</tr>
 		<%= fields_for :info do |g| %>
 			<tr>

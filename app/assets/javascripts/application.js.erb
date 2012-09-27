@@ -32,6 +32,11 @@ $(document).ready(function() {
 		fieldAdder();
 	});
 
+	$('.new_teacher #teacher_email').each(
+		function /*change email*/ () {
+			$(this).attr('value', getQueryHash().email || '');
+		});
+
 });
 
 function fieldAdder () {
@@ -202,4 +207,14 @@ function selectPickFolder(fObj) {
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);
 	$(fObj).closest(".pickerpane").hide();
 
+}
+
+function getQueryHash() {
+	// returns a map of query parameters
+	var ad={};
+	location.search.replace(/[A-Z0-9]+?=(\w*)/gi,
+		function(ae) {
+			ad[ae.split("=").shift()]=ae.split("=").pop();
+		});
+	return ad;
 }

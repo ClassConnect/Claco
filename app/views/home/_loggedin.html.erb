@@ -124,7 +124,7 @@
 			<div class="findppl">
 				<div class="boxyleft">
 
-		<% educators = current_teacher.recommends[0..15].shuffle[0..2].map{ |f| Teacher.find(f.to_s) } %>
+		<% educators = current_teacher.recommends[0..8].shuffle[0..2].map{ |f| Teacher.find(f.to_s) } %>
 	
 		<% if !educators[0].nil? %>
 

@@ -128,6 +128,8 @@ class Teacher
 
 		Rails.cache.delete(self.id.to_s)
 
+		Rails.cache.write("#{self.id.to_s}educobj",true)
+
 	end
 
 
@@ -616,82 +618,57 @@ class Teacher
 
 		# pre-seed!
 
-		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
+		# keys = Rails.cache.read("self.id.to_s}recs")
+
+		# return if keys.nil?
+
+		# Rails.cache.delete("self.id.to_s}recs")
 
 		#debugger
 
-		vectors = Teacher.vectors(self.id.to_s,2)
+		if Rails.cache.read("#{self.id.to_s}recs").nil?
 
-		recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
+			subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
 
-		# steven : 503bfe25fafac30002000011
-		# jerry  : 502d3b822fc6100002000012
-		# erin   : 502d3edd2fc61000020000bf
-		# joan   : 5049718bf5d9ab00020000a7
-		# spang  : 505ce7fae274d70002000019
-		# NASA   : 502cab3378de86000200006d
+			#debugger
 
-		# (['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
+			vectors = Teacher.vectors(self.id.to_s,2)
 
-		recs = recs.flatten.uniq - subs
+			recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
 
-		if recs.size < 5
-			if Rails.env.production?
-				recs = (['503bfe25fafac30002000011',
-						'502d3b822fc6100002000012',
-						'502d3edd2fc61000020000bf',
-						'5049718bf5d9ab00020000a7',
-						'505ce7fae274d70002000019',
-						'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+			# steven : 503bfe25fafac30002000011
+			# jerry  : 502d3b822fc6100002000012
+			# erin   : 502d3edd2fc61000020000bf
+			# joan   : 5049718bf5d9ab00020000a7
+			# spang  : 505ce7fae274d70002000019
+			# NASA   : 502cab3378de86000200006d
+
+			# (['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
+
+			recs = recs.flatten.uniq - subs
+
+			if recs.size < 5
+				if Rails.env.production?
+					recs = (['503bfe25fafac30002000011',
+							'502d3b822fc6100002000012',
+							'502d3edd2fc61000020000bf',
+							'5049718bf5d9ab00020000a7',
+							'505ce7fae274d70002000019',
+							'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+				end
 			end
+
+			Rails.cache.write("#{self.id.to_s}recs",recs[0..60])
+
+			return recs[0..60]
+
+		else
+
+			return Rails.cache.read("#{self.id.to_s}recs")
+
 		end
 
-		recs[0..40]
-
-		
-
-
-		#recs
-
-		#recs << ['502ca11eaa1d2a000200000b',{:dist => 1}]
-
-		#recs.reject!{ |f| subs.include? f[0].to_s }
-
-
-		#list
-
 	end
-
-
-
-	# this does not work
-	# def subs_of_subs
-
-	# 	sos = [] #{"id" => id, "count" => count}
-
-	# 	subs = relationships.where(:subscribed => true).entries.map {|r| Teacher.find(r["user_id"])}
-
-	# 	debugger
-
-	# 	subs.each do |sub|
-
-	# 		e = sos.find{|s| s["id"] == sub.id.to_s}
-
-	# 		if e.nil?
-
-	# 			sos << {"id" => sub.id.to_s, "count" => 1}
-
-	# 		else
-
-	# 			e["count"] += 1
-
-	# 		end
-
-	# 	end
-
-	# 	return sos
-
-	# end
 
 	def self.find_for_authentication(conditions) 
 		conditions[:login].downcase!
@@ -929,6 +906,30 @@ class Relationship
 
 	embedded_in :teacher
 
+	# after_create do
+
+	# 	debugger
+	# 	Rails.cache.write("self.teacher.id.to_s}recs",true)
+
+	# end
+
+	after_save do
+
+		#debugger
+		Rails.cache.delete("#{self.teacher.id.to_s}recs")
+
+	end
+
+	# after_create do
+
+	# 	keys = Rails.cache.read("self.teacher.id.to_s}recs")
+
+	# 	return if keys.nil?
+
+	# 	Rails.cache.delete("self.teacher.id.to_s}recs")
+
+	# end
+
 	# Class Methods
 
 	def subscribe
@@ -1005,6 +1006,8 @@ class Info
 		end
 
 		Rails.cache.delete(self.teacher.id.to_s)
+
+		Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
 
 	end
 

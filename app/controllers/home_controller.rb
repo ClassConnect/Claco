@@ -168,7 +168,15 @@ class HomeController < ApplicationController
 
 		@title = "Educators you may know"
 
-		@crb = rand(2..50)
+		#debugger
+
+		current_teacher.recommends.each do |f|
+			if !Rails.cache.read("#{f.to_s}educobj").nil?
+				debugger
+				expire_fragment("#{f.to_s}educobj") 
+				Rails.cache.delete("#{f.to_s}educobj")
+			end
+		end
 
 		render 'educators'
 

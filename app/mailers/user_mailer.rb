@@ -66,7 +66,7 @@ class UserMailer < ActionMailer::Base
 
 		if invitation.from == "0"
 
-			@link = "http://www.claco.com/join?key=#{invitation.code}"
+			@link = "http://www.claco.com/join?key=#{invitation.code}&email=#{invitation.to}"
 
 			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
 				format.html {render "system_invite"}
@@ -76,7 +76,7 @@ class UserMailer < ActionMailer::Base
 
 			@sender = Teacher.find(invitation.from)
 
-			@link = "http://www.claco.com/join?ref=#{invitation.from}"
+			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{invitation.to}"
 
 			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Beta invite for claco") do |format|
 				format.html {render "user_invite"}

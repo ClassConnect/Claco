@@ -25,22 +25,26 @@ module ApplicationHelper
 
 	def teacher_thumb_lg(teacher)
 		ret = Teacher.thumb_lg(teacher)
-		ret.nil? ? asset_path("placer.png") : ret
+		#ret.nil? ? asset_path("placer.png") : ret
+		ret.nil? ? asset_path("face170.png") : ret
 	end
 
 	def teacher_thumb_mg(teacher)
 		ret = Teacher.thumb_mg(teacher)
-		ret.nil? ? asset_path("placer.png") : ret
+		#ret.nil? ? asset_path("placer.png") : ret
+		ret.nil? ? asset_path("face122.png") : ret
 	end
 
 	def teacher_thumb_md(teacher)
 		ret = Teacher.thumb_md(teacher)
-		ret.nil? ? asset_path("placer.png") : ret
+		#ret.nil? ? asset_path("placer.png") : ret
+		ret.nil? ? asset_path("face48.png") : ret
 	end
 
 	def teacher_thumb_sm(teacher)
 		ret = Teacher.thumb_sm(teacher)
-		ret.nil? ? asset_path("placer.png") : ret
+		#ret.nil? ? asset_path("placer.png") : ret
+		ret.nil? ? asset_path("face30.png") : ret
 	end
 
 	def binder_contentview(binder)

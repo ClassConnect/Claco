@@ -71,6 +71,7 @@
 	# 	expire_fragment(g[:log].id.to_s) 
 	# 	Rails.cache.delete(g[:log].id.to_s)
 	# end
+	#debugger
 	%>
 
 	<% cache("#{g[:log].id}", :expires_in => 15.minutes) do %>

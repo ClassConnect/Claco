@@ -790,8 +790,6 @@ class Teacher
 
 	after_create do
 
-		self.info = Info.new
-
 		if self.code.length == 24
 
 			inviter = Teacher.find(self.code)

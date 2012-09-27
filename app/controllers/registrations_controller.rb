@@ -31,6 +31,8 @@ class RegistrationsController < Devise::RegistrationsController
     resource.code = params[:teacher][:code]
     resource.registered_at = Time.now.to_i
     resource.registered_ip = request.ip
+
+    resource.info = Info.new(grades: params[:info][:grades].strip.split(/\s*,\s*/), subjects: params[:info][:subjects].strip.split(/\s*,\s*/))
     
     if (!Teacher.where(:_id => params[:teacher][:code]).first.nil? || Ns.where(:code => params[:teacher][:code]).first.active) && resource.save
 

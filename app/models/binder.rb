@@ -1533,7 +1533,7 @@ class Version
 
 	after_save do
 
-		debugger
+		#debugger
 
 		keys = Rails.cache.read(self.binder.id.to_s)
 

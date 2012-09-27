@@ -91,13 +91,13 @@ AVATAR_MDIM = 48
 AVATAR_SDIM = 30
 
 # Feed
-MAIN_FEED_LENGTH = 30
-SUBSC_FEED_LENGTH = 30
-PERSONAL_FEED_LENGTH = 30
+MAIN_FEED_LENGTH = 50
+SUBSC_FEED_LENGTH = 50
+PERSONAL_FEED_LENGTH = 50
 
-MAIN_FEED_STORAGE = 50
-SUBSC_FEED_STORAGE = 50
-PERSONAL_FEED_STORAGE = 50
+# MAIN_FEED_STORAGE = 50
+# SUBSC_FEED_STORAGE = 50
+# PERSONAL_FEED_STORAGE = 50
 
 FEED_METHOD_WHITELIST = %w[createfile createcontent update forkitem favorite setpub sub unsub]
 FEED_DISPLAY_BLACKLIST = %w[unsub]
@@ -106,9 +106,9 @@ FEED_ANNIHILATION_PAIRS = { 'sub'=>'unsub', 'unsub'=>'sub', 'add'=>'confremove',
 
 FEED_COLLAPSE_TIME = 30.minutes.to_i
 
-Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env = "development"
+Zencoder.api_key = "1cf703e610abc35110dfc7e9962d53e0" if Rails.env == "development"
 
-Zencoder.api_key = ENV['ZENCODER_API_KEY'] if Rails.env = "production"
+Zencoder.api_key = ENV['ZENCODER_API_KEY'] if Rails.env == "production"
 
 Twitter.configure do |config|
   config.consumer_key = 'RAlHtL8ZSNBg16RaYiDBQ'

@@ -145,8 +145,7 @@ class HomeController < ApplicationController
 							end
 						end
 					end
-
-					break if @subsfeed.size == SUBSC_FEED_LENGTH
+					break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 				end
 			end
 		end
@@ -160,6 +159,8 @@ class HomeController < ApplicationController
 	end
 
 	def educators
+
+		@title = "Educators you may know"
 
 		@crb = rand(2..50)
 

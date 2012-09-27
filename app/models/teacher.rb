@@ -627,7 +627,7 @@ class Teacher
 					'502cab3378de86000200006d'] + recs).flatten.uniq-subs
 		end
 
-		recs
+		recs[0..40]
 
 		
 
@@ -694,14 +694,6 @@ class Teacher
 
 			teacher.omnihash[auth.provider]["fids"] = fids
 
-			Teacher.where(:'omnihash.twitter.uid'.in => fids).each do |fteacher|
-
-				teacher.relationship_by_teacher_id(fteacher.id).subscribe
-
-				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
-
-			end
-
 			auth.extra.delete("access_token")
 			teacher.omnihash[auth.provider]["data"] = auth
 
@@ -713,14 +705,6 @@ class Teacher
 			fids = JSON.parse(RestClient.get("https://graph.facebook.com/#{teacher.omnihash["facebook"]["data"]["uid"]}/friends?access_token=#{teacher.omnihash["facebook"]["data"]["credentials"]["token"]}"))["data"].collect{|f| f["id"]}
 
 			teacher.omnihash[auth.provider]["fids"] = fids
-
-			Teacher.where(:'omnihash.facebook.uid'.in => fids).each do |fteacher|
-
-				teacher.relationship_by_teacher_id(fteacher.id).subscribe
-
-				Teacher.delay(:queue => "email").newsub_email(teacher.id.to_s, fteacher.id.to_s)
-
-			end
 
 		end
 		teacher
@@ -806,15 +790,15 @@ class Teacher
 
 	after_create do
 
-		self.info = Info.new
-
 		if self.code.length == 24
 
 			inviter = Teacher.find(self.code)
 
 		elsif self.code.length == 32
 
-			inviter = Teacher.find(Invitation.where(:code => self.code).first.from)
+			invitation = Invitation.where(:code => self.code).first
+
+			inviter = invitation.from == "0" ? nil : Teacher.find(invitation.from)
 
 		end
 

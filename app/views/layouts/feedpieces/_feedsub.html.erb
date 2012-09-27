@@ -1,15 +1,5 @@
 <% if !@f[:array] %>
 
-	<% 
-	# if !Rails.cache.read(@f[:log].id.to_s).nil?
-	# 	expire_fragment(@f[:log].id.to_s) 
-	# 	Rails.cache.delete(@f[:log].id.to_s)
-	# end
-	%>
-
-	<% expire_fragment(@f[:log].id.to_s) if Rails.cache.read(@f[:log].id.to_s) 
-	%>
-
 	<% cache("#{@f[:log].id}", :expires_in => 15.minutes) do %>
 
 	<a href="<%= "/#{@subscribee.username}" %>" class="conlink">
@@ -64,16 +54,6 @@
 <% else %>
 
 	<% @f[:array].each do |g| %>
-
-		<% 
-		# if !Rails.cache.read(g[:log].id.to_s).nil? 
-		# 	expire_fragment(g[:log].id.to_s) 
-		# 	Rails.cache.delete(g[:log].id.to_s)
-		# end
-		%>
-
-		<% expire_fragment(g[:log].id.to_s) if Rails.cache.read(g[:log].id.to_s) 
-		%>
 
 		<% cache("#{g[:log].id}", :expires_in => 15.minutes) do %>
 

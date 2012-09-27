@@ -174,6 +174,8 @@ class TeachersController < ApplicationController
 						# there is a similar event, combine in feed array
 						else	
 
+							expire_fragment(@f[:log].id.to_s) if Rails.cache.read(@f[:log].id.to_s) 
+
 							if (f[:model].to_s=='binders' && Binder.thumbready?(f[:model])) ||
 									# (f[:model].thumbimgids[0].nil? || 
 									# f[:model].thumbimgids[0].empty?)) || 

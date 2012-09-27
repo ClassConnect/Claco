@@ -121,6 +121,8 @@ class HomeController < ApplicationController
 								# there is a similar event, combine in feed array
 								else	
 
+									expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
+
 									# insert into array dependent on whether or not a thumbnail exists
 									if (f[:log].model.to_s=='binders' && 
 											(f[:model].thumbimgids[0].nil? || 

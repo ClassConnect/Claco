@@ -619,12 +619,14 @@ class Teacher
 		recs = recs.flatten.uniq - subs
 
 		if recs.size < 5
-			recs = (['503bfe25fafac30002000011',
-					'502d3b822fc6100002000012',
-					'502d3edd2fc61000020000bf',
-					'5049718bf5d9ab00020000a7',
-					'505ce7fae274d70002000019',
-					'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+			if Rails.env.production?
+				recs = (['503bfe25fafac30002000011',
+						'502d3b822fc6100002000012',
+						'502d3edd2fc61000020000bf',
+						'5049718bf5d9ab00020000a7',
+						'505ce7fae274d70002000019',
+						'502cab3378de86000200006d'] + recs).flatten.uniq-subs
+			end
 		end
 
 		recs[0..40]

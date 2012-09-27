@@ -19,13 +19,16 @@
 
 
 .labeler {
-  width:110px;
+  width:85px;
   color:#666;
   text-align: right;
   padding-right:5px;
   padding-bottom:12px;
 }
 
+td>input {
+  width: auto;
+}
 
 .errornote {
   font-size:12px;

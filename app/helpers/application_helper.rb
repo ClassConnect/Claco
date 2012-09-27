@@ -1,9 +1,14 @@
 module ApplicationHelper
 
-
 	def map_to_model(modelid,cachekey)
 
+		#debugger
+
 		keys = Rails.cache.read(modelid.to_s)
+
+		#return if keys.nil?
+
+		#debugger
 
 		if keys.nil?
 			Rails.cache.write(modelid.to_s,[cachekey])
@@ -11,28 +16,32 @@ module ApplicationHelper
 			keys << cachekey.to_s
 			Rails.cache.write(modelid.to_s,keys)
 		end
+		
+		#debugger
+
+		#test = 1
 
 	end
 
 	def teacher_thumb_lg(teacher)
 		#debugger
 		ret = Teacher.thumb_lg(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-170.png") : ret
+		ret.empty? ? asset_path("profile/face-170.png") : ret
 	end
 
 	def teacher_thumb_mg(teacher)
 		ret = Teacher.thumb_mg(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-122.png") : ret
+		ret.empty? ? asset_path("profile/face-122.png") : ret
 	end
 
 	def teacher_thumb_md(teacher)
 		ret = Teacher.thumb_md(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-48.png") : ret
+		ret.empty? ? asset_path("profile/face-48.png") : ret
 	end
 
 	def teacher_thumb_sm(teacher)
 		ret = Teacher.thumb_sm(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-30.png") : ret
+		ret.empty? ? asset_path("profile/face-30.png") : return
 	end
 
 	def binder_contentview(binder)

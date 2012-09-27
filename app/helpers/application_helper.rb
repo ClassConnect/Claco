@@ -41,7 +41,7 @@ module ApplicationHelper
 
 	def teacher_thumb_sm(teacher)
 		ret = Teacher.thumb_sm(teacher).to_s
-		ret.empty? ? asset_path("profile/face-30.png") : return
+		ret.empty? ? asset_path("profile/face-30.png") : ret
 	end
 
 	def binder_contentview(binder)

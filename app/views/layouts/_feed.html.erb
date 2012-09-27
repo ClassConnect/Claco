@@ -26,7 +26,7 @@
 
 				<div class="feedcontent">
 
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/createfileheader' %>
 
@@ -40,7 +40,7 @@
 
 				<div class="feedcontent">
 
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/createcontentheader' %>
 
@@ -54,7 +54,7 @@
 
 				<div class="feedcontent">
 					
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/updateheader' %>
 
@@ -68,7 +68,7 @@
 
 				<div class="feedcontent">
 
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/forkitemheader' %>
 
@@ -82,7 +82,7 @@
 
 				<div class="feedcontent">
 
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/favoriteheader' %>
 
@@ -96,7 +96,7 @@
 
 				<div class="feedcontent">
 
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/setpubheader' %>
 
@@ -114,7 +114,7 @@
 
 				<div class="feedcontent">
 
-					<% cache("#{current_teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
+					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/subheader' %>
 

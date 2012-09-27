@@ -5,22 +5,22 @@ module ApplicationHelper
 	def teacher_thumb_lg(teacher)
 		#debugger
 		ret = Teacher.thumb_lg(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-170.png") : ret
+		ret.empty? ? asset_path("profile/face-170.png") : ret
 	end
 
 	def teacher_thumb_mg(teacher)
 		ret = Teacher.thumb_mg(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-122.png") : ret
+		ret.empty? ? asset_path("profile/face-122.png") : ret
 	end
 
 	def teacher_thumb_md(teacher)
 		ret = Teacher.thumb_md(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-48.png") : ret
+		ret.empty? ? asset_path("profile/face-48.png") : ret
 	end
 
 	def teacher_thumb_sm(teacher)
 		ret = Teacher.thumb_sm(teacher).to_s
-		ret.empty? ? asset_path("profile/face-inverse-30.png") : ret
+		ret.empty? ? asset_path("profile/face-30.png") : ret
 	end
 
 	def binder_contentview(binder)

@@ -194,6 +194,7 @@ class Teacher
 		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
 				!teacher.info.avatar.nil? &&
+				!teacher.info.avatar.url.to_s.empty? &&
 				!teacher.info.avatar.thumb_sm.nil?
 
 	end

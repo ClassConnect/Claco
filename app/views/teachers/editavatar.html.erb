@@ -1,0 +1,10 @@
+<%= direct_upload_form_for @uploader do |f| %>
+	<%= image_tag(current_teacher.info.avatar.url) %>
+	<%= f.file_field :file %>
+	<br />
+
+	<div class="buttonbar">
+		<button class="btn btn-primary" id="checkout" type="submit">Upload this file</button>
+		<button class="btn" id="rmclose" type="reset" onClick="closefBox()">Cancel</button>
+	</div>
+<% end %>

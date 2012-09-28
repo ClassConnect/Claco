@@ -55,7 +55,7 @@
 
 	  		<% else %>
 	       
-	      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= imgarr[0].to_s %>');"></div>
+	      	<div class="single-hold" style="margin-top:-1px;background-image:url('<%= binder_thumb_lg(imgarr[0]) %>');"></div>
 			<div class="contype"><%= image_tag "binders/types/folder.png", :style => "width:24px" %></div>
 
 	    	<% end %>

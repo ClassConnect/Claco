@@ -230,6 +230,40 @@ class TeachersController < ApplicationController
 					params)
 	end
 
+	def editavatar
+
+		data = Digest::MD5.hexdigest(current_teacher.info.id.to_s + Time.now.to_f.to_s)
+
+		token = Digest::MD5.hexdigest(data + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
+
+		current_teacher.info.size = 0
+
+		@uploader = current_teacher.info.avatar
+
+		@uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}/editavatar/#{data}/#{token}"
+
+		render "editavatar", :layout => false
+
+	end
+
+	def createavatar
+
+		if params[:token] == Digest::MD5.hexdigest(params[:data] + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
+
+			current_teacher.info.data = params[:key]
+
+			# current_teacher.info.avatar.recreate_versions!
+
+			current_teacher.info.size = 0#current_teacher.info.avatar.size
+
+			current_teacher.save
+
+		end
+
+		redirect_to "/editavatar"
+
+	end
+
 	#PUT /updateinfo
 	def updateinfo
 

@@ -194,34 +194,34 @@ class Teacher
 		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
 				!teacher.info.avatar.nil? &&
-				!teacher.info.avatar.thumb_sm.nil?
+				!teacher.info.avatar.url(:thumb_sm).empty?
 
 	end
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_lg) : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_mg).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_md).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_sm).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end

@@ -140,9 +140,9 @@ $('#myTab a').click(function (e) {
 			<div>
 		
 
-			<input type="text" id="city" placeholder="Enter your city name" <%= 'style=display:none' if !(current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %> />
+			<input type="text" id="city" placeholder="Enter your city name" <%= 'style="display:none"'.html_safe if !(current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %> />
 
-			<div class="fulldiv" <%= 'style=display:none' if (current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %>>
+			<div class="fulldiv" <%= 'style="display:none"'.html_safe if (current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %>>
 				<a href="#" onclick="$(this).parent().hide(); $('#city').val('').show().focus(); return false" class="fullnameswap">Change location</a><br />
 
 				<%= i.text_field "fulllocation", :id => "fulllocation", :value => current_teacher.info.fulllocation, :readonly => true %>

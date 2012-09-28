@@ -633,7 +633,7 @@ class BindersController < ApplicationController
 
 		errors = []
 
-		if Binder.where("version.data" => params[:data]).count == 0
+		if Binder.where("versions.data" => params[:data]).count == 0
 
 			#Validate the request
 			if params[:token] == Digest::MD5.hexdigest(params[:data] + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")

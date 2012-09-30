@@ -10,6 +10,7 @@ class Teacher
 		attr_accessor :original_filename
 
 		def set_filename(name = "")
+			debugger
 			@original_filename = name
 			return self
 		end
@@ -263,6 +264,8 @@ class Teacher
 			stathash['avatar_thumb_mg']['generated'] = true
 			stathash['avatar_thumb_md']['generated'] = true
 			stathash['avatar_thumb_sm']['generated'] = true
+
+			debugger
 
 			teacher.info.update_attributes(	:avatarstatus => stathash,
 											:avatar_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(AVATAR_LDIM, AVATAR_LDIM, Magick::CenterGravity).to_blob).set_filename(LG_AVATAR_FILENAME),
@@ -694,6 +697,24 @@ class Teacher
 			# NASA   : 502cab3378de86000200006d
 
 			# (['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
+
+			#debugger
+
+			#TODO: migrate this into the algorithm
+			if !self.code.nil? && !self.code.empty? && self.code.to_s!="0"
+				t_id = nil
+				case self.code.to_s.length.to_i
+				when 24
+				#if self.code.to_s.length==24
+					t_id = self.code.to_s
+				#else
+				when 32
+					invitation = Invitation.where(:code => self.code.to_s).first
+					t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+				end
+			end
+
+			recs = [t_id] + recs if !t_id.nil? && !t_id.empty?
 
 			recs = recs.flatten.uniq - subs
 

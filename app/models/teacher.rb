@@ -1,10 +1,19 @@
 class Teacher
 	include Mongoid::Document
+	include Mongoid::Spacial::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
 	include Sprockets::Helpers::RailsHelper
 	include Sprockets::Helpers::IsolatedHelper
-	include Mongoid::Spacial::Document
+
+	class FilelessIO < StringIO
+		attr_accessor :original_filename
+
+		def set_filename(name = "")
+			@original_filename = name
+			return self
+		end
+	end
 
 	# Include default devise modules. Others available are:
 	# :token_authenticatable, :confirmable,
@@ -194,35 +203,76 @@ class Teacher
 		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
 				!teacher.info.avatar.nil? &&
-				!teacher.info.avatar.url(:thumb_sm).empty?
+				#!teacher.info.avatar.url(:thumb_sm).to_s.empty?
+				!teacher.info.avatar_thumb_sm.url.to_s.empty?
 
 	end
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_lg) : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_lg.url.to_s : nil #teacher.info.avatar.url(:thumb_lg) : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_mg).to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_mg.url.to_s : nil #teacher.info.avatar.url(:thumb_mg).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_md).to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_md.url.to_s : nil #teacher.info.avatar.url(:thumb_md).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.url(:thumb_sm).to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_sm.url.to_s : nil #teacher.info.avatar.url(:thumb_sm).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.gen_thumbnails(teacher)
+
+			# create versions of avatar
+			include Magick
+
+			debugger
+
+			origimg = Magick::ImageList.new
+
+			# retrieve fullsize image from S3 store, read into an ImageList object
+			open(teacher.info.avatar.url.to_s) do |f|
+				origimg.from_blob(f.read)
+			end
+
+	        origimg.format = BLOB_FILETYPE
+
+			if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
+				origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			end
+
+			GC.start
+
+			stathash = teacher.info.avatarstatus
+			stathash['avatar_thumb_lg']['generated'] = true
+			stathash['avatar_thumb_mg']['generated'] = true
+			stathash['avatar_thumb_md']['generated'] = true
+			stathash['avatar_thumb_sm']['generated'] = true
+
+			teacher.info.update_attributes(	:avatarstatus => stathash,
+											:avatar_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(AVATAR_LDIM, AVATAR_LDIM, Magick::CenterGravity).to_blob).set_filename(LG_AVATAR_FILENAME),
+											:avatar_thumb_mg => FilelessIO.new(origimg.resize_to_fill!(AVATAR_MGDIM,AVATAR_MGDIM,Magick::CenterGravity).to_blob).set_filename(MG_AVATAR_FILENAME),
+											:avatar_thumb_md => FilelessIO.new(origimg.resize_to_fill!(AVATAR_MDIM, AVATAR_MDIM, Magick::CenterGravity).to_blob).set_filename(MD_AVATAR_FILENAME),
+											:avatar_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(AVATAR_SDIM, AVATAR_SDIM, Magick::CenterGravity).to_blob).set_filename(SM_AVATAR_FILENAME))
+
+			origimg.destroy!
+
+			GC.start
 
 	end
 
@@ -844,41 +894,6 @@ class Tag
 
 	embedded_in :teacher
 
-	# Class Methods
-
-	# updates all data within the Tag class
-	# def update_tag_fields(params)
-
-	# 	# array to be eventually passed into the :grade_levels field
-	# 	#true_checkbox_array = Array.new(20, false)
-	# 	grade_levels_checkbox_array = Array.new
-	# 	subjects_checkbox_array = Array.new
-	# 	#zero_count = 0
-
-	# 	# update grade_levels array
-	# 	(1..(params[:tag][:grade_levels].length-1)).each do |i|
-	# 		#if params[:tag][:grade_levels][i] == "0"
-	# 		#	zero_count += 1
-	# 		#else
-	# 		#	true_checkbox_array[zero_count] = true
-	# 		#end
-	# 		grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_levels][i] != "0"
-	# 	end
-
-	# 	# update subjects array
-	# 	(1..(params[:tag][:subjects].length-1)).each do |i|
-	# 		subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
-	# 	end
-
-
-	# 	self.update_attributes(	:grade_levels => grade_levels_checkbox_array,
-	# 							#:subjects => params[:tag][:subjects].downcase.split.uniq,
-	# 							:subjects => subjects_checkbox_array,
-	# 							:standards => params[:tag][:standards].downcase.split.uniq,
-	# 							:other => params[:tag][:other].downcase.split.uniq)
-	# 	#self.save
-	# end
-
 end
 
 class Relationship
@@ -970,7 +985,16 @@ class Info
 
 	#validates_with InfoValidator
 
+	field :avatarstatus, :type => Hash, :default => { 	:avatar_thumb_lg => { :generated => false },
+													 	:avatar_thumb_mg => { :generated => false },
+													 	:avatar_thumb_md => { :generated => false },
+														:avatar_thumb_sm => { :generated => false } }
+
 	mount_uploader :avatar, AvatarUploader
+	mount_uploader :avatar_thumb_lg, AvatarUploader
+	mount_uploader :avatar_thumb_mg, AvatarUploader
+	mount_uploader :avatar_thumb_md, AvatarUploader
+	mount_uploader :avatar_thumb_sm, AvatarUploader
 
 	field :thumbnails, :type => Array, :default => [nil,nil,nil,nil]
 

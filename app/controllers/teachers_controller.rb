@@ -258,6 +258,8 @@ class TeachersController < ApplicationController
 
 			current_teacher.save
 
+			Teacher.gen_thumbnails(current_teacher)
+
 		end
 
 		redirect_to "/editavatar"
@@ -281,6 +283,8 @@ class TeachersController < ApplicationController
 		#debugger
 
 		current_teacher.update_attributes(params[:teacher])
+
+		debugger
 
 		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],
 												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,

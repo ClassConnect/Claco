@@ -172,7 +172,7 @@ class HomeController < ApplicationController
 
 		current_teacher.recommends.each do |f|
 			if !Rails.cache.read("#{f.to_s}educobj").nil?
-				debugger
+				#debugger
 				expire_fragment("#{f.to_s}educobj") 
 				Rails.cache.delete("#{f.to_s}educobj")
 			end

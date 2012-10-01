@@ -37,7 +37,7 @@ class Applicant
 
 	def self.seedstatus
 
-		Applicant.each do |app|
+		Applicant.all.each do |app|
 
 			inv = Invitation.where(:to => app.email).first
 

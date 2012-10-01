@@ -1,7 +1,8 @@
 class ApplicantsController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:apply, :create]
-
+	before_filter :authenticate_admin!, :only => [:show, :approve, :deny]
 	def apply
+
+		@title = "Request an invite"
 
 		@app = Applicant.new
 
@@ -15,8 +16,26 @@ class ApplicantsController < ApplicationController
 
 		@app.update_attributes(:timestamp => Time.now.to_i)
 
-		render "apply" and return if !@app.errors.empty?
+		render :apply and return if !@app.errors.empty?
 
+	end
+
+	def approve
+
+		app = Applicant.find(params[:id])
+
+		app.approve
+
+		redirect_to apps_path
+	end
+
+	def deny
+
+		app = Applicant.find(params[:id])
+
+		app.deny
+
+		redirect_to apps_path
 	end
 
 	def show

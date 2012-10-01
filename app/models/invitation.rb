@@ -61,6 +61,10 @@ class Invitation
 			Setting.f("sys_inv_list").v = x
 		end
 
+		applicant = Applicant.where(:email => invitation.to).first
+
+		applicant.set(:status, 1) unless applicant.nil?
+
 		UserMailer.new_invite(invitation).deliver
 
 	end

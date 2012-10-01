@@ -258,7 +258,7 @@ class TeachersController < ApplicationController
 
 			current_teacher.save
 
-			Teacher.gen_thumbnails(current_teacher)
+			Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
 
 		end
 

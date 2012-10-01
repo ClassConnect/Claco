@@ -237,12 +237,14 @@ class Teacher
 
 	end
 
-	def self.gen_thumbnails(teacher)
+	def self.gen_thumbnails(teacherid)
+
+			teacher = Teacher.find(teacherid.to_s)
 
 			# create versions of avatar
-			include Magick
+			#include Magick
 
-			debugger
+			#debugger
 
 			origimg = Magick::ImageList.new
 
@@ -265,7 +267,7 @@ class Teacher
 			stathash['avatar_thumb_md']['generated'] = true
 			stathash['avatar_thumb_sm']['generated'] = true
 
-			debugger
+			#debugger
 
 			teacher.info.update_attributes(	:avatarstatus => stathash,
 											:avatar_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(AVATAR_LDIM, AVATAR_LDIM, Magick::CenterGravity).to_blob).set_filename(LG_AVATAR_FILENAME),
@@ -397,44 +399,46 @@ class Teacher
 		ret
 	end
 
-	# convert these to ElasticSearch queries!
+	#TODO: convert these to ElasticSearch queries!
 	def self.vectors (id, degree = 1, vec = {})
 
 		if degree>0
 			id = id.to_s
 			ids = []
 			teacher = Teacher.find(id.to_s)
-			# if !teacher.code.nil? && !teacher.code.empty? #&& teacher.code.to_s!="0"
-			# 	t_id = nil
-			# 	if teacher.code.to_s.length==24
-			# 		t_id = teacher.code.to_s
-			# 	else
-			# 		invitation = Invitation.where(:code => teacher.code.to_s).first
-			# 		t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
-			# 	end
-			# 	if !vec[id]
-			# 		vec[id] = { t_id => 0x40 }
-			# 		ids << t_id
-			# 	elsif !vec[id][t_id]
-			# 		vec[id][t_id] = 0x40
-			# 		ids << t_id
-			# 	else
-			# 		vec[id][t_id] |= 0x40
-			# 	end
-			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-			# 	ids = []
-			# end
+			if !teacher.code.nil? && !teacher.code.empty? && teacher.code.to_s!="0"
+				t_id = nil
+				if teacher.code.to_s.length==24
+					t_id = teacher.code.to_s
+				else
+					invitation = Invitation.where(:code => teacher.code.to_s).first
+					t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+				end
+				if !t_id.nil? && !t_id.empty?
+					if !vec[id]
+						vec[id] = { t_id => ~0x40 }
+						ids << t_id
+					elsif !vec[id][t_id]
+						vec[id][t_id] = ~0x40
+						ids << t_id
+					else
+						vec[id][t_id] &= ~0x40
+					end
+					ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+					ids = []
+				end
+			end
 			if !teacher.info.nil? && !teacher.info.grades.nil? && !teacher.info.grades.empty?
 				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x20 }
+						vec[id] = { f.id.to_s => ~0x20 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x20
+						vec[id][f.id.to_s] = ~0x20
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x20
+						vec[id][f.id.to_s] &= ~0x20
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -444,13 +448,13 @@ class Teacher
 				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x10 }
+						vec[id] = { f.id.to_s => ~0x10 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x10
+						vec[id][f.id.to_s] = ~0x10
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x10
+						vec[id][f.id.to_s] |= ~0x10
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -460,13 +464,13 @@ class Teacher
 			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 				next if f.id.to_s==id
 				if !vec[id]
-					vec[id] = { f.id.to_s => 0x8 }
+					vec[id] = { f.id.to_s => ~0x8 }
 					ids << f.id.to_s
 				elsif !vec[id][f.id.to_s]
-					vec[id][f.id.to_s] = 0x8
+					vec[id][f.id.to_s] = ~0x8
 					ids << f.id.to_s
 				else
-					vec[id][f.id.to_s] |= 0x8
+					vec[id][f.id.to_s] &= ~0x8
 				end
 			end
 			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -475,13 +479,13 @@ class Teacher
 				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x4 }
+						vec[id] = { f.id.to_s => ~0x4 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x4
+						vec[id][f.id.to_s] = ~0x4
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x4
+						vec[id][f.id.to_s] &= ~0x4
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -491,13 +495,13 @@ class Teacher
 				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x2 }
+						vec[id] = { f.id.to_s => ~0x2 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x2
+						vec[id][f.id.to_s] = ~0x2
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x2
+						vec[id][f.id.to_s] &= ~0x2
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -507,13 +511,13 @@ class Teacher
 			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
 			# 		next if f.id.to_s==id
 			# 		if !vec[id]
-			# 			vec[id] = { f.id.to_s => 0x1 }
+			# 			vec[id] = { f.id.to_s => ~0x10 }
 			# 			ids << f.id.to_s
 			# 		elsif !vec[id][f.id.to_s]
-			# 			vec[id][f.id.to_s] = 0x1
+			# 			vec[id][f.id.to_s] = ~0x10
 			# 			ids << f.id.to_s
 			# 		else
-			# 			vec[id][f.id.to_s] |= 0x1
+			# 			vec[id][f.id.to_s] |= ~0x10
 			# 		end
 			# 	end
 			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -577,12 +581,12 @@ class Teacher
 
 		#if invert
 		#network_orig.each do |f|
-		network.each do |f|
-			f[1].each do |g|
-				network[f[0].to_s][g[0].to_s] = (128-g[1]).to_i
-				#g[1] = (16-g[1]).to_i
-			end
-		end
+		# network.each do |f|
+		# 	f[1].each do |g|
+		# 		network[f[0].to_s][g[0].to_s] = (128-g[1]).to_i
+		# 		#g[1] = (16-g[1]).to_i
+		# 	end
+		# end
 		#end
 
 		pathhash = {}
@@ -705,16 +709,16 @@ class Teacher
 				t_id = nil
 				case self.code.to_s.length.to_i
 				when 24
-				#if self.code.to_s.length==24
 					t_id = self.code.to_s
-				#else
 				when 32
 					invitation = Invitation.where(:code => self.code.to_s).first
 					t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
 				end
 			end
 
-			recs = [t_id] + recs if !t_id.nil? && !t_id.empty?
+			#debugger
+
+			recs = (t_id.to_a + recs) if (!t_id.nil? && !t_id.empty?)
 
 			recs = recs.flatten.uniq - subs
 
@@ -730,6 +734,8 @@ class Teacher
 			end
 
 			Rails.cache.write("#{self.id.to_s}recs",recs[0..60])
+
+			#debugger
 
 			return recs[0..60]
 
@@ -1012,10 +1018,10 @@ class Info
 														:avatar_thumb_sm => { :generated => false } }
 
 	mount_uploader :avatar, AvatarUploader
-	mount_uploader :avatar_thumb_lg, AvatarUploader
-	mount_uploader :avatar_thumb_mg, AvatarUploader
-	mount_uploader :avatar_thumb_md, AvatarUploader
-	mount_uploader :avatar_thumb_sm, AvatarUploader
+	mount_uploader :avatar_thumb_lg, AvatarthumbUploader
+	mount_uploader :avatar_thumb_mg, AvatarthumbUploader
+	mount_uploader :avatar_thumb_md, AvatarthumbUploader
+	mount_uploader :avatar_thumb_sm, AvatarthumbUploader
 
 	field :thumbnails, :type => Array, :default => [nil,nil,nil,nil]
 

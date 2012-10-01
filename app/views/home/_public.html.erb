@@ -99,7 +99,7 @@
 
 					<div class="conr">
 						<center>
-							<img class="pcht" src="<%= get_binder_image(Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).first) %>" />
+							<img class="pcht" src="<%= get_binder_image(Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).last) %>" />
 							<div class="tname"></div>
 						</center>
 					</div>

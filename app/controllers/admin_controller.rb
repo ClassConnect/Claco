@@ -1,11 +1,11 @@
 class AdminController < ApplicationController
-	before_filter :authenticate_admin
+	before_filter :authenticate_admin!
 
 	def sendinvite
 
-		Invitation.new(	:from => "0",
-						:to => params[:to],
-						:submitted => Time.now.to_i).save
+		Invitation.new(	:from		=> "0",
+						:to			=> params[:to],
+						:submitted	=> Time.now.to_i).save
 
 		redirect_to "/admin"
 
@@ -85,14 +85,6 @@ class AdminController < ApplicationController
 		expire_fragment('publichome')
 
 		redirect_to "/admin"
-
-	end
-
-protected
-
-	def authenticate_admin
-
-		render "public/404.html", :status => 404 unless signed_in? && current_teacher.admin
 
 	end
 

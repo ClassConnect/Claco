@@ -2,11 +2,11 @@ class PioneersController < ApplicationController
 
 	def index
 
-		@title = "Pioneers"
-
-		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index)
+		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).reverse
 
 		@current = @pibinders.first
+
+		@title = "Pioneers - #{@current.title}"
 
 		render "pioneers"
 
@@ -14,11 +14,11 @@ class PioneersController < ApplicationController
 
 	def show
 
-		@title = "Pioneers"
-
-		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index)
-
 		@current = Binder.find(params[:id])
+
+		@title = "Pioneers - #{@current.title}"
+
+		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).reverse
 
 		unless pioneer_routing_ok?(@current)
 

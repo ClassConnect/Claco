@@ -490,7 +490,7 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s)
+		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s).sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1}
 
 		render "subscribers", :layout => false
 
@@ -500,7 +500,7 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])} 
+		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])}.sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1}
 
 		render "subscriptions", :layout => false
 

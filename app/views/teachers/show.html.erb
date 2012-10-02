@@ -122,6 +122,7 @@
       <h3>
         <strong><%= @subscriptions.count %></strong>
         Subscriptions 
+        <button class="btn btn-mini pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscriptions" type="button">View all</button>
       </h3>
       <ul class="profile-avatars">
         <% 
@@ -131,7 +132,7 @@
             i += 1 %>
               <li>
                 <a href="/<%= sub.username %>">
-                  <img src="<%= teacher_thumb_md(sub) %>">
+                  <img src="<%= teacher_thumb_md(sub) %>" class="thumbster">
                 </a>
               </li>
             <%
@@ -145,6 +146,7 @@
       <h3>
         <strong><%= @subscribers.count %></strong>
         Subscribers 
+        <button class="btn btn-mini pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscribers" type="button">View all</button>
       </h3>
       <ul class="profile-avatars">
         <% 
@@ -154,7 +156,7 @@
             i += 1 %>
               <li>
                 <a href="/<%= sub.username %>">
-                  <img src="<%= teacher_thumb_md(sub) %>">
+                  <img src="<%= teacher_thumb_md(sub) %>" class="thumbster">
                 </a>
               </li>
             <%

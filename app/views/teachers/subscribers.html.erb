@@ -1,9 +1,17 @@
+<div class="headtitle">
+      Subscribers
+</div>
 <ul>
-<% @subscribers.each do |sub| %>
-<li>
-<div><%= image_tag(teacher_thumb_md(sub)) %></div>
-<div><%= link_to(sub.full_name, sub.username) %></div>
-<div><%= sub.info.bio %></div>
-</li>
-<% end %>
+    <% @subscribers.each do |sub| %>
+    <li>
+        <%= image_tag(teacher_thumb_md(sub), {:class => 'thumbster'}) %>
+        <h3><%= link_to(sub.full_name, sub.username) %></h3>
+        <% if !current_teacher.subscribed_to?(sub.id) %>
+            <button class="btn btn-mini subbtn pull-right" data-action="subscribe" data-url="<%= sub.username %>/subscribe" type="button">Subscribe</button>
+        <% else %>
+            <span class="pull-right">✓ Subscribed!</span>
+        <% end %>
+        <hr>
+    </li>
+    <% end %>
 </ul>

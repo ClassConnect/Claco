@@ -31,7 +31,34 @@ $(document).ready(function() {
 
 
 
-	$('#subbtn').click(function() {
+	 $(document).bind('reveal.facebox', function() {
+      $('button[data-action=subscribe]').click(function() {
+      // new subscription
+      $(this).after('<span class="pull-right">✓ Subscribed!</div>');
+
+
+      $.ajax({
+              url: $(this).attr("data-url"),
+              data: '',
+              type: 'put',
+              success: function(data) {
+                // if the data isn't success (aka "1")
+                if (data != '1') {
+                  alert(data);
+                }
+
+        }
+      });
+
+      $(this).remove();
+
+
+      return false;
+    });
+  });
+
+
+$('#subbtn').click(function() {
 		var subtype = ' ';
 		// new subscription
 		if ($(this).hasClass("btn-primary")) {
@@ -110,7 +137,10 @@ $(document).ready(function() {
 
   });
 
-
+  $('button[data-action=modal]').click(
+      function(){
+        jQuery.facebox({ajax: $(this).attr('data-url')});
+      });
 
 
 

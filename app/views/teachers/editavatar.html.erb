@@ -1,15 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Avatar</title>
+</head>
+</body>
 <%= direct_upload_form_for @uploader do |f| %>
-	<img src='<%= teacher_thumb_lg(current_teacher) %>' />
+<!-- 	<img src='<%= teacher_thumb_lg(current_teacher) %>' />
 	<img src='<%= teacher_thumb_mg(current_teacher) %>' />
 	<img src='<%= teacher_thumb_md(current_teacher) %>' />
 	<img src='<%= teacher_thumb_sm(current_teacher) %>' />
-	<br />
+	<br /> -->
+	<%= image_tag(teacher_thumb_lg(current_teacher)) %>
 	<%= f.file_field :file %>
-	<br />
+	<!-- <br /> -->
 	<div class="buttonbar">
 		<button class="btn btn-primary" id="checkout" type="submit">Upload this file</button>
-		<button class="btn" id="rmclose" type="reset" onClick="closefBox()">Cancel</button>
 	</div>
-	<br />
-	<%= image_tag(current_teacher.info.avatar.url) %>
+	<!-- <br /> -->
 <% end %>
+</body>
+</html>

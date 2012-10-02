@@ -127,6 +127,7 @@ class Binder
 		return 	!binder.nil? && 
 				!binder.current_version.nil? &&
 				!binder.current_version.imgfile.nil? &&
+				# these can be migrated to the imgstatus hash
 				!binder.current_version.img_thumb_lg.nil? &&
 				!binder.current_version.img_thumb_lg.url.nil? &&
 				#!binder.current_version.imgstatus.nil? &&

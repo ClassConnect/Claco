@@ -1,10 +1,15 @@
 <%= direct_upload_form_for @uploader do |f| %>
-	<%= image_tag(current_teacher.info.avatar.url) %>
+	<img src='<%= teacher_thumb_lg(current_teacher) %>' />
+	<img src='<%= teacher_thumb_mg(current_teacher) %>' />
+	<img src='<%= teacher_thumb_md(current_teacher) %>' />
+	<img src='<%= teacher_thumb_sm(current_teacher) %>' />
+	<br />
 	<%= f.file_field :file %>
 	<br />
-
 	<div class="buttonbar">
 		<button class="btn btn-primary" id="checkout" type="submit">Upload this file</button>
 		<button class="btn" id="rmclose" type="reset" onClick="closefBox()">Cancel</button>
 	</div>
+	<br />
+	<%= image_tag(current_teacher.info.avatar.url) %>
 <% end %>

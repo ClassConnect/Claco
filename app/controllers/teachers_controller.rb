@@ -258,6 +258,18 @@ class TeachersController < ApplicationController
 
 			current_teacher.save
 
+			stathash = current_teacher.info.avatarstatus
+			stathash['avatar_thumb_lg']['generated'] = false
+			stathash['avatar_thumb_mg']['generated'] = false
+			stathash['avatar_thumb_md']['generated'] = false
+			stathash['avatar_thumb_sm']['generated'] = false
+			stathash['avatar_thumb_lg']['scheduled'] = true
+			stathash['avatar_thumb_mg']['scheduled'] = true
+			stathash['avatar_thumb_md']['scheduled'] = true
+			stathash['avatar_thumb_sm']['scheduled'] = true
+
+			current_teacher.info.update_attributes(:avatarstatus => stathash)
+
 			Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
 
 		end
@@ -284,8 +296,6 @@ class TeachersController < ApplicationController
 
 		current_teacher.update_attributes(params[:teacher])
 
-		debugger
-
 		current_teacher.info.update_attributes(	:avatar			=> params[:info][:avatar],
 												:website		=> Addressable::URI.heuristic_parse(params[:info][:website]).to_s,
 												:grades			=> params[:grades].strip.split(/\s*,\s*/).uniq,
@@ -295,7 +305,11 @@ class TeachersController < ApplicationController
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",
 												:location		=> params[:lng].empty? || params[:lat].empty? ? nil : [params[:lng].to_f, params[:lat].to_f],
-												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size)
+												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size,
+												:avatarstatus 	=> {:avatar_thumb_lg => { :generated => false, :scheduled => false },
+													 				:avatar_thumb_mg => { :generated => false, :scheduled => false },
+													 				:avatar_thumb_md => { :generated => false, :scheduled => false },
+																	:avatar_thumb_sm => { :generated => false, :scheduled => false } })
 
 		#debugger
 

@@ -24,24 +24,60 @@ module ApplicationHelper
 	end
 
 	def teacher_thumb_lg(teacher)
-		#debugger
+		debugger
 		ret = Teacher.thumb_lg(teacher).to_s
-		ret.empty? ? asset_path("profile/face-170.png") : ret
+		if ret.empty?
+			# only display the generating image if the current teacher is viewing the thumb
+			if Teacher.thumbscheduled?(teacher,'avatar_thumb_lg') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+				asset_path("profile/gen-face-170.png")
+			else
+				asset_path("profile/face-170.png")
+			end
+		else
+			ret
+		end
 	end
 
 	def teacher_thumb_mg(teacher)
 		ret = Teacher.thumb_mg(teacher).to_s
-		ret.empty? ? asset_path("profile/face-122.png") : ret
+		if ret.empty?
+			# only display the generating image if the current teacher is viewing the thumb
+			#if Teacher.thumbscheduled?(teacher,'avatar_thumb_mg') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+			#	asset_path("profile/gen-face-122.png")
+			#else
+				asset_path("profile/face-122.png")
+			#end
+		else
+			ret
+		end
 	end
 
 	def teacher_thumb_md(teacher)
 		ret = Teacher.thumb_md(teacher).to_s
-		ret.empty? ? asset_path("profile/face-48.png") : ret
+		if ret.empty?
+			# only display the generating image if the current teacher is viewing the thumb
+			#if Teacher.thumbscheduled?(teacher,'avatar_thumb_md') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+			#	asset_path("profile/gen-face-48.png")
+			#else
+				asset_path("profile/face-48.png")
+			#end
+		else
+			ret
+		end		
 	end
 
 	def teacher_thumb_sm(teacher)
 		ret = Teacher.thumb_sm(teacher).to_s
-		ret.empty? ? asset_path("profile/face-30.png") : ret
+		if ret.empty?
+			# only display the generating image if the current teacher is viewing the thumb
+			#if Teacher.thumbscheduled?(teacher,'avatar_thumb_sm') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+			#	asset_path("profile/gen-face-30.png")
+			#else
+				asset_path("profile/face-30.png")
+			#end
+		else
+			ret
+		end		
 	end
 
 	def binder_contentview(binder)

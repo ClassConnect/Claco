@@ -10,7 +10,6 @@ class Teacher
 		attr_accessor :original_filename
 
 		def set_filename(name = "")
-			debugger
 			@original_filename = name
 			return self
 		end
@@ -204,8 +203,15 @@ class Teacher
 		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
 				!teacher.info.avatar.nil? &&
+				teacher.info.avatarstatus['avatar_thumb_lg']['generated']
 				#!teacher.info.avatar.url(:thumb_sm).to_s.empty?
-				!teacher.info.avatar_thumb_sm.url.to_s.empty?
+				#!teacher.info.avatar_thumb_sm.url.to_s.empty?
+
+	end
+
+	def self.thumbscheduled? (teacher,thumb)
+
+		return teacher.info.avatarstatus[thumb]['scheduled']
 
 	end
 
@@ -1012,10 +1018,10 @@ class Info
 
 	#validates_with InfoValidator
 
-	field :avatarstatus, :type => Hash, :default => { 	:avatar_thumb_lg => { :generated => false },
-													 	:avatar_thumb_mg => { :generated => false },
-													 	:avatar_thumb_md => { :generated => false },
-														:avatar_thumb_sm => { :generated => false } }
+	field :avatarstatus, :type => Hash, :default => { 	:avatar_thumb_lg => { :generated => false, :scheduled => false },
+													 	:avatar_thumb_mg => { :generated => false, :scheduled => false },
+													 	:avatar_thumb_md => { :generated => false, :scheduled => false },
+														:avatar_thumb_sm => { :generated => false, :scheduled => false } }
 
 	mount_uploader :avatar, AvatarUploader
 	mount_uploader :avatar_thumb_lg, AvatarthumbUploader

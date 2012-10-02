@@ -137,14 +137,14 @@ jqueryui.js: jqueryui-c04b8ed279f78b6387c8d090964d2e16.js
 media_server_api.js: media_server_api-3af39f1da6f167c2cbf453ed74daff3d.js
 messages/show.js: messages/show-af1bfe6546d966549eb5e11fd056910c.js
 omniauth_callbacks.js: omniauth_callbacks-3af39f1da6f167c2cbf453ed74daff3d.js
-profile/main.js: profile/main-546e343160755cc6af23c17839bdd131.js
-search/main.js: search/main-6af1cecf4e1c97a5a736d69ebae18231.js
+profile/main.js: profile/main-bd53f71a48b19aff790cdd5fd44006ba.js
+search/main.js: search/main-4e16709cce13c68fd83fd5fe3fce9a18.js
 tabs.js: tabs-c33b80148176645ee1b9efdc16eae810.js
 tooltip.js: tooltip-c1f31f50d05852374b1ca905917af3e6.js
 wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
 wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
-application.css: application-ac603a4f0aa24bad599d1870d58ab7df.css
+application.css: application-63ca2e5350d3168f27e20286eb888daa.css
 binders.css: binders-7270767b2a9e9fff880aa5de378ca791.css
 binders/folder.css: binders/folder-40f61fb57e03f42611e5cc63aff6193e.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
@@ -157,7 +157,7 @@ devise/apply.css: devise/apply-0ad1afb7a35de94bd1e3ed2d11b7c881.css
 devise/newuser.css: devise/newuser-699e38e3ba35e57a0543559fe1fe1d89.css
 editinfo.css: editinfo-7f91d7e2fc8e6b9c909c97164aa3292b.css
 gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
-home/educators.css: home/educators-0fdea0325db52694e5a437bf12c42162.css
+home/educators.css: home/educators-d7dcc222e05084ff8471838a71aba1c8.css
 home/main.css: home/main-b4e88e858c4ba30f581eca373eac63d0.css
 home/pub/about.css: home/pub/about-d828dfad390c7e3cc313fbabf72109cf.css
 home/pub/pioneers.css: home/pub/pioneers-079d64301b9d8854bc0fa04053053d83.css
@@ -169,7 +169,7 @@ media_server_api.css: media_server_api-7270767b2a9e9fff880aa5de378ca791.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
 strap.css: strap-67a539b8b7564fe71daf5473f00d5735.css
-teacher.css: teacher-8c6c06d902faa2d2d0799dc18f8d3361.css
+teacher.css: teacher-8293138657a5c23579430c96e8542122.css
 widgets/icheck.css: widgets/icheck-9f8386150ad015fa20947d4a7971e1fb.css
 jquery.pjax.js: jquery.pjax-d1cce8182a1606ac7252c4296716256c.js
 video-js.css: video-js-8fba5d3e38e191d2268019543ae06d89.css

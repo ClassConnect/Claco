@@ -11,16 +11,16 @@ Claco::Application.routes.draw do
 
 		# get		'/auth/:provider'
 
-		get		'/login'			=> 'devise/sessions#new',			:as => :new_teacher_session
-		post	'/login'			=> 'devise/sessions#create',		:as => :teacher_session
-		delete	'/logout'			=> 'devise/sessions#destroy',		:as => :destroy_teacher_session
+		get		'/login'			=> 'devise/sessions#new',				:as => :new_teacher_session
+		post	'/login'			=> 'devise/sessions#create',			:as => :teacher_session
+		delete	'/logout'			=> 'devise/sessions#destroy',			:as => :destroy_teacher_session
 
-		post	'/account'			=> 'registrations#create',			:as => :teacher_registration
-		get		'/join'				=> 'registrations#new',				:as => :new_teacher_registration
+		post	'/account'			=> 'registrations#create',				:as => :teacher_registration
+		get		'/join'				=> 'registrations#new',					:as => :new_teacher_registration
 
-		post	'/password'			=> 'passwords#create',				:as => :teacher_password
-		get		'/password/new'		=> 'passwords#new',					:as => :new_teacher_password
-		get		'/password/edit'	=> 'passwords#edit',				:as => :edit_teacher_password
+		post	'/password'			=> 'passwords#create',					:as => :teacher_password
+		get		'/password/new'		=> 'passwords#new',						:as => :new_teacher_password
+		get		'/password/edit'	=> 'passwords#edit',					:as => :edit_teacher_password
 		put		'/password'			=> 'passwords#update'
 
 	end
@@ -30,176 +30,175 @@ Claco::Application.routes.draw do
 	#############
 
 	#Root to home
-	root	:to																=> 'home#index'
-	get		'/homebase'														=> 'home#index'
-	get		'/autocomplete'													=> 'home#auto'
-	get		'/dj'															=> 'home#dj'
-	get		'/search'														=> 'home#search'
-	get		'/about'														=> 'home#about'
-	get		'/about/team'													=> 'home#team'
-	get		'/unitedweteach'												=> 'home#united'
+	root	:to																	=> 'home#index'
+	get		'/homebase'															=> 'home#index'
+	get		'/autocomplete'														=> 'home#auto'
+	get		'/dj'																=> 'home#dj'
+	get		'/search'															=> 'home#search'
+	get		'/about'															=> 'home#about'
+	get		'/about/team'														=> 'home#team'
+	get		'/unitedweteach'													=> 'home#united'
 
-	get		'/teachersearch'												=> 'home#teachersearch'
-	get		'/subscribedlog'												=> 'home#subscribedlog'
-	get		'/educators'													=> 'home#educators'
+	get		'/teachersearch'													=> 'home#teachersearch'
+	get		'/subscribedlog'													=> 'home#subscribedlog'
+	get		'/educators'														=> 'home#educators'
 
-	get		'/mediaserver/:id'												=> 'media_server_api#tokencheck'
-	get		'/mediaservertest'												=> 'media_server_api#mediaserver'
-	post	'/mediaserver/thumbs'											=> 'media_server_api#addthumbs'
+	get		'/mediaserver/:id'													=> 'media_server_api#tokencheck'
+	get		'/mediaservertest'													=> 'media_server_api#mediaserver'
+	post	'/mediaserver/thumbs'												=> 'media_server_api#addthumbs'
 
-	get		'/invite'														=> 'invitations#invite'
-	post	'/invite'														=> 'invitations#create'
-
+	get		'/invite'															=> 'invitations#invite'
+	post	'/invite'															=> 'invitations#create'
 
 	#################
 	# ADMIN ROUTING #
 	#################
 
-	get		'/admin'														=> 'admin#index'
-	get		'/admin/apps'													=> 'admin#apps'
-	get		'/admin/users'													=> 'admin#users'
-	get		'/admin/fpfeatured'												=> 'admin#choosefpfeatured',	:as => 'fpfeatured'
-	post	'/admin/fpfeatured'												=> 'admin#setfpfeatured'
-	get		'/admin/featured'												=> 'admin#choosefeatured',		:as => 'featured'
-	post	'/admin/featured'												=> 'admin#setfeatured'
-	get		'/admin/invite'													=> 'admin#invite'
-	post	'/admin/sendinvite'												=> 'admin#sendinvite'
-	get		'/admin/invites'												=> 'admin#invites'
-	get		'/admin/invite/:id'												=> 'admin#showinv'
-	get		'/admin/sysinvlist'												=> 'admin#sysinvlist'
-	post	'/admin/invite/:to'												=> 'admin#sendinvite', :constraints => {:to => /[^\/]+/}
-	get		'/admin/pioneer'												=> 'admin#choosepibinder'
-	post	'/admin/pioneer'												=> 'admin#setpibinder',			:as => 'pioneer'
+	get		'/admin'															=> 'admin#index'
+	get		'/admin/apps'														=> 'admin#apps',					:as => 'apps'
+	get		'/admin/apps/:id/approve'											=> 'applicants#approve',			:as => 'approve'
+	get		'/admin/apps/:id/deny'												=> 'applicants#deny',				:as => 'deny'
+	get		'/admin/users'														=> 'admin#users'
+	get		'/admin/fpfeatured'													=> 'admin#choosefpfeatured',		:as => 'fpfeatured'
+	post	'/admin/fpfeatured'													=> 'admin#setfpfeatured'
+	get		'/admin/featured'													=> 'admin#choosefeatured',			:as => 'featured'
+	post	'/admin/featured'													=> 'admin#setfeatured'
+	get		'/admin/invite'														=> 'admin#invite'
+	post	'/admin/sendinvite'													=> 'admin#sendinvite'
+	get		'/admin/invites'													=> 'admin#invites'
+	get		'/admin/invite/:id'													=> 'admin#showinv'
+	get		'/admin/sysinvlist'													=> 'admin#sysinvlist'
+	post	'/admin/invite/:to'													=> 'admin#sendinvite',				:constraints => {:to => /[^\/]+/}
+	get		'/admin/pioneer'													=> 'admin#choosepibinder'
+	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
 
 	##################
 	# TEACHER ROUTING#
 	##################
 
 	#Edit Info Form/Process
-	get		'/editinfo'														=> "teachers#editinfo"
-	put		'/editinfo'														=> "teachers#updatepass"
-	post	'/updateprefs'													=> "teachers#updateprefs"
-	post	'/updateinfo'													=> "teachers#updateinfo"
-	get		'/editavatar'													=> "teachers#editavatar"
-	get		'/editavatar/:data/:token'										=> "teachers#createavatar"
+	get		'/editinfo'															=> "teachers#editinfo"
+	put		'/editinfo'															=> "teachers#updatepass"
+	post	'/updateprefs'														=> "teachers#updateprefs"
+	post	'/updateinfo'														=> "teachers#updateinfo"
+	get		'/editavatar'														=> "teachers#editavatar"
+	get		'/editavatar/:data/:token'											=> "teachers#createavatar"
+
 
 	# resources :teachers, :only => [:show, :index]
 
-	post	'/utils/fetchtitle'												=> 'home#fetchtitle'
+	post	'/utils/fetchtitle'													=> 'home#fetchtitle'
 
-	get		'/legal/tos'													=> 'home#tos'
-	get		'/legal/privacy'												=> 'home#privacy'
+	get		'/legal/tos'														=> 'home#tos'
+	get		'/legal/privacy'													=> 'home#privacy'
 
 	#####################
 	# APPLICANT ROUTING #
 	#####################
 
-	get		'/apply'														=> 'applicants#apply'
-	post	'/apply'														=> 'applicants#create',				:as => 'applicants'
+	get		'/apply'															=> 'applicants#apply'
+	post	'/apply'															=> 'applicants#create',				:as => 'applicants'
 
-	get		'/gs/:provider'													=> 'home#gs'
-	post	'/done'															=> 'teachers#done'
+	get		'/gs/:provider'														=> 'home#gs'
+	post	'/done'																=> 'teachers#done'
 
 	###################
 	# MESSAGE ROUTING #
 	###################
 
 	#Inbox
-	get		'/messages'																				=> 'teachers#conversations',		:as => 'conversations'
+	get		'/messages'															=> 'teachers#conversations',		:as => 'conversations'
 
 	#New conversation
-	get		'/messages/new'																			=> 'conversations#new',				:as => 'new_conversation'
-	post	'/messages/new'																			=> 'conversations#create'
+	get		'/messages/new'														=> 'conversations#new',				:as => 'new_conversation'
+	post	'/messages/new'														=> 'conversations#create'
 
 	#New message/reply
-	get		'/messages/:id'																			=> 'conversations#show',			:as => 'show_conversation'
-	get		'/messages/:id/add'																		=> 'conversations#newmessage',		:as => 'add_message'
-	put		'/messages/:id/add'																		=> 'conversations#createmessage'
+	get		'/messages/:id'														=> 'conversations#show',			:as => 'show_conversation'
+	get		'/messages/:id/add'													=> 'conversations#newmessage',		:as => 'add_message'
+	put		'/messages/:id/add'													=> 'conversations#createmessage'
 
-	post	'/zcb'																					=> 'zencoder_callbacks#processed'
+	post	'/zcb'																=> 'zencoder_callbacks#processed'
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
+
+		BASE_BINDER_ROUTE = '/:username/portfolio(/:root)/:title/:id'
 
 		#########################
 		# PIONEER CHATS ROUTING #
 		#########################
 
-		get		'/pioneers'																			=> 'pioneers#index'
-		get		'/pioneers/:title/:id'																=> 'pioneers#show'
-
+		get		'/pioneers'														=> 'pioneers#index'
+		get		'/pioneers/:title/:id'											=> 'pioneers#show'
 
 		#Subscribe/unsubscribe
-		put		'/:username/subscribe'																=> 'teachers#sub'
-		put		'/:username/unsubscribe'															=> 'teachers#unsub'
-		get		'/:username/subscribers'															=> 'teachers#subscribers'
-		get		'/:username/subscriptions'															=> 'teachers#subscriptions'
+		put		'/:username/subscribe'											=> 'teachers#sub'
+		put		'/:username/unsubscribe'										=> 'teachers#unsub'
+		get		'/:username/subscribers'										=> 'teachers#subscribers'
+		get		'/:username/subscriptions'										=> 'teachers#subscriptions'
 
-		post	'/:username/message'																=> 'conversations#createmessage'
+		post	'/:username/message'											=> 'conversations#createmessage'
 
 		##################
 		# BINDER ROUTING #
 		##################
 
-
-		#Binder Index
-		# get		'/:username/portfolio'																=> 'binders#index',					:as => 'binders'
-
 		#New
-		get		'/:username/portfolio/new'															=> 'binders#new',					:as => 'new_binder'
-		post	'/:username/portfolio'																=> 'binders#create',				:as => 'binders'
+		get		'/:username/portfolio/new'										=> 'binders#new',					:as => 'new_binder'
+		post	'/:username/portfolio'											=> 'binders#create',				:as => 'binders'
 		
 		#Trash folder
-		get		'/trash'																			=> 'binders#trash',					:as => 'trash'
+		get		'/trash'														=> 'binders#trash',					:as => 'trash'
 
-		post	'/:username/portfolio(/:root)/:title/:id/reorder'									=> 'binders#reorderitem'
+		post	"#{BASE_BINDER_ROUTE}/reorder"									=> 'binders#reorderitem'
 
-		get		'/:username/portfolio(/:root)/:title/:id/regen'										=> 'binders#regen'
+		get		"#{BASE_BINDER_ROUTE}/regen"									=> 'binders#regen'
 
 		################################################
 		# Paths handled by named_binder_route function #
 		################################################
 
-		# post	'/:username/portfolio(/:root)/:title/:id/favorite'									=> 'binders#create'
+		# post	"#{BASE_BINDER_ROUTE}/favorite"									=> 'binders#create'
 
 		#New
-		post	'/:username/portfolio(/:root)/:title/:id/create'									=> 'binders#create'
-		get		'/:username/portfolio(/:root)/:title/:id/cf'										=> 'binders#cf'
-		get		'/:username/portfolio(/:root)/:title/:id/createfile/:data/:timestamp/:token'		=> 'binders#createfile'
-		# post	'/:username/portfolio(/:root)/:title/:id/createfile'								=> 'binders#createfile'
-		post	'/:username/portfolio(/:root)/:title/:id/createcontent'								=> 'binders#createcontent'
+		post	"#{BASE_BINDER_ROUTE}/create"									=> 'binders#create'
+		get		"#{BASE_BINDER_ROUTE}/cf"										=> 'binders#cf'
+		get		"#{BASE_BINDER_ROUTE}/createfile/:data/:timestamp/:token"		=> 'binders#createfile'
+		# post	"#{BASE_BINDER_ROUTE}/createfile"								=> 'binders#createfile'
+		post	"#{BASE_BINDER_ROUTE}/createcontent"							=> 'binders#createcontent'
 
 		#Move
-		put		'/:username/portfolio(/:root)/:title/:id/move'										=> 'binders#moveitem'
+		put		"#{BASE_BINDER_ROUTE}/move"										=> 'binders#moveitem'
 
 		#Copy
-		put		'/:username/portfolio(/:root)/:title/:id/copy'										=> 'binders#copyitem'
+		put		"#{BASE_BINDER_ROUTE}/copy"										=> 'binders#copyitem'
 
 		#Versioning
-		put		'/:username/portfolio(/:root)/:title/:id/update'									=> 'binders#createversion'
+		put		"#{BASE_BINDER_ROUTE}/update"									=> 'binders#createversion'
 
 		# #Permissions
-		# put		'/:username/portfolio(/:root)/:title/:id/permissions'								=> 'binders#createpermission'
-		# delete	'/:username/portfolio(/:root)/:title/:id/permissions/:pid'							=> 'binders#destroypermission'
-		# get		'/:username/portfolio(/:root)/:title/:id/permissions/:pid'				=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
-		post	'/:username/portfolio(/:root)/:title/:id/setpub'									=> 'binders#setpub'
+		# put		"#{BASE_BINDER_ROUTE}/permissions"								=> 'binders#createpermission'
+		# delete	"#{BASE_BINDER_ROUTE}/permissions/:pid"							=> 'binders#destroypermission'
+		# get		"#{BASE_BINDER_ROUTE}/permissions/:pid"				=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
+		post	"#{BASE_BINDER_ROUTE}/setpub"									=> 'binders#setpub'
 
 		#Edit
-		put		'/:username/portfolio(/:root)/:title/:id/rename'									=> 'binders#rename'
-		post	'/:username/portfolio(/:root)/:title/:id/tags'										=> 'binders#updatetags'
+		put		"#{BASE_BINDER_ROUTE}/rename"									=> 'binders#rename'
+		post	"#{BASE_BINDER_ROUTE}/tags"										=> 'binders#updatetags'
 
 		#Show
-		get		'/:username/portfolio(/:root)/:title/:id/download'									=> 'binders#download'
-		get		'/:username/portfolio(/:root)/:title/:id/video'										=> 'binders#zenframe'
-		get		'/:username/portfolio(/:root)/:title/:id'											=> 'binders#show'
-		delete	'/:username/portfolio(/:root)/:title/:id'											=> 'binders#destroy'
+		get		"#{BASE_BINDER_ROUTE}/download"									=> 'binders#download'
+		get		"#{BASE_BINDER_ROUTE}/video"									=> 'binders#zenframe'
+		get		"#{BASE_BINDER_ROUTE}"											=> 'binders#show'
+		delete	"#{BASE_BINDER_ROUTE}"											=> 'binders#destroy'
 		
 		#Update :body
-		put		'/:username/portfolio(/:root)/:title/:id'											=> 'binders#update'
+		put		"#{BASE_BINDER_ROUTE}"											=> 'binders#update'
 
 
 
 		#Profile Page
-		get		'/:username'																		=> 'teachers#show'
+		get		'/:username'													=> 'teachers#show'
 	
 	end
 

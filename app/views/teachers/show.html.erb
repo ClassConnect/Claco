@@ -122,30 +122,47 @@
       <h3>
         <strong><%= @subscriptions.count %></strong>
         Subscriptions 
+        <button class="btn btn-mini pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscriptions" type="button">View all</button>
       </h3>
       <ul class="profile-avatars">
-        <% @subscriptions.shuffle.sort_by{|t| Teacher.thumbready?(t) ? 1 : 0}[0..5].shuffle.each do |sub| %>
-          <li>
-            <a href="/<%= sub.username %>">
-              <img src="<%= teacher_thumb_md(sub) %>">
-            </a>
-          </li>
-        <% end %>
+        <% 
+        i=0
+        @subscriptions.shuffle.each do |sub|
+          if Teacher.thumbready?(sub)
+            i += 1 %>
+              <li>
+                <a href="/<%= sub.username %>">
+                  <img src="<%= teacher_thumb_md(sub) %>" class="thumbster">
+                </a>
+              </li>
+            <%
+          end
+          break if i==6
+        end
+        %>
       </ul>
     </div>
     <div class="pull-right profile-module">
       <h3>
         <strong><%= @subscribers.count %></strong>
         Subscribers 
+        <button class="btn btn-mini pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscribers" type="button">View all</button>
       </h3>
       <ul class="profile-avatars">
-        <% @subscribers.shuffle.sort_by{|t| Teacher.thumbready?(t) ? 1 : 0}[0..5].shuffle.each do |sub| %>
-          <li>
-            <a href="/<%= sub.username %>">
-              <img src="<%= teacher_thumb_md(sub) %>">
-            </a>
-          </li>
-        <% end %>
+        <% 
+        i=0
+        @subscribers.shuffle.each do |sub|
+          if Teacher.thumbready?(sub)
+            i += 1 %>
+              <li>
+                <a href="/<%= sub.username %>">
+                  <img src="<%= teacher_thumb_md(sub) %>" class="thumbster">
+                </a>
+              </li>
+            <%
+          end
+          break if i==6
+        end %>
       </ul>
     </div>
   </div>

@@ -213,6 +213,7 @@ class Teacher
 
 	def self.thumbscheduled? (teacher,thumb)
 
+		return false if teacher.info.nil? || teacher.info.avatarstatus.nil? || teacher.info.avatarstatus[thumb].nil?
 		return teacher.info.avatarstatus[thumb]['scheduled']
 
 	end

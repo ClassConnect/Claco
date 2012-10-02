@@ -24,7 +24,7 @@ module ApplicationHelper
 	end
 
 	def teacher_thumb_lg(teacher)
-		debugger
+		#debugger
 		ret = Teacher.thumb_lg(teacher).to_s
 		if ret.empty?
 			# only display the generating image if the current teacher is viewing the thumb

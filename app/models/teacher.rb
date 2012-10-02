@@ -203,6 +203,8 @@ class Teacher
 		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
 				!teacher.info.avatar.nil? &&
+				!teacher.info.avatarstatus.nil? && 
+				!teacher.info.avatarstatus['avatar_thumb_lg'].nil? &&
 				teacher.info.avatarstatus['avatar_thumb_lg']['generated']
 				#!teacher.info.avatar.url(:thumb_sm).to_s.empty?
 				#!teacher.info.avatar_thumb_sm.url.to_s.empty?

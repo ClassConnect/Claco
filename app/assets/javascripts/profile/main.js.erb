@@ -137,7 +137,7 @@ $('#subbtn').click(function() {
 
   });
 
-  $('button[data-action=modal]').click(
+  $('*[data-action=modal]').click(
       function(){
         jQuery.facebox({ajax: $(this).attr('data-url')});
       });

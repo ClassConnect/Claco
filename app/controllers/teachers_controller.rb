@@ -230,6 +230,50 @@ class TeachersController < ApplicationController
 					params)
 	end
 
+	def editavatar
+
+		data = Digest::MD5.hexdigest(current_teacher.info.id.to_s + Time.now.to_f.to_s)
+
+		token = Digest::MD5.hexdigest(data + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
+
+		current_teacher.info.size = 0
+
+		@uploader = current_teacher.info.avatar
+
+		@uploader.success_action_redirect = "#{request.protocol}#{request.host_with_port}/editavatar/#{data}/#{token}"
+
+		render "editavatar", :layout => false
+
+	end
+
+	def createavatar
+
+		if params[:token] == Digest::MD5.hexdigest(params[:data] + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
+
+			current_teacher.info.data = params[:key]
+
+			# current_teacher.info.avatar.recreate_versions!
+
+			current_teacher.info.size = 0#current_teacher.info.avatar.size
+
+			current_teacher.save
+
+			stathash = current_teacher.info.avatarstatus
+			stathash['avatar_thumb_lg']['scheduled'] = true
+			stathash['avatar_thumb_mg']['scheduled'] = true
+			stathash['avatar_thumb_md']['scheduled'] = true
+			stathash['avatar_thumb_sm']['scheduled'] = true
+
+			current_teacher.info.update_attributes(:avatarstatus => stathash)
+
+			Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
+
+		end
+
+		redirect_to "/editavatar"
+
+	end
+
 	#PUT /updateinfo
 	def updateinfo
 
@@ -257,7 +301,11 @@ class TeachersController < ApplicationController
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",
 												:location		=> params[:lng].empty? || params[:lat].empty? ? nil : [params[:lng].to_f, params[:lat].to_f],
-												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size)
+												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size,
+												:avatarstatus 	=> {:avatar_thumb_lg => { :generated => false, :scheduled => false },
+													 				:avatar_thumb_mg => { :generated => false, :scheduled => false },
+													 				:avatar_thumb_md => { :generated => false, :scheduled => false },
+																	:avatar_thumb_sm => { :generated => false, :scheduled => false } })
 
 		#debugger
 
@@ -456,7 +504,7 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s)
+		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s).sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1}
 
 		render "subscribers", :layout => false
 
@@ -466,7 +514,7 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])} 
+		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])}.sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1}
 
 		render "subscriptions", :layout => false
 

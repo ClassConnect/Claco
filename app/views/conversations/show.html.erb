@@ -32,7 +32,7 @@
 			<% @messages.each do |message| %>
 				<li>
 
-						<a href="/<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).username %>"><img src="<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).info.avatar.thumb_md %>" class="profpic" /></a>
+						<a href="/<%= (message.sender == current_teacher.id.to_s ? current_teacher : @other).username %>"><img src="<%= teacher_thumb_md(message.sender == current_teacher.id.to_s ? current_teacher : @other)%>" class="profpic" /></a>
 
 						<div class="mescon">
 							<div class="tstamp">

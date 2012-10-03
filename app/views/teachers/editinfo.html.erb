@@ -45,15 +45,16 @@ $('#myTab a').click(function (e) {
 			</div>
 
 			<div class="imgbox">
-				<img src="<%= teacher_thumb_lg(current_teacher) %>" class="imger" />
+				<iframe src="/editavatar"></iframe>
+				<!-- <img src="<%= teacher_thumb_lg(current_teacher) %>" class="imger" /> -->
 			</div>
 
 
-		  	<div style="margin-top:30px;color:#444;font-style:italic">Update your profile picture<br />
+		  	<!-- <div style="margin-top:30px;color:#444;font-style:italic">Update your profile picture<br />
 		  	<%= fields_for current_teacher.info do |i| %>
 		  	<%= i.file_field :avatar %></div>
 
-		  	<div style="clear:both"></div>
+		  	<div style="clear:both"></div> -->
 
 
 
@@ -140,9 +141,9 @@ $('#myTab a').click(function (e) {
 			<div>
 		
 
-			<input type="text" id="city" placeholder="Enter your city name" <%= 'style=display:none' if !(current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %> />
+			<input type="text" id="city" placeholder="Enter your city name" <%= 'style="display:none"'.html_safe if !(current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %> />
 
-			<div class="fulldiv" <%= 'style=display:none' if (current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %>>
+			<div class="fulldiv" <%= 'style="display:none"'.html_safe if (current_teacher.info.city.empty? || current_teacher.info.country.empty? || current_teacher.info.state.empty?) %>>
 				<a href="#" onclick="$(this).parent().hide(); $('#city').val('').show().focus(); return false" class="fullnameswap">Change location</a><br />
 
 				<%= i.text_field "fulllocation", :id => "fulllocation", :value => current_teacher.info.fulllocation, :readonly => true %>

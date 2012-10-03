@@ -59,7 +59,9 @@ class BindersController < ApplicationController
 					
 					pids.each do |pid| 
 						if pid != "0"
-							Binder.find(pid).inc(:folders, 1)
+							p = Binder.find(pid).inc(:folders, 1)
+							p.update_attributes(:folders		=> p.folders + 1,
+												:last_update	=> Time.now.to_i)
 						end
 						#Binder.find(pid).inc(:folders, 1) if pid != "0"
 					end
@@ -86,6 +88,8 @@ class BindersController < ApplicationController
 				new_binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if @parent == "0"
 
 				#Rails.logger.debug "METHOD got here! #{__method__}"
+
+				new_binder.cascadetimestamp
 
 				new_binder.save
 
@@ -634,7 +638,7 @@ class BindersController < ApplicationController
 
 		errors = []
 
-		if Binder.where("version.data" => params[:data]).count == 0
+		if Binder.where("versions.data" => params[:data]).count == 0
 
 			#Validate the request
 			if params[:token] == Digest::MD5.hexdigest(params[:data] + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
@@ -2084,10 +2088,10 @@ class BindersController < ApplicationController
 			retstr = "/#{binder.handle}/portfolio"
 
 			if binder.parents.length != 1 
-				retstr += "/#{CGI.escape(binder.root)}" 
+				retstr += "/#{URI.escape(binder.root)}" 
 			end
 
-			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+			retstr += "/#{URI.escape(binder.title)}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

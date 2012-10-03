@@ -1,10 +1,19 @@
 class Teacher
 	include Mongoid::Document
+	include Mongoid::Spacial::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks
 	include Sprockets::Helpers::RailsHelper
 	include Sprockets::Helpers::IsolatedHelper
-	include Mongoid::Spacial::Document
+
+	class FilelessIO < StringIO
+		attr_accessor :original_filename
+
+		def set_filename(name = "")
+			@original_filename = name
+			return self
+		end
+	end
 
 	# Include default devise modules. Others available are:
 	# :token_authenticatable, :confirmable,
@@ -114,21 +123,23 @@ class Teacher
 
 	after_save do
 
-		#debugger
+		#self.update_index
 
 		keys = Rails.cache.read(self.id.to_s)
 
-		return if keys.nil?
+		if !keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)
-			#Rails.cache.expire_fragment(f.to_s)
-			Rails.cache.write(f.to_s,true)			
+			keys.each do |f|
+				#Rails.cache.delete(f.to_s)
+				#Rails.cache.expire_fragment(f.to_s)
+				Rails.cache.write(f.to_s,true)			
+			end
+
+			Rails.cache.delete(self.id.to_s)
+
+			Rails.cache.write("#{self.id.to_s}educobj",true)
+
 		end
-
-		Rails.cache.delete(self.id.to_s)
-
-		Rails.cache.write("#{self.id.to_s}educobj",true)
 
 	end
 
@@ -137,7 +148,7 @@ class Teacher
 		filter: {
 			ngram_filter: {
 				type: 		"nGram",
-				min_gram: 	1,
+				min_gram: 	3,
 				max_gram: 	6
 			}
 		},
@@ -155,7 +166,12 @@ class Teacher
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' }}}}
+			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' },
+																															 :uid => 	  { :type => 'object', :enabled => false },
+																															 :profile =>  { :type => 'object', :enabled => false },
+																															 :fids => 	  { :type => 'object', :enabled => false },
+																															 :data => 	  { :type => 'object', :enabled => false }}},
+																	:facebook 		=> { :type => 'object', :enabled => false }}
 			indexes :info, 		:type => 'object', 	:properties => {:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
 																	:avatar 		=> { :type => 'object',	:enabled => false },
 																	:size 			=> { :type => 'object', :enabled => false },
@@ -194,36 +210,91 @@ class Teacher
 		return 	!teacher.nil? &&
 				!teacher.info.nil? && 
 				!teacher.info.avatar.nil? &&
-				!teacher.info.avatar.url.to_s.empty? &&
-				!teacher.info.avatar.thumb_sm.nil?
+				!teacher.info.avatarstatus.nil? && 
+				!teacher.info.avatarstatus['avatar_thumb_lg'].nil? && 
+				teacher.info.avatarstatus['avatar_thumb_lg']['generated'] # &&
+				#teacher.info.avatarstatus['avatar_thumb_lg']['generated']
+				#!teacher.info.avatar.url(:thumb_sm).to_s.empty?
+				#!teacher.info.avatar_thumb_sm.url.to_s.empty?
+
+	end
+
+	def self.thumbscheduled? (teacher,thumb)
+
+		return false if teacher.info.nil? || teacher.info.avatarstatus.nil? || teacher.info.avatarstatus[thumb].nil?
+		return teacher.info.avatarstatus[thumb]['scheduled']
 
 	end
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_lg.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_lg.url.to_s : nil #teacher.info.avatar.url(:thumb_lg) : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_mg.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_mg.url.to_s : nil #teacher.info.avatar.url(:thumb_mg).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_md.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_md.url.to_s : nil #teacher.info.avatar.url(:thumb_md).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar.thumb_sm.url.to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_sm.url.to_s : nil #teacher.info.avatar.url(:thumb_sm).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
+
+	end
+
+	def self.gen_thumbnails(teacherid)
+
+			teacher = Teacher.find(teacherid.to_s)
+
+			# create versions of avatar
+			#include Magick
+
+			#debugger
+
+			origimg = Magick::ImageList.new
+
+			# retrieve fullsize image from S3 store, read into an ImageList object
+			open(teacher.info.avatar.url.to_s) do |f|
+				origimg.from_blob(f.read)
+			end
+
+	        origimg.format = BLOB_FILETYPE
+
+			if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
+				origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			end
+
+			GC.start
+
+			stathash = teacher.info.avatarstatus
+			stathash['avatar_thumb_lg']['generated'] = true
+			stathash['avatar_thumb_mg']['generated'] = true
+			stathash['avatar_thumb_md']['generated'] = true
+			stathash['avatar_thumb_sm']['generated'] = true
+
+			#debugger
+
+			teacher.info.update_attributes(	:avatarstatus => stathash,
+											:avatar_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(AVATAR_LDIM, AVATAR_LDIM, Magick::CenterGravity).to_blob).set_filename(LG_AVATAR_FILENAME),
+											:avatar_thumb_mg => FilelessIO.new(origimg.resize_to_fill!(AVATAR_MGDIM,AVATAR_MGDIM,Magick::CenterGravity).to_blob).set_filename(MG_AVATAR_FILENAME),
+											:avatar_thumb_md => FilelessIO.new(origimg.resize_to_fill!(AVATAR_MDIM, AVATAR_MDIM, Magick::CenterGravity).to_blob).set_filename(MD_AVATAR_FILENAME),
+											:avatar_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(AVATAR_SDIM, AVATAR_SDIM, Magick::CenterGravity).to_blob).set_filename(SM_AVATAR_FILENAME))
+
+			origimg.destroy!
+
+			GC.start
 
 	end
 
@@ -345,44 +416,46 @@ class Teacher
 		ret
 	end
 
-	# convert these to ElasticSearch queries!
+	#TODO: convert these to ElasticSearch queries!
 	def self.vectors (id, degree = 1, vec = {})
 
 		if degree>0
 			id = id.to_s
 			ids = []
 			teacher = Teacher.find(id.to_s)
-			# if !teacher.code.nil? && !teacher.code.empty? #&& teacher.code.to_s!="0"
-			# 	t_id = nil
-			# 	if teacher.code.to_s.length==24
-			# 		t_id = teacher.code.to_s
-			# 	else
-			# 		invitation = Invitation.where(:code => teacher.code.to_s).first
-			# 		t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
-			# 	end
-			# 	if !vec[id]
-			# 		vec[id] = { t_id => 0x40 }
-			# 		ids << t_id
-			# 	elsif !vec[id][t_id]
-			# 		vec[id][t_id] = 0x40
-			# 		ids << t_id
-			# 	else
-			# 		vec[id][t_id] |= 0x40
-			# 	end
-			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-			# 	ids = []
-			# end
+			if !teacher.code.nil? && !teacher.code.empty? && teacher.code.to_s!="0"
+				t_id = nil
+				if teacher.code.to_s.length==24
+					t_id = teacher.code.to_s
+				else
+					invitation = Invitation.where(:code => teacher.code.to_s).first
+					t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+				end
+				if !t_id.nil? && !t_id.empty?
+					if !vec[id]
+						vec[id] = { t_id => ~0x40 }
+						ids << t_id
+					elsif !vec[id][t_id]
+						vec[id][t_id] = ~0x40
+						ids << t_id
+					else
+						vec[id][t_id] &= ~0x40
+					end
+					ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+					ids = []
+				end
+			end
 			if !teacher.info.nil? && !teacher.info.grades.nil? && !teacher.info.grades.empty?
 				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x20 }
+						vec[id] = { f.id.to_s => ~0x20 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x20
+						vec[id][f.id.to_s] = ~0x20
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x20
+						vec[id][f.id.to_s] &= ~0x20
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -392,13 +465,13 @@ class Teacher
 				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x10 }
+						vec[id] = { f.id.to_s => ~0x10 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x10
+						vec[id][f.id.to_s] = ~0x10
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x10
+						vec[id][f.id.to_s] |= ~0x10
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -408,13 +481,13 @@ class Teacher
 			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 				next if f.id.to_s==id
 				if !vec[id]
-					vec[id] = { f.id.to_s => 0x8 }
+					vec[id] = { f.id.to_s => ~0x8 }
 					ids << f.id.to_s
 				elsif !vec[id][f.id.to_s]
-					vec[id][f.id.to_s] = 0x8
+					vec[id][f.id.to_s] = ~0x8
 					ids << f.id.to_s
 				else
-					vec[id][f.id.to_s] |= 0x8
+					vec[id][f.id.to_s] &= ~0x8
 				end
 			end
 			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -423,13 +496,13 @@ class Teacher
 				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x4 }
+						vec[id] = { f.id.to_s => ~0x4 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x4
+						vec[id][f.id.to_s] = ~0x4
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x4
+						vec[id][f.id.to_s] &= ~0x4
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -439,13 +512,13 @@ class Teacher
 				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => 0x2 }
+						vec[id] = { f.id.to_s => ~0x2 }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = 0x2
+						vec[id][f.id.to_s] = ~0x2
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= 0x2
+						vec[id][f.id.to_s] &= ~0x2
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -455,13 +528,13 @@ class Teacher
 			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
 			# 		next if f.id.to_s==id
 			# 		if !vec[id]
-			# 			vec[id] = { f.id.to_s => 0x1 }
+			# 			vec[id] = { f.id.to_s => ~0x10 }
 			# 			ids << f.id.to_s
 			# 		elsif !vec[id][f.id.to_s]
-			# 			vec[id][f.id.to_s] = 0x1
+			# 			vec[id][f.id.to_s] = ~0x10
 			# 			ids << f.id.to_s
 			# 		else
-			# 			vec[id][f.id.to_s] |= 0x1
+			# 			vec[id][f.id.to_s] |= ~0x10
 			# 		end
 			# 	end
 			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -525,12 +598,12 @@ class Teacher
 
 		#if invert
 		#network_orig.each do |f|
-		network.each do |f|
-			f[1].each do |g|
-				network[f[0].to_s][g[0].to_s] = (128-g[1]).to_i
-				#g[1] = (16-g[1]).to_i
-			end
-		end
+		# network.each do |f|
+		# 	f[1].each do |g|
+		# 		network[f[0].to_s][g[0].to_s] = (128-g[1]).to_i
+		# 		#g[1] = (16-g[1]).to_i
+		# 	end
+		# end
 		#end
 
 		pathhash = {}
@@ -646,6 +719,24 @@ class Teacher
 
 			# (['503bfe25fafac30002000011','502d3b822fc6100002000012','502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','505ce7fae274d70002000019','502cab3378de86000200006d'] + recs).flatten.uniq-subs
 
+			#debugger
+
+			#TODO: migrate this into the algorithm
+			if !self.code.nil? && !self.code.empty? && self.code.to_s!="0"
+				t_id = nil
+				case self.code.to_s.length.to_i
+				when 24
+					t_id = self.code.to_s
+				when 32
+					invitation = Invitation.where(:code => self.code.to_s).first
+					t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+				end
+			end
+
+			#debugger
+
+			recs = (t_id.to_a + recs) if (!t_id.nil? && !t_id.empty?)
+
 			recs = recs.flatten.uniq - subs
 
 			if recs.size < 5
@@ -660,6 +751,8 @@ class Teacher
 			end
 
 			Rails.cache.write("#{self.id.to_s}recs",recs[0..60])
+
+			#debugger
 
 			return recs[0..60]
 
@@ -845,41 +938,6 @@ class Tag
 
 	embedded_in :teacher
 
-	# Class Methods
-
-	# updates all data within the Tag class
-	# def update_tag_fields(params)
-
-	# 	# array to be eventually passed into the :grade_levels field
-	# 	#true_checkbox_array = Array.new(20, false)
-	# 	grade_levels_checkbox_array = Array.new
-	# 	subjects_checkbox_array = Array.new
-	# 	#zero_count = 0
-
-	# 	# update grade_levels array
-	# 	(1..(params[:tag][:grade_levels].length-1)).each do |i|
-	# 		#if params[:tag][:grade_levels][i] == "0"
-	# 		#	zero_count += 1
-	# 		#else
-	# 		#	true_checkbox_array[zero_count] = true
-	# 		#end
-	# 		grade_levels_checkbox_array << params[:tag][:grade_levels][i] if params[:tag][:grade_levels][i] != "0"
-	# 	end
-
-	# 	# update subjects array
-	# 	(1..(params[:tag][:subjects].length-1)).each do |i|
-	# 		subjects_checkbox_array << params[:tag][:subjects][i] if params[:tag][:subjects][i] != "0"
-	# 	end
-
-
-	# 	self.update_attributes(	:grade_levels => grade_levels_checkbox_array,
-	# 							#:subjects => params[:tag][:subjects].downcase.split.uniq,
-	# 							:subjects => subjects_checkbox_array,
-	# 							:standards => params[:tag][:standards].downcase.split.uniq,
-	# 							:other => params[:tag][:other].downcase.split.uniq)
-	# 	#self.save
-	# end
-
 end
 
 class Relationship
@@ -919,6 +977,8 @@ class Relationship
 		#debugger
 		Rails.cache.delete("#{self.teacher.id.to_s}recs")
 
+
+
 	end
 
 	# after_create do
@@ -952,8 +1012,8 @@ end
 
 class Info
 	include Mongoid::Document
-	include Tire::Model::Search
-	include Tire::Model::Callbacks
+	#include Tire::Model::Search
+	#include Tire::Model::Callbacks
 	# include Mongoid::Spacial::Document
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
@@ -971,7 +1031,16 @@ class Info
 
 	#validates_with InfoValidator
 
+	field :avatarstatus, :type => Hash, :default => { 	"avatar_thumb_lg" => { "generated" => false, "scheduled" => false },
+													 	"avatar_thumb_mg" => { "generated" => false, "scheduled" => false },
+													 	"avatar_thumb_md" => { "generated" => false, "scheduled" => false },
+														"avatar_thumb_sm" => { "generated" => false, "scheduled" => false } }
+
 	mount_uploader :avatar, AvatarUploader
+	mount_uploader :avatar_thumb_lg, AvatarthumbUploader
+	mount_uploader :avatar_thumb_mg, AvatarthumbUploader
+	mount_uploader :avatar_thumb_md, AvatarthumbUploader
+	mount_uploader :avatar_thumb_sm, AvatarthumbUploader
 
 	field :thumbnails, :type => Array, :default => [nil,nil,nil,nil]
 
@@ -994,21 +1063,24 @@ class Info
 
 	after_save do
 
-		#debugger
+		# triggers reindexing from parent document
+		#self.teacher.save
 
 		keys = Rails.cache.read(self.teacher.id.to_s)
 
-		return if keys.nil?
+		if !keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)
-			#Rails.cache.expire_fragment(f.to_s)			
-			Rails.cache.write(f.to_s,true)
+			keys.each do |f|
+				#Rails.cache.delete(f.to_s)
+				#Rails.cache.expire_fragment(f.to_s)			
+				Rails.cache.write(f.to_s,true)
+			end
+
+			Rails.cache.delete(self.teacher.id.to_s)
+
+			Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
+
 		end
-
-		Rails.cache.delete(self.teacher.id.to_s)
-
-		Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
 
 	end
 

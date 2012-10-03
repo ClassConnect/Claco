@@ -79,6 +79,7 @@ class ImageUploader < CarrierWave::Uploader::Base
     #  return "testdir"
     #else
       Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
+      #Digest::MD5.hexdigest(model.teacher.id.to_s + model.size.to_s + model.data.to_s)
     #end
   end
 

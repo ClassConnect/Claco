@@ -79,6 +79,11 @@ CV_FILENAME = "contentview.png"
 LTHUMB_FILENAME = "thumb_lg.png"
 STHUMB_FILENAME = "thumb_sm.png"
 
+LG_AVATAR_FILENAME = "thumb_lg.png"
+MG_AVATAR_FILENAME = "thumb_mg.png"
+MD_AVATAR_FILENAME = "thumb_md.png"
+SM_AVATAR_FILENAME = "thumb_sm.png"
+
 # crocodoc thumbs
 CROC_BACKGROUND_COLOR = "#EEEEEE"
 CROC_BORDER_COLOR = "#CCCCCC"

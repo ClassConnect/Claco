@@ -81,6 +81,9 @@ Claco::Application.routes.draw do
 	put		'/editinfo'															=> "teachers#updatepass"
 	post	'/updateprefs'														=> "teachers#updateprefs"
 	post	'/updateinfo'														=> "teachers#updateinfo"
+	get		'/editavatar'														=> "teachers#editavatar"
+	get		'/editavatar/:data/:token'											=> "teachers#createavatar"
+
 
 	# resources :teachers, :only => [:show, :index]
 

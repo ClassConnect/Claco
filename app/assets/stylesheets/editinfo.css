@@ -34,8 +34,11 @@
 	clear:both;
 }
 
-.imgbox {
-
+.imgbox iframe{
+  border: none;
+  width: 100%;
+  height: 130px;
+  overflow: hidden;
 }
 
 .imgbox .imger {

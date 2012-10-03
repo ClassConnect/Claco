@@ -127,6 +127,7 @@ class Binder
 		return 	!binder.nil? && 
 				!binder.current_version.nil? &&
 				!binder.current_version.imgfile.nil? &&
+				# these can be migrated to the imgstatus hash
 				!binder.current_version.img_thumb_lg.nil? &&
 				!binder.current_version.img_thumb_lg.url.nil? &&
 				#!binder.current_version.imgstatus.nil? &&
@@ -502,6 +503,18 @@ class Binder
 		return title
 	end
 
+	def cascadetimestamp
+
+		binderparents = self.parents.map{|p| Binder.find(p["id"])}
+
+		binderparents.each do |binder|
+
+			binder.update_attributes(last_message: Time.now.to_i)
+
+		end
+
+	end
+
 	def regen
 
 		if self.current_version.croc?
@@ -560,6 +573,11 @@ class Binder
 
 	end
 
+	def self.fixtimetamps
+
+		Binder.all.each{|binder| binder.update_attributes(:last_update => binder.subtree.sort_by(&:timestamp).last.last_update) if binder.type == 1}
+
+	end
 
 	###############################################################################################
 
@@ -837,7 +855,7 @@ class Binder
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
-		debugger
+		#debugger
 
 		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(filled_sm.to_blob).set_filename(STHUMB_FILENAME),
 													:imgstatus => stathash)

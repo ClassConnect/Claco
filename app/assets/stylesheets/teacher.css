@@ -219,6 +219,19 @@ ul.nav-tabs.onProfile li.active a {
           border-radius: 4px;
 }
 
+a.view-all {
+  cursor: pointer;
+  font-size: 11px;
+  padding: 4px 8px;
+  line-height: 1.1em;
+  margin-top: 2px;
+  border-radius: 1px;
+}
+a.view-all:hover {
+  text-decoration: none;
+  background: #3A87AD;
+  color: white;
+}
 
 #facebox li>img {
   display: inline;

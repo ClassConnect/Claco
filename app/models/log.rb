@@ -29,6 +29,12 @@ class Log
 	# 	indexes :params,	:type => 'hash'
 	# end	
 
+	# used for elasticsearch
+	def self
+    	#to_indexed_json.as_json
+    	to_indexed_json.to_json
+	end
+
 	# determine whether an unsubscription has occured before to this teacher
 	def self.first_subsc?(subscriber_id,subscribee_id)
 

@@ -573,6 +573,11 @@ class Binder
 
 	end
 
+	def self.fixtimetamps
+
+		Binder.all.each{|binder| binder.update_attributes(:last_update => binder.subtree.sort_by(&:timestamp).last.last_update) if binder.type == 1}
+
+	end
 
 	###############################################################################################
 

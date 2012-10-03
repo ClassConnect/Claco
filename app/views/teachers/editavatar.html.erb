@@ -37,7 +37,7 @@
 	<%= image_tag(teacher_thumb_lg(current_teacher), :class => "imger") %>
 	<span>Update your profile picture</span>
 	<br />
-	<%= f.file_field :file %>
+	<%= f.file_field :file, :accept => "image/*" %>
 	<div>
 		<button id="checkout" type="submit">Upload this file</button>
 	</div>

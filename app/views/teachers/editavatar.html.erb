@@ -46,7 +46,16 @@
 <%= javascript_include_tag "jquery" %>
 <script type="text/javascript">
 $(document).ready(function() {
+	// re-enable parent form controls
+	parent.$("button[type=submit]").attr("disabled", null);
+	parent.$("button[type=submit]").html("Update Personal Info");
+	
 	$("input[type=file]").change(function(){
+		 // disable parent form controls
+		 parent.$("button[type=submit]").attr("disabled", "disabled");
+		 parent.$("button[type=submit]").html("Please wait...");
+        
+         // auto submit
          $("form#new_avatar_uploader").submit();
      });
  });

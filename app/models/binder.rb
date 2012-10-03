@@ -850,7 +850,7 @@ class Binder
 		stathash['img_thumb_lg']['generated'] = true
 		stathash['img_thumb_sm']['generated'] = true
 
-		debugger
+		#debugger
 
 		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(filled_sm.to_blob).set_filename(STHUMB_FILENAME),
 													:imgstatus => stathash)

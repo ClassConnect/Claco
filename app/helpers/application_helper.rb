@@ -28,11 +28,11 @@ module ApplicationHelper
 		ret = Teacher.thumb_lg(teacher).to_s
 		if ret.empty?
 			# only display the generating image if the current teacher is viewing the thumb
-			if Teacher.thumbscheduled?(teacher,'avatar_thumb_lg') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
-				asset_path("profile/gen-face-170.png")
-			else
+			#if Teacher.thumbscheduled?(teacher,'avatar_thumb_lg') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+				#asset_path("profile/gen-face-170.png")
+			#else
 				asset_path("profile/face-170.png")
-			end
+			#end
 		else
 			ret
 		end

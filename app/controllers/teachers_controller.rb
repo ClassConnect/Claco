@@ -259,10 +259,6 @@ class TeachersController < ApplicationController
 			current_teacher.save
 
 			stathash = current_teacher.info.avatarstatus
-			stathash['avatar_thumb_lg']['generated'] = false
-			stathash['avatar_thumb_mg']['generated'] = false
-			stathash['avatar_thumb_md']['generated'] = false
-			stathash['avatar_thumb_sm']['generated'] = false
 			stathash['avatar_thumb_lg']['scheduled'] = true
 			stathash['avatar_thumb_mg']['scheduled'] = true
 			stathash['avatar_thumb_md']['scheduled'] = true

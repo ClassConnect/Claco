@@ -503,6 +503,18 @@ class Binder
 		return title
 	end
 
+	def cascadetimestamp
+
+		binderparents = self.parents.map{|p| Binder.find(p["id"])}
+
+		binderparents.each do |binder|
+
+			binder.update_attributes(last_message: Time.now.to_i)
+
+		end
+
+	end
+
 	def regen
 
 		if self.current_version.croc?

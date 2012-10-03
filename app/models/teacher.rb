@@ -266,7 +266,7 @@ class Teacher
 			origimg = Magick::ImageList.new
 
 			# retrieve fullsize image from S3 store, read into an ImageList object
-			open(teacher.info.avatar.url.to_s) do |f|
+			open(URI.escape(teacher.info.avatar.url.to_s)) do |f|
 				origimg.from_blob(f.read)
 			end
 

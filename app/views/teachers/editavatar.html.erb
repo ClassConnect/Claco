@@ -2,6 +2,30 @@
 <html>
 <head>
 <title>Edit Avatar</title>
+<style type="text/css">
+	.imger {
+		padding:7px;
+		border:1px solid #ccc;
+		float:left;
+		margin-right:10px;
+		width:100px;
+
+		 -webkit-border-radius: 4px;
+	     -moz-border-radius: 4px;
+	          border-radius: 4px;
+    }
+    button {
+    	display: none;
+    }
+    span {
+    	margin-top:40px;
+    	color:#444;
+    	font-style:italic;
+    	font-size: 13px;
+    	font-family: sans-serif;
+    	display: inline-block;
+    }
+</style>
 </head>
 </body>
 <%= direct_upload_form_for @uploader do |f| %>
@@ -10,13 +34,22 @@
 	<img src='<%= teacher_thumb_md(current_teacher) %>' />
 	<img src='<%= teacher_thumb_sm(current_teacher) %>' />
 	<br /> -->
-	<%= image_tag(teacher_thumb_lg(current_teacher)) %>
+	<%= image_tag(teacher_thumb_lg(current_teacher), :class => "imger") %>
+	<span>Update your profile picture</span>
+	<br />
 	<%= f.file_field :file %>
-	<!-- <br /> -->
-	<div class="buttonbar">
-		<button class="btn btn-primary" id="checkout" type="submit">Upload this file</button>
+	<div>
+		<button id="checkout" type="submit">Upload this file</button>
 	</div>
 	<!-- <br /> -->
 <% end %>
+<%= javascript_include_tag "jquery" %>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("input[type=file]").change(function(){
+         $("form#new_avatar_uploader").submit();
+     });
+ });
+</script>
 </body>
 </html>

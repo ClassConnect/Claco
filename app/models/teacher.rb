@@ -123,21 +123,23 @@ class Teacher
 
 	after_save do
 
-		#debugger
+		#self.update_index
 
 		keys = Rails.cache.read(self.id.to_s)
 
-		return if keys.nil?
+		if !keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)
-			#Rails.cache.expire_fragment(f.to_s)
-			Rails.cache.write(f.to_s,true)			
+			keys.each do |f|
+				#Rails.cache.delete(f.to_s)
+				#Rails.cache.expire_fragment(f.to_s)
+				Rails.cache.write(f.to_s,true)			
+			end
+
+			Rails.cache.delete(self.id.to_s)
+
+			Rails.cache.write("#{self.id.to_s}educobj",true)
+
 		end
-
-		Rails.cache.delete(self.id.to_s)
-
-		Rails.cache.write("#{self.id.to_s}educobj",true)
 
 	end
 
@@ -146,7 +148,7 @@ class Teacher
 		filter: {
 			ngram_filter: {
 				type: 		"nGram",
-				min_gram: 	1,
+				min_gram: 	3,
 				max_gram: 	6
 			}
 		},
@@ -164,7 +166,12 @@ class Teacher
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' }}}}
+			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' },
+																															 :uid => 	  { :type => 'object', :enabled => false },
+																															 :profile =>  { :type => 'object', :enabled => false },
+																															 :fids => 	  { :type => 'object', :enabled => false },
+																															 :data => 	  { :type => 'object', :enabled => false }}},
+																	:facebook 		=> { :type => 'object', :enabled => false }}
 			indexes :info, 		:type => 'object', 	:properties => {:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
 																	:avatar 		=> { :type => 'object',	:enabled => false },
 																	:size 			=> { :type => 'object', :enabled => false },
@@ -969,6 +976,8 @@ class Relationship
 		#debugger
 		Rails.cache.delete("#{self.teacher.id.to_s}recs")
 
+
+
 	end
 
 	# after_create do
@@ -1002,8 +1011,8 @@ end
 
 class Info
 	include Mongoid::Document
-	include Tire::Model::Search
-	include Tire::Model::Callbacks
+	#include Tire::Model::Search
+	#include Tire::Model::Callbacks
 	# include Mongoid::Spacial::Document
 	#include ActiveModel::Validations
 	#include CarrierWave::MiniMagick
@@ -1053,21 +1062,24 @@ class Info
 
 	after_save do
 
-		#debugger
+		# triggers reindexing from parent document
+		#self.teacher.save
 
 		keys = Rails.cache.read(self.teacher.id.to_s)
 
-		return if keys.nil?
+		if !keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)
-			#Rails.cache.expire_fragment(f.to_s)			
-			Rails.cache.write(f.to_s,true)
+			keys.each do |f|
+				#Rails.cache.delete(f.to_s)
+				#Rails.cache.expire_fragment(f.to_s)			
+				Rails.cache.write(f.to_s,true)
+			end
+
+			Rails.cache.delete(self.teacher.id.to_s)
+
+			Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
+
 		end
-
-		Rails.cache.delete(self.teacher.id.to_s)
-
-		Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
 
 	end
 

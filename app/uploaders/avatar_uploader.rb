@@ -100,18 +100,18 @@ class AvatarUploader < CarrierWave::Uploader::Base
   #   fog_uri
   # end
 
-  # def url(version = nil)
-  #   filenames = { thumb_lg: "thumb_lg.png",
-  #                 thumb_md: "thumb_md.png",
-  #                 thumb_mg: "thumb_mg.png",
-  #                 thumb_sm: "thumb_sm.png"}
-  #   if fog_public
-  #     fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{model.data.empty? ? store_dir : model.data.split("/").first}/#{version.nil? ?  model.data.split("/").last : filenames[version]}").public_url
-  #   else
-  #     fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{model.data.empty? ? store_dir : model.data.split("/").first}/#{version.nil? ?  model.data.split("/").last : filenames[version]}").authenticated_url
-  #   end
-  #   fog_uri
-  # end
+  def url(version = nil)
+    filenames = { thumb_lg: "thumb_lg.png",
+                  thumb_md: "thumb_md.png",
+                  thumb_mg: "thumb_mg.png",
+                  thumb_sm: "thumb_sm.png"}
+    if fog_public
+      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{model.data.empty? ? store_dir : model.data.split("/").first}/#{version.nil? ?  model.data.split("/").last : filenames[version]}").public_url
+    else
+      fog_uri = CarrierWave::Storage::Fog::File.new(self, CarrierWave::Storage::Fog.new(self), "#{model.data.empty? ? store_dir : model.data.split("/").first}/#{version.nil? ?  model.data.split("/").last : filenames[version]}").authenticated_url
+    end
+    fog_uri
+  end
 
   # def direct_fog_url
   #   return fog_host

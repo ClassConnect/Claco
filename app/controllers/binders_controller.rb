@@ -59,7 +59,7 @@ class BindersController < ApplicationController
 					
 					pids.each do |pid| 
 						if pid != "0"
-							p = Binder.find(pid).inc(:folders, 1)
+							p = Binder.find(pid)
 							p.update_attributes(:folders		=> p.folders + 1,
 												:last_update	=> Time.now.to_i)
 						end
@@ -89,7 +89,7 @@ class BindersController < ApplicationController
 
 				#Rails.logger.debug "METHOD got here! #{__method__}"
 
-				new_binder.cascadetimestamp
+				# new_binder.cascadetimestamp
 
 				new_binder.save
 

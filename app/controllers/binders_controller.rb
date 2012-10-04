@@ -259,6 +259,12 @@ class BindersController < ApplicationController
 
 	end
 
+	def bookmarklet
+
+		
+
+	end
+
 	#Add links function
 	def createcontent
 		

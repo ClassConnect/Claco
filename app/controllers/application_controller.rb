@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  after_filter :store_location
+  before_filter :store_location
   # protect_from_forgery
 
   #include Oink::MemoryUsageLogger

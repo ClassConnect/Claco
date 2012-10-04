@@ -1,5 +1,7 @@
 class UserMailer < ActionMailer::Base
+	layout 'email'
 	default from: "claco <support@claco.com>"
+
 
 	def new_sub(subscriber, subscribee)
 

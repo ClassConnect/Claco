@@ -248,6 +248,8 @@ class TeachersController < ApplicationController
 
 	def createavatar
 
+		#debugger
+
 		if params[:token] == Digest::MD5.hexdigest(params[:data] + "ekileromkoolodottnawogneveesuotdedicedsaneverafneebyllaerenoynasah")
 
 			current_teacher.info.data = params[:key]
@@ -259,6 +261,10 @@ class TeachersController < ApplicationController
 			current_teacher.save
 
 			stathash = current_teacher.info.avatarstatus
+			# stathash['avatar_thumb_lg']['generated'] = false
+			# stathash['avatar_thumb_mg']['generated'] = false
+			# stathash['avatar_thumb_md']['generated'] = false
+			# stathash['avatar_thumb_sm']['generated'] = false
 			stathash['avatar_thumb_lg']['scheduled'] = true
 			stathash['avatar_thumb_mg']['scheduled'] = true
 			stathash['avatar_thumb_md']['scheduled'] = true
@@ -266,7 +272,26 @@ class TeachersController < ApplicationController
 
 			current_teacher.info.update_attributes(:avatarstatus => stathash)
 
-			Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
+			storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
+
+			datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
+
+			#debugger
+
+			response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
+															:class => 'avatar',
+															:url => current_teacher.info.avatar.url.to_s,
+															:model => [current_teacher.id.to_s],
+															:datahash => datahash.to_s })
+
+			Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						params[:controller].to_s,
+						current_teacher.id.to_s,
+						params,
+						{ :response => response })
+
+			#Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
 
 		end
 
@@ -277,7 +302,7 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		#debugger
+		debugger
 
 		current_teacher.info = Info.new if current_teacher.info.nil?
 
@@ -301,7 +326,7 @@ class TeachersController < ApplicationController
 												:state			=> params[:info][:fulllocation].split(', ').second || "",
 												:country		=> params[:info][:fulllocation].split(', ').third || "",
 												:location		=> params[:lng].empty? || params[:lat].empty? ? nil : [params[:lng].to_f, params[:lat].to_f],
-												:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size,
+												#:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size,
 												:avatarstatus 	=> {:avatar_thumb_lg => { :generated => false, :scheduled => false },
 													 				:avatar_thumb_mg => { :generated => false, :scheduled => false },
 													 				:avatar_thumb_md => { :generated => false, :scheduled => false },

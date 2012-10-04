@@ -9,7 +9,6 @@ class ApplicationController < ActionController::Base
 
   protected
     def store_location
-      # debugger
       session[:previous_urls] ||= []
       # store unique urls only
       session[:previous_urls].prepend request.fullpath if session[:previous_urls].first != request.fullpath

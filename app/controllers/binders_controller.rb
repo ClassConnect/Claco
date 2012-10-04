@@ -367,74 +367,80 @@ class BindersController < ApplicationController
 
 							#@binder.create_binder_tags(params,current_teacher.id)
 
-							@binder.save
+							if @binder.save
 
-							Mongo.log(	current_teacher.id.to_s,
-										__method__.to_s,
-										params[:controller].to_s,
-										@binder.id.to_s,
-										params)
+								Mongo.log(	current_teacher.id.to_s,
+											__method__.to_s,
+											params[:controller].to_s,
+											@binder.id.to_s,
+											params)
 
-							if url || embedtourl
-								uri = URI.parse(link)
-								# debugger
+								if url || embedtourl
+									uri = URI.parse(link)
+									# debugger
 
-								stathash = @binder.current_version.imgstatus
-								stathash[:imgfile][:retrieved] = true
+									stathash = @binder.current_version.imgstatus
+									stathash[:imgfile][:retrieved] = true
 
-								if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+									if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
 
-									# YOUTUBE
-									# DELAYTAG
-									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
-									@binder.current_version.vidtype = "youtube"
+										# YOUTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
+										@binder.current_version.vidtype = "youtube"
 
-									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-								elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+									elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
 
-									# VIMEO
-									# DELAYTAG
-									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
-									@binder.current_version.vidtype = "vimeo"
+										# VIMEO
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
+										@binder.current_version.vidtype = "vimeo"
 
-									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-								elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
+									elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
 
-									# EDUCREATIONS
-									# DELAYTAG
-									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
-									@binder.current_version.vidtype = "educreations"
+										# EDUCREATIONS
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
+										@binder.current_version.vidtype = "educreations"
 
-									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-								elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+									elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
 
-									# SCHOOLTUBE
-									# DELAYTAG
-									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
-									@binder.current_version.vidtype = "schooltube"
+										# SCHOOLTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
+										@binder.current_version.vidtype = "schooltube"
 
-									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-								elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+									elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
 
-									# SHOWME
-									# DELAYTAG
-									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
-									@binder.current_version.vidtype = "showme"
+										# SHOWME
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
+										@binder.current_version.vidtype = "showme"
 
-									#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
 
-								else
-									@binder.versions.last.update_attributes( :thumbnailgen => 2 )
-									# generic URL, grab Url2png
-									# DELAYTAG
-									Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
+									else
+										@binder.versions.last.update_attributes( :thumbnailgen => 2 )
+										# generic URL, grab Url2png
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
 
-									#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+										#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+									end
+
 								end
+
+							else
+
+								errors << "There was an error adding this content."
 
 							end
 

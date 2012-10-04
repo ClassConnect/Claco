@@ -166,6 +166,7 @@ Claco::Application.routes.draw do
 		get		"#{BASE_BINDER_ROUTE}/createfile/:data/:timestamp/:token"		=> 'binders#createfile'
 		# post	"#{BASE_BINDER_ROUTE}/createfile"								=> 'binders#createfile'
 		post	"#{BASE_BINDER_ROUTE}/createcontent"							=> 'binders#createcontent'
+		get		"#{BASE_BINDER_ROUTE}/createcontent"							=> 'binders#createcontent'
 
 		#Move
 		put		"#{BASE_BINDER_ROUTE}/move"										=> 'binders#moveitem'

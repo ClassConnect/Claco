@@ -1,7 +1,8 @@
 class UserMailer < ActionMailer::Base
+	include Sprockets::Helpers::RailsHelper
+	include Sprockets::Helpers::IsolatedHelper
 	layout 'email'
 	default from: "claco <support@claco.com>"
-
 
 	def new_sub(subscriber, subscribee)
 
@@ -10,7 +11,8 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "Your learning network just got bigger!"
 		@head = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">' + @subscriber.first_last + '</a> has subscribed to you'
-		@limg = @subscriber.info.avatar.url
+		# @limg = @subscriber.info.avatar.url
+		@limg = teacher_thumb_lg(@subscriber)
 
 		bioarr = @subscriber.glance_info
 
@@ -41,7 +43,7 @@ class UserMailer < ActionMailer::Base
 		@pre = "Woah - you have a new message!"
 		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a>'
 		@linkto = 'http://www.claco.com/messages/' + @message.thread
-		@limg = @sender.info.avatar.url
+		@limg = teacher_thumb_lg(@sender)
 		@body = @message.body.rstrip
 
 		@html_safe = false
@@ -102,6 +104,21 @@ class UserMailer < ActionMailer::Base
 		# 		format.html {render "user_invite"}
 		# end
 
+	end
+
+	def teacher_thumb_lg(teacher)
+		#debugger
+		ret = Teacher.thumb_lg(teacher).to_s
+		if ret.empty?
+			# only display the generating image if the current teacher is viewing the thumb
+			#if Teacher.thumbscheduled?(teacher,'avatar_thumb_lg') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+				#asset_path("profile/gen-face-170.png")
+			#else
+				asset_path("profile/face-170.png")
+			#end
+		else
+			ret
+		end
 	end
 
 end

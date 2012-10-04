@@ -261,7 +261,7 @@ class BindersController < ApplicationController
 
 	def bookmarklet
 
-		
+		@root = signed_in? ? current_teacher.binders.root_binders : []
 
 	end
 

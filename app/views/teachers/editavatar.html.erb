@@ -34,7 +34,11 @@
 	<img src='<%= teacher_thumb_md(current_teacher) %>' />
 	<img src='<%= teacher_thumb_sm(current_teacher) %>' />
 	<br /> -->
-	<%= image_tag(teacher_thumb_lg(current_teacher), :class => "imger") %>
+	<% if Teacher.thumbscheduled?(current_teacher,'avatar_thumb_lg') %>
+		<%= image_tag(current_teacher.info.avatar.url.to_s, :class => "imger", :crop => :fill ) %>
+	<% else %>
+		<%= image_tag(teacher_thumb_lg(current_teacher), :class => "imger") %>
+	<% end %>
 	<span>Update your profile picture</span>
 	<br />
 	<%= f.file_field :file, :accept => "image/*" %>

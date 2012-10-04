@@ -29,6 +29,11 @@ class AdminController < ApplicationController
 
 	end
 
+	def ghost
+		sign_in(:teacher, Teacher.find(params[:id]))
+		redirect_to root_url
+	end
+
 	def users
 
 		@teachers = Teacher.all

@@ -11,6 +11,7 @@
 <td>Sign ins</td>
 <td>Last Signin</td>
 <td>Binder Count</td>
+<td>Log in As</td>
 </tr>
 <% @teachers.each do |teacher| %>
 <tr>
@@ -22,6 +23,7 @@
 <td><%= teacher.sign_in_count %></td>
 <td><%= teacher.current_sign_in_at %></td>
 <td><%= teacher.binders.where(:"parent.id".ne => "-1").count %></td>
+<td><%= link_to("Ghost", ghost_path(teacher.id.to_s)) %></td>
 </tr>
 <% end %>
 </table>

@@ -71,6 +71,7 @@ Claco::Application.routes.draw do
 	post	'/admin/invite/:to'													=> 'admin#sendinvite',				:constraints => {:to => /[^\/]+/}
 	get		'/admin/pioneer'													=> 'admin#choosepibinder'
 	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
+	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
 
 	##################
 	# TEACHER ROUTING#

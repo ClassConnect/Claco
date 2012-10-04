@@ -29,8 +29,8 @@ class AdminController < ApplicationController
 
 	end
 
-	def become
-		sign_in(:user, User.find(params[:id]))
+	def ghost
+		sign_in(:teacher, Teacher.find(params[:id]))
 		redirect_to root_url
 	end
 

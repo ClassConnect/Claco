@@ -1,5 +1,7 @@
 class UserMailer < ActionMailer::Base
+	layout 'email'
 	default from: "claco <support@claco.com>"
+
 
 	def new_sub(subscriber, subscribee)
 
@@ -8,7 +10,6 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "Your learning network just got bigger!"
 		@head = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">' + @subscriber.first_last + '</a> has subscribed to you'
-		@omission = ""
 		@limg = @subscriber.info.avatar.url
 
 		bioarr = @subscriber.glance_info
@@ -23,7 +24,7 @@ class UserMailer < ActionMailer::Base
 
 		end
 
-		@body += '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">view profile</a>'
+		@linkto = "http://www.claco.com/" + @subscriber.username
 
 		mail(from: "#{@subscriber.first_last} via Claco <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
@@ -39,7 +40,7 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "Woah - you have a new message!"
 		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a>'
-		@omission = '<a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">view full message</a>'
+		@linkto = 'http://www.claco.com/messages/' + @message.thread
 		@limg = @sender.info.avatar.url
 		@body = @message.body.rstrip
 

@@ -503,6 +503,18 @@ class Binder
 		return title
 	end
 
+	def cascadetimestamp
+
+		binderparents = self.parents.reject{|p| p["id"] == "0" || p[:id] == "0"}.map{|p| Binder.find(p["id"])}
+
+		binderparents.each do |binder|
+
+			binder.update_attributes(last_update: self.last_update)
+
+		end
+
+	end
+
 	def regen
 
 		if self.current_version.croc?
@@ -561,6 +573,11 @@ class Binder
 
 	end
 
+	def self.fixtimetamps
+
+		Binder.all.each{|binder| binder.update_attributes(:last_update => binder.subtree.sort_by(&:timestamp).last.last_update) if binder.type == 1}
+
+	end
 
 	###############################################################################################
 

@@ -29,6 +29,11 @@ class AdminController < ApplicationController
 
 	end
 
+	def become
+		sign_in(:user, User.find(params[:id]))
+		redirect_to root_url
+	end
+
 	def users
 
 		@teachers = Teacher.all

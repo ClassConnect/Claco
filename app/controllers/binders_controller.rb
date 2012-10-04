@@ -2094,10 +2094,10 @@ class BindersController < ApplicationController
 			retstr = "/#{binder.handle}/portfolio"
 
 			if binder.parents.length != 1 
-				retstr += "/#{URI.escape(binder.root)}" 
+				retstr += "/#{CGI.escape(binder.root)}" 
 			end
 
-			retstr += "/#{URI.escape(binder.title)}/#{binder.id}"
+			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

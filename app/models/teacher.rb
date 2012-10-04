@@ -266,7 +266,7 @@ class Teacher
 			origimg = Magick::ImageList.new
 
 			# retrieve fullsize image from S3 store, read into an ImageList object
-			open(teacher.info.avatar.url.to_s) do |f|
+			open(URI.escape(teacher.info.avatar.url.to_s)) do |f|
 				origimg.from_blob(f.read)
 			end
 
@@ -1058,6 +1058,8 @@ class Info
 	field :location,			:type => Array#,  spacial: {lat: :latitude, lng: :longitude, return_array: true }#  				spacial: true
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
+
+	validates_format_of :website, with: URI::regexp(%w(http https)), message: "The website entered is invalid"
 
 	embedded_in :teacher
 

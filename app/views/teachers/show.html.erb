@@ -121,8 +121,10 @@
     <div class="pull-right profile-module">
       <h3>
         <strong><%= @subscriptions.count %></strong>
-        Subscriptions 
-        <a class="view-all pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscriptions">View all</a>
+        Subscriptions
+        <% unless @subscriptions.count == 0 %>
+          <a class="view-all pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscriptions">View all</a>
+        <% end %>
       </h3>
       <ul class="profile-avatars">
         <% 
@@ -145,8 +147,10 @@
     <div class="pull-right profile-module">
       <h3>
         <strong><%= @subscribers.count %></strong>
-        Subscribers 
-        <a class="view-all pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscribers">View all</a>
+        Subscribers
+        <% unless @subscriptions.count == 0 %>
+          <a class="view-all pull-right" data-action="modal" data-url="<%= @teacher.username %>/subscribers">View all</a>
+        <% end %>
       </h3>
       <ul class="profile-avatars">
         <% 

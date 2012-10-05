@@ -73,7 +73,7 @@ class UserMailer < ActionMailer::Base
 			@link = "http://www.claco.com/join?key=#{invitation.code}&email=#{CGI.escape(invitation.to)}"
 
 			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
-				format.html {render "system_invite"}
+				format.html {render "system_invite", :layout => false}
 			end
 
 		else
@@ -83,7 +83,7 @@ class UserMailer < ActionMailer::Base
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
 
 			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Beta invite for claco") do |format|
-				format.html {render "user_invite"}
+				format.html {render "user_invite", :layout => false}
 			end
 
 		end

@@ -26,7 +26,7 @@ class UserMailer < ActionMailer::Base
 
 		end
 
-		@linkto = "http://www.claco.com/" + @subscriber.username
+		@button_info = [{linkto: "http://www.claco.com/" + @subscriber.username, text: 'View Profile'}]
 
 		mail(from: "#{@subscriber.first_last} via Claco <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
@@ -42,7 +42,8 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "Woah - you have a new message!"
 		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a>'
-		@linkto = 'http://www.claco.com/messages/' + @message.thread
+		@button_info = [{linkto: 'http://www.claco.com/messages/' + @message.thread, text: 'View Full Message'}]
+		@linkto = 
 		@limg = teacher_thumb_lg(@sender)
 		@body = @message.body.rstrip
 

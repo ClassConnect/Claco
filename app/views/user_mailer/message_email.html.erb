@@ -9,18 +9,20 @@
 <tr>
   <td style="padding: 10px 10px 0 60px; " align="center">
     <a href="#">
-      <img src="<%= @limg %>" style="max-width:200px;"/>
+      <img src="<%= @limg %>" width="200px" style="max-width:200px;"/>
     </a>
   </td>
   <td style="padding: 10px 60px 0 10px;" >
     <%= @head.html_safe %>
     <%= @html_safe ? truncate(@body, :length => 500).html_safe : truncate(@body, :length => 500) %>
-    <table>
-      <tr>
-        <td align="center" width="150" bgcolor="#cf142b" style="background: #cf142b; padding-top: 6px; padding-right: 10px; padding-bottom: 6px; padding-left: 10px; -webkit-border-radius: 6px; -moz-border-radius: 6px; border-radius: 6px; color: #fff; font-weight: bold; text-decoration: none; font-family: Helvetica, Arial, sans-serif; display: block;"><a href="<%= @linkto %>" style="color: #fff; text-decoration: none;">
-          <%= @message ? 'View Full Message' : 'View Profile' %>
-        </a></td>
-      </tr>
-    </table>
+    <ul style="list-style: none; padding: 10px 0 0; margin-top: 5px;">
+      <% @button_info.each do |info| %> 
+        <li style='margin-bottom: 8px; margin-left: 0px; width: 170px;'>
+          <a href="<%= info[:linkto] %>" align="center" width="150" bgcolor="#cb0101" style="background: #cb0101; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; -webkit-border-radius: 15px; -moz-border-radius: 15px; border-radius: 15px; color: #fff; font-weight: bold; text-decoration: none; font-family: Helvetica, Arial, sans-serif; display: block; color: #fff; text-decoration: none; width: auto;">
+            <%= info[:text] %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
   </td>
 </tr>

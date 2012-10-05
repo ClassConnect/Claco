@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
     def store_location
       session[:previous_urls] ||= []
       # store unique urls only
-      session[:previous_urls].prepend request.fullpath if session[:previous_urls].first != request.fullpath && request.fullpath != destroy_teacher_session_path
+      session[:previous_urls].prepend request.fullpath if session[:previous_urls].first != request.fullpath && request.fullpath != destroy_teacher_session_path && !request.fullpath.include?("favicon.ico")
       # For Rails < 3.2
       # session[:previous_urls].unshift request.fullpath if session[:previous_urls].first != request.fullpath 
       session[:previous_urls].pop if session[:previous_urls].count > 2

@@ -118,7 +118,6 @@ stockfilethumbs/xls.png: stockfilethumbs/xls-980bc311d58b7f23802c0e12c8d66294.pn
 stockfilethumbs/xlsx.png: stockfilethumbs/xlsx-618bc0693ac24e4179ffd92317a67cd6.png
 success.png: success-11af90207d2f9fb4bbeae9239725ac5c.png
 application.js: application-4cee0af7ecc8cd375f8a30c69f4ad0ac.js
-binder.js: binder-3af39f1da6f167c2cbf453ed74daff3d.js
 binders/folder.js: binders/folder-91db727ad472f6a83e12fb3f7b3030ee.js
 binders/icheck.js: binders/icheck-5c1621b3f36a3f184889c9e35c9f8aca.js
 binders/pretags.js: binders/pretags-9aeb3580994267ddf468f4dbd4bfdffd.js
@@ -138,9 +137,7 @@ gen/wizard.js: gen/wizard-7523ae0f935550c9aff5e16185825d59.js
 home/main.js: home/main-301c922b6573173306f7b0e87c3363bf.js
 home/pub.js: home/pub-02a36d8b4d98f3403fcb9a38da0ff118.js
 jqueryui.js: jqueryui-c04b8ed279f78b6387c8d090964d2e16.js
-media_server_api.js: media_server_api-3af39f1da6f167c2cbf453ed74daff3d.js
 messages/show.js: messages/show-af1bfe6546d966549eb5e11fd056910c.js
-omniauth_callbacks.js: omniauth_callbacks-3af39f1da6f167c2cbf453ed74daff3d.js
 profile/main.js: profile/main-ff0376a2336f8194e0602536646c5372.js
 search/main.js: search/main-4e16709cce13c68fd83fd5fe3fce9a18.js
 tabs.js: tabs-c33b80148176645ee1b9efdc16eae810.js
@@ -149,7 +146,6 @@ wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
 wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
 application.css: application-63ca2e5350d3168f27e20286eb888daa.css
-binders.css: binders-7270767b2a9e9fff880aa5de378ca791.css
 binders/folder.css: binders/folder-40f61fb57e03f42611e5cc63aff6193e.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
 buttons/buttons.css: buttons/buttons-9cca403a266424438923ea405de6337f.css
@@ -169,7 +165,6 @@ home/pub/team.css: home/pub/team-ce1e43f72a8d96a8b08ce936c64f0aaf.css
 home/pub/uwt.css: home/pub/uwt-1e8baecc5f7a535e85a2df14dad531cf.css
 home/public.css: home/public-35bb08bfaa76af2064bebb8bd1f8a953.css
 jqueryui.css: jqueryui-3e5488d61bcd5d2d63259970ab23b226.css
-media_server_api.css: media_server_api-7270767b2a9e9fff880aa5de378ca791.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
 strap.css: strap-67a539b8b7564fe71daf5473f00d5735.css

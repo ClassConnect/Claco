@@ -282,7 +282,8 @@ class TeachersController < ApplicationController
 															:class => 'avatar',
 															:url => current_teacher.info.avatar.url.to_s,
 															:model => [current_teacher.id.to_s],
-															:datahash => datahash.to_s })
+															:datahash => datahash.to_s,
+															:origin => ENV['SERVERCLASS']=='staging' })
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,

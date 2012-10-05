@@ -360,10 +360,10 @@ class Teacher
 		end
 
 		# iterate through single-line content items
-		[{:type => 'location', 	:content => "From #{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
-		{:type => 'subjects', 	:content => "Subjects taught: #{info.subjects.join(', ')}"},
-		{:type => 'grades', 	:content => "Grades taught: #{info.grades.join(', ')}"},
-		{:type => 'website', 	:content => "Website: #{info.website}"}].each do |f|
+		[{:type => 'location', 	:content => info.fulllocation == ', , ' ? '' : "From: #{info.fulllocation}"},
+		{:type => 'subjects', 	:content => info.subjects.empty? ? '' : "Subjects taught: #{info.subjects.join(', ')}"},
+		{:type => 'grades', 	:content => info.grades.empty? ? '' : "Grades taught: #{info.grades.join(', ')}"},
+		{:type => 'website', 	:content => info.website.empty? ? '' : "Website: #{info.website}"}].each do |f|
 
 			retarr << f if !f[:content].nil? && !f[:content].empty?
 

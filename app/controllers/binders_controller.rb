@@ -318,7 +318,7 @@ class BindersController < ApplicationController
 			end
 
 			if !embed && !embedtourl
-				RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
+				# RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
 				url = true
 			end
 
@@ -1855,7 +1855,7 @@ class BindersController < ApplicationController
 		
 		def follow(url, hop = 0)
 		
-			raise "Url is not redirecting properly" if hop == 5
+			return url if hop == 5
 
 			r = RestClient.get(url){|r1,r2,r3|r1}
 
@@ -1865,7 +1865,7 @@ class BindersController < ApplicationController
 
 			rescue
 
-			raise "Url is not redirecting properly"
+			return url
 
 		end
 

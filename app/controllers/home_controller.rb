@@ -188,7 +188,7 @@ class HomeController < ApplicationController
 
 		if f.nil?
 
-			title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze(' ')
+			title = Nokogiri::HTML(RestClient.get(URI.escape(params[:url]))).title.strip.squeeze(' ')
 
 		else
 

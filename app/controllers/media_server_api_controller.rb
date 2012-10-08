@@ -59,11 +59,11 @@ class MediaServerApiController < ApplicationController
 				stathash['avatar_thumb_md']['generated'] = true
 				stathash['avatar_thumb_sm']['generated'] = true
 
-				model.update_attribute(:avatarstatus, stathash)
+				model.update_attributes(:avatarstatus => stathash)
 
-				#model.thumbnails = params[:thumbs]
-				model.update_attribute(:thumbnails,params[:thumbs])
-				#model.teacher.save
+				model.thumbnails = params[:thumbs]
+				#model.update_attribute(:thumbnails,params[:thumbs])
+				model.teacher.save
 			end
 
 			respond_to do |format|

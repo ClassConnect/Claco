@@ -1087,7 +1087,7 @@ class Info
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 
-	validates_format_of :website, with: URI::regexp(%w(http https)), message: "The website entered is invalid"
+	validates_format_of :website, with: URI::regexp(%w(http https)), message: "The website entered is invalid", allow_blank: true
 
 	embedded_in :teacher
 

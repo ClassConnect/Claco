@@ -270,7 +270,7 @@ class TeachersController < ApplicationController
 			stathash['avatar_thumb_md']['scheduled'] = true
 			stathash['avatar_thumb_sm']['scheduled'] = true
 
-			current_teacher.info.update_attribute(:avatarstatus, stathash)
+			current_teacher.info.update_attributes(:avatarstatus => stathash)
 
 			storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
 

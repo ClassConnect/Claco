@@ -1057,7 +1057,7 @@ class Info
 
 	#validates_with InfoValidator
 
-	attr_accessible :avatarstatus, :thumbnails
+	attr_accessible :avatarstatus, :thumbnails, :website, :grades, :subjects, :bio, :city, :state, :country, :location 
 
 	field :avatarstatus, :type => Hash, :default => { 	"avatar_thumb_lg" => { "generated" => false, "scheduled" => false },
 													 	"avatar_thumb_mg" => { "generated" => false, "scheduled" => false },

@@ -43,7 +43,7 @@ Claco::Application.routes.draw do
 	get		'/subscribedlog'													=> 'home#subscribedlog'
 	get		'/educators'														=> 'home#educators'
 
-	get		'/mediaserver/:id'													=> 'media_server_api#tokencheck'
+	#get		'/mediaserver/:id'													=> 'media_server_api#tokencheck'
 	get		'/mediaservertest'													=> 'media_server_api#mediaserver'
 	post	'/mediaserver/thumbs'												=> 'media_server_api#addthumbs'
 
@@ -71,6 +71,7 @@ Claco::Application.routes.draw do
 	post	'/admin/invite/:to'													=> 'admin#sendinvite',				:constraints => {:to => /[^\/]+/}
 	get		'/admin/pioneer'													=> 'admin#choosepibinder'
 	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
+	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
 
 	##################
 	# TEACHER ROUTING#

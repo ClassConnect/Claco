@@ -1,4 +1,7 @@
 class UserMailer < ActionMailer::Base
+	include Sprockets::Helpers::RailsHelper
+	include Sprockets::Helpers::IsolatedHelper
+	layout 'email'
 	default from: "claco <support@claco.com>"
 
 	def new_sub(subscriber, subscribee)
@@ -8,8 +11,8 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "Your learning network just got bigger!"
 		@head = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">' + @subscriber.first_last + '</a> has subscribed to you'
-		@omission = ""
-		@limg = @subscriber.info.avatar.url
+		# @limg = @subscriber.info.avatar.url
+		@limg = teacher_thumb_lg(@subscriber)
 
 		bioarr = @subscriber.glance_info
 
@@ -23,7 +26,7 @@ class UserMailer < ActionMailer::Base
 
 		end
 
-		@body += '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">view profile</a>'
+		@button_info = [{linkto: "http://www.claco.com/" + @subscriber.username, text: 'View Profile'}]
 
 		mail(from: "#{@subscriber.first_last} via Claco <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
@@ -39,8 +42,9 @@ class UserMailer < ActionMailer::Base
 
 		@pre = "Woah - you have a new message!"
 		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a>'
-		@omission = '<a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">view full message</a>'
-		@limg = @sender.info.avatar.url
+		@button_info = [{linkto: 'http://www.claco.com/messages/' + @message.thread, text: 'View Full Message'}]
+		@linkto = 
+		@limg = teacher_thumb_lg(@sender)
 		@body = @message.body.rstrip
 
 		@html_safe = false
@@ -69,7 +73,7 @@ class UserMailer < ActionMailer::Base
 			@link = "http://www.claco.com/join?key=#{invitation.code}&email=#{CGI.escape(invitation.to)}"
 
 			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
-				format.html {render "system_invite"}
+				format.html {render "system_invite", :layout => false}
 			end
 
 		else
@@ -79,7 +83,7 @@ class UserMailer < ActionMailer::Base
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
 
 			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Beta invite for claco") do |format|
-				format.html {render "user_invite"}
+				format.html {render "user_invite", :layout => false}
 			end
 
 		end
@@ -101,6 +105,21 @@ class UserMailer < ActionMailer::Base
 		# 		format.html {render "user_invite"}
 		# end
 
+	end
+
+	def teacher_thumb_lg(teacher)
+		#debugger
+		ret = Teacher.thumb_lg(teacher).to_s
+		if ret.empty?
+			# only display the generating image if the current teacher is viewing the thumb
+			#if Teacher.thumbscheduled?(teacher,'avatar_thumb_lg') && signed_in? && teacher.id.to_s == current_teacher.id.to_s
+				#asset_path("profile/gen-face-170.png")
+			#else
+				asset_path("profile/face-170.png")
+			#end
+		else
+			ret
+		end
 	end
 
 end

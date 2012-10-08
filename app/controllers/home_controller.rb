@@ -279,8 +279,6 @@ class HomeController < ApplicationController
 
 			@teachers=@teachers.results.to_a
 
-			#debugger
-
 			if @teachers.map { |f| f.id.to_s }.include? current_teacher.id.to_s
 				@teachers = @teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )
 			end

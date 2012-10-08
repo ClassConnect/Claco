@@ -83,7 +83,7 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig, :pub_size, :priv_size, :total_size
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig, :pub_size, :priv_size, :total_size, :avatarstatus, :thumbnails
 	
 	validate :username_blacklist
 
@@ -166,25 +166,29 @@ class Teacher
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
 			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
-			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 		=> { :type => 'object', :properties => { :username => { :type => 'string', :analyzer => 'ngram_analyzer' },
-																															 :uid => 	  { :type => 'object', :enabled => false },
-																															 :profile =>  { :type => 'object', :enabled => false },
-																															 :fids => 	  { :type => 'object', :enabled => false },
-																															 :data => 	  { :type => 'object', :enabled => false }}},
-																	:facebook 		=> { :type => 'object', :enabled => false }}
-			indexes :info, 		:type => 'object', 	:properties => {:thumbnails		=> { :type => 'object', :enabled => false, :store => "yes" },
-																	:avatar 		=> { :type => 'object',	:enabled => false },
-																	:size 			=> { :type => 'object', :enabled => false },
-																	:ext 			=> { :type => 'object', :enabled => false },
-																	:data 			=> { :type => 'object', :enabled => false },
-																	:grades 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																	:subjects 		=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																	:bio 			=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
-																	:website 		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																	:city			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																	:state 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																	:country		=> { :type => 'string', :analyzer => 'ngram_analyzer' },
-																	:location		=> { :type => 'geo_point', :default => [] } }
+			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 			=> { :type => 'object', :properties => { :username 	=> 	{ :type => 'string', :analyzer => 'ngram_analyzer' },
+																															 	 :uid 		=> 	{ :type => 'object', :enabled => false },
+																																 :profile 	=> 	{ :type => 'object', :enabled => false },
+																																 :fids 		=> 	{ :type => 'object', :enabled => false },
+																																 :data 		=> 	{ :type => 'object', :enabled => false }}},
+																	:facebook 			=> { :type => 'object', :enabled => false }}
+			indexes :info, 		:type => 'object', 	:properties => {:thumbnails			=> { :type => 'object', :enabled => false, :store => "yes" },
+																	:avatar 			=> { :type => 'object',	:enabled => false },
+																	:avatar_thumb_lg	=> { :type => 'object',	:enabled => false }, 
+																	:avatar_thumb_mg	=> { :type => 'object',	:enabled => false }, 
+																	:avatar_thumb_md	=> { :type => 'object',	:enabled => false }, 
+																	:avatar_thumb_sm	=> { :type => 'object',	:enabled => false }, 
+																	:size 				=> { :type => 'object', :enabled => false },
+																	:ext 				=> { :type => 'object', :enabled => false },
+																	:data 				=> { :type => 'object', :enabled => false },
+																	:grades 			=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																	:subjects 			=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
+																	:bio 				=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
+																	:website 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:city				=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:state 				=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:country			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
+																	:location			=> { :type => 'geo_point', :default => [] } }
 		end
 	end
 
@@ -228,28 +232,28 @@ class Teacher
 
 	def self.thumb_lg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_lg.url.to_s : nil #teacher.info.avatar.url(:thumb_lg) : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : nil #teacher.info.avatar.url(:thumb_lg) : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[0] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_mg (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_mg.url.to_s : nil #teacher.info.avatar.url(:thumb_mg).to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : nil #teacher.info.avatar.url(:thumb_mg).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[1] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_md (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_md.url.to_s : nil #teacher.info.avatar.url(:thumb_md).to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : nil #teacher.info.avatar.url(:thumb_md).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[2] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
 
 	def self.thumb_sm (teacher)
 
-		return Teacher.thumbready?(teacher) ? teacher.info.avatar_thumb_sm.url.to_s : nil #teacher.info.avatar.url(:thumb_sm).to_s : nil #asset_path("placer.png")
+		return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : nil #teacher.info.avatar.url(:thumb_sm).to_s : nil #asset_path("placer.png")
 		#return Teacher.thumbready?(teacher) ? teacher.info.thumbnails[3] : (teacher.info.avatar.nil?||teacher.info.avatar.url.nil?) ? "/assets/placer.png" : teacher.info.avatar.url.to_s
 
 	end
@@ -279,6 +283,10 @@ class Teacher
 			GC.start
 
 			stathash = teacher.info.avatarstatus
+			stathash['avatar_thumb_lg']['scheduled'] = false
+			stathash['avatar_thumb_mg']['scheduled'] = false
+			stathash['avatar_thumb_md']['scheduled'] = false
+			stathash['avatar_thumb_sm']['scheduled'] = false
 			stathash['avatar_thumb_lg']['generated'] = true
 			stathash['avatar_thumb_mg']['generated'] = true
 			stathash['avatar_thumb_md']['generated'] = true
@@ -292,9 +300,27 @@ class Teacher
 											:avatar_thumb_md => FilelessIO.new(origimg.resize_to_fill!(AVATAR_MDIM, AVATAR_MDIM, Magick::CenterGravity).to_blob).set_filename(MD_AVATAR_FILENAME),
 											:avatar_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(AVATAR_SDIM, AVATAR_SDIM, Magick::CenterGravity).to_blob).set_filename(SM_AVATAR_FILENAME))
 
+			teacher.info.update_attributes( :thumbnails => [teacher.info.avatar_thumb_lg.url.to_s,
+															teacher.info.avatar_thumb_mg.url.to_s,
+															teacher.info.avatar_thumb_md.url.to_s,
+															teacher.info.avatar_thumb_sm.url.to_s])
+
 			origimg.destroy!
 
 			GC.start
+
+	end
+
+	def shift_thumb_urls
+
+		#debugger
+
+		return if self.info.nil? || !self.info.avatarstatus['avatar_thumb_sm']['generated'] #|| !self.info.avatarstatus['avatar_thumb_sm']['scheduled']
+
+		self.info.update_attributes( :thumbnails => [self.info.avatar_thumb_lg.url.to_s,
+													 self.info.avatar_thumb_mg.url.to_s,
+													 self.info.avatar_thumb_md.url.to_s,
+													 self.info.avatar_thumb_sm.url.to_s])
 
 	end
 
@@ -334,10 +360,10 @@ class Teacher
 		end
 
 		# iterate through single-line content items
-		[{:type => 'location', 	:content => "From #{info.city+', ' if !info.city.nil? && !info.city.empty?}#{info.state+', ' if !info.state.nil? && !info.state.empty?}#{info.country if !info.country.nil? && !info.country.empty?}"},
-		{:type => 'subjects', 	:content => "Subjects taught: #{info.subjects.join(', ')}"},
-		{:type => 'grades', 	:content => "Grades taught: #{info.grades.join(', ')}"},
-		{:type => 'website', 	:content => "Website: #{info.website}"}].each do |f|
+		[{:type => 'location', 	:content => info.fulllocation == ', , ' ? '' : "From: #{info.fulllocation}"},
+		{:type => 'subjects', 	:content => info.subjects.empty? ? '' : "Subjects taught: #{info.subjects.join(', ')}"},
+		{:type => 'grades', 	:content => info.grades.empty? ? '' : "Grades taught: #{info.grades.join(', ')}"},
+		{:type => 'website', 	:content => info.website.empty? ? '' : "Website: #{info.website}"}].each do |f|
 
 			retarr << f if !f[:content].nil? && !f[:content].empty?
 
@@ -1031,6 +1057,8 @@ class Info
 
 	#validates_with InfoValidator
 
+	attr_accessible :avatarstatus, :thumbnails
+
 	field :avatarstatus, :type => Hash, :default => { 	"avatar_thumb_lg" => { "generated" => false, "scheduled" => false },
 													 	"avatar_thumb_mg" => { "generated" => false, "scheduled" => false },
 													 	"avatar_thumb_md" => { "generated" => false, "scheduled" => false },
@@ -1058,6 +1086,8 @@ class Info
 	field :location,			:type => Array#,  spacial: {lat: :latitude, lng: :longitude, return_array: true }#  				spacial: true
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
+
+	validates_format_of :website, with: URI::regexp(%w(http https)), message: "The website entered is invalid", allow_blank: true
 
 	embedded_in :teacher
 

@@ -505,11 +505,11 @@ class Binder
 
 	def cascadetimestamp
 
-		binderparents = self.parents.map{|p| Binder.find(p["id"])}
+		binderparents = self.parents.reject{|p| p["id"] == "0" || p[:id] == "0"}.map{|p| Binder.find(p["id"])}
 
 		binderparents.each do |binder|
 
-			binder.update_attributes(last_message: Time.now.to_i)
+			binder.update_attributes(last_update: self.last_update)
 
 		end
 

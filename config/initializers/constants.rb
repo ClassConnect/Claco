@@ -131,7 +131,7 @@ if Rails.env == "development"
 	MEDIASERVER_API_URL = 'localhost:5001/api'
 	APPSERVER_API_URL = 'localhost:5000/mediaserver/thumbs'
 else
-	MEDIASERVER_API_URL = '184.73.195.113/api'
+	MEDIASERVER_API_URL = '184.73.195.113:5000/api'
 	APPSERVER_API_URL = 'http://claco.com/mediaserver/thumbs'
 end
 

@@ -318,7 +318,7 @@ class BindersController < ApplicationController
 			end
 
 			if !embed && !embedtourl
-				RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
+				# RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
 				url = true
 			end
 
@@ -339,7 +339,7 @@ class BindersController < ApplicationController
 
 					if !((url || embedtourl) && link.empty?)
 
-						if (embed ? true : !URI.parse(link).host.include?("teacherspayteachers.com"))
+						if (embed ? true : !Addressable::URI.heuristic_parse(link).host.include?("teacherspayteachers.com"))
 						
 							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 													:owner				=> current_teacher.id,
@@ -375,9 +375,9 @@ class BindersController < ApplicationController
 											@binder.id.to_s,
 											params)
 
+
 								if url || embedtourl
-									uri = URI.parse(link)
-									# debugger
+									uri = Addressable::URI.heuristic_parse(link)
 
 									stathash = @binder.current_version.imgstatus
 									stathash[:imgfile][:retrieved] = true
@@ -1855,7 +1855,7 @@ class BindersController < ApplicationController
 		
 		def follow(url, hop = 0)
 		
-			raise "Url is not redirecting properly" if hop == 5
+			return url if hop == 5
 
 			r = RestClient.get(url){|r1,r2,r3|r1}
 
@@ -1865,7 +1865,7 @@ class BindersController < ApplicationController
 
 			rescue
 
-			raise "Url is not redirecting properly"
+			return url
 
 		end
 

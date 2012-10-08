@@ -188,7 +188,7 @@ class HomeController < ApplicationController
 
 		if f.nil?
 
-			title = Nokogiri::HTML(RestClient.get(params[:url])).title.strip.squeeze(' ')
+			title = Nokogiri::HTML(RestClient.get(URI.escape(params[:url]))).title.strip.squeeze(' ')
 
 		else
 
@@ -278,8 +278,6 @@ class HomeController < ApplicationController
 			end
 
 			@teachers=@teachers.results.to_a
-
-			#debugger
 
 			if @teachers.map { |f| f.id.to_s }.include? current_teacher.id.to_s
 				@teachers = @teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )

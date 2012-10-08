@@ -72,11 +72,11 @@
 	        <div class="titler"><%= link_to binder.title[0..50], named_binder_route(binder), :class => "pjax linkster" %></div>
 	        <div class="reflink">
 	        	<% if binder.type == 1 %>
-	    		<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
+	    			<%= image_tag "binders/file.png", :style => "margin-top:-3px;margin-right:1px" %><%= binder.files %> &bull; <%= number_to_human_size(binder.total_size) %>
 	        	<% elsif binder.format == 2  && !binder.current_version.embed %>
-	    		<%= URI.parse(binder.current_version.data).host.sub(/www\./, "") %>
+	    			<%= Addressable::URI.heuristic_parse(binder.current_version.data).host.sub(/www\./, "") %>
 	    		<% else %>
-				<%= binder.current_version.ext %> &bull; <%= number_to_human_size(binder.total_size) %>
+					<%= binder.current_version.ext %> &bull; <%= number_to_human_size(binder.total_size) %>
 	        	<% end %>
 	        </div>
 

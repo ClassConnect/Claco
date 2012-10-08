@@ -339,7 +339,7 @@ class BindersController < ApplicationController
 
 					if !((url || embedtourl) && link.empty?)
 
-						if (embed ? true : !URI.parse(link).host.include?("teacherspayteachers.com"))
+						if (embed ? true : !Addressable::URI.heuristic_parse(link).host.include?("teacherspayteachers.com"))
 						
 							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
 													:owner				=> current_teacher.id,
@@ -375,9 +375,9 @@ class BindersController < ApplicationController
 											@binder.id.to_s,
 											params)
 
+
 								if url || embedtourl
-									uri = URI.parse(link)
-									# debugger
+									uri = Addressable::URI.heuristic_parse(link)
 
 									stathash = @binder.current_version.imgstatus
 									stathash[:imgfile][:retrieved] = true

@@ -203,6 +203,9 @@ function selectPickFolder(fObj) {
 	var folid = $(fObj).parent().attr('folid');
 	var text = $(fObj).text();
 
+	var changeBinder = $.Event("changeBinder");		// custom event
+	$(fObj).parent().trigger(changeBinder);
+	
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);
 	$(fObj).closest(".pickerpane").hide();
@@ -210,11 +213,24 @@ function selectPickFolder(fObj) {
 }
 
 function getQueryHash() {
-	// returns a map of query parameters
-	var ad={};
-	location.search.replace(/[A-Z0-9]+?=(\w*)/gi,
-		function(ae) {
-			ad[ae.split("=").shift()]=ae.split("=").pop();
-		});
-	return ad;
+    // returns a map of query parameters
+    function getParameterByName(name) {
+        // returns value of named query param
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regexString = "[\\?&]" + name + "=([^&#]*)";
+        var regex = new RegExp(regexString);
+        var results = regex.exec(window.location.search);
+        if(results == null)
+            return "";
+        else
+            return decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    var queryMap={};
+    location.search.replace(/[A-Z0-9]+?=(\w*)/gi,
+        function(ae) {
+            key = ae.split("=").shift();
+            queryMap[key] = getParameterByName(key);
+        });
+    return queryMap;
 }

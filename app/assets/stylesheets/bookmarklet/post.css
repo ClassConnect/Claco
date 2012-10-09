@@ -1,0 +1,36 @@
+.navbar .container {
+	width: auto;
+}
+
+.brand img {
+	margin-left: 16px;
+}
+
+#postitem {
+	width: 80%;
+	background: white;
+	margin: auto;
+	padding: 12px 36px;
+}
+
+form input,
+form textarea {
+	display: block;
+	width:240px;
+}
+
+.description {
+	display:none;
+}
+
+.descToggle {
+	display: block;
+}
+
+.fol-picker {
+	margin-left: 110px;
+}
+
+#msgBox h4 {
+	text-transform: capitalize;
+}

@@ -263,6 +263,12 @@ class BindersController < ApplicationController
 
 	end
 
+	def bookmarklet
+
+		@root = signed_in? ? current_teacher.binders.root_binders : []
+
+	end
+
 	#Add links function
 	def createcontent
 		
@@ -350,7 +356,7 @@ class BindersController < ApplicationController
 													:parents			=> @parentsarr,
 													:last_update		=> Time.now.to_i,
 													:last_updated_by	=> current_teacher.id.to_s,
-													:body				=> params[:body],
+													:body				=> params[:body] || "",
 													:order_index		=> @parent_child_count,
 													:parent_permissions	=> @parentperarr,
 													:files				=> 1,
@@ -493,9 +499,14 @@ class BindersController < ApplicationController
 		rescue
 			errors << "Invalid URL"
 		ensure
-			respond_to do |format|
-				format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
+			if request.get?
+				redirect_to named_binder_route(@binder) and return
+			else
+				respond_to do |format|
+					format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
+				end
 			end
+
 
 	end
 

@@ -239,6 +239,10 @@ class HomeController < ApplicationController
 		@title = "About"
 	end
 
+	def goodies
+		@title = "Goodies"
+	end
+
 	def united
 		@title = "United We Teach"
 	end

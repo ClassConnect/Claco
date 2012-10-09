@@ -6,7 +6,9 @@
     <% @subscriptions.each do |sub| %>
     <li>
         <%= image_tag(teacher_thumb_md(sub), {:class => 'thumbster'}) %>
-        <% if !current_teacher.subscribed_to?(sub.id) %>
+        <% if !signed_in? %>
+            <a class="btn btn-mini subbtn pull-right" href="/login">Subscribe</a>
+        <% elsif !current_teacher.subscribed_to?(sub.id) %>
             <button class="btn btn-mini subbtn pull-right" data-action="subscribe" data-url="<%= sub.username %>/subscribe" type="button">Subscribe</button>
         <% else %>
             <span class="pull-right">✓ Subscribed!</span>

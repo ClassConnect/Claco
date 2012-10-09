@@ -13,7 +13,7 @@ class AdminController < ApplicationController
 
 	def invites
 
-		@invites = Invitation.all
+		@invites = Invitation.page(params[:page]).per(100)
 
 	end
 
@@ -25,7 +25,7 @@ class AdminController < ApplicationController
 
 	def apps
 
-		@apps = Applicant.all
+		@apps = Applicant.page(params[:page]).per(100)
 
 	end
 
@@ -36,7 +36,7 @@ class AdminController < ApplicationController
 
 	def users
 
-		@teachers = Teacher.all
+		@teachers = Teacher.page(params[:page]).per(100)
 
 	end
 

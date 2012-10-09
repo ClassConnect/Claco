@@ -250,6 +250,7 @@ a.view-all:hover {
 }
 
 #facebox li button,
+#facebox li .subbtn,
 #facebox li span {
   margin: 12px 5px 0 0;
   font-weight: bolder;

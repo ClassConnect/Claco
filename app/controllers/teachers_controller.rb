@@ -527,7 +527,9 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s).sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1}
+		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s)
+
+		@subscribers = @subscribers.sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1} if signed_in?
 
 		render "subscribers", :layout => false
 
@@ -537,7 +539,9 @@ class TeachersController < ApplicationController
 
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])}.sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1}
+		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])}
+
+		@subscriptions = @subscriptions.sort_by{|t| current_teacher.subscribed_to?(t.id) ? 0 : 1} if signed_in?
 
 		render "subscriptions", :layout => false
 

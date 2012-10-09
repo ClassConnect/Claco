@@ -105,7 +105,7 @@
         <li>
           <a href="<%= @teacher.info.website %>" target="_blank">
             <span class="webIcon"><%= image_tag("settings/website.png", :style => "margin-top:-4px") %></span>
-            <%= URI.parse(@teacher.info.website).host.sub(/www\./, "") %>
+            <%= Addressable::URI.heuristic_parse(@teacher.info.website).host.sub(/www\./, "") %>
           </a>
         </li>
         <% end %>

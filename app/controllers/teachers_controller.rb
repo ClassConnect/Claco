@@ -1,5 +1,5 @@
 class TeachersController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:show]
+	before_filter :authenticate_teacher!, :except => [:show, :subscribers, :subscriptions]
 
 	#/teachers
 	#Lists all teachers

@@ -97,7 +97,7 @@ class TeachersController < ApplicationController
 			search.filter :terms, :method => FEED_METHOD_WHITELIST
 			search.filter :terms, :ownerid => [@teacher.id.to_s]
 
-			search.size 200
+			search.size 100
 
 			search.sort { by :timestamp, 'desc' }
 

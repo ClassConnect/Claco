@@ -62,6 +62,7 @@ class MediaServerApiController < ApplicationController
 				model.update_attributes(:avatarstatus => stathash)
 
 				model.thumbnails = params[:thumbs]
+				#model.update_attribute(:thumbnails,params[:thumbs])
 				model.teacher.save
 			end
 

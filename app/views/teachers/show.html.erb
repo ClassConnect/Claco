@@ -39,7 +39,7 @@
           </a>
           <% end %>
         <% else %>
-          <a class="btn btn-medium btn-primary actbtn" href="/apply">
+          <a class="btn btn-medium btn-primary actbtn" href="/login">
             <%= image_tag("profile/whitescribe.png", :style => "float:left;height:12px;margin:3px 5px 0 0") %>
             <span class="upme">Subscribe</span>
           </a>
@@ -105,7 +105,7 @@
         <li>
           <a href="<%= @teacher.info.website %>" target="_blank">
             <span class="webIcon"><%= image_tag("settings/website.png", :style => "margin-top:-4px") %></span>
-            <%= URI.parse(@teacher.info.website).host.sub(/www\./, "") %>
+            <%= Addressable::URI.heuristic_parse(@teacher.info.website).host.sub(/www\./, "") %>
           </a>
         </li>
         <% end %>

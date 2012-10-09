@@ -83,7 +83,7 @@ class Teacher
 
 	embeds_many :relationships#, validate: false
 
-	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig, :pub_size, :priv_size, :total_size
+	attr_accessible :username, :email, :password, :password_confirmation, :remember_me, :login, :fname, :lname, :title, :getting_started, :emailconfig, :pub_size, :priv_size, :total_size, :avatarstatus, :thumbnails
 	
 	validate :username_blacklist
 
@@ -1057,6 +1057,8 @@ class Info
 
 	#validates_with InfoValidator
 
+	attr_accessible :avatarstatus, :thumbnails, :website, :grades, :subjects, :bio, :city, :state, :country, :location 
+
 	field :avatarstatus, :type => Hash, :default => { 	"avatar_thumb_lg" => { "generated" => false, "scheduled" => false },
 													 	"avatar_thumb_mg" => { "generated" => false, "scheduled" => false },
 													 	"avatar_thumb_md" => { "generated" => false, "scheduled" => false },
@@ -1085,7 +1087,7 @@ class Info
 	field :twitterhandle,		:type => String, :default => ""
 	field :facebookurl,			:type => String, :default => ""
 
-	validates_format_of :website, with: URI::regexp(%w(http https)), message: "The website entered is invalid"
+	validates_format_of :website, with: URI::regexp(%w(http https)), message: "The website entered is invalid", allow_blank: true
 
 	embedded_in :teacher
 

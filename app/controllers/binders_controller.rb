@@ -89,7 +89,7 @@ class BindersController < ApplicationController
 
 				#Rails.logger.debug "METHOD got here! #{__method__}"
 
-				new_binder.cascadetimestamp
+				# new_binder.cascadetimestamp
 
 				new_binder.save
 

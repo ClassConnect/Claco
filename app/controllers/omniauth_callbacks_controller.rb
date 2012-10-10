@@ -4,6 +4,9 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 		# raise request.env["omniauth.auth"].to_yaml
 		teacher = Teacher.from_omniauth(request.env["omniauth.auth"], current_teacher)
 		if teacher.save
+
+			# schedule extraction of profile pictures, give priority to twitter
+
 			redirect_to root_path and return if session["gs"] == "true"
 			redirect_to editinfo_path
 		else

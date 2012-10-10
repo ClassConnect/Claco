@@ -459,13 +459,13 @@ class Teacher
 				end
 				if !t_id.nil? && !t_id.empty?
 					if !vec[id]
-						vec[id] = { t_id => ~0x40 }
+						vec[id] = { t_id => ~INVITE_BITMAP }
 						ids << t_id
 					elsif !vec[id][t_id]
-						vec[id][t_id] = ~0x40
+						vec[id][t_id] = ~INVITE_BITMAP
 						ids << t_id
 					else
-						vec[id][t_id] &= ~0x40
+						vec[id][t_id] &= ~INVITE_BITMAP
 					end
 					ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
 					ids = []
@@ -475,13 +475,13 @@ class Teacher
 				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~0x20 }
+						vec[id] = { f.id.to_s => ~GRADE_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~0x20
+						vec[id][f.id.to_s] = ~GRADE_BITMAP
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] &= ~0x20
+						vec[id][f.id.to_s] &= ~GRADE_BITMAP
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -491,13 +491,13 @@ class Teacher
 				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~0x10 }
+						vec[id] = { f.id.to_s => ~SUBJECT_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~0x10
+						vec[id][f.id.to_s] = ~SUBJECT_BITMAP
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] |= ~0x10
+						vec[id][f.id.to_s] |= ~SUBJECT_BITMAP
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -507,13 +507,13 @@ class Teacher
 			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 				next if f.id.to_s==id
 				if !vec[id]
-					vec[id] = { f.id.to_s => ~0x8 }
+					vec[id] = { f.id.to_s => ~SUBSC_BITMAP }
 					ids << f.id.to_s
 				elsif !vec[id][f.id.to_s]
-					vec[id][f.id.to_s] = ~0x8
+					vec[id][f.id.to_s] = ~SUBSC_BITMAP
 					ids << f.id.to_s
 				else
-					vec[id][f.id.to_s] &= ~0x8
+					vec[id][f.id.to_s] &= ~SUBSC_BITMAP
 				end
 			end
 			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -522,13 +522,13 @@ class Teacher
 				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~0x4 }
+						vec[id] = { f.id.to_s => ~TWITTER_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~0x4
+						vec[id][f.id.to_s] = ~TWITTER_BITMAP
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] &= ~0x4
+						vec[id][f.id.to_s] &= ~TWITTER_BITMAP
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -538,13 +538,13 @@ class Teacher
 				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~0x2 }
+						vec[id] = { f.id.to_s => ~FACEBOOK_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~0x2
+						vec[id][f.id.to_s] = ~FACEBOOK_BITMAP
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] &= ~0x2
+						vec[id][f.id.to_s] &= ~FACEBOOK_BITMAP
 					end
 				end
 				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -554,13 +554,13 @@ class Teacher
 			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
 			# 		next if f.id.to_s==id
 			# 		if !vec[id]
-			# 			vec[id] = { f.id.to_s => ~0x10 }
+			# 			vec[id] = { f.id.to_s => ~GEO_BITMAP }
 			# 			ids << f.id.to_s
 			# 		elsif !vec[id][f.id.to_s]
-			# 			vec[id][f.id.to_s] = ~0x10
+			# 			vec[id][f.id.to_s] = ~GEO_BITMAP
 			# 			ids << f.id.to_s
 			# 		else
-			# 			vec[id][f.id.to_s] |= ~0x10
+			# 			vec[id][f.id.to_s] |= ~GEO_BITMAP
 			# 		end
 			# 	end
 			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
@@ -864,7 +864,7 @@ class Teacher
 
 				self.info.update_attributes(:data => url.to_s,
 											:size => 0,
-											:remote_avatar_url => to_s,
+											:remote_avatar_url => url.to_s,
 											:avatarstatus => stathash)
 
 
@@ -872,7 +872,7 @@ class Teacher
 
 				datahash = Digest::MD5.hexdigest(storedir + 'avatar' + url.to_s + [self.id.to_s].to_s + TX_PRIVATE_KEY)
 
-				debugger
+				#debugger
 
 				begin
 					response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,

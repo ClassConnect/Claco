@@ -138,3 +138,13 @@ end
 # dijkstra
 # allows for doubling while remaining a 4B variable
 INFINITY = 1<<30
+
+# Recommendation Bitmaps
+
+GEO_BITMAP = 0x01
+FACEBOOK_BITMAP = 0x02
+TWITTER_BITMAP = 0x04
+SUBSC_BITMAP = 0x08
+SUBJECT_BITMAP = 0x10
+GRADE_BITMAP =  0x20
+INVITE_BITMAP = 0x40

@@ -6,6 +6,7 @@ class OmniauthCallbacksController < Devise::OmniauthCallbacksController
 		if teacher.save
 
 			# schedule extraction of profile pictures, give priority to twitter
+			teacher.avatar_from_omnihash
 
 			redirect_to root_path and return if session["gs"] == "true"
 			redirect_to editinfo_path

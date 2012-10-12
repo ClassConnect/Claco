@@ -154,7 +154,7 @@ buttons/zocial-regular-webfont.svg: buttons/zocial-regular-webfont-0e6254926a7b2
 buttons/zocial-regular-webfont.ttf: buttons/zocial-regular-webfont-64b8100c4452b3191c14f52556955667.ttf
 buttons/zocial-regular-webfont.woff: buttons/zocial-regular-webfont-beb0af4aa85ca3f84348c19883dbdbd9.woff
 devise/apply.css: devise/apply-0ad1afb7a35de94bd1e3ed2d11b7c881.css
-devise/newuser.css: devise/newuser-699e38e3ba35e57a0543559fe1fe1d89.css
+devise/newuser.css: devise/newuser-88889376cf2fb83872f64630ae27a397.css
 editinfo.css: editinfo-18c1eaa9ada96e5b8c9dd1219da2e825.css
 gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
 home/educators.css: home/educators-d7dcc222e05084ff8471838a71aba1c8.css
@@ -168,7 +168,7 @@ jqueryui.css: jqueryui-3e5488d61bcd5d2d63259970ab23b226.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
 strap.css: strap-67a539b8b7564fe71daf5473f00d5735.css
-teacher.css: teacher-ab07ee20fc1f3038ff427f8aa2dcfa61.css
+teacher.css: teacher-ec8c81086dd990ea25534ba2bb32805b.css
 widgets/icheck.css: widgets/icheck-9f8386150ad015fa20947d4a7971e1fb.css
 jquery.pjax.js: jquery.pjax-d1cce8182a1606ac7252c4296716256c.js
 video-js.css: video-js-8fba5d3e38e191d2268019543ae06d89.css

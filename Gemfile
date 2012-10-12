@@ -53,6 +53,7 @@ gem 'newrelic_rpm'
 gem 'exceptional'
 gem 'memcachier'
 gem 'dalli'
+gem 'sitemap_generator'
 
 gem 'mini_magick'
 gem 'rmagick'

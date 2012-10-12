@@ -17,7 +17,6 @@
   background: #fff;
 }
 
-
 .labeler {
   width:85px;
   color:#666;
@@ -38,6 +37,7 @@ td>input {
   font-size:14px;
   font-weight:bolder;
 }
+
 .ui-autocomplete {
   font-size:12px;
   -moz-border-radius-topleft: 0; -webkit-border-top-left-radius: 0; -khtml-border-top-left-radius: 0; border-top-left-radius: 0;
@@ -60,10 +60,12 @@ td>input {
   -webkit-box-shadow:0px 0px 2px #ccc;
   box-shadow:0px 0px 2px #ccc;
 }
+
 .ui-autocomplete a.ui-state-hover {
   color:#333;
   background:none;
 }
+
 #ui-active-menuitem {
   border-color:#ddd;
   border-left:1px solid #D9E8FF;
@@ -91,4 +93,8 @@ td>input {
   text-transform: uppercase;
   font-weight:bolder;
   margin-left:3px;
+}
+
+#flash_alert {
+  color: #cb0101;
 }

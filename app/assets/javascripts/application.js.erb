@@ -32,12 +32,25 @@ $(document).ready(function() {
 		fieldAdder();
 	});
 
+	$('#forgot_link').one('click', function /* prefillForgotPage */ (e){
+		e.preventDefault();
+		var username = $('input#user-info').val();
+		var link = $(this).attr('href');
+		$('#forgot_link').attr('href', link+'?user='+username);
+		$('#forgot_link').click();
+	});
+
+	$('input#forgot_user').val(getQueryHash().user);
+
+
+
 	// $('.new_teacher #teacher_email').each(
 	// 	function change email () {
 	// 		$(this).attr('value', getQueryHash().email || '');
 	// 	});
 
 });
+
 
 function fieldAdder () {
     $('#facebox input#invite_').last()

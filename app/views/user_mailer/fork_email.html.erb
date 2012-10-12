@@ -1,0 +1,26 @@
+<tr>
+  <td style="padding: 30px 0 30px 60px;" colspan="2">
+    <h1 style="padding:0; margin:0; font-weight: normal; font-family: Helvetica, Arial, sans-serif; color: #5a5a5a;">
+      <%= @pre  %>
+    </h1>
+  </td>
+</tr>
+
+<tr>
+  <td style="padding: 10px 10px 0 60px; " align="center">
+    <a href="<%= @limg_link %>">
+      <img src="<%= @limg %>" width="200px" style="max-width:200px;"/>
+    </a>
+  </td>
+  <td style="padding: 10px 60px 0 20px;" >
+    <p> <%= 'Wow ' + @resource.title + ' was really helpful!' %></p>
+    <p> <%= @head.html_safe + ' snapped ' + @resource.title + ' to one of their binders:' %> </p>
+    <ul style="list-style: none; padding: 10px 0 0; margin-top: 5px;">
+      <li style='margin-bottom: 8px; margin-left: 0px; width: 170px;'>
+        <a href="<%= @linkto %>" align="center" width="150" bgcolor="#cb0101" style="background: #cb0101; text-align: center; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; -webkit-border-radius: 15px; -moz-border-radius: 15px; border-radius: 15px; color: #fff; font-weight: bold; text-decoration: none; font-family: Helvetica, Arial, sans-serif; display: block; color: #fff; text-decoration: none; width: auto;">
+          Check it out!
+        </a>
+      </li>
+    </ul>
+  </td>
+</tr>

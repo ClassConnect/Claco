@@ -95,17 +95,41 @@ class UserMailer < ActionMailer::Base
 	def fork_notification(ogbinder, forkedbinder, forker, forkee)
 
 		#All params are actual objects
-		@pre = "Someone has snapped your content!"
+		@pre = "Nice! " + forker.first_last + "is using your stuff!"
 		@head = '<a href="http://www.claco.com/' + forker.username + '" style="font-weight:bolder">' + forker.first_last + '</a>'
-		@omission = ''#'<a href="http://www.claco.com/messages/' + @message.thread + '" style="font-weight:bolder">view full message</a>'
 		@limg = forker.info.avatar.url
-		@body = ""
+		@resource = forkedbinder
+		@linkto = "http://www.claco.com#{named_binder_route(@resource)}"
 
-		@html_safe = false
+		# @html_safe = true
 
-		# mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "Someone forked") do |format|
-		# 		format.html {render "user_invite"}
-		# end
+		mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "FYI - #{forker.first_last} just snapped #{@resource.title}!") do |format|
+				format.html {render "fork_email"}
+		end
+
+	end
+
+	def named_binder_route(binder, action = "show")
+
+		if binder.class == Binder
+			retstr = "/#{binder.handle}/portfolio"
+
+			if binder.parents.length != 1 
+				retstr += "/#{CGI.escape(binder.root)}" 
+			end
+
+			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+
+			if action != "show" 
+				retstr += "/#{action}" 
+			end
+
+			return retstr
+		elsif binder.class == String 
+			return named_binder_route(Binder.find(binder), action)
+		else
+			return "/500.html"
+		end
 
 	end
 

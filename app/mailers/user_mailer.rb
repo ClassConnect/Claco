@@ -60,8 +60,6 @@ class UserMailer < ActionMailer::Base
 	end
 
 	def new_invite(invitation)
-
-
 		invitation.status["sent"] = true
 
 		invitation.sent_at = Time.now.to_i
@@ -69,15 +67,12 @@ class UserMailer < ActionMailer::Base
 		invitation.save
 
 		if invitation.from == "0"
-
 			@link = "http://www.claco.com/join?key=#{invitation.code}&email=#{CGI.escape(invitation.to)}"
 
-			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your beta invite is ready :)") do |format|
+			mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Your Claco beta invite is ready :)") do |format|
 				format.html {render "system_invite", :layout => false}
 			end
-
 		else
-
 			@sender = Teacher.find(invitation.from)
 
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
@@ -85,9 +80,16 @@ class UserMailer < ActionMailer::Base
 			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Beta invite for claco") do |format|
 				format.html {render "user_invite", :layout => false}
 			end
-
 		end
+	end
 
+	def new_user(teacher)
+		user = Teacher.find(teacher)
+		@username = user.first_last
+
+		mail(from: "Eric Simons <support@claco.com>", :to => user.email, :subject => "Your Claco account has been created!") do |format|
+			format.html {render "welcome"}
+		end
 	end
 
 	def fork_notification(ogbinder, forkedbinder, forker, forkee)

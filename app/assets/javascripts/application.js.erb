@@ -65,11 +65,6 @@ function destroyAsyc() {
 	$('.async-pop').slideUp(200).animate({ opacity: 0 },{ queue: false, duration: 200});
 }
 
-
-
-
-
-
 function htmlEncode(value){
     if (value) {
         return jQuery('<div />').text(value).html();
@@ -86,12 +81,10 @@ function htmlDecode(value) {
     }
 }
 
-
 // close facebox
 function closefBox() {
 	jQuery(document).trigger('close.facebox');
 }
-
 
 // facebox form helpers
 function fbFormActLoader() {
@@ -129,10 +122,6 @@ function showFormError(data) {
 	$("#facebox .errorBox").html(data).show();
 }
 
-
-
-
-
 // okay so now lets build the picker functions
 function togglePicker(tObj) {
 	tObj = $(tObj);
@@ -142,7 +131,6 @@ function togglePicker(tObj) {
 		tObj.parent().find('.pickerpane').show();
 	}
 }
-
 
 function togglePickFolder(fObj) {
 	var childs = $(fObj).parent().find('.dirWrap:first');
@@ -162,8 +150,7 @@ function togglePickFolder(fObj) {
 	} else {
 		$(fObj).parent().find(".dirWrap").html('Loading...').show();
 		$(fObj).addClass('arrow-down').removeClass('arrow-right');
-
-		
+	
 
 		$.getJSON($(fObj).parent().attr('turl') + '.json', function(data) {
 

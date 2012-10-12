@@ -403,6 +403,35 @@ class Teacher
 		return self.relationships.find_or_initialize_by(:user_id => id).colleague_status
 	end
 
+	def schedule_autosubs
+
+		Setting.f("autosubs").v.each do |autosub|
+			Teacher.delay(:queue => "autosub", :run_at => autosub["delay"].days.from_now).autosub(self.id.to_s, autosub["id"])
+		end
+
+	end
+
+	def self.autosub(teacher_id, subscriber_id)
+
+		teacher = Teacher.find(teacher_id)
+
+		subscriber = Teacher.find(subscriber_id)
+
+		subscriber.subscribe_to(teacher)
+
+	end
+
+	def subscribe_to(teacher)
+
+		# ignore duplicate requests
+		return if self.subscribed_to?(teacher.id.to_s)
+
+		self.relationship_by_teacher_id(teacher.id.to_s).subscribe()
+
+		Teacher.delay(:queue => "email").newsub_email(self.id.to_s, teacher.id.to_s)
+
+	end
+
 	def self.find_first_by_auth_conditions(warden_conditions)
 		conditions = warden_conditions.dup
 		if login = conditions.delete(:login)

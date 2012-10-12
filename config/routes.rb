@@ -73,6 +73,10 @@ Claco::Application.routes.draw do
 	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
 	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
 
+	get		'/admin/autosubs'													=> 'admin#autosubs',				:as => 'autosub'
+	post	'/admin/autosubs'													=> 'admin#addautosub'
+	delete	'/admin/autosubs/:id'												=> 'admin#removeautosub',			:as => 'remove_autosub'
+
 	##################
 	# TEACHER ROUTING#
 	##################

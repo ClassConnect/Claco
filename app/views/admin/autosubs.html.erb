@@ -1,0 +1,36 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<% unless @autosubs.empty? %>
+<table>
+<tr>
+<td>Username</td>
+<td>Id</td>
+<td>Full Name</td>
+<td>Subscribe After</td>
+<td>Remove</td>
+</tr>
+<% @autosubs.each do |teacher| %>
+<tr>
+<td><%= teacher.username %></td>
+<td><%= teacher.id.to_s %></td>
+<td><%= teacher.full_name %></td>
+<td><%= @autosub_hash.find{|t| t["id"] == teacher.id.to_s}["delay"] %></td>
+<td><%= link_to("Remove", remove_autosub_path(teacher.id.to_s), method: :delete) %></td>
+</tr>
+<% end %>
+</table>
+<% end %>
+
+<h1>Add user</h1>
+<%= form_tag autosub_path, :method => :post do %>
+
+	<%= label_tag :autosub, "Username:" %>
+	<%= text_field_tag :autosub %>
+
+	<%= label_tag :delay, "Delay:" %>
+	<%= number_field_tag :delay, nil, :in => 1..100 %> days
+
+	<%= submit_tag("Add") %>
+
+<% end %>

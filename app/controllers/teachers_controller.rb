@@ -303,8 +303,6 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		debugger
-
 		current_teacher.info = Info.new if current_teacher.info.nil?
 
 		if current_teacher.fname!=params[:teacher][:fname] || current_teacher.lname!=params[:teacher][:lname]
@@ -313,8 +311,6 @@ class TeachersController < ApplicationController
 									:lname => params[:teacher][:lname])
 			end
 		end
-
-		#debugger
 
 		current_teacher.update_attributes(params[:teacher])
 
@@ -329,8 +325,6 @@ class TeachersController < ApplicationController
 												:location		=> params[:lng].empty? || params[:lat].empty? ? nil : [params[:lng].to_f, params[:lat].to_f]
 												#:size			=> !params[:info][:avatar].nil? ? params[:info][:avatar].size : current_teacher.info.size,
 												)
-
-		#debugger
 
 		# BEGIN IMAGE SERVER
 

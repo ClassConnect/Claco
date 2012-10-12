@@ -40,6 +40,31 @@ class AdminController < ApplicationController
 
 	end
 
+	def autosubs
+
+		@autosub_hash = Setting.f("autosubs").v
+		@autosubs = (@autosub_hash || []).map{|h| Teacher.find(h["id"])}
+
+	end
+
+	def addautosub
+
+		teacher = Teacher.where(:username => /#{Regexp.escape(params[:autosub])}/i).first
+
+		Setting.f("autosubs").v = (Setting.f("autosubs").v || []) << {"id" => teacher.id.to_s, "delay" => params[:delay].to_i}
+
+		redirect_to autosub_path
+
+	end
+
+	def removeautosub
+
+		Setting.f("autosubs").v = (Setting.f("autosubs").v || []).reject{|c| c["id"] == params[:id]}
+
+		redirect_to autosub_path
+
+	end
+
 	# Concurrency fix
 	# Setting.f("sys_inv_list").v = Setting.f("sys_inv_list").v.map{|e| i = Invitation.where(:to => e["email"]).first; e["invited_at"] = i.submitted unless i.nil?; e["invited"] = true unless i.nil?; e}
 	

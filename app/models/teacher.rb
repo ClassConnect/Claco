@@ -443,9 +443,12 @@ class Teacher
 	end
 
 	#TODO: convert these to ElasticSearch queries!
-	def self.vectors (id, degree = 1, vec = {})
+	def self.vectors (id, degree = 1, vec = {}, ids = [])
 
-		if degree>0
+		#debugger
+		# determine vec.size
+
+		if degree!=0
 			id = id.to_s
 			ids = []
 			teacher = Teacher.find(id.to_s)
@@ -467,12 +470,54 @@ class Teacher
 					else
 						vec[id][t_id] &= ~INVITE_BITMAP
 					end
-					ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-					ids = []
+					#ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+					#ids = []
 				end
 			end
+			if 	!teacher.omnihash.nil? && 
+				!teacher.omnihash.empty? &&
+				!teacher.omnihash['twitter'].nil? && 
+				!teacher.omnihash['twitter'].empty? && 
+				!teacher.omnihash['twitter']['fids'].nil? &&
+				!teacher.omnihash['twitter']['fids'].empty?
+				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => ~TWITTER_BITMAP }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = ~TWITTER_BITMAP
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] &= ~TWITTER_BITMAP
+					end 
+				end
+				#ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				#ids = []
+			end
+			if 	!teacher.omnihash.nil? && 
+				!teacher.omnihash.empty? && 
+				!teacher.omnihash['facebook'].nil? && 
+				!teacher.omnihash['facebook'].empty? && 
+				!teacher.omnihash['facebook']['fids'].nil? &&
+				!teacher.omnihash['facebook']['fids'].empty?
+				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
+					next if f.id.to_s==id
+					if !vec[id]
+						vec[id] = { f.id.to_s => ~FACEBOOK_BITMAP }
+						ids << f.id.to_s
+					elsif !vec[id][f.id.to_s]
+						vec[id][f.id.to_s] = ~FACEBOOK_BITMAP
+						ids << f.id.to_s
+					else
+						vec[id][f.id.to_s] &= ~FACEBOOK_BITMAP
+					end
+				end
+				#ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				#ids = []
+			end
 			if !teacher.info.nil? && !teacher.info.grades.nil? && !teacher.info.grades.empty?
-				Teacher.any_in(:'info.grades' => teacher.info.grades).each do |f|
+				Teacher.any_in(:'info.grades' => teacher.info.grades).any_in(:'info.subjects' => teacher.info.subjects).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
 						vec[id] = { f.id.to_s => ~GRADE_BITMAP }
@@ -484,8 +529,8 @@ class Teacher
 						vec[id][f.id.to_s] &= ~GRADE_BITMAP
 					end
 				end
-				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-				ids = []
+				#ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				#ids = []
 			end
 			if !teacher.info.nil? && !teacher.info.subjects.nil? && !teacher.info.subjects.empty?
 				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
@@ -500,56 +545,25 @@ class Teacher
 						vec[id][f.id.to_s] |= ~SUBJECT_BITMAP
 					end
 				end
-				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-				ids = []
+				#ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+				#ids = []
 			end
-
-			teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
-				next if f.id.to_s==id
-				if !vec[id]
-					vec[id] = { f.id.to_s => ~SUBSC_BITMAP }
-					ids << f.id.to_s
-				elsif !vec[id][f.id.to_s]
-					vec[id][f.id.to_s] = ~SUBSC_BITMAP
-					ids << f.id.to_s
-				else
-					vec[id][f.id.to_s] &= ~SUBSC_BITMAP
-				end
-			end
-			ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-			ids = []
-			if teacher.omnihash && teacher.omnihash['twitter'] && teacher.omnihash['twitter']['fids']
-				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
+			if degree > 0
+				teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~TWITTER_BITMAP }
+						vec[id] = { f.id.to_s => ~SUBSC_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~TWITTER_BITMAP
+						vec[id][f.id.to_s] = ~SUBSC_BITMAP
 						ids << f.id.to_s
 					else
-						vec[id][f.id.to_s] &= ~TWITTER_BITMAP
+						vec[id][f.id.to_s] &= ~SUBSC_BITMAP
 					end
 				end
-				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-				ids = []
 			end
-			if teacher.omnihash && teacher.omnihash['facebook'] && teacher.omnihash['facebook']['fids']
-				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
-					next if f.id.to_s==id
-					if !vec[id]
-						vec[id] = { f.id.to_s => ~FACEBOOK_BITMAP }
-						ids << f.id.to_s
-					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~FACEBOOK_BITMAP
-						ids << f.id.to_s
-					else
-						vec[id][f.id.to_s] &= ~FACEBOOK_BITMAP
-					end
-				end
-				ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
-				ids = []
-			end
+			#ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
+			#ids = []
 			# if !teacher.info.nil? && !teacher.info.location.nil? && teacher.info.location!={:lng=>0.0, :lat=>0.0}
 			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
 			# 		next if f.id.to_s==id
@@ -566,8 +580,18 @@ class Teacher
 			# 	ids.each { |g| vec = Teacher.vectors(g,degree-1,vec) }
 			# 	ids = []
 			# end
+
+			if degree>0
+				ids.clone.each do |f|
+					temp = Teacher.vectors(f,degree-1,vec,ids)
+					vec = temp[0]
+					ids = (ids + temp[1]).flatten.uniq
+				end
+			end
 		end
-		vec
+
+		[vec,ids]
+		#vec
 
 	end
 
@@ -723,7 +747,6 @@ class Teacher
 		# return if keys.nil?
 
 		# Rails.cache.delete("self.id.to_s}recs")
-
 		#debugger
 
 		if Rails.cache.read("#{self.id.to_s}recs").nil?
@@ -732,9 +755,11 @@ class Teacher
 
 			#debugger
 
-			vectors = Teacher.vectors(self.id.to_s,2)
+			vectors = Teacher.vectors(self.id.to_s,2)[0]
 
 			recs = (Teacher.dijkstra(vectors,self.id.to_s).sort_by { |e| e[1][:dist] }.map { |f| f[0] })# - subs
+
+			recs = Teacher.vectors(self.id.to_s,-1)[1] + recs
 
 			# steven : 503bfe25fafac30002000011
 			# jerry  : 502d3b822fc6100002000012
@@ -748,20 +773,20 @@ class Teacher
 			#debugger
 
 			#TODO: migrate this into the algorithm
-			if !self.code.nil? && !self.code.empty? && self.code.to_s!="0"
-				t_id = nil
-				case self.code.to_s.length.to_i
-				when 24
-					t_id = self.code.to_s
-				when 32
-					invitation = Invitation.where(:code => self.code.to_s).first
-					t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
-				end
-			end
+			# if !self.code.nil? && !self.code.empty? && self.code.to_s!="0"
+			# 	t_id = nil
+			# 	case self.code.to_s.length.to_i
+			# 	when 24
+			# 		t_id = self.code.to_s
+			# 	when 32
+			# 		invitation = Invitation.where(:code => self.code.to_s).first
+			# 		t_id = Teacher.find(invitation.from.to_s).id.to_s if !invitation.nil? && !invitation.from.nil? && invitation.from.to_s!="0"
+			# 	end
+			# end
 
 			#debugger
 
-			recs = (t_id.to_a + recs) if (!t_id.nil? && !t_id.empty?)
+			#recs = (t_id.to_a + recs) if (!t_id.nil? && !t_id.empty?)
 
 			recs = recs.flatten.uniq - subs
 

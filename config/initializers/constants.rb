@@ -141,6 +141,8 @@ INFINITY = 1<<30
 
 # Recommendation Bitmaps
 
+# bitmap size correlates directly with rank order
+
 GEO_BITMAP = 0x01
 FACEBOOK_BITMAP = 0x02
 TWITTER_BITMAP = 0x04

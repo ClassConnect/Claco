@@ -925,6 +925,8 @@ class Teacher
 
 		end
 
+		UserMailer.new_user(self).deliver
+
 	end
 
 	private

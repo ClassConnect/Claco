@@ -34,6 +34,12 @@ class UserMailer < ActionMailer::Base
 		end
 	end
 
+	def send_nag(invitation)
+		mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Beta invite for claco") do |format|
+			format.html {render "invite_nag", :layout => false}
+		end
+	end
+
 	def new_user(user)
 		@username = user.first_last
 
@@ -108,6 +114,7 @@ class UserMailer < ActionMailer::Base
 		end
 	end
 
+protected
 	def named_binder_route(binder, action = "show")
 		if binder.class == Binder
 			retstr = "/#{binder.handle}/portfolio"

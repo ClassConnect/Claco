@@ -20,6 +20,12 @@ class Applicant
 	validates_presence_of :body, :message => "Please enter a few words about yourself."
 	validates_uniqueness_of :email, :message => "We already have an applicant under the submitted email."
 
+	after_create do
+
+		UserMailer.request_invite(self.email).deliver
+
+	end
+
 	def approve
 
 		self.set(:status, 1)

@@ -35,6 +35,13 @@ class UserMailer < ActionMailer::Base
 	end
 
 	def send_nag(invitation)
+
+		if invitation.from == "0"
+			@link = "http://www.claco.com/join?key=#{invitation.code}&email=#{CGI.escape(invitation.to)}"
+		else
+			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
+		end
+
 		mail(from: "Eric Simons <support@claco.com>", :to => invitation.to, :subject => "Beta invite for claco") do |format|
 			format.html {render "invite_nag", :layout => false}
 		end

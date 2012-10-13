@@ -33,11 +33,33 @@
 
 	<% end %>
 
+
+	<% #educators = current_teacher.recommends[0..8].shuffle[0..2].map{ |f| Teacher.find(f.to_s) } 
+
+		# because I'm fucking lazy
+		educators = []
+		current_teacher.recommends[0..8].shuffle[0..2].each do |f|
+			begin
+				educators << Teacher.find(f.to_s)
+			rescue
+				next
+			end
+		end
+
+	%>
+
 	<% current_teacher.recommends.each do |f| %>
 
 	<% cache("#{f.to_s}educobj", :expires_in => 10.minutes) do %>
 
-	<% @rec = Teacher.find(f.to_s) %>
+	<% 
+		begin
+			@rec = Teacher.find(f.to_s) 
+		rescue
+			next
+		end
+
+	%>
 
 	<div class="listitem">
 		<a href="/<%= @rec.username %>">

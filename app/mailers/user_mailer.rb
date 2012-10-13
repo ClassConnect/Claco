@@ -5,7 +5,7 @@ class UserMailer < ActionMailer::Base
 	default from: "claco <support@claco.com>"
 
 	def request_invite(email)
-		mail(from: "Eric Simons <support@claco.com>", to: email, subject: "Thanks for signing up for Claco!") do |format|
+		mail(from: "Eric Simons <support@claco.com>", to: email, subject: "Thanks for requesting an invite to Claco!") do |format|
 			format.html {render "request_invite", :layout => false}
 		end
 	end
@@ -28,7 +28,7 @@ class UserMailer < ActionMailer::Base
 
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
 
-			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Beta invite for claco") do |format|
+			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Come collaborate with me on claco") do |format|
 				format.html {render "user_invite", :layout => false}
 			end
 		end
@@ -37,12 +37,15 @@ class UserMailer < ActionMailer::Base
 	def new_user(user)
 		@username = user.first_last
 
-		mail(from: "Eric Simons <support@claco.com>", :to => user.email, :subject => "Your Claco account has been created!") do |format|
+		mail(from: "Eric Simons <support@claco.com>", :to => user.email, :subject => "Re: Welcome to Claco!") do |format|
 			format.html {render "welcome"}
 		end
 	end
 
 	def new_sub(subscriber, subscribee)
+
+		@prefix_email = ['Woah!', 'Nice!', 'Woohoo!', 'Awesome!']
+
 		@subscriber = Teacher.find(subscriber)
 		@subscribee = Teacher.find(subscribee)
 
@@ -65,7 +68,7 @@ class UserMailer < ActionMailer::Base
 
 		@button_info = [{linkto: "http://www.claco.com/" + @subscriber.username, text: 'View Profile'}]
 
-		mail(from: "#{@subscriber.first_last} via Claco <support@claco.com>", to: @subscribee.email, subject: "FYI - #{@subscriber.first_last} subscribed to you") do |format|
+		mail(from: "#{@subscriber.first_last} via Claco <support@claco.com>", to: @subscribee.email, subject: "#{@subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
 		end
 	end
@@ -95,7 +98,7 @@ class UserMailer < ActionMailer::Base
 
 	def fork_notification(ogbinder, forkedbinder, forker, forkee)
 		#All params are actual objects
-		@pre = "Nice! " + forker.first_last + "is using your stuff!"
+		@pre = forker.first_last + " thinks you rock!"
 		@head = '<a href="http://www.claco.com/' + forker.username + '" style="font-weight:bolder">' + forker.first_last + '</a>'
 		@limg = forker.info.avatar.url
 		@resource = forkedbinder
@@ -103,7 +106,7 @@ class UserMailer < ActionMailer::Base
 
 		# @html_safe = true
 
-		mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "FYI - #{forker.first_last} just snapped #{@resource.title}!") do |format|
+		mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "#{forker.first_last} just used one of your resources") do |format|
 				format.html {render "fork_email"}
 		end
 	end

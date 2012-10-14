@@ -72,6 +72,9 @@ Claco::Application.routes.draw do
 	get		'/admin/pioneer'													=> 'admin#choosepibinder'
 	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
 	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
+	get 	'/admin/updatethumbnails'											=> 'admin#choosethumbnails'			#:as => 
+	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
+	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
 
 	##################
 	# TEACHER ROUTING#

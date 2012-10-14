@@ -132,11 +132,9 @@ class AdminController < ApplicationController
 
 		end
 
-	end
-
-	def choosethumbnails
-
-		render 'admin/updatethumbnails'
+		respond_to do |format|
+			format.json { render :json => {}.to_json }
+		end
 
 	end
 
@@ -172,6 +170,10 @@ class AdminController < ApplicationController
 													  params[:thumb4].to_s.empty? ? binder.thumbimgids[3] : params[:thumb4].to_s])
 		rescue
 			return
+		end
+
+		respond_to do |format|
+			format.json { render :json => {}.to_json }
 		end
 
 		#render 'admin/updatethumbnails'

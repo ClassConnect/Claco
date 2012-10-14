@@ -1,0 +1,199 @@
+<script type="text/javascript">
+	function wipeoutthumbs() {
+
+		submitThumbs('/admin/updatethumbnails?wipe=1&binderid='+document.getElementById('binderid').value)
+
+		//setTimeout(refreshpreviews(),1000)
+
+	}
+	function refreshpreviews() {
+
+		//alert(document.getElementById('binderid').value);
+		response = httpGet('/admin/getthumbnails?type=folder&binderid='+document.getElementById('binderid').value)
+		//alert(response[0])
+		document.getElementById('oldlg').innerHTML = '<img src=\''+response[0]+'\'/>'
+		document.getElementById('oldsm1').innerHTML = '<img src=\''+response[1]+'\'/>'
+		document.getElementById('oldsm2').innerHTML = '<img src=\''+response[2]+'\'/>'
+		document.getElementById('oldsm3').innerHTML = '<img src=\''+response[3]+'\'/>'
+		document.getElementById('oldids').innerHTML = 'Large Thumb:'+response[4][0]+'<br/>'+'Small Thumb 1:'+response[4][1]+'<br/>'+'Small Thumb 2:'+response[4][2]+'<br/>'+'Small Thumb 3:'+response[4][3]+'<br/>'
+
+		//alert(document.getElementById('thumb1').value)
+
+		if (document.getElementById('thumb1').value != '') {
+			//alert(document.getElementById('newlg').innerHTML)
+			//alert(httpGet('/admin/getthumbnails?type=content&binderid='+document.getElementById('thumb1').value))
+			document.getElementById('newlg').innerHTML = '<img src=\''+httpGet('/admin/getthumbnails?type=content&binderid='+document.getElementById('thumb1').value)[0]+'\'/>'
+		}
+		if (document.getElementById('thumb2').value != '') {
+			document.getElementById('newsm1').innerHTML = '<img src=\''+httpGet('/admin/getthumbnails?type=content&binderid='+document.getElementById('thumb2').value)[1]+'\'/>'
+		}
+		if (document.getElementById('thumb3').value != '') {
+			document.getElementById('newsm2').innerHTML = '<img src=\''+httpGet('/admin/getthumbnails?type=content&binderid='+document.getElementById('thumb3').value)[1]+'\'/>'
+		}
+		if (document.getElementById('thumb4').value != '') {
+			document.getElementById('newsm3').innerHTML = '<img src=\''+httpGet('/admin/getthumbnails?type=content&binderid='+document.getElementById('thumb4').value)[1]+'\'/>'
+		}
+
+	}
+	function updatethumbnails() {
+
+		submitThumbs('/admin/updatethumbnails?binderid='+document.getElementById('binderid').value+'&thumb1='+document.getElementById('thumb1').value+'&thumb2='+document.getElementById('thumb2').value+'&thumb3='+document.getElementById('thumb3').value+'&thumb4='+document.getElementById('thumb4').value)
+
+
+	}
+	function submitThumbs(theUrl)
+    {
+	    var xmlHttp = null;
+
+	    xmlHttp = new XMLHttpRequest();
+	    xmlHttp.open( "POST", theUrl, false );
+	    xmlHttp.send( null );
+	    //eval('(' + req.responseText + ')');
+	   	//return xmlHttp.responseText;
+	   	return eval('(' + xmlHttp.responseText + ')');
+    }
+	function httpGet(theUrl)
+    {
+	    var xmlHttp = null;
+
+	    xmlHttp = new XMLHttpRequest();
+	    xmlHttp.open( "GET", theUrl, false );
+	    xmlHttp.send( null );
+	    //eval('(' + req.responseText + ')');
+	   	//return xmlHttp.responseText;
+	   	return eval('(' + xmlHttp.responseText + ')');
+    }
+</script>
+<h3>
+<p>>> Page will not auto-refresh thumbnails.  Click 'Refresh previews' to see the current thumbs in the database, and the new thumbnail previews </p>
+<p>>> To clear a thumbnail field, click 'Wipe out thumbs'.  This will wipe out all four thumbnail fields to empty fields. This cannot be undone!</p>
+<p>>> Clicking 'Submit replacement folder thumbnails' submits the values in the text boxes, NOT what is necessarily displayed in the preview.  </p>
+<p>>> Refresh the previews to make sure you know what you are submitting!</p>
+</h3>
+<%= form_tag updatethumbnails_path, :method => :post do %>
+
+	<table>
+		<tr>
+			<td>
+				<%= label_tag :binderid, "Folder ID (my preview thumbnails will be changed)" %>
+			</td>
+			<td>
+				<%= text_field_tag :binderid %>
+			</td>
+		</tr>
+		<tr>
+			<td colspan='3'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				If a thumbnail is to remain unchanged, leave the box blank
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= label_tag :thumb1, "Large thumb binder ID" %>
+			</td>
+			<td>
+				<%= text_field_tag :thumb1 %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= label_tag :thumb2, "Small thumb 1 binder ID" %>
+			</td>
+			<td>
+				<%= text_field_tag :thumb2 %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= label_tag :thumb3, "Small thumb 2 binder ID" %>
+			</td>
+			<td>
+				<%= text_field_tag :thumb3 %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= label_tag :thumb4, "Small thumb 3 binder ID" %>
+			</td>
+			<td>
+				<%= text_field_tag :thumb4 %>
+			</td>
+		</tr>
+	</table>
+<br />
+<% end %>
+<br />
+<button onclick="refreshpreviews()">Refresh previews</button>
+<br /><br />
+<table>
+	<tr>
+		<td valign='top'>
+			<h3>
+				Current Folder Thumbnails:
+			</h3>
+			<div id="oldids"></div>
+			<table>
+				<tr>
+					<td colspan='3'>
+					</td>
+				</tr>
+				<tr>
+					<td colspan='3'>
+					</td>
+				</tr>
+				<tr>
+					<td colspan='3'>
+						<div id="oldlg"></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="oldsm1"></div>
+					</td>
+					<td>
+						<div id="oldsm2"></div>
+					</td>
+					<td>
+						<div id="oldsm3"></div>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign='top'>
+			<h3>
+				Replacement Folder Thumbnails:
+			</h3>
+			<table>
+				<tr>
+					<td colspan='3'>
+					</td>
+				</tr>
+				<tr>
+					<td colspan='3'>
+						<div id="newlg"></div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="newsm1"></div>
+					</td>
+					<td>
+						<div id="newsm2"></div>
+					</td>
+					<td>
+						<div id="newsm3"></div>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<br /><br />
+<button onclick="updatethumbnails()">Submit replacement folder thumbnails</button>
+<br /><br />
+<button onclick="wipeoutthumbs()">Wipe out all thumbs for this folder</button>
+<br />

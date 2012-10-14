@@ -33,11 +33,19 @@
 
 	<% end %>
 
+
 	<% current_teacher.recommends.each do |f| %>
 
 	<% cache("#{f.to_s}educobj", :expires_in => 10.minutes) do %>
 
-	<% @rec = Teacher.find(f.to_s) %>
+	<% 
+		begin
+			@rec = Teacher.find(f.to_s) 
+		rescue
+			next
+		end
+
+	%>
 
 	<div class="listitem">
 		<a href="/<%= @rec.username %>">

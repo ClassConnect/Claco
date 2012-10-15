@@ -17,6 +17,8 @@ class PasswordsController < Devise::PasswordsController
 
   # GET /resource/password/edit?reset_password_token=abcdef
   def edit
+    redirect_to root_path and return if params[:reset_password_token].nil? || params[:reset_password_token].empty?
+
     self.resource = resource_class.new
     resource.reset_password_token = params[:reset_password_token]
   end

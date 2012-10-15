@@ -11,7 +11,7 @@ Claco::Application.configure do
 
   # Show full error reports and disable caching
   config.consider_all_requests_local       = true
-  config.action_controller.perform_caching = true
+  config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = true
@@ -27,7 +27,7 @@ Claco::Application.configure do
   # Do not compress assets
   config.assets.compress = false
   # config.assets.digest = true
-  config.serve_static_assets = true
+  config.serve_static_assets = false
 
   config.threadsafe!
   

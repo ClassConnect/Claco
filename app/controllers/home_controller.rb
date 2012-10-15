@@ -238,19 +238,19 @@ class HomeController < ApplicationController
 	def about
 		@title = "About"
 
-		expires_in 1.hour
+		# expires_in 1.hour
 	end
 
 	def united
 		@title = "United We Teach"
 
-		expires_in 1.hour
+		# expires_in 1.hour
 	end
 
 	def team
 		@title = "Team"
 
-		expires_in 1.hour
+		# expires_in 1.hour
 	end
 
 	def privacy

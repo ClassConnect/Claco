@@ -150,7 +150,7 @@ class BindersController < ApplicationController
 
 		if !binder_routing_ok?(@binder, params[:action])
 			error = true
-			redirect_to named_binder_route(@binder, params[:action]) and return
+			redirect_to named_binder_route(@binder, params[:action]), :status => 301 and return
 		end
 
 		if @access == 0

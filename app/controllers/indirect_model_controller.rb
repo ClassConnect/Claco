@@ -23,4 +23,5 @@ class IndirectModelController < AbstractController::Base
     #render template: "hello_world/show"
     render template: "layouts/_commoncorelogo"
   end
+
 end

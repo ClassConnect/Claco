@@ -30,6 +30,7 @@ class PioneersController < ApplicationController
 
 	end
 
+protected
 	def pioneer_routing_ok?(binder)
 
 		return request.path[0..pioneer_route(binder).size - 1] == pioneer_route(binder)
@@ -38,7 +39,7 @@ class PioneersController < ApplicationController
 
 	def pioneer_route(binder)
 		if binder.class == Binder && binder.parent["id"] == Setting.f("pioneer").v
-			return "/pioneers/#{CGI.escape(binder.title)}/#{binder.id.to_s}"
+			return "/pioneers/#{CGI.escape(binder.title.gsub(" ", "-"))}/#{binder.id.to_s}"
 		end
 	end
 

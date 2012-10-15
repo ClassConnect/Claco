@@ -584,7 +584,7 @@ class Teacher
 
 			if degree>0
 				ids.clone.each do |f|
-					break if ids.size > 250
+					break if ids.size > 500
 					temp = Teacher.vectors(f,degree-1,vec,ids)
 					vec = temp[0]
 					ids = (ids + temp[1]).flatten.uniq

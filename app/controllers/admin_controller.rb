@@ -73,6 +73,113 @@ class AdminController < ApplicationController
 
 	end
 
+	def choosethumbnails
+
+		render 'admin/updatethumbnails'
+
+	end
+
+	def getthumbnails
+
+		#debugger
+
+		if params[:type]=='folder'
+
+			begin
+				binder = Binder.find(params[:binderid].to_s)
+				#raise "not a folder" if binder.type != 1
+			rescue
+				return
+			end
+
+			thumburls = []
+
+			begin
+				thumburls << (binder.thumbimgids[0].to_s.empty? ? '' : Binder.thumb_lg(Binder.find(binder.thumbimgids[0])))
+				thumburls << (binder.thumbimgids[1].to_s.empty? ? '' : Binder.thumb_sm(Binder.find(binder.thumbimgids[1])))
+				thumburls << (binder.thumbimgids[2].to_s.empty? ? '' : Binder.thumb_sm(Binder.find(binder.thumbimgids[2])))
+				thumburls << (binder.thumbimgids[3].to_s.empty? ? '' : Binder.thumb_sm(Binder.find(binder.thumbimgids[3])))
+				thumburls << binder.thumbimgids
+			rescue
+				#return
+			end
+
+			respond_to do |format|
+				format.json { render :json => thumburls.to_json }
+			end
+
+		elsif params[:type]=='content'
+
+			begin
+				binder = Binder.find(params[:binderid].to_s)
+				#raise "not a folder" if binder.type != 1
+			rescue
+				return
+			end
+
+			thumburls = []
+
+			begin
+				thumburls << Binder.thumb_lg(binder)
+				thumburls << Binder.thumb_sm(binder)
+			rescue
+				return
+			end
+
+			respond_to do |format|
+				format.json { render :json => thumburls.to_json }
+			end
+
+		end
+
+		respond_to do |format|
+			format.json { render :json => {}.to_json }
+		end
+
+	end
+
+	def setthumbnails
+
+		#debugger
+
+		begin
+			binder = Binder.find(params[:binderid].to_s)
+			raise "not a folder" if binder.type != 1
+		rescue
+			return
+		end
+
+		if params[:wipe]=='1'
+			binder.update_attributes(:thumbimgids=>['','','',''])
+			return
+		end
+
+		begin
+			Binder.find(params[:thumb1].to_s) if !params[:thumb1].to_s.empty?
+			Binder.find(params[:thumb2].to_s) if !params[:thumb2].to_s.empty?
+			Binder.find(params[:thumb3].to_s) if !params[:thumb3].to_s.empty?
+			Binder.find(params[:thumb4].to_s) if !params[:thumb4].to_s.empty?
+		rescue
+			return
+		end
+
+		begin
+			binder.update_attributes(:thumbimgids => [params[:thumb1].to_s.empty? ? binder.thumbimgids[0] : params[:thumb1].to_s,
+													  params[:thumb2].to_s.empty? ? binder.thumbimgids[1] : params[:thumb2].to_s,
+													  params[:thumb3].to_s.empty? ? binder.thumbimgids[2] : params[:thumb3].to_s,
+													  params[:thumb4].to_s.empty? ? binder.thumbimgids[3] : params[:thumb4].to_s])
+		rescue
+			return
+		end
+
+		respond_to do |format|
+			format.json { render :json => {}.to_json }
+		end
+
+		#render 'admin/updatethumbnails'
+
+	end
+
 	def choosefpfeatured
 
 		@fpfeatured = Setting.f("fpfeatured").v

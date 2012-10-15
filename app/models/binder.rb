@@ -1,5 +1,6 @@
 class Binder
 	include Mongoid::Document
+	include Mongoid::Timestamps
 	include Sprockets::Helpers::RailsHelper
 	include Sprockets::Helpers::IsolatedHelper
 

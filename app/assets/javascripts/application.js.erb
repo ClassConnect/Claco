@@ -32,12 +32,13 @@ $(document).ready(function() {
 		fieldAdder();
 	});
 
-	$('#forgot_link').one('click', function /* prefillForgotPage */ (e){
+	$('a#forgot_link').one('click', function /* prefillForgotPage */ (e){
 		e.preventDefault();
 		var username = $('input#user-info').val();
 		var link = $(this).attr('href');
-		$('#forgot_link').attr('href', link+'?user='+username);
-		$('#forgot_link').click();
+		$('a#forgot_link').attr('href', link+'?user='+username);
+		// $('a#forgot_link').click();
+		window.location = $('a#forgot_link').attr('href');
 	});
 
 	$('input#forgot_user').val(getQueryHash().user);

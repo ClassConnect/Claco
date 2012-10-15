@@ -138,3 +138,5 @@ end
 # dijkstra
 # allows for doubling while remaining a 4B variable
 INFINITY = 1<<30
+
+PREFIX_EMAIL = ['Woah!', 'Nice!', 'Woohoo!', 'Awesome!']

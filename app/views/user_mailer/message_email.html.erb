@@ -7,14 +7,14 @@
 </tr>
 
 <tr>
-  <td style="padding: 10px 0 0 60px; " align="center">
+  <td style="padding: 10px 0 0 60px;" align="center">
     <a href="<%= @limg_link %>">
       <img src="<%= @limg %>" width="200px" style="max-width:200px;"/>
     </a>
   </td>
   <td style="padding: 10px 60px 0 20px;" >
     <%= @head.html_safe %>
-    <%= @html_safe ? truncate(@body, :length => 500).html_safe : truncate(@body, :length => 500) %>
+    <%= @body.html_safe ? truncate(@body, :length => 500).html_safe : truncate(@body, :length => 500) %>
     <ul style="list-style: none; padding-top: 10px; margin-top: 5px;">
       <% @button_info.each do |info| %> 
         <li style='margin-bottom: 8px; margin-left: 0px; width: 170px;'>

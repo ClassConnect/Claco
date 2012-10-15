@@ -4,6 +4,7 @@ class UserMailer < ActionMailer::Base
 	layout 'email'
 	default from: "claco <support@claco.com>"
 
+
 	def request_invite(email)
 		mail(from: "Eric Simons <support@claco.com>", to: email, subject: "Thanks for requesting an invite to Claco!") do |format|
 			format.html {render "request_invite", :layout => false}
@@ -24,18 +25,17 @@ class UserMailer < ActionMailer::Base
 				format.html {render "system_invite", :layout => false}
 			end
 		else
-			@sender = Teacher.find(invitation.from)
+			sender = Teacher.find(invitation.from)
 
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
 
-			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Come collaborate with me on claco") do |format|
+			mail(from: "#{sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Come collaborate with me on claco") do |format|
 				format.html {render "user_invite", :layout => false}
 			end
 		end
 	end
 
 	def send_nag(invitation)
-
 		if invitation.from == "0"
 			@link = "http://www.claco.com/join?key=#{invitation.code}&email=#{CGI.escape(invitation.to)}"
 		else
@@ -55,72 +55,57 @@ class UserMailer < ActionMailer::Base
 		end
 	end
 
-	def new_sub(subscriber, subscribee)
-
-		@prefix_email = ['Woah!', 'Nice!', 'Woohoo!', 'Awesome!']
-
-		@subscriber = Teacher.find(subscriber)
-		@subscribee = Teacher.find(subscribee)
+	def new_sub(subscriber_id, subscribee_id)
+		subscriber = Teacher.find(subscriber_id)
+		subscribee = Teacher.find(subscribee_id)
 
 		@pre = "Your learning network just got bigger!"
-		@head = '<a href="http://www.claco.com/' + @subscriber.username + '" style="font-weight:bolder">' + @subscriber.first_last + '</a> has subscribed to you'
-		# @limg = @subscriber.info.avatar.url
-		@limg = teacher_thumb_lg(@subscriber)
-
-		bioarr = @subscriber.glance_info
+		@limg = teacher_thumb_lg(subscriber)
+		@limg_link = 'http://www.claco.com/' + subscriber.username
+		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + subscriber.first_last + '</a> has subscribed to you'
 
 		@body = "<br />"
-
-		@html_safe = true
-
+		bioarr = subscriber.glance_info
 		bioarr.each do |item|
-
 			@body += "#{item[:content]}<br />"
-
 		end
 
-		@button_info = [{linkto: "http://www.claco.com/" + @subscriber.username, text: 'View Profile'}]
+		@button_info = [{linkto: "http://www.claco.com/" + subscriber.username, text: 'View Profile'}]
 
-		mail(from: "#{@subscriber.first_last} via Claco <support@claco.com>", to: @subscribee.email, subject: "#{@subscriber.first_last} subscribed to you") do |format|
+		mail(from: "#{subscriber.first_last} via Claco <support@claco.com>", to: subscribee.email, subject: PREFIX_EMAIL.sample + " - #{subscriber.first_last} subscribed to you") do |format|
 			format.html {render "message_email"}
 		end
 	end
 
-	def new_msg(message, sender, recipient)
-		@message = message
-		@sender = Teacher.find(sender)
-		@recipient = recipient
+	def new_msg(message, sender_id, recipient)
+		sender = Teacher.find(sender_id)
 
 		@pre = "Woah - you have a new message!"
-		@head = '<a href="http://www.claco.com/' + @sender.username + '" style="font-weight:bolder">' + @sender.first_last + '</a>'
-		@button_info = [{linkto: 'http://www.claco.com/messages/' + @message.thread, text: 'View Full Message'}]
-		@linkto = 
-		@limg = teacher_thumb_lg(@sender)
-		@body = @message.body.rstrip
-
-		@html_safe = false
+		@limg = teacher_thumb_lg(sender)
+		@limg_link = 'http://www.claco.com/' + sender.username
+		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + sender.first_last + '</a>'
+		@body = message.body.rstrip
+		@button_info = [{linkto: "http://www.claco.com/messages/#{named_binder_route(forkedbinder)}" + message.thread, text: 'View Full Message'}]
 
 		while @body.last == "."
 			@body.chomp!(".")
 		end
 
-		mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: @recipient.email, subject: "FYI - #{@sender.first_last} sent you a message") do |format|
+		mail(from: "#{sender.first_last} via Claco <support@claco.com>", to: recipient.email, subject: "FYI - #{sender.first_last} sent you a message") do |format|
 			format.html {render "message_email"}
 		end
 	end
 
 	def fork_notification(ogbinder, forkedbinder, forker, forkee)
-		#All params are actual objects
 		@pre = forker.first_last + " thinks you rock!"
-		@head = '<a href="http://www.claco.com/' + forker.username + '" style="font-weight:bolder">' + forker.first_last + '</a>'
 		@limg = forker.info.avatar.url
-		@resource = forkedbinder
-		@linkto = "http://www.claco.com#{named_binder_route(@resource)}"
+		@limg_link = 'http://www.claco.com/' + forker.username
+		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + forker.first_last + '</a>'
+		@body = ' (and 30 others) snapped ' + forkedbinder.title + ' to one of their binders:'
+		@button_info = [{linkto: "http://www.claco.com", text: 'Check it out!'}]
 
-		# @html_safe = true
-
-		mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: "#{forker.first_last} just used one of your resources") do |format|
-				format.html {render "fork_email"}
+		mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: PREFIX_EMAIL.sample + " - #{forker.first_last} just used one of your resources") do |format|
+			format.html {render "message_email"}
 		end
 	end
 
@@ -161,5 +146,4 @@ protected
 			ret
 		end
 	end
-
 end

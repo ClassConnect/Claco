@@ -11,7 +11,7 @@
 		<%= stylesheet_link_tag    "jqueryui", :media => "all" %>
 
 		<%= yield :headcon %>
-		<%= csrf_meta_tags %>
+		<%= csrf_meta_tags unless response.cache_control[:public] %>
 
 		<% if signed_in? && current_teacher.getting_started %>
 

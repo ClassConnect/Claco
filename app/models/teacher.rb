@@ -1,5 +1,6 @@
 class Teacher
 	include Mongoid::Document
+	include Mongoid::Timestamps
 	include Mongoid::Spacial::Document
 	include Tire::Model::Search
 	include Tire::Model::Callbacks

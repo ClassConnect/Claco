@@ -20,13 +20,14 @@ class PioneersController < ApplicationController
 
 		@pibinders = Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).reverse
 
-		unless pioneer_routing_ok?(@current)
-
-			render "public/404.html", :status => 404 and return
-
-		end
+		redirect_to pioneer_route(@current), :status => 301 and return unless pioneer_routing_ok?(@current)
 
 		render "pioneers"
+
+		rescue BSON::InvalidObjectId
+			render "public/404.html", :status => 404 and return
+		rescue Mongoid::Errors::DocumentNotFound
+			render "public/404.html", :status => 404 and return
 
 	end
 

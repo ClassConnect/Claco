@@ -463,10 +463,10 @@ class Teacher
 				end
 				if !t_id.nil? && !t_id.empty?
 					if !vec[id]
-						vec[id] = { t_id => ~INVITE_BITMAP }
+						vec[id] = { t_id => -~INVITE_BITMAP }
 						ids << t_id
 					elsif !vec[id][t_id]
-						vec[id][t_id] = ~INVITE_BITMAP
+						vec[id][t_id] = -~INVITE_BITMAP
 						ids << t_id
 					else
 						vec[id][t_id] &= ~INVITE_BITMAP
@@ -484,10 +484,10 @@ class Teacher
 				Teacher.any_in('omnihash.twitter.uid' => teacher.omnihash['twitter']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~TWITTER_BITMAP }
+						vec[id] = { f.id.to_s => -~TWITTER_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~TWITTER_BITMAP
+						vec[id][f.id.to_s] = -~TWITTER_BITMAP
 						ids << f.id.to_s
 					else
 						vec[id][f.id.to_s] &= ~TWITTER_BITMAP
@@ -505,10 +505,10 @@ class Teacher
 				Teacher.any_in('omnihash.facebook.uid' => teacher.omnihash['facebook']['fids'].map { |e| e.to_s }).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~FACEBOOK_BITMAP }
+						vec[id] = { f.id.to_s => -~FACEBOOK_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~FACEBOOK_BITMAP
+						vec[id][f.id.to_s] = -~FACEBOOK_BITMAP
 						ids << f.id.to_s
 					else
 						vec[id][f.id.to_s] &= ~FACEBOOK_BITMAP
@@ -521,10 +521,10 @@ class Teacher
 				Teacher.any_in(:'info.grades' => teacher.info.grades).any_in(:'info.subjects' => teacher.info.subjects).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~GRADE_BITMAP }
+						vec[id] = { f.id.to_s => -~GRADE_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~GRADE_BITMAP
+						vec[id][f.id.to_s] = -~GRADE_BITMAP
 						ids << f.id.to_s
 					else
 						vec[id][f.id.to_s] &= ~GRADE_BITMAP
@@ -537,10 +537,10 @@ class Teacher
 				Teacher.any_in(:'info.subjects' => teacher.info.subjects).each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~SUBJECT_BITMAP }
+						vec[id] = { f.id.to_s => -~SUBJECT_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~SUBJECT_BITMAP
+						vec[id][f.id.to_s] = -~SUBJECT_BITMAP
 						ids << f.id.to_s
 					else
 						vec[id][f.id.to_s] |= ~SUBJECT_BITMAP
@@ -553,10 +553,10 @@ class Teacher
 				teacher.relationships.where(:subscribed => true).entries.map { |r| Teacher.find(r["user_id"]) }.each do |f|
 					next if f.id.to_s==id
 					if !vec[id]
-						vec[id] = { f.id.to_s => ~SUBSC_BITMAP }
+						vec[id] = { f.id.to_s => -~SUBSC_BITMAP }
 						ids << f.id.to_s
 					elsif !vec[id][f.id.to_s]
-						vec[id][f.id.to_s] = ~SUBSC_BITMAP
+						vec[id][f.id.to_s] = -~SUBSC_BITMAP
 						ids << f.id.to_s
 					else
 						vec[id][f.id.to_s] &= ~SUBSC_BITMAP
@@ -569,10 +569,10 @@ class Teacher
 			# 	Teacher.geo_near(teacher.info.location, :max_distance => 50, :unit => :mi, :spherical => true).each do |f|
 			# 		next if f.id.to_s==id
 			# 		if !vec[id]
-			# 			vec[id] = { f.id.to_s => ~GEO_BITMAP }
+			# 			vec[id] = { f.id.to_s => -~GEO_BITMAP }
 			# 			ids << f.id.to_s
 			# 		elsif !vec[id][f.id.to_s]
-			# 			vec[id][f.id.to_s] = ~GEO_BITMAP
+			# 			vec[id][f.id.to_s] = -~GEO_BITMAP
 			# 			ids << f.id.to_s
 			# 		else
 			# 			vec[id][f.id.to_s] |= ~GEO_BITMAP

@@ -107,6 +107,7 @@ class AdminController < ApplicationController
 			respond_to do |format|
 				format.json { render :json => thumburls.to_json }
 			end
+			return
 
 		elsif params[:type]=='content'
 
@@ -129,6 +130,7 @@ class AdminController < ApplicationController
 			respond_to do |format|
 				format.json { render :json => thumburls.to_json }
 			end
+			return
 
 		end
 

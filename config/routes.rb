@@ -1,3 +1,5 @@
+BASE_BINDER_ROUTE = '/:username/portfolio(/:root)/:title/:id'
+
 Claco::Application.routes.draw do
 
 
@@ -74,6 +76,9 @@ Claco::Application.routes.draw do
 	get		'/admin/pioneer'													=> 'admin#choosepibinder'
 	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
 	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
+	get 	'/admin/updatethumbnails'											=> 'admin#choosethumbnails'			#:as => 
+	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
+	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
 
 	##################
 	# TEACHER ROUTING#
@@ -124,8 +129,6 @@ Claco::Application.routes.draw do
 	post	'/zcb'																=> 'zencoder_callbacks#processed'
 
 	constraints(:username => /[^\/]+/, :root => /[^\/]+/, :title => /[^\/]+/, :format => /json|html/) do
-
-		BASE_BINDER_ROUTE = '/:username/portfolio(/:root)/:title/:id'
 
 		#########################
 		# PIONEER CHATS ROUTING #

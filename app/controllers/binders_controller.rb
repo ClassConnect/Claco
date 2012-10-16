@@ -150,7 +150,7 @@ class BindersController < ApplicationController
 
 		if !binder_routing_ok?(@binder, params[:action])
 			error = true
-			redirect_to named_binder_route(@binder, params[:action]) and return
+			redirect_to named_binder_route(@binder, params[:action]), :status => 301 and return
 		end
 
 		if @access == 0
@@ -2105,17 +2105,17 @@ class BindersController < ApplicationController
 			retstr = "/#{binder.handle}/portfolio"
 
 			if binder.parents.length != 1 
-				retstr += "/#{CGI.escape(binder.root)}" 
+				retstr += "/#{CGI.escape(binder.root.gsub(" ", "-"))}"
 			end
 
-			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+			retstr += "/#{CGI.escape(binder.title.gsub(" ", "-"))}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 
 			end
 
 			return retstr
-		elsif binder.class == String 
+		elsif binder.class == String
 			return named_binder_route(Binder.find(binder), action)
 		else
 			return "/500.html"

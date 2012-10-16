@@ -278,12 +278,20 @@ class TeachersController < ApplicationController
 
 			#debugger
 
-			response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
-															:class => 'avatar',
-															:url => current_teacher.info.avatar.url.to_s,
-															:model => [current_teacher.id.to_s],
-															:datahash => datahash.to_s,
-															:origin => ENV['SERVERCLASS']=='staging' })
+			begin
+				response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
+																:class => 'avatar',
+																:url => current_teacher.info.avatar.url.to_s,
+																:model => [current_teacher.id.to_s],
+																:datahash => datahash.to_s,
+																:origin => ENV['SERVERCLASS']=='staging' })
+
+				raise "Submission error" if response['status'].to_s!='1'
+			rescue
+				Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)				
+			end
+
+			#if response['status']
 
 			Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
@@ -449,8 +457,8 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		# ignore duplicate requests
-		return if current_teacher.subscribed_to?(@teacher.id.to_s)
+		# ignore duplicate requests and self requests
+		return if current_teacher.subscribed_to?(@teacher.id.to_s) || current_teacher.id.to_s == @teacher.id.to_s
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 

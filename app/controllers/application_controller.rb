@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
-      return root_path if session[:previous_urls].last == request.fullpath
+      return root_path if session[:previous_urls].nil? || session[:previous_urls].last == request.fullpath
 
       session[:previous_urls].last || root_path
     end

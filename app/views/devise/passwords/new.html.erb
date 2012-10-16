@@ -11,9 +11,9 @@
 <%= form_for(resource, :as => resource_name, :url => teacher_password_path, :html => { :method => :post }) do |f| %>
   <%= devise_error_messages! %>
 
-  <%= f.email_field :email, :placeholder => "Enter your Claco email address", :style => "margin-top:10px;margin-bottom:10px" %>
+  <label>Enter your email address or username:</label><%= f.text_field :login, :style => "margin-top:10px;margin-bottom:10px", :id => "forgot_user", :value => params[:user] %>
 
-  <div><%= f.submit "Send me reset password instructions", :class => "btn btn-primary", :style => "font-weight:bolder" %></div>
+  <div><%= f.submit "Reset my password", :class => "btn btn-primary", :style => "font-weight:bolder" %></div>
 <% end %>
 
 

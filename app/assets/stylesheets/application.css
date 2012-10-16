@@ -104,22 +104,23 @@ footer {
   opacity: 0.75;
   filter: alpha(opacity=75);
 }
+
 #menuopttog:hover .droparr {
   opacity: 1;
   filter: alpha(opacity=100);
 }
 
-#namester {
+#nav-tags {
   float:right;
   padding:18px 7px 17px 7px;
   cursor:pointer;
 }
 
-#namester:hover {
+#nav-tags:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-#namester .fname {
+#nav-tags .fname {
   float:left;
   color:#fff;
   font-size:13px;
@@ -128,7 +129,7 @@ footer {
   filter: alpha(opacity=85);
 }
 
-#namester .myprofpic {
+#nav-tags .myprofpic {
   height:30px;
   width:30px;
   float:left;
@@ -139,11 +140,11 @@ footer {
   box-shadow: 0 0px 4px rgba(34,25,25,0.4);*/
 }
 
-#namester a:hover {
+#nav-tags a:hover {
   text-decoration: none;
 }
 
-#namester:hover .fname {
+#nav-tags:hover .fname {
   opacity: 1;
   filter: alpha(opacity=100);
 }
@@ -184,7 +185,6 @@ footer {
   background-color: #942a25 \9;
 }
 
-
 .notch-login {
   margin-top:12px !important;
 }
@@ -203,11 +203,8 @@ footer {
   -webkit-border-radius: 10px;
      -moz-border-radius: 10px;
           border-radius: 10px;
-
   position:absolute;
-
 }
-
 
 .searchWrap {
   margin-top:-34px;
@@ -219,7 +216,6 @@ footer {
   border-left:1px solid #891312 !important;
   border-right:1px solid #891312 !important;
   border-bottom:1px solid #C54F4E !important;
-
   -webkit-border-radius: 15px;
      -moz-border-radius: 15px;
           border-radius: 15px;
@@ -243,7 +239,6 @@ footer {
   -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0) !important;
 }
-
 
 .noclose {
   padding: 10px;
@@ -279,7 +274,6 @@ footer {
   font-size:14px;
   margin:10px 0 10px 5px;
   padding:10px 9px 10px 9px;
-
   color:#745419;
   font-weight:bolder;
   text-shadow: 0px 1px 1px #fff;
@@ -323,9 +317,6 @@ footer {
   margin: 0 5px 0 7px;
 }
 
-
-
-
 .search-span {
   margin-top:53px;
   margin-left:0px;
@@ -351,28 +342,17 @@ footer {
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
-
-
 .async-pop {
   font-weight:bolder;
   display:none;
   position:fixed;
   top:52px;
   left:48%;
-
   z-index: 1000;
-
   -moz-box-shadow:0 1px 3px rgba(34,25,25,0.4);
   -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
   box-shadow: 0 1px 3px rgba(34,25,25,0.5);
 }
-
-
-
-.fol-picker {
-
-}
-
 
 .fol-picker .togbar {
   cursor:pointer;
@@ -405,7 +385,6 @@ footer {
   background-color: #F1EEEE;
   *background-color: #d9d9d9;
   /* Buttons in IE7 don't get borders, so darken on hover */
-
   background-position: 0 -15px;
   -webkit-transition: background-position 0.1s linear;
      -moz-transition: background-position 0.1s linear;
@@ -434,15 +413,14 @@ footer {
   min-height:50px;
   border: 1px solid;
   border-color: rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.4) rgba(0, 0, 0, 0.3);
-
   -webkit-border-radius: 4px;
      -moz-border-radius: 4px;
           border-radius: 4px;
-
   -moz-box-shadow:0 1px 3px rgba(34,25,25,0.4);
   -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
   box-shadow: 0 1px 10px rgba(34,25,25,0.3);
 }
+
 .fol-picker .pickerpane .bndr {
   padding:8px;
   border-bottom:1px solid #ddd;
@@ -454,7 +432,6 @@ footer {
 .fol-picker .pickerpane .bndr:hover {
   background-color:#fff;
 }
-
 
 .fol-picker .pickerpane .bndr .dirWrap {
   margin-left:20px;
@@ -482,7 +459,6 @@ footer {
 .fol-picker .pickerpane .bndr .dir .dirtitle:hover{
   background-color: #E4FFF4;
 }
-
 
 .fol-picker .pickerpane .bndr .dir .arrow-down {
   width:0px; 

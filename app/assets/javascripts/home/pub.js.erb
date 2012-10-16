@@ -10,5 +10,13 @@ $(document).ready(function() {
 		}
 	});
 
+	$('a#forgot_link').one('click', function /* prefillForgotPage */ (e){
+		e.preventDefault();
+		var username = $('input#user-info').val();
+		var link = $(this).attr('href');
+		$('a#forgot_link').attr('href', link+'?user='+username);
+		// $('a#forgot_link').click();
+		window.location = $('a#forgot_link').attr('href');
+	});
 
 });

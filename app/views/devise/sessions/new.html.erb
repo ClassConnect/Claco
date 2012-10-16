@@ -2,12 +2,10 @@
     <%= stylesheet_link_tag "devise/newuser", :media => "all" %>
 <% end %>
 
-
 <div class="container">
 <div class="formbox">
 
 <h2>Sign in</h2>
-
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
   <%= content_tag(:p, flash[:alert], :id => "flash_alert") if flash[:alert] %>

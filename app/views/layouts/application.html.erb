@@ -75,7 +75,7 @@
 		<% end %>
 
 
-		<% if params[:controller] == "home" &&  !signed_in? %>
+		<% if (params[:controller] == "home" || params[:controller] == "devise/sessions") && !signed_in? %>
 			<%= javascript_include_tag "home/pub" %>
 		<% end %>
 

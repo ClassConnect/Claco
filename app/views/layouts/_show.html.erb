@@ -210,52 +210,32 @@
                 <div style="clear:both"></div>
               </div>
             </div>
-
-
-
-            <div id="other-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
-            %><%= boxvis(@tagset)  
-            %>>
+            <div id="other-addarea" class="add-area tagenter" <%= boxvis(@tagset) %>
               <input type="text" class="add-field other-addfield" placeholder="Ex: 'Civil War', 'edchat'" />
               <div class="empty-auto-hold">Hit enter to add tag...</div>
             </div>
-
           </div>
         </div>
         <% end %>
-
-
-
-
-
       </div>
-
-
-
 </div>
 
-
-
-
 <div id="form-helpers" style="display:none">
-
 	<div id="upload-form" style="display:none">
-		
 	</div>
-
-
 
   <div id="addweb-form" style="display:none">
     <div class="headtitle">
       Add web bookmark / embed
     </div>
 
-    <div class="errorBox"></div>
     <div class="well">
       <span class="label label-info">NEW</span>&nbsp;Use this bookmarklet <a class="bookmarklet badge" href="javascript:(function()%7Bvar%20d%3D''%2Cm%2Ci%2Cs%3Bm%3Ddocument.getElementsByTagName('meta')%3Bfor(i%3D0%3Bi%3Cm.length%3Bi%2B%2B)%7Bif(m%5Bi%5D.name%3D%3D'description')d%3Dm%5Bi%5D.content%3B%7Ds%3D'http%3A%2F%2F<%=u request.host_with_port %>%2Fpost%3Fweblink%3D'%2BencodeURIComponent(document.location)%2B'%26webtitle%3D'%2BencodeURIComponent(document.title)%2B'%26body%3D'%2Bd%3Bif(!navigator.userAgent.match(%2F(iphone%7Cipad%7Cipod%7Candroid%7Cmini%7Cmobi)%2Fi))%7Bwindow.open(s%2C''%2C'scrollbars%3Dyes%2Cwidth%3D660%2Cheight%3D360')%3B%7Delse%7Bwindow.location%3Ds%3B%7D%7D)()%3B" onclick="return false;">Snap to Claco</a> to easily add resources to binders.
-        
     </div>
+
     <hr>
+
+    <div class="errorBox"></div>
 
     <form action="#" class="bodcon">
       <div class="conitem">
@@ -274,11 +254,6 @@
 
     </form>
   </div>
-
-
-
-
-
 
   <div id="addfolder-form" style="display:none">
     <div class="headtitle">
@@ -305,13 +280,9 @@
   </div>
 
 
-
-
-
   <div id="addfile-form" style="display:none">
     
   </div>
-
 
 
 	<div id="rename-form" style="display:none">

@@ -486,3 +486,9 @@ footer {
   float:left;
   cursor:pointer;
 }
+
+.errorBox {
+  list-style: none;
+  color: red;
+  padding-left: 5px;
+}

@@ -12,10 +12,10 @@ module BinderHelper
 			retstr = "/#{binder.handle}/portfolio"
 
 			if binder.parents.length != 1 
-				retstr += "/#{CGI.escape(binder.root)}" 
+				retstr += "/#{CGI.escape(binder.root.gsub(" ", "-"))}"
 			end
 
-			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
+			retstr += "/#{CGI.escape(binder.title.gsub(" ", "-"))}/#{binder.id}"
 
 			if action != "show" 
 				retstr += "/#{action}" 

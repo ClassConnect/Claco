@@ -1,7 +1,6 @@
 <% content_for :headcon do %>
-    <%= stylesheet_link_tag    "devise/newuser", :media => "all" %>
+    <%= stylesheet_link_tag "devise/newuser", :media => "all" %>
 <% end %>
-
 
 <div class="container">
 <div class="formbox">
@@ -9,8 +8,9 @@
 <h2>Sign in</h2>
 
 <%= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f| %>
+  <%= content_tag(:p, flash[:alert], :id => "flash_alert") if flash[:alert] %>
   <div style="margin-top:10px">
-    <%= f.text_field :login, :placeholder => "Username / Email" %>
+    <%= f.text_field :login, :placeholder => "Username / Email", :id => "user-info" %>
   </div>
 
   <div>
@@ -25,6 +25,6 @@
 <% end %>
 
 <br />
-<a href="<%= new_password_path('teacher') %>">Forgot your password?</a>
+<a href="<%= new_password_path('teacher') %>" id="forgot_link">Forgot your password?</a>
 </div>
 </div>

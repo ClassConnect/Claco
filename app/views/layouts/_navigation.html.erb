@@ -13,6 +13,7 @@
 
           <% if signed_in? %>
 
+            <% unless params[:action] == "bookmarklet" %>
             <a href="/messages" class="btn top-notch-btn notch-nav">
               <%= image_tag("profile/message.png", :style => "height:16px;width:16px;margin-top:-3px") %>
               <% if current_teacher.get_unread_count != 0 %>
@@ -21,13 +22,12 @@
             </a>
 
 
-
             <div class="searchWrap">
               <form method="GET" action="/search" style="margin:0">
                 <input type="text" name="q" class="topSearch" placeholder="Search" value="<%= params[:q] if !params[:q].nil? %>" />
               </form>
             </div>
-
+            <% end %>
 
 
             <ul class="nav nav-pills pull-right" style="margin-left:0px">

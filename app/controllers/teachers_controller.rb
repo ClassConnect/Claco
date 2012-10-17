@@ -457,8 +457,8 @@ class TeachersController < ApplicationController
 
 		errors = []
 
-		# ignore duplicate requests
-		return if current_teacher.subscribed_to?(@teacher.id.to_s)
+		# ignore duplicate requests and self requests
+		return if current_teacher.subscribed_to?(@teacher.id.to_s) || current_teacher.id.to_s == @teacher.id.to_s
 
 		@title = "You are now subscribed to #{@teacher.full_name}"
 

@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow]
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow, :goodies]
 
 	def index
 		@title = "Claco"
@@ -241,6 +241,10 @@ class HomeController < ApplicationController
 		# expires_in 1.hour
 	end
 
+	def goodies
+		@title = "Goodies"
+	end
+
 	def united
 		@title = "United We Teach"
 
@@ -263,6 +267,12 @@ class HomeController < ApplicationController
 		@title = "Terms of Service"
 
 		render "public/tos.html"#, :status => 200 and return
+	end
+
+	def bookmarklet
+		@title = "Add Web Bookmark"
+
+		@root = current_teacher.binders.root_binders
 	end
 
 	def search

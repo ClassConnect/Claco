@@ -39,6 +39,7 @@ Claco::Application.routes.draw do
 	get		'/about/team'														=> 'home#team'
 	get		'/unitedweteach'													=> 'home#united'
 	get		'/goodies'															=> 'home#goodies'
+	get		'/post'																=> 'home#bookmarklet'
 
 	get		'/teachersearch'													=> 'home#teachersearch'
 	get		'/subscribedlog'													=> 'home#subscribedlog'
@@ -50,7 +51,6 @@ Claco::Application.routes.draw do
 
 	get		'/invite'															=> 'invitations#invite'
 	post	'/invite'															=> 'invitations#create'
-	get		'post'																=> 'binders#bookmarklet'
 
 	#################
 	# ADMIN ROUTING #

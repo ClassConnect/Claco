@@ -263,6 +263,12 @@ class HomeController < ApplicationController
 		render "public/tos.html"#, :status => 200 and return
 	end
 
+	def bookmarklet
+		@title = "Add Web Bookmark"
+
+		@root = current_teacher.binders.root_binders
+	end
+
 	def search
 
 		if params[:q].present?

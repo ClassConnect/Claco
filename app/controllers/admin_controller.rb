@@ -36,7 +36,34 @@ class AdminController < ApplicationController
 
 	def users
 
-		@teachers = Teacher.page(params[:page]).per(100)
+		# debugger
+
+		# if params[:q].present? && !params[:q].to_s.empty?
+		# 	#@teachers = Teacher.all.tire.search(params[:query], load: true)
+		# 	@teachers = Tire.search 'teachers' do |search|
+		# 		#query do
+
+		# 		# number of results returned
+		# 		search.size 30
+
+		# 		search.query do |query|
+		# 			#string 'fname:S*'
+		# 			#query.size 15
+		# 			query.string "#{params[:q]}*"
+		# 		end
+		# 		#query { all } 
+		# 	end
+
+		# 	@teachers=@teachers.results.to_a
+
+		# 	if @teachers.map { |f| f.id.to_s }.include? current_teacher.id.to_s
+		# 		@teachers = @teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )
+		# 	end
+		# else
+			@teachers = Teacher.page(params[:page]).per(100)
+		# end
+
+		#@teachers = @teachers
 
 	end
 

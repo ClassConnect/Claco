@@ -31,6 +31,10 @@ form textarea {
 	margin-left: 110px;
 }
 
+.pickerpane {
+	z-index: 1;
+}
+
 #msgBox h4 {
 	text-transform: capitalize;
 }

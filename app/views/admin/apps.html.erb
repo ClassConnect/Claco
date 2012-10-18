@@ -1,6 +1,16 @@
 <h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
 <h2><%= params[:controller] %>#<%= params[:action] %></h2>
-
+<script type="text/javascript">
+	function search() {
+		window.location.href = '/admin/apps?adminq=' + document.getElementById('appsearch').value
+	}
+	function reset() {
+		window.location.href = '/admin/apps'
+	}
+</script>
+<input type="text" id="appsearch" />
+<button onclick="search()">Search</button>
+<button onclick="reset()">Reset</button>
 <table>
 <tr>
 <td>First Name</td>
@@ -26,5 +36,8 @@
 </tr>
 <% end %>
 </table>
-<%= paginate(@apps) %>
-<%= page_entries_info(@apps).html_safe %>
+<% begin %>
+	<%= paginate(@apps) %>
+	<%= page_entries_info(@apps).html_safe %>
+<% rescue %>
+<% end %>

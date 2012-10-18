@@ -1,0 +1,84 @@
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag    "bookmarklet/post", :media => "all" %>
+<% end %>
+<% content_for :botcon do %>
+    <%= javascript_include_tag "bookmarklet/post" %>
+<% end %>
+
+<div id="postitem">
+
+  <legend>Add web bookmark</legend>
+  
+  <div class="alert alert-block" id="msgBox" style="display:none;">
+    <h4>Success!</h4>
+    <p></p>
+  </div>
+
+  <div class="fol-picker" style="margin-bottom:10px">
+    <div class="togbar" onclick="togglePicker(this)">
+      <span class="chosenTitle">
+        <i>Choose a binder or folder to copy this to</i>
+      </span>
+      <div class="down-arrow"></div>
+      <input type="hidden" name="folid" class="chosenOne" value="" />
+    </div>
+
+    <div class="pickerpane">
+
+      <% if !@root.nil? %>
+      <% @root.each do |binder| %>
+
+
+        <% if binder.parent["id"] == "0" %>
+
+          <div class="bndr">
+
+            <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
+              <div class="arrow-right" onclick="togglePickFolder(this)"></div>
+              <span class="dirtitle" onclick="selectPickFolder(this)">
+                <%= image_tag "binders/folder.png", :class => "foldicon" %>
+                <%= binder.title %>
+              </span>
+              <div class="dirWrap"></div>
+
+            </div>
+          </div>
+
+        <% end %>
+
+      <% end %>
+      <% end %>
+
+
+    </div>
+  </div>
+
+  <form class="form-horizontal" id="post" method="post">
+    <div class="control-group">
+      <label class="control-label" for="weblink">Link</label>
+      <div class="controls">
+        <input name="weblink" id="weblink" type="text" placeholder="http:// or <embed>" />
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="webtitle">Title</label>
+      <div class="controls">
+        <input name="webtitle" maxlength="50" id="webtitle" type="text" placeholder="Title of the web page" />
+      <a href="#" class="descToggle" style="font-size:11px; margin-left:5px">Add a description</a>
+      </div>
+    </div>
+    <div class="control-group description">
+      <label class="control-label" for="body">Description</label>
+      <div class="controls">
+        <textarea name="body" id="body" class="input-xlarge" rows="3" placeholder="Description of the web page"></textarea>
+      </div>
+    </div>
+    <input type="hidden" id="binderUrl" name="binderUrl" />
+    <div class="control-group">
+      <div class="controls">
+        <button class="btn btn-primary showloader" type="submit" disabled="disabled">Add this!</button>
+        <button class="btn" type="reset" onClick="window.close()">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>

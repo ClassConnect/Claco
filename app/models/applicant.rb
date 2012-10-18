@@ -1,5 +1,7 @@
 class Applicant
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	field :title, :type => String
 	field :fname, :type => String

@@ -1,5 +1,16 @@
 <h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
 <h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<script type="text/javascript">
+	function search() {
+		window.location.href = '/admin/users?adminq=' + document.getElementById('usersearch').value
+	}
+	function reset() {
+		window.location.href = '/admin/users'
+	}
+</script>
+<input type="text" id="usersearch" />
+<button onclick="search()">Search</button>
+<button onclick="reset()">Reset</button>
 <h2>User count: <%= @teachers.count %></h2>
 <table>
 <tr>
@@ -27,5 +38,8 @@
 </tr>
 <% end %>
 </table>
-<%= paginate(@teachers) %>
-<%= page_entries_info(@teachers).html_safe %>
+<% begin %>
+	<%= paginate(@teachers) %>
+	<%= page_entries_info(@teachers).html_safe %>
+<% rescue %>
+<% end %>

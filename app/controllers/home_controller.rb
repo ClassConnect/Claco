@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow]
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow, :goodies]
 
 	def index
 		@title = "Claco"
@@ -156,6 +156,8 @@ class HomeController < ApplicationController
 			end
 		end
 
+		#debugger
+
 		rescue Errno::ECONNREFUSED
 			Rails.logger.fatal "ElasticSearch server unreachable"
 		rescue Tire::Search::SearchRequestFailed
@@ -241,6 +243,10 @@ class HomeController < ApplicationController
 		# expires_in 1.hour
 	end
 
+	def goodies
+		@title = "Goodies"
+	end
+
 	def united
 		@title = "United We Teach"
 
@@ -265,6 +271,12 @@ class HomeController < ApplicationController
 		render "public/tos.html"#, :status => 200 and return
 	end
 
+	def bookmarklet
+		@title = "Add Web Bookmark"
+
+		@root = current_teacher.binders.root_binders
+	end
+
 	def search
 
 		if params[:q].present?
@@ -278,10 +290,16 @@ class HomeController < ApplicationController
 				search.query do |query|
 					#string 'fname:S*'
 					#query.size 15
-					query.string "#{params[:q]}*"
+					if params[:q].to_s.split(' ').size>1
+						query.string "#{params[:q]}"
+					else
+						query.string "#{params[:q]}*"
+					end
 				end
 				#query { all } 
 			end
+
+			#debugger
 
 			@teachers=@teachers.results.to_a
 

@@ -13,17 +13,17 @@ Claco::Application.routes.draw do
 
 		# get		'/auth/:provider'
 
-		get		'/login'			=> 'devise/sessions#new',				:as => :new_teacher_session
+		get		'/login'			=> 'devise/sessions#new',					:as => :new_teacher_session
 		post	'/login'			=> 'devise/sessions#create',			:as => :teacher_session
-		delete	'/logout'			=> 'devise/sessions#destroy',			:as => :destroy_teacher_session
+		delete	'/logout'		=> 'devise/sessions#destroy',			:as => :destroy_teacher_session
 
-		post	'/account'			=> 'registrations#create',				:as => :teacher_registration
-		get		'/join'				=> 'registrations#new',					:as => :new_teacher_registration
+		post	'/account'		=> 'registrations#create',				:as => :teacher_registration
+		get		'/join'				=> 'registrations#new',						:as => :new_teacher_registration
 
-		post	'/password'			=> 'passwords#create',					:as => :teacher_password
+		post	'/password'				=> 'passwords#create',				:as => :teacher_password
 		get		'/password/new'		=> 'passwords#new',						:as => :new_teacher_password
 		get		'/password/edit'	=> 'passwords#edit',					:as => :edit_teacher_password
-		put		'/password'			=> 'passwords#update'
+		put		'/password'				=> 'passwords#update'
 
 	end
 
@@ -33,52 +33,52 @@ Claco::Application.routes.draw do
 
 	#Root to home
 	root	:to																	=> 'home#index'
-	get		'/homebase'															=> 'home#index'
-	get		'/autocomplete'														=> 'home#auto'
+	get		'/homebase'													=> 'home#index'
+	get		'/autocomplete'											=> 'home#auto'
 	get		'/dj'																=> 'home#dj'
-	get		'/search'															=> 'home#search'
-	get		'/about'															=> 'home#about'
-	get		'/about/team'														=> 'home#team'
-	get		'/unitedweteach'													=> 'home#united'
-	get		'/goodies'															=> 'home#goodies'
-	get		'/post'																=> 'home#bookmarklet'
+	get		'/search'														=> 'home#search'
+	get		'/about'														=> 'home#about'
+	get		'/about/team'												=> 'home#team'
+	get		'/unitedweteach'										=> 'home#united'
+	get 	'/explore/detail'										=> 'home#explore_detail'
+	get		'/goodies'													=> 'home#goodies'
+	get		'/post'															=> 'home#bookmarklet'
 
-	get		'/teachersearch'													=> 'home#teachersearch'
-	get		'/subscribedlog'													=> 'home#subscribedlog'
-	get		'/educators'														=> 'home#educators'
+	get		'/teachersearch'										=> 'home#teachersearch'
+	get		'/subscribedlog'										=> 'home#subscribedlog'
+	get		'/educators'												=> 'home#educators'
 
-	#get		'/mediaserver/:id'													=> 'media_server_api#tokencheck'
-	get		'/mediaservertest'													=> 'media_server_api#mediaserver'
-	post	'/mediaserver/thumbs'												=> 'media_server_api#addthumbs'
+	get		'/mediaservertest'									=> 'media_server_api#mediaserver'
+	post	'/mediaserver/thumbs'								=> 'media_server_api#addthumbs'
 
-	get		'/invite'															=> 'invitations#invite'
-	post	'/invite'															=> 'invitations#create'
+	get		'/invite'														=> 'invitations#invite'
+	post	'/invite'														=> 'invitations#create'
 
 	#################
 	# ADMIN ROUTING #
 	#################
 
-	get		'/admin'															=> 'admin#index'
-	get		'/admin/apps'														=> 'admin#apps',					:as => 'apps'
-	get		'/admin/apps/:id/approve'											=> 'applicants#approve',			:as => 'approve'
-	get		'/admin/apps/:id/deny'												=> 'applicants#deny',				:as => 'deny'
-	get		'/admin/users'														=> 'admin#users'
-	get		'/admin/fpfeatured'													=> 'admin#choosefpfeatured',		:as => 'fpfeatured'
-	post	'/admin/fpfeatured'													=> 'admin#setfpfeatured'
-	get		'/admin/featured'													=> 'admin#choosefeatured',			:as => 'featured'
-	post	'/admin/featured'													=> 'admin#setfeatured'
-	get		'/admin/invite'														=> 'admin#invite'
-	post	'/admin/sendinvite'													=> 'admin#sendinvite'
-	get		'/admin/invites'													=> 'admin#invites'
-	get		'/admin/invite/:id'													=> 'admin#showinv'
-	get		'/admin/sysinvlist'													=> 'admin#sysinvlist'
-	post	'/admin/invite/:to'													=> 'admin#sendinvite',				:constraints => {:to => /[^\/]+/}
-	get		'/admin/pioneer'													=> 'admin#choosepibinder'
-	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
-	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
-	get 	'/admin/updatethumbnails'											=> 'admin#choosethumbnails'			#:as => 
-	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
-	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
+	get		'/admin'																=> 'admin#index'
+	get		'/admin/apps'														=> 'admin#apps',						:as => 'apps'
+	get		'/admin/apps/:id/approve'								=> 'applicants#approve',		:as => 'approve'
+	get		'/admin/apps/:id/deny'									=> 'applicants#deny',				:as => 'deny'
+	get		'/admin/users'													=> 'admin#users'
+	get		'/admin/fpfeatured'											=> 'admin#choosefpfeatured',:as => 'fpfeatured'
+	post	'/admin/fpfeatured'											=> 'admin#setfpfeatured'
+	get		'/admin/featured'												=> 'admin#choosefeatured',	:as => 'featured'
+	post	'/admin/featured'												=> 'admin#setfeatured'
+	get		'/admin/invite'													=> 'admin#invite'
+	post	'/admin/sendinvite'											=> 'admin#sendinvite'
+	get		'/admin/invites'												=> 'admin#invites'
+	get		'/admin/invite/:id'											=> 'admin#showinv'
+	get		'/admin/sysinvlist'											=> 'admin#sysinvlist'
+	post	'/admin/invite/:to'											=> 'admin#sendinvite',			:constraints => {:to => /[^\/]+/}
+	get		'/admin/pioneer'												=> 'admin#choosepibinder'
+	post	'/admin/pioneer'												=> 'admin#setpibinder',			:as => 'pioneer'
+	get		'/admin/ghost/:id'											=> 'admin#ghost',						:as => 'ghost'
+	get 	'/admin/updatethumbnails'								=> 'admin#choosethumbnails'	 
+	post 	'/admin/updatethumbnails'								=> 'admin#setthumbnails',		:as => 'updatethumbnails'
+	get		'/admin/getthumbnails'									=> 'admin#getthumbnails'
 
 	##################
 	# TEACHER ROUTING#
@@ -87,18 +87,18 @@ Claco::Application.routes.draw do
 	#Edit Info Form/Process
 	get		'/editinfo'															=> "teachers#editinfo"
 	put		'/editinfo'															=> "teachers#updatepass"
-	post	'/updateprefs'														=> "teachers#updateprefs"
+	post	'/updateprefs'													=> "teachers#updateprefs"
 	post	'/updateinfo'														=> "teachers#updateinfo"
 	get		'/editavatar'														=> "teachers#editavatar"
-	get		'/editavatar/:data/:token'											=> "teachers#createavatar"
+	get		'/editavatar/:data/:token'							=> "teachers#createavatar"
 
 
 	# resources :teachers, :only => [:show, :index]
 
-	post	'/utils/fetchtitle'													=> 'home#fetchtitle'
+	post	'/utils/fetchtitle'											=> 'home#fetchtitle'
 
 	get		'/legal/tos'														=> 'home#tos'
-	get		'/legal/privacy'													=> 'home#privacy'
+	get		'/legal/privacy'												=> 'home#privacy'
 
 	#####################
 	# APPLICANT ROUTING #
@@ -107,7 +107,7 @@ Claco::Application.routes.draw do
 	get		'/apply'															=> 'applicants#apply'
 	post	'/apply'															=> 'applicants#create',				:as => 'applicants'
 
-	get		'/gs/:provider'														=> 'home#gs'
+	get		'/gs/:provider'												=> 'home#gs'
 	post	'/done'																=> 'teachers#done'
 
 	###################

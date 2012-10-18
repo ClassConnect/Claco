@@ -156,6 +156,8 @@ class HomeController < ApplicationController
 			end
 		end
 
+		#debugger
+
 		rescue Errno::ECONNREFUSED
 			Rails.logger.fatal "ElasticSearch server unreachable"
 		rescue Tire::Search::SearchRequestFailed
@@ -288,10 +290,16 @@ class HomeController < ApplicationController
 				search.query do |query|
 					#string 'fname:S*'
 					#query.size 15
-					query.string "#{params[:q]}*"
+					if params[:q].to_s.split(' ').size>1
+						query.string "#{params[:q]}"
+					else
+						query.string "#{params[:q]}*"
+					end
 				end
 				#query { all } 
 			end
+
+			#debugger
 
 			@teachers=@teachers.results.to_a
 

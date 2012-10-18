@@ -74,6 +74,8 @@ class Teacher
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
 
+	field :feed_ids, :type => Array, :default => []
+
 	field :admin, :type => Boolean, :default => false
 
 	embeds_one :info#, autobuild: true #, validate: false
@@ -165,7 +167,7 @@ class Teacher
 	} 	do
 		mapping do
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
-			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
+			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 400.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
 			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 			=> { :type => 'object', :properties => { :username 	=> 	{ :type => 'string', :analyzer => 'ngram_analyzer' },
 																															 	 :uid 		=> 	{ :type => 'object', :enabled => false },
@@ -184,7 +186,7 @@ class Teacher
 																	:data 				=> { :type => 'object', :enabled => false },
 																	:grades 			=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
 																	:subjects 			=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																	:bio 				=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
+																	:bio 				=> { :type => 'string', :analyzer => 'snowball'}, #, :boost => 50.0 },
 																	:website 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																	:city				=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																	:state 				=> { :type => 'string', :analyzer => 'ngram_analyzer' },
@@ -339,6 +341,11 @@ class Teacher
 		return @subsfeed.flatten.size
 
 	end
+
+		# if !logs.empty?
+
+		# end
+	#end
 
 	# these clases are not defined on instances of Teacher because they are not available to ElasticSearch result objects,
 	# which are indistinguishable from mongo result objects

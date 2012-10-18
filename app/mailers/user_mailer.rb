@@ -48,7 +48,7 @@ class UserMailer < ActionMailer::Base
 	end
 
 	def new_user(user)
-		@username = user.first_last
+		@name = user.first_last
 
 		mail(from: "Eric Simons <support@claco.com>", :to => user.email, :subject => "Re: Welcome to Claco!") do |format|
 			format.html {render "welcome"}
@@ -85,7 +85,7 @@ class UserMailer < ActionMailer::Base
 		@limg_link = 'http://www.claco.com/' + sender.username
 		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + sender.first_last + '</a>'
 		@body = message.body.rstrip
-		@button_info = [{linkto: "http://www.claco.com/messages/#{named_binder_route(forkedbinder)}" + message.thread, text: 'View Full Message'}]
+		@button_info = [{linkto: "http://www.claco.com/messages/#{message.thread}", text: 'View Full Message'}]
 
 		while @body.last == "."
 			@body.chomp!(".")
@@ -101,8 +101,9 @@ class UserMailer < ActionMailer::Base
 		@limg = forker.info.avatar.url
 		@limg_link = 'http://www.claco.com/' + forker.username
 		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + forker.first_last + '</a>'
-		@body = ' (and 30 others) snapped ' + forkedbinder.title + ' to one of their binders:'
-		@button_info = [{linkto: "http://www.claco.com", text: 'Check it out!'}]
+		@body = ' snapped ' + forkedbinder.title + ' to one of their binders!'
+		# @button_info = [{linkto: "http://www.claco.com#{named_binder_route(forkedbinder)}", text: 'Check it out!'}]
+		@button_info = []
 
 		mail(from: "#{forker.first_last} via Claco <support@claco.com>", to: forkee.email, subject: PREFIX_EMAIL.sample + " - #{forker.first_last} just used one of your resources") do |format|
 			format.html {render "message_email"}

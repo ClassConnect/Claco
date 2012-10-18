@@ -601,7 +601,7 @@ class Binder
 
 		forkee = Teacher.find(ogbinder.owner)
 
-		if forkee.emailconfig["fork"]
+		if forkee.emailconfig["fork"].nil? || forkee.emailconfig["fork"]
 
 			forkedbinder = Binder.find(npid)
 

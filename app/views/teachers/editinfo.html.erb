@@ -215,7 +215,10 @@ $('#myTab a').click(function (e) {
 				<%= check_box_tag "msg", 1, current_teacher.emailconfig["msg"].nil? ? true : current_teacher.emailconfig["msg"], :style => "margin:-3px 5px 0 0" %>
 				When you receive a message
 			</div>
-
+			<div>
+				<%= check_box_tag "fork", 1, current_teacher.emailconfig["fork"].nil? ? true : current_teacher.emailconfig["fork"], :style => "margin:-3px 5px 0 0" %>
+				When someone snaps your content
+			</div>
 
 
 

@@ -11,6 +11,7 @@ class IndirectModelController < AbstractController::Base
   # Uncomment if you want to use helpers 
   # defined in ApplicationHelper in your views
   helper ApplicationHelper
+  helper BinderHelper
 
   # Make sure your controller can find views
   self.view_paths = "app/views"
@@ -24,24 +25,40 @@ class IndirectModelController < AbstractController::Base
     render template: "layouts/_commoncorelogo"
   end
 
-  def build(mclass)
-    case mclass.to_s
-    when 'createfile'
-      render template: "layouts/feedpieces/_createfileheader"
-    when 'createcontent'
-      render template: "layouts/feedpieces/_feedcontent"
-    when 'update' 
-      render template: "layouts/feedpieces/_update"
-    when 'forkitem' 
-      render template: "layouts/feedpieces/_forkitemheader"
-    when 'favorite'
-      render template: "layouts/feedpieces/_favoriteheader"
-    when 'setpub'
-      render template: "layouts/feedpieces/_setpubheader"
-    when 'sub'
-      render template: "layouts/feedpieces/_subheader"
-    else
-      raise 'Invalid class in IndirectModelController!'
+  def pseudorender(obj)
+
+    if obj.class == Feedobject
+      case obj.oclass
+      when 'binder'
+        @binder = Binder.find(obj.binderid)
+        render template: "layouts/feedpieces/_feedbinder"
+      when 'teacher'
+        @teacher = Teacher.find(obj.teacherid)
+        render template: "layouts/feedpieces/_feedteacher"
+      else
+        raise 'Invalid feedobject class!'
+      end
+      # when 'createfile'
+      #   render template: "layouts/feedpieces/_createfileheader"
+      # when 'createcontent'
+      #   render template: "layouts/feedpieces/_feedcontent"
+      # when 'update' 
+      #   render template: "layouts/feedpieces/_update"
+      # when 'forkitem' 
+      #   render template: "layouts/feedpieces/_forkitemheader"
+      # when 'favorite'
+      #   render template: "layouts/feedpieces/_favoriteheader"
+      # when 'setpub'
+      #   render template: "layouts/feedpieces/_setpubheader"
+      # when 'sub'
+      #   render template: "layouts/feedpieces/_subheader"
+      # else
+      #   raise 'Invalid feedobject class!'
+      # end
+    elsif obj.class = "Wrapper"
+      case obj.wclass
+      when "holder"
+      end
     end
   end
 

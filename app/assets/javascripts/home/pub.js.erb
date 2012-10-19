@@ -19,4 +19,14 @@ $(document).ready(function() {
 		window.location = $('a#forgot_link').attr('href');
 	});
 
+
+	$('.nominate-btn').click(function() {
+		jQuery.facebox($('#nominate-form'));
+
+		$("#facebox .firstfocus").focus();
+
+		// set the form handler
+		$('#facebox .bodcon').submit(function() {
+		});
+	});
 });

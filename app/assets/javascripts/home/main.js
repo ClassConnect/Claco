@@ -25,23 +25,13 @@ $(document).ready(function() {
             success: function(retData) {
               if (retData["success"] == 1) {
                 window.location = retData["data"];
-
               } else {
                 fbFormRevert();
                 showFormError(retData["data"]);
-
               }
-
 			}
-
           });
-
           return false;
 		});
-
 	});
-
-
-
-
 });

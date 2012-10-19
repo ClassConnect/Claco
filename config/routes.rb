@@ -36,13 +36,15 @@ Claco::Application.routes.draw do
 	get		'/homebase'													=> 'home#index'
 	get		'/autocomplete'											=> 'home#auto'
 	get		'/dj'																=> 'home#dj'
-	get		'/search'														=> 'home#search'
-	get		'/about'														=> 'home#about'
-	get		'/about/team'												=> 'home#team'
-	get		'/unitedweteach'										=> 'home#united'
-	get 	'/explore/detail'										=> 'home#explore_detail'
-	get		'/goodies'													=> 'home#goodies'
-	get		'/post'															=> 'home#bookmarklet'
+	get		'/search'															=> 'home#search'
+	get		'/about'															=> 'home#about'
+
+	get		'/explore'															=> 'home#explore'
+	
+	get		'/about/team'														=> 'home#team'
+	get		'/unitedweteach'													=> 'home#united'
+	get		'/goodies'															=> 'home#goodies'
+	get		'/post'																=> 'home#bookmarklet'
 
 	get		'/teachersearch'										=> 'home#teachersearch'
 	get		'/subscribedlog'										=> 'home#subscribedlog'

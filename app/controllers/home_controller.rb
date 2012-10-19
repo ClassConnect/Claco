@@ -241,6 +241,10 @@ class HomeController < ApplicationController
 		# expires_in 1.hour
 	end
 
+	def explore
+		@title = "Explore"
+	end
+
 	def goodies
 		@title = "Goodies"
 	end

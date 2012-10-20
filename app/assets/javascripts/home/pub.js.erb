@@ -29,4 +29,27 @@ $(document).ready(function() {
 		$('#facebox .bodcon').submit(function() {
 		});
 	});
+
+	$(document).bind('reveal.facebox', function() {
+		fieldAdder();
+	});
+
 });
+
+
+function fieldAdder() {
+  $('#facebox input.invite_').last()
+  	.css('opacity', 0.4);
+
+	$('#facebox input.invite_').last()
+		.on('focus',
+		  function () {
+				if($('#facebox input.invite_').last().prev().val() != '') {
+				  $('#facebox .buttonbar').first()
+		      .before('<input name="invite[]" maxlength="50" class="invite_" style="margin-top:0px; width:300px" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
+			  }
+			  $('#facebox input.invite_').off('focus');
+			  $('#facebox input.invite_').css('opacity', 1);
+				fieldAdder();
+		  });
+}

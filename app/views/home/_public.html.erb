@@ -8,8 +8,8 @@
 
 			<div class="addtl">
 				Find, build and share resources with teachers across the hall or across the world — aligned with <%= render 'layouts/commoncorelogo' %>
-				<div class='action-items'>
 					<a href="/apply" id="apply-btn" class="btn">Sign up for our Beta!</a>
+				<div class='action-items'>
 					<p>Know a great educator?</p>
 					<!-- <a href="/about" style="padding:15px 15px 15px 30px;text-decoration:underline">Learn more</a> -->
 					<a class="btn nominate-btn">Send them an invite</a>
@@ -126,21 +126,19 @@
 
 <div id="nominate-form">
   <div class="headtitle">
-    Nominate a teacher!
+		Share the love! 
   </div>
 
   <div class="errorBox"></div>
 
   <form action="#" class="bodcon">
-    <div class="conitem">
+    <h3 style="font-size:11px;"> Leave your name so (s)he can thank you:</h3>
 
-      <input name="nominate-email" maxlength="50" class="firstfocus" style="width:300px" type="text" placeholder="Enter an awesome teacher's email!" />
+    <input name="nominater" maxlength="50" class="firstfocus" style="width:300px" type="text" placeholder="Your full name" />
 
-      <h3 style="font-size:11px;"> Leave your name so (s)he can thank you:</a>
-
-      <input name="nominate-email" maxlength="50" class="firstfocus" style="width:300px" type="text" placeholder="Your full name" />
-
-    </div>
+		<h3 style="font-size:11px;"> Invite Teachers to our exclusive beta!</h3> 
+    <input name="invite[]" maxlength="50" class="invite_" style="width:300px" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
+    <input name="invite[]" maxlength="50" class="invite_" style="width:300px" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
 
     <div class="buttonbar">
        <button class="btn btn-primary showloader" type="submit">Send Nomination!</button>

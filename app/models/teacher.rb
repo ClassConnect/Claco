@@ -69,7 +69,8 @@ class Teacher
 
 	field :emailconfig, :type => Hash, :default => {"msg" => true,
 													"col" => true,
-													"sub" => true}
+													"sub" => true,
+													"fork" => true}
 
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
@@ -1066,7 +1067,7 @@ class Teacher
 	#DELAYED JOB
 	def self.newsub_email(subscriber, subscribee)
 
-		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && Teacher.find(subscribee).emailconfig["sub"]
+		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && (Teacher.find(subscribee).emailconfig["sub"].nil? || Teacher.find(subscribee).emailconfig["sub"])
 
 	end
 
@@ -1160,6 +1161,8 @@ class Teacher
 			self.incsizecap
 
 		end
+
+		UserMailer.new_user(self).deliver
 
 	end
 

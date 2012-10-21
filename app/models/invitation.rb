@@ -40,7 +40,7 @@ class Invitation
 
 		Invitation.delay(:queue => "email").blast(self.id)
 		# Invitation.blast(self.id)
-		Invitation.delay(:queue => "email", :run_at => 3.days.from_now).schedule_nag(self.id)
+		Invitation.delay(:queue => "scheduled_nag", :run_at => 3.days.from_now).schedule_nag(self.id)
 
 	end
 

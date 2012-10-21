@@ -25,7 +25,7 @@ class UserMailer < ActionMailer::Base
 				format.html {render "system_invite", :layout => false}
 			end
 		else
-			sender = Teacher.find(invitation.from)
+			@sender = Teacher.find(invitation.from)
 
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
 
@@ -51,7 +51,7 @@ class UserMailer < ActionMailer::Base
 		@name = user.first_last
 
 		mail(from: "Eric Simons <support@claco.com>", :to => user.email, :subject => "Re: Welcome to Claco!") do |format|
-			format.html {render "welcome"}
+			format.html {render "welcome", :layout => false}
 		end
 	end
 
@@ -86,10 +86,6 @@ class UserMailer < ActionMailer::Base
 		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + sender.first_last + '</a>'
 		@body = message.body.rstrip
 		@button_info = [{linkto: "http://www.claco.com/messages/#{message.thread}", text: 'View Full Message'}]
-
-		while @body.last == "."
-			@body.chomp!(".")
-		end
 
 		mail(from: "#{sender.first_last} via Claco <support@claco.com>", to: recipient.email, subject: "FYI - #{sender.first_last} sent you a message") do |format|
 			format.html {render "message_email"}

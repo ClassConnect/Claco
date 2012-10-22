@@ -21,7 +21,9 @@ $(document).ready(function() {
 
 
 	$('.nominate-btn').click(function() {
-		jQuery.facebox($('#nominate-form'));
+		jQuery.facebox({ div: '#nominate-form' });
+
+		// jQuery.facebox($('#nominate-form'));
 
 		$("#facebox .firstfocus").focus();
 
@@ -38,18 +40,18 @@ $(document).ready(function() {
 
 
 function fieldAdder() {
-  $('#facebox input.invite_').last()
+  $('#facebox input.invite-email').last()
   	.css('opacity', 0.4);
 
-	$('#facebox input.invite_').last()
+	$('#facebox input.invite-email').last()
 		.on('focus',
 		  function () {
-				if($('#facebox input.invite_').last().prev().val() != '') {
+				if($('#facebox input.invite-email').last().prev().val() != '') {
 				  $('#facebox .buttonbar').first()
-		      .before('<input name="invite[]" maxlength="50" class="invite_" style="margin-top:0px; width:300px" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
+		      .before('<input maxlength="50" class="invite-email" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
 			  }
-			  $('#facebox input.invite_').off('focus');
-			  $('#facebox input.invite_').css('opacity', 1);
+			  $('#facebox input.invite-email').off('focus');
+			  $('#facebox input.invite-email').css('opacity', 1);
 				fieldAdder();
 		  });
 }

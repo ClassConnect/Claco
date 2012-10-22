@@ -4,8 +4,8 @@
 		<title><%= @title %></title>
 		<meta property="og:image" content="<%= asset_path('public/claco_solid.png') %>"/> 
 		<%= stylesheet_link_tag "strap", :media => "all" %>
-		<%= stylesheet_link_tag "application", :media => "all" %>
 		<%= stylesheet_link_tag "jqueryui", :media => "all" %>
+		<%= stylesheet_link_tag "application", :media => "all" %>
 
 		<%= yield :headcon %>
 		<%= csrf_meta_tags unless response.cache_control[:public] %>

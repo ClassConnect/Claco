@@ -156,7 +156,9 @@ class HomeController < ApplicationController
 			end
 		end
 
-		#debugger
+		debugger
+
+		return if false
 
 		rescue Errno::ECONNREFUSED
 			Rails.logger.fatal "ElasticSearch server unreachable"

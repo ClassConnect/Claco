@@ -2,16 +2,14 @@ class Feed
 	include Mongoid::Document
 
 	# integer timestamp used for acquiring a fresh logset from the ES server
-	field :last_refresh, :type => Float, :default => 0.0
-	field :f_class, :type => Integer, :default => 0
+	field :last_retrieve, :type => Float, :default => 0.0
+	field :fclass, :type => Integer, :default => 0
 	field :owner, :type => String, :default => ''
 
 	embeds_many :wrappers
 
 	def size
-
 		return self.wrappers.size
-
 	end
 
 	#def 
@@ -26,19 +24,22 @@ class Feed
 
 	end
 
-	def retrieve(teacherid,last_refresh)
+	# for now, this remains class-invariant
+	def html(teacherid)#,last_refresh)
 
 		@feed = []
 		@subsfeed = []
 
 		# i = 0
 
+		retstr = ''
+
 		feedblacklist = {}
 		duplist = {}
 
-		teacherid = self.id.to_s # teacherid.to_s
+		teacher = Teacher.find(teacherid) #self.id.to_s # teacherid.to_s
 
-		teacher = self # Teacher.find(teacherid)
+		#teacher = self # Teacher.find(teacherid)
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 		#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
@@ -52,11 +53,7 @@ class Feed
 		logs = Tire.search 'logs' do |search|
 
 			search.query do |query|
-				#query.string params[:q]
-
 				query.all
-
-				#search.size 40
 			end
 
 			# technically these should be cascaded to avoid cross-method name conflicts
@@ -146,7 +143,7 @@ class Feed
 							# there is a similar event, combine in feed array
 							else	
 
-								expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
+								# expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
 
 								# insert into array dependent on whether or not a thumbnail exists
 								if (f[:log].model.to_s=='binders' && 
@@ -169,45 +166,54 @@ class Feed
 								duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
 							end
-							if !Rails.cache.read(f[:log].id.to_s).nil? 
-								expire_fragment(f[:log].id.to_s) 
-								Rails.cache.delete(f[:log].id.to_s)
-							end
+							# if !Rails.cache.read(f[:log].id.to_s).nil? 
+							# 	expire_fragment(f[:log].id.to_s) 
+							# 	Rails.cache.delete(f[:log].id.to_s)
+							# end
 						end
 					end
 				end
 				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 			end
+
+			debugger
+
+			@subsfeed.each do |f|
+				debugger
+				#self.wrappers << Wrapper.new()#.build(f))
+				self.wrappers.new(	:teachers => [],
+									:binders => [],
+									:content => "",
+									:feedobjectids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
+									:wclass => (f.class==Array ? f.first[:method] : f[:method]))
+				self.save
+				debugger
+				#self.wrappers.last.build(f)
+				#self.wrappers.last.build(f)
+				retstr += self.wrappers.last.html
+			end
 		end
+
+		retstr
 	end
-
-	# self.wrappers.each { |f| f.delete }
-
-	# @subsfeed.each do |f|
-
-	# 	a = Wrapper.new()
-	# 	a.generate(f)
-	# 	a.save
-
-	# end
 end
 
 class Wrapper
 	include Mongoid::Document
 
 	# model IDs
-	field :teachers, :type => Array, :default => []
-	field :binders, :type => Array, :default => []
+	field :teachers, 		:type => Array, 	:default => []
+	field :binders, 		:type => Array, 	:default => []
 
 	# all feedobjects are references to the feedobject model
-	field :content, :type => String, :default => ""
-	field :feedobjects, :type => Array, :default => []
-	field :w_class, :type => Integer, :default => nil
+	field :content, 		:type => String, 	:default => ""
+	field :feedobjectids, 	:type => Array, 	:default => []
+	field :wclass, 			:type => String, 	:default => ""
 
 	embedded_in :feed
 
 	# called when retrieving or refreshing the feed
-	def retrieve
+	def html
 
 		# cachedata = Rails.cache.read("feedwrapper/#{self.id.to_s}")
 
@@ -218,21 +224,33 @@ class Wrapper
 		# end
 
 		# initially, don't cache any of this, build on the fly
-		retstr = IndirectModelController.new.build(self.w_class)
+		retstr = IndirectModelController.new.pseudorender(self)
 		self.update_attributes(:content => retstr)
-
-		self.feedobjects.each do |f|
-			retstr += f.retrieve
-		end
-
+		self.feedobjectids.each { |f| retstr += Feedobject.find(f).html }
 		retstr	
 
 	end
 
-	def generate(feedobj)
+	# def build(feedobj)
 
-		if !logs.empty?
+	# 	# wrapper is not being stored 
+	# 	# extract IDs, generate wrapper, generate feedobject(s) 
+	# 	# if feedobj.class==Array
+	# 	# 	self.update_attributes(	:wclass => feedobj.first[:method].to_s,
+	# 	# 							:feedobjectids => (feedobj.map { |f| f[:log].id.to_s }))
+	# 	# else
+	# 	# 	self.update_attributes(	:wclass => feedobj[:method].to_s,
+	# 	# 							:feedobjectids => [feedobj[:log].id.to_s] )
+	# 	# end
 
-		end
-	end
+	# 	debugger
+
+	# 	return if false
+
+	# 	#self.feedobjects.each do |f|
+	# 		# create feedobject from log object
+
+	# 		#Feedobject.find(f).build
+	# 	#end
+	# end
 end

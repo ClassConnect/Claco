@@ -27,6 +27,8 @@ class IndirectModelController < AbstractController::Base
 
   def pseudorender(obj)
 
+    debugger
+
     if obj.class == Feedobject
       case obj.oclass
       when 'binder'
@@ -40,8 +42,6 @@ class IndirectModelController < AbstractController::Base
       end
       # when 'createfile'
       #   render template: "layouts/feedpieces/_createfileheader"
-      # when 'createcontent'
-      #   render template: "layouts/feedpieces/_feedcontent"
       # when 'update' 
       #   render template: "layouts/feedpieces/_update"
       # when 'forkitem' 
@@ -55,9 +55,22 @@ class IndirectModelController < AbstractController::Base
       # else
       #   raise 'Invalid feedobject class!'
       # end
-    elsif obj.class = "Wrapper"
+    elsif obj.class == Wrapper
       case obj.wclass
-      when "holder"
+      when 'createfile'
+        render template: "layouts/feedpieces/_createfileheader"
+      when 'update' 
+        render template: "layouts/feedpieces/_updateheader"
+      when 'forkitem' 
+        render template: "layouts/feedpieces/_forkitemheader"
+      when 'favorite'
+        render template: "layouts/feedpieces/_favoriteheader"
+      when 'setpub'
+        render template: "layouts/feedpieces/_setpubheader"
+      when 'sub'
+        render template: "layouts/feedpieces/_subheader"
+      else
+        raise 'Invalid feedobject class!'
       end
     end
   end

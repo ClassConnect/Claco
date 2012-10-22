@@ -15,8 +15,12 @@ class Feedobject
 	# storage of HTML
 	field :markup, :type => String, :default => ''
 
-	# returns plaintext HTML
-	def build
+	# after_initialize do
+	# 	self.generate
+	# end
+
+	# called asynchronously on initialization & callbacks
+	def generate
 		raise 'Undefined feedobject class!' if self.oclass.empty?
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
 		Rails.cache.delete("#{self.id.to_s}/feedobject")
@@ -30,7 +34,7 @@ class Feedobject
 	def html
 		html = Rails.cache.read("#{self.id.to_s}/feedobject")
 		if html.nil?
-			self.build
+			self.generate
 			Rails.cache.write("#{self.id.to_s}/feedobject",self.markup)
 			html = self.markup
 			self.wipe

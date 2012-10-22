@@ -1,0 +1,41 @@
+<a href="<%= "/#{@teacher.username}" %>" class="conlink">
+	<div class="thecontent">
+		<% if !@teacher.info.nil? %>
+			<% #if !(@teacher.info.avatar.nil? || @teacher.info.avatar.url=="/assets/placer.png")
+			%>
+
+			<div class="previmg" style="background-image: url('<%= teacher_thumb_mg(@teacher) %>');background-repeat: no-repeat;background-position: center; width:122px; -webkit-border-radius: 4px;"></div>
+
+
+			<% if !@teacher.info.bio.nil? && !@teacher.info.bio.empty? %>
+				<div class="txtcon">
+					<div class="contitle"><%= "#{@teacher.fname} #{@teacher.lname} (#{@teacher.username})" %></div>
+					<div class="condesc">
+						<%= truncate(strip_tags(@teacher.info.bio), :length => 250, :omission => "... <u>see more</u>").html_safe %>
+					</div>
+				</div>
+			<% else %>
+				<div class="txtcon">
+					<div class="contitle"><%= "#{@teacher.fname} #{@teacher.lname} (#{@teacher.username})" %></div>
+					<% if @teacher.info.subjects.any? %>
+					<div class="condesc" >
+						<span>
+							<%= image_tag("profile/subject.png", :style=>"margin-top:-4px;margion-right:3px;opacity:0.50;") %>
+							<%= "#{@teacher.info.subjects[0]}#{", #{@teacher.info.subjects[1]}" if @teacher.info.subjects.size > 1}#{", and #{@teacher.info.subjects.size-2} more" if @teacher.info.subjects.size > 2}" %>
+						</span>
+					</div>
+					<% end %>
+					<% if !@teacher.info.city.empty? || !@teacher.info.state.empty? || !@teacher.info.country.empty? %>
+					<div class="condesc" >
+						<span>
+							<%= image_tag("profile/point.png", :style=>"margin-top:-4px;margion-right:0px;opacity:0.50;") %>
+							<%= "#{@teacher.info.city}#{', ' if !@teacher.info.city.empty?}#{@teacher.info.state}#{', ' if !@teacher.info.city.empty? || !@teacher.info.state.empty?}#{@teacher.info.country}" %>
+						</span>
+					</div>
+					<% end %>
+				</div>
+			<% end %>
+		<% end %>
+		<div style="clear:both"></div>
+	</div>
+</a>

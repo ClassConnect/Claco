@@ -1,0 +1,21 @@
+<% if !@f[:array] %>
+
+	<div class="thetitle">
+		<% if @teacher_activity.nil? || (!current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s) %>
+			You added content to <a href="<%= @f[:model].parents.size==2 ? named_binder_route(Binder.find(@f[:model].parent['id'])) : named_binder_route(Binder.find(@f[:model].parents[1]['id'])) %>"><%= @f[:model].parents.size==2 ? @f[:model].parents[1]["title"] : @f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% else %>
+			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> added content to <a href="<%= @f[:model].parents.size==2 ? named_binder_route(Binder.find(@f[:model].parent['id'])) : named_binder_route(Binder.find(@f[:model].parents[1]['id'])) %>"><%= @f[:model].parents.size==2 ? @f[:model].parents[1]["title"] : @f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% end %>
+	</div>
+
+<% else %>
+
+	<div class="thetitle">
+		<% if @teacher_activity.nil? || (!current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s) %>
+			You added <%= @f[:array].size %> links to <a href="<%= @f[:model].parents.size==2 ? named_binder_route(Binder.find(@f[:model].parent['id'])) : named_binder_route(Binder.find(@f[:model].parents[1]['id'])) %>"><%= @f[:model].parents.size==2 ? @f[:model].parents[1]["title"] : @f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% else %>
+			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> added <%= @f[:array].size %> links to <a href="<%= @f[:model].parents.size==2 ? named_binder_route(Binder.find(@f[:model].parent['id'])) : named_binder_route(Binder.find(@f[:model].parents[1]['id'])) %>"><%= @f[:model].parents.size==2 ? @f[:model].parents[1]["title"] : @f[:model].parent['title'] %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
+		<% end %>
+	</div>
+
+<% end %>

@@ -176,20 +176,21 @@ class Feed
 				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 			end
 
-			debugger
+			self.wrappers.delete_all
 
 			@subsfeed.each do |f|
+				#self.wrappers << Wrapper.new()#.generate(f))
+				#f = [f] if f.size==1
 				debugger
-				#self.wrappers << Wrapper.new()#.build(f))
-				self.wrappers.new(	:teachers => [],
-									:binders => [],
-									:content => "",
-									:feedobjectids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
-									:wclass => (f.class==Array ? f.first[:method] : f[:method]))
+				self.wrappers << Wrapper.new(	timestamp: 	f.first[:log].timestamp,
+												logids: 	f.map { |g| g[:log].id.to_s },
+												wclass: 	f.first[:log][:method])
+												# :logids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
+												# :wclass => (f.class==Array ? f.first[:log][:method] : f[:method]))
 				self.save
-				debugger
-				#self.wrappers.last.build(f)
-				#self.wrappers.last.build(f)
+				self.wrappers.last.generate#(f)
+				#self.wrappers.last.generate(f)
+				#debugger
 				retstr += self.wrappers.last.html
 			end
 		end
@@ -205,12 +206,18 @@ class Wrapper
 	field :teachers, 		:type => Array, 	:default => []
 	field :binders, 		:type => Array, 	:default => []
 
+	# used for self-referential identification
+	field :ownerid,			:type => String, 	:default => ''
+
 	# all feedobjects are references to the feedobject model
+	field :timestamp,		:type => Float,		:default => 0.0
 	field :content, 		:type => String, 	:default => ""
+	field :logids,			:type => Array, 	:default => []
 	field :feedobjectids, 	:type => Array, 	:default => []
 	field :wclass, 			:type => String, 	:default => ""
 
 	embedded_in :feed
+
 
 	# called when retrieving or refreshing the feed
 	def html
@@ -223,34 +230,76 @@ class Wrapper
 		# 	Rails.cache.write("feedwrapper/#{self.id.to_s}",cachedata)
 		# end
 
-		# initially, don't cache any of this, build on the fly
-		retstr = IndirectModelController.new.pseudorender(self)
-		self.update_attributes(:content => retstr)
+		# initially, don't cache any of this, generate on the fly
+		retstr = ''
+		#retstr = IndirectModelController.new.pseudorender(self)
+		#self.update_attributes(:content => retstr)
+		debugger
 		self.feedobjectids.each { |f| retstr += Feedobject.find(f).html }
 		retstr	
 
 	end
 
-	# def build(feedobj)
+	# this will be called on both new wrappers and already populated wrappers
+	def generate#(a=nil,b=nil,c=nil) #(feedobj)
 
-	# 	# wrapper is not being stored 
-	# 	# extract IDs, generate wrapper, generate feedobject(s) 
-	# 	# if feedobj.class==Array
-	# 	# 	self.update_attributes(	:wclass => feedobj.first[:method].to_s,
-	# 	# 							:feedobjectids => (feedobj.map { |f| f[:log].id.to_s }))
-	# 	# else
-	# 	# 	self.update_attributes(	:wclass => feedobj[:method].to_s,
-	# 	# 							:feedobjectids => [feedobj[:log].id.to_s] )
-	# 	# end
+		# wrapper is not being stored 
+		# extract IDs, generate wrapper, generate feedobject(s) 
+		# if feedobj.class==Array
+		# 	self.update_attributes(	:wclass => feedobj.first[:method].to_s,
+		# 							:feedobjectids => (feedobj.map { |f| f[:log].id.to_s }))
+		# else
+		# 	self.update_attributes(	:wclass => feedobj[:method].to_s,
+		# 							:feedobjectids => [feedobj[:log].id.to_s] )
+		# end
 
-	# 	debugger
+		#debugger
 
-	# 	return if false
+		if self.logids.any?
+			# this is the first generate of the wrapper
+			self.logids.each do |f|
+				log = Log.find(f)
+				feedobj = Feedobject.where(:logid => log.id.to_s).first
+				case log.model
+				when 'binders'
+					self.binders << log.modelid
+					if feedobj.nil?
+						feedobj = Feedobject.new(	:binderid => log.modelid,
+													:logid => log.id.to_s,
+													:oclass => log.model)
+						feedobj.save
+					end
+				when 'teachers'
+					self.teachers << log.modelid
+					if feedobj.nil?
+						feedobj = Feedobject.new(	:teacherid => log.modelid,
+													:logid => log.id.to_s,
+													:oclass => log.model)
+						feedobj.save
+					end
+				end
+				self.feedobjectids << feedobj.id.to_s
+			end
+			self.save
+			# exit unbuilt state, presently unused
+			self.update_attributes(:logids => [])
+		#else
+			# this
+		end
 
-	# 	#self.feedobjects.each do |f|
-	# 		# create feedobject from log object
+		#debugger
 
-	# 		#Feedobject.find(f).build
-	# 	#end
-	# end
+		return if false
+
+		# these are pre-generate on class initialization
+
+		# self.feedobjects.each do |f|
+		# 	#create feedobject from log object
+		# 	Feedobject.find(f).generate
+		# end
+	end
+
+	def multiplicity?
+		self.feedobjectids.size > 1
+	end
 end

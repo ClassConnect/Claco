@@ -1,5 +1,11 @@
 module ApplicationHelper
 
+	#def time_ago_in_words_wrapper(data)
+
+
+
+	#end
+
 	def map_to_model(modelid,cachekey)
 
 		#debugger

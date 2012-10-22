@@ -1,4 +1,7 @@
 class IndirectModelController < AbstractController::Base
+
+  require 'action_view'
+
   include AbstractController::Rendering
   include AbstractController::Layouts
   include AbstractController::Helpers
@@ -8,10 +11,14 @@ class IndirectModelController < AbstractController::Base
   include ActionDispatch::Routing
   include Rails.application.routes.url_helpers
 
+  include ActionView::Helpers::DateHelper
+
   # Uncomment if you want to use helpers 
   # defined in ApplicationHelper in your views
   helper ApplicationHelper
   helper BinderHelper
+  helper TeacherHelper
+#  helper Helpers::DateHelper
 
   # Make sure your controller can find views
   self.view_paths = "app/views"
@@ -27,18 +34,18 @@ class IndirectModelController < AbstractController::Base
 
   def pseudorender(obj)
 
-    debugger
+    #debugger
 
     if obj.class == Feedobject
       case obj.oclass
-      when 'binder'
+      when 'binders'
         @binder = Binder.find(obj.binderid)
-        render template: "layouts/feedpieces/_feedbinder"
-      when 'teacher'
+        render template: "layouts/feedpieces/objects/_binder"
+      when 'teachers'
         @teacher = Teacher.find(obj.teacherid)
-        render template: "layouts/feedpieces/_feedteacher"
+        render template: "layouts/feedpieces/objects/_teacher"
       else
-        raise 'Invalid feedobject class!'
+        raise "Invalid feedobject class #{obj.oclass}"
       end
       # when 'createfile'
       #   render template: "layouts/feedpieces/_createfileheader"
@@ -56,21 +63,37 @@ class IndirectModelController < AbstractController::Base
       #   raise 'Invalid feedobject class!'
       # end
     elsif obj.class == Wrapper
+
+      @mult = obj.multiplicity?
+      @time = time_ago_in_words(Time.at(obj.timestamp).to_datetime)
+
+
+
+      #if obj.
+
       case obj.wclass
       when 'createfile'
-        render template: "layouts/feedpieces/_createfileheader"
+
+
+
+        render template: "layouts/feedpieces/wrappers/_createfile"
       when 'update' 
-        render template: "layouts/feedpieces/_updateheader"
+
+        render template: "layouts/feedpieces/wrappers/_update"
       when 'forkitem' 
-        render template: "layouts/feedpieces/_forkitemheader"
+
+        render template: "layouts/feedpieces/wrappers/_forkitem"
       when 'favorite'
-        render template: "layouts/feedpieces/_favoriteheader"
+
+        render template: "layouts/feedpieces/wrappers/_favorite"
       when 'setpub'
-        render template: "layouts/feedpieces/_setpubheader"
+
+        render template: "layouts/feedpieces/wrappers/_setpub"
       when 'sub'
-        render template: "layouts/feedpieces/_subheader"
+
+        render template: "layouts/feedpieces/wrappers/_sub"
       else
-        raise 'Invalid feedobject class!'
+        raise "Invalid wrapper class #{obj.oclass}"
       end
     end
   end

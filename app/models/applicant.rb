@@ -1,5 +1,7 @@
 class Applicant
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	field :title, :type => String
 	field :fname, :type => String
@@ -19,6 +21,12 @@ class Applicant
 	validates_presence_of :email, :message => "Please enter an email."
 	validates_presence_of :body, :message => "Please enter a few words about yourself."
 	validates_uniqueness_of :email, :message => "We already have an applicant under the submitted email."
+
+	after_create do
+
+		UserMailer.request_invite(self.email).deliver
+
+	end
 
 	def approve
 

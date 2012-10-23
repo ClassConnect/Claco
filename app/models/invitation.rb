@@ -40,6 +40,15 @@ class Invitation
 
 		Invitation.delay(:queue => "email").blast(self.id)
 		# Invitation.blast(self.id)
+		Invitation.delay(:queue => "scheduled_nag", :run_at => 3.days.from_now).schedule_nag(self.id)
+
+	end
+
+	def self.schedule_nag(id)
+
+		invitation = Invitation.find(id)
+
+		UserMailer.send_nag(invitation).deliver unless invitation.status["signed_up"]
 
 	end
 

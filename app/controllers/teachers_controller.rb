@@ -380,7 +380,8 @@ class TeachersController < ApplicationController
 
 		emailconfig = {	"sub" => params[:sub] == "1",
 						"col" => params[:col] == "1",
-						"msg" => params[:msg] == "1"}
+						"msg" => params[:msg] == "1",
+						"fork" => params[:fork] == "1"}
 
 		current_teacher.update_attributes(:emailconfig => emailconfig)
 

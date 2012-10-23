@@ -69,10 +69,13 @@ class Teacher
 
 	field :emailconfig, :type => Hash, :default => {"msg" => true,
 													"col" => true,
-													"sub" => true}
+													"sub" => true,
+													"fork" => true}
 
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
+
+	field :feed_ids, :type => Array, :default => []
 
 	field :admin, :type => Boolean, :default => false
 
@@ -166,7 +169,7 @@ class Teacher
 	} 	do
 		mapping do
 			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
-			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 300.0
+			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 400.0
 			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
 			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 			=> { :type => 'object', :properties => { :username 	=> 	{ :type => 'string', :analyzer => 'ngram_analyzer' },
 																															 	 :uid 		=> 	{ :type => 'object', :enabled => false },
@@ -185,7 +188,7 @@ class Teacher
 																	:data 				=> { :type => 'object', :enabled => false },
 																	:grades 			=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
 																	:subjects 			=> { :type => 'string', :analyzer => 'ngram_analyzer', :default => [] },
-																	:bio 				=> { :type => 'string', :analyzer => 'snowball', :boost => 50.0 },
+																	:bio 				=> { :type => 'string', :analyzer => 'snowball'}, #, :boost => 50.0 },
 																	:website 			=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																	:city				=> { :type => 'string', :analyzer => 'ngram_analyzer' },
 																	:state 				=> { :type => 'string', :analyzer => 'ngram_analyzer' },
@@ -201,6 +204,150 @@ class Teacher
     	#to_indexed_json.as_json
     	to_indexed_json.to_json
 	end
+
+	# temporary method to find number of feed items in main feed
+	def feedsize
+
+		@feed = []
+		@subsfeed = []
+
+		# i = 0
+
+		feedblacklist = {}
+		duplist = {}
+
+		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+
+		logs = Tire.search 'logs' do |search|
+
+			search.query do |query|
+				#query.string params[:q]
+
+				query.all
+
+				#search.size 40
+			end
+
+			# technically these should be cascaded to avoid cross-method name conflicts
+			search.filter :terms, :model => ['binders','teachers']
+			search.filter :terms, :method => FEED_METHOD_WHITELIST
+			search.filter :terms, :ownerid => subs + [self.id.to_s]
+
+			search.size 100
+
+			search.sort { by :timestamp, 'desc' }
+
+		end
+		
+		logs = logs.results
+
+		#debugger
+		
+		if logs.any?
+			logs.each do |f|
+
+				#debugger
+
+				begin
+					case f[:model].to_s
+						when 'binders'
+							model = Binder.find(f[:modelid].to_s)
+						when 'teachers'
+							model = Teacher.find(f[:modelid].to_s)
+					end
+				rescue
+					Rails.logger.fatal "Invalid log model ID!"
+					next
+				end
+
+				# the binder log entry:		should not be deleted
+				# 							should not be private
+				# 							should not be sourced from another log entry
+				# 							should not have a blacklist entry
+				# 							should not be a setpub -> private
+				#
+				# the teacher log entry: 	should not have a blacklist entry
+				if 	(f[:model].to_s=='binders' && 
+						model.parents[0]!={ "id" => "-1", "title" => "" } && 
+						model.is_pub? && 
+						!f[:data][:src] && 
+						!(feedblacklist[f[:actionhash].to_s]) && 
+						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
+					(f[:model].to_s=='teachers' &&
+						!(feedblacklist[f[:actionhash].to_s]))
+
+					# calculate number of items contributed from this teacher
+					c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+
+					# must be subscribed or owned
+					# occupancy of up to 10 from any teacher
+					if ((subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == self.id.to_s)) && c<10
+
+						# whether or not the item is included in the blacklist,
+						# add the actionhash and annihilation IDs to the exclusion list
+						feedblacklist[f[:actionhash].to_s] = true
+
+						# enter all annihilation entries into blacklist hash
+						f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+
+						# execute blacklist exclusion
+						if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+
+							# create a key for an owner and an action
+							similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
+
+							f = { :model => model, :owner => f[:ownerid].to_s, :log => f }	
+
+							# if there are no members in the duplist, create a new action in each tracking hash
+							if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
+
+								# store the index at which the similar item resides, and the current time
+								duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
+
+								# new array set for feed object type
+								@subsfeed << [f]
+
+							# there is a similar event, combine in feed array
+							else	
+
+								#expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
+
+								# insert into array dependent on whether or not a thumbnail exists
+								if (f[:log].model.to_s=='binders' && 
+										(f[:model].thumbimgids[0].nil? || 
+										f[:model].thumbimgids[0].empty?)) || 
+									(f[:log].model.to_s=='teachers' && 
+										!Teacher.thumbready?(f[:model]))
+
+									@subsfeed[duplist[similar]['index']] << f
+
+								else
+
+									@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
+
+									duplist[similar]['blank_index'] += 1
+
+								end
+
+								# update to the most recent time
+								duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
+
+							end
+						end
+					end
+				end
+				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
+			end
+		end
+
+		return @subsfeed.flatten.size
+
+	end
+
+		# if !logs.empty?
+
+		# end
+	#end
 
 	# these clases are not defined on instances of Teacher because they are not available to ElasticSearch result objects,
 	# which are indistinguishable from mongo result objects
@@ -950,7 +1097,7 @@ class Teacher
 	#DELAYED JOB
 	def self.newsub_email(subscriber, subscribee)
 
-		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && Teacher.find(subscribee).emailconfig["sub"]
+		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && (Teacher.find(subscribee).emailconfig["sub"].nil? || Teacher.find(subscribee).emailconfig["sub"])
 
 	end
 
@@ -1044,6 +1191,8 @@ class Teacher
 			self.incsizecap
 
 		end
+
+		UserMailer.new_user(self).deliver
 
 	end
 

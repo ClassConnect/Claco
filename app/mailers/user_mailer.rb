@@ -29,7 +29,7 @@ class UserMailer < ActionMailer::Base
 
 			@link = "http://www.claco.com/join?ref=#{invitation.from}&email=#{CGI.escape(invitation.to)}"
 
-			mail(from: "#{sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Come collaborate with me on claco") do |format|
+			mail(from: "#{@sender.first_last} via Claco <support@claco.com>", to: invitation.to, subject: "Come collaborate with me on claco") do |format|
 				format.html {render "user_invite", :layout => false}
 			end
 		end

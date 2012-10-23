@@ -80,6 +80,23 @@ Claco::Application.routes.draw do
 	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
 	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
 
+	###################
+	# EXPLORE ROUTING #
+	###################
+	
+	#Admin
+	get		'/admin/explore'													=> 'explore#admin',					:as => 'admin_explore'
+	post	'/admin/explore'													=> 'explore#create'
+	get		'/admin/explore/:issue'												=> 'explore#showissue',				:as => 'admin_explore_issue'
+	post	'/admin/explore/:issue'												=> 'explore#createcat'
+	get		'/admin/explore/:issue/:category'									=> 'explore#viewcat',				:as => 'admin_explore_categories'
+	post	'/admin/explore/:issue/:category'									=> 'explore#setcatbinders'
+
+	#Public
+	get		'/explore'															=> 'explore#index',					:as => 'explore'
+	get		'/explore/:issue'													=> 'explore#issue',					:as => 'explore_issue'
+	get		'/explore/:issue/:category'											=> 'explore#category',				:as => 'explore_category'
+
 	##################
 	# TEACHER ROUTING#
 	##################

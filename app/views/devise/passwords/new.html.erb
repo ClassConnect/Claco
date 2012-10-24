@@ -10,9 +10,11 @@
 <%= form_for(resource, :as => resource_name, :url => teacher_password_path, :html => { :method => :post }) do |f| %>
   <%= devise_error_messages! %>
 
-  <label>Enter your email address or username:</label><%= f.text_field :login, :style => "margin-top:10px;margin-bottom:10px", :id => "forgot_user", :value => params[:user] %>
+  <label style="margin-top:5px">Enter your email address or username:</label>
 
-  <div><%= f.submit "Reset my password", :class => "btn btn-primary", :style => "font-weight:bolder" %></div>
+  <%= f.text_field :login, :id => "forgot_user", :class => "login-info", :value => params[:user] %>
+
+  <div><%= f.submit "Reset my password", :class => "btn btn-primary login-btn" %></div>
 <% end %>
 
 </div>

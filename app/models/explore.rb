@@ -65,10 +65,14 @@ end
 class Category
 	include Mongoid::Document
 
-	field ::name => :type => String
+	field :name, :type => String
 	field :binders, :type => Array, :default => []
 
 	embedded_in :explore
 
-	validates_uniqueness_of ::name =>
+	validates_uniqueness_of :name
+
+	def find_binders
+		self.binders.map{|b|Binder.find(b)}
+	end
 end

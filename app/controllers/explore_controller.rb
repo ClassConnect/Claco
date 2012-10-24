@@ -23,8 +23,6 @@ class ExploreController < ApplicationController
 
 		end
 
-		# render :text => exp.errors.to_s
-
 	end
 
 	#View an issue, add/remove categories
@@ -39,7 +37,7 @@ class ExploreController < ApplicationController
 
 		exp = Explore.find_by_issue(params[:issue])
 
-		exp.categories << Category.new(name: params[:name])
+		exp.categories << Category.new(params[:category])
 
 		redirect_to admin_explore_issue_path(params[:issue])
 
@@ -61,8 +59,13 @@ class ExploreController < ApplicationController
 
 		redirect_to admin_explore_categories_path(params[:issue], params[:category]) and return if cat.update_attributes(:binders => params[:binders])
 
-		rescue Mongoid::Errors::DocumentNotFound
-			
+	end
+
+	def destroycategory
+
+		Explore.find_by_issue(params[:issue]).find_category(params[:category]).destroy
+
+		redirect_to admin_explore_issue_path
 
 	end
 

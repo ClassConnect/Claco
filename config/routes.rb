@@ -91,6 +91,7 @@ Claco::Application.routes.draw do
 	post	'/admin/explore/:issue'												=> 'explore#createcat'
 	get		'/admin/explore/:issue/:category'									=> 'explore#viewcat',				:as => 'admin_explore_categories'
 	post	'/admin/explore/:issue/:category'									=> 'explore#setcatbinders'
+	delete	'/admin/explore/:issue/:category'									=> 'explore#destroycategory'
 
 	#Public
 	get		'/explore'															=> 'explore#index',					:as => 'explore'

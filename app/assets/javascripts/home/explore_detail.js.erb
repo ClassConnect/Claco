@@ -1,0 +1,20 @@
+/**
+* @authors: diwank
+* @status: terribly hacky
+*/
+$(document).ready(function() {
+
+	$('*[data-href]').click(function /* redirector */(){
+		window.location = $(this).data('href');
+	});
+
+
+	$('.snapbtn').click(function /* binderPicker */(e){
+		// e.preventDefault();
+		if(!loggedin) window.location = 'http://' + window.location.host + '/login';
+		// alert('Yay');
+		// facebox
+		return false;
+	})
+
+});

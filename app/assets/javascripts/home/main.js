@@ -2,7 +2,7 @@ $(document).ready(function() {
 
 	$('#newbinder').click(function() {
 
-		jQuery.facebox({ div: '#addbinder-form' });
+		$.facebox({ div: '#addbinder-form' });
 
 		$("#facebox .firstfocus").focus();
 
@@ -14,34 +14,24 @@ $(document).ready(function() {
 
 		// set the form handler
 		$('#facebox .bodcon').submit(function() {
-          var serData = $("#facebox .bodcon").serialize();
-          fbFormSubmitted();
+      var serData = $("#facebox .bodcon").serialize();
+      fbFormSubmitted();
 
-          $.ajax({
-            type: "POST",
-            url: username + "/portfolio",
-            dataType: "json",
-            data: serData,
-            success: function(retData) {
-              if (retData["success"] == 1) {
-                window.location = retData["data"];
-
-              } else {
-                fbFormRevert();
-                showFormError(retData["data"]);
-
-              }
-
-			}
-
-          });
-
-          return false;
+      $.ajax({
+        type: "POST",
+        url: username + "/portfolio",
+        dataType: "json",
+        data: serData,
+        success: function(retData) {
+          if (retData["success"] == 1) {
+            window.location = retData["data"];
+          } else {
+            fbFormRevert();
+            showFormError(retData["data"]);
+          }
+  			}
+      });
+      return false;
 		});
-
 	});
-
-
-
-
 });

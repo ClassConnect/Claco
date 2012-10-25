@@ -140,7 +140,7 @@ gen/cookie.js: gen/cookie-0604f2c7b2b3900ddcacab3ef6279f15.js
 gen/guiders.js: gen/guiders-693d564bd42978b8a4bcafb2ec898d78.js
 gen/sticky.js: gen/sticky-c7405eda437c719c60a02718ab838fc1.js
 gen/wizard.js: gen/wizard-7523ae0f935550c9aff5e16185825d59.js
-home/main.js: home/main-301c922b6573173306f7b0e87c3363bf.js
+home/main.js: home/main-b004fbfca0cd774f733d66cf8dddceaf.js
 home/pub.js: home/pub-befa495e6afb8f77dc9a0be74f84d0cc.js
 jqueryui.js: jqueryui-c04b8ed279f78b6387c8d090964d2e16.js
 messages/show.js: messages/show-af1bfe6546d966549eb5e11fd056910c.js

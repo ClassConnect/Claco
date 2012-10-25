@@ -1,0 +1,30 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<h1>Issue # <%= params[:issue] %></h1>
+<% if @issue.categories.empty? %>
+No categories have been made yet
+<% else %>
+<table>
+<tr>
+<td>Subject</td>
+<td># Binders</td>
+<td>Remove Category</td>
+</tr>
+<% @issue.categories.each do |category| %>
+<tr>
+<td><%= link_to("#{category.name}", admin_explore_categories_path(params[:issue], category.name)) %></td>
+<td><%= category.binders.count %></td>
+<td><%= link_to("Remove Category", admin_explore_categories_path(params[:issue], category.name), :method => :delete) %></td>
+</tr>
+<% end %>
+</table>
+<% end %>
+<br />
+<br />
+<%= link_to("Preview Issue", preview_issue_path(params[:issue])) %>
+<%= form_for Category.new, url: admin_explore_issue_path do |f| %>
+	<%= f.label :name, "Category" %>
+	<%= f.text_field :name %>
+	<%= f.submit "add" %>
+<% end %>

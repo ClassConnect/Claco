@@ -30,7 +30,7 @@ class Message
 
 		recipient = Teacher.find(conversation.get_other(sender))
 
-		UserMailer.new_msg(message, sender, recipient).deliver if recipient.emailconfig["msg"]
+		UserMailer.new_msg(message, sender, recipient).deliver if recipient.emailconfig["msg"].nil? || recipient.emailconfig["msg"]
 
 	end
 

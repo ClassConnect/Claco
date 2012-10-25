@@ -1,0 +1,22 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+Existing Issues:<br />
+<% if @issues.empty? %>
+No explore issues have been made yet
+<% else %>
+<table>
+<tr>
+<td>Issue #</td>
+<td>Published?</td>
+</tr>
+<% @issues.each do |issue| %>
+<tr>
+<td><%= link_to(issue.issue.to_s, admin_explore_issue_path(issue.issue)) %></td>
+<td><%= issue.published? ? "Yes" : link_to("No", admin_explore_issue_path(issue.issue), :method => :put) %></td>
+</tr>
+<% end %>
+</table>
+<% end %>
+<br />
+<%= link_to("Create new issue", admin_explore_path, method: :post) %>

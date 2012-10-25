@@ -1,11 +1,44 @@
 class Feed
 	include Mongoid::Document
 
-	def self.generate(teacherid)
+	# integer timestamp used for acquiring a fresh logset from the ES server
+	field :last_refresh, :type => Float, :default => 0.0
+	field :f_class, :type => Integer, :default => 0
+	field :owner, :type => String, :default => ''
 
-		teacherid = teacherid.to_s
+	embeds_many :wrappers
 
-		teacher = Teacher.find(teacherid)
+	def size
+
+		return self.wrappers.size
+
+	end
+
+	#def 
+
+	def generate
+
+		retstr = ''
+
+		self.wrappers.each do |f|
+			retstr += f.retrieve
+		end
+
+	end
+
+	def retrieve(teacherid,last_refresh)
+
+		@feed = []
+		@subsfeed = []
+
+		# i = 0
+
+		feedblacklist = {}
+		duplist = {}
+
+		teacherid = self.id.to_s # teacherid.to_s
+
+		teacher = self # Teacher.find(teacherid)
 
 		# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 		#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
@@ -30,7 +63,12 @@ class Feed
 			search.filter :terms, :model => ['binders','teachers']
 			search.filter :terms, :method => FEED_METHOD_WHITELIST
 			search.filter :terms, :ownerid => subs + [teacherid]
+			# search.filter :range, :timestamp => { 	:from => last_refresh.to_f,													:include_upper => false }
+			# 										:include_lower => true,
+			# 										:include_upper => false }
+			#search.filter :terms, :logid => self.parentid.to_s
 
+			# analyze later for retention in feed object
 			search.size 100
 
 			search.sort { by :timestamp, 'desc' }
@@ -140,6 +178,61 @@ class Feed
 				end
 				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 			end
+		end
+	end
+
+	# self.wrappers.each { |f| f.delete }
+
+	# @subsfeed.each do |f|
+
+	# 	a = Wrapper.new()
+	# 	a.generate(f)
+	# 	a.save
+
+	# end
+end
+
+class Wrapper
+	include Mongoid::Document
+
+	# model IDs
+	field :teachers, :type => Array, :default => []
+	field :binders, :type => Array, :default => []
+
+	# all feedobjects are references to the feedobject model
+	field :content, :type => String, :default => ""
+	field :feedobjects, :type => Array, :default => []
+	field :w_class, :type => Integer, :default => nil
+
+	embedded_in :feed
+
+	# called when retrieving or refreshing the feed
+	def retrieve
+
+		# cachedata = Rails.cache.read("feedwrapper/#{self.id.to_s}")
+
+		# if cachedata.nil?
+		# 	# wrapper does not exist in cache!  
+		# 	cachedata = self.generate
+		# 	Rails.cache.write("feedwrapper/#{self.id.to_s}",cachedata)
+		# end
+
+		# initially, don't cache any of this, build on the fly
+		retstr = IndirectModelController.new.build(self.w_class)
+		self.update_attributes(:content => retstr)
+
+		self.feedobjects.each do |f|
+			retstr += f.retrieve
+		end
+
+		retstr	
+
+	end
+
+	def generate(feedobj)
+
+		if !logs.empty?
+
 		end
 	end
 end

@@ -24,4 +24,35 @@ class IndirectModelController < AbstractController::Base
     render template: "layouts/_commoncorelogo"
   end
 
+  def build(mclass)
+    case mclass.to_s
+    when 'createfile'
+      render template: "layouts/feedpieces/_createfileheader"
+    when 'createcontent'
+      render template: "layouts/feedpieces/_feedcontent"
+    when 'update' 
+      render template: "layouts/feedpieces/_update"
+    when 'forkitem' 
+      render template: "layouts/feedpieces/_forkitemheader"
+    when 'favorite'
+      render template: "layouts/feedpieces/_favoriteheader"
+    when 'setpub'
+      render template: "layouts/feedpieces/_setpubheader"
+    when 'sub'
+      render template: "layouts/feedpieces/_subheader"
+    else
+      raise 'Invalid class in IndirectModelController!'
+    end
+  end
+
+  def render_partial(params)
+
+    debugger
+
+    if true
+      return
+    end
+
+  end
+
 end

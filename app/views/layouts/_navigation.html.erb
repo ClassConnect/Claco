@@ -80,8 +80,7 @@
             <button data-toggle="dropdown" class="btn top-notch-btn notch-login">Sign in</button>
             <ul class="dropdown-menu noclose">
               <%= form_for("teacher", :url => teacher_session_path) do |f| %>
-                
-                <input type="text" size="30" placeholder="Username / Email" name="teacher[login]" id="user-info" class="span3 login-focus">
+                <%= f.text_field :login, :class => "span3 login-focus", :placeholder => "Username / Email", :id => "user-info" %>
                 
                 <%= f.password_field :password, :class => "span3", :placeholder => "Password" %>
                 

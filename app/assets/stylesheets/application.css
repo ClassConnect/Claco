@@ -16,6 +16,13 @@ footer {
   color:#666;
 }
 
+.common-logo {
+  background: white;
+  padding: 0px 8px 1px 4px;
+  border-radius: 3px;
+  margin-left: 2px;
+}
+
 #emailInviter {
   display: none;
   text-align: center;

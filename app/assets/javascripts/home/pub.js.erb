@@ -19,4 +19,39 @@ $(document).ready(function() {
 		window.location = $('a#forgot_link').attr('href');
 	});
 
+
+	$('.nominate-btn').click(function() {
+		jQuery.facebox({ div: '#nominate-form' });
+
+		// jQuery.facebox($('#nominate-form'));
+
+		$("#facebox .firstfocus").focus();
+
+		// set the form handler
+		$('#facebox .bodcon').submit(function() {
+		});
+	});
+
+	$(document).bind('reveal.facebox', function() {
+		fieldAdder();
+	});
+
 });
+
+
+function fieldAdder() {
+  $('#facebox input.invite-email').last()
+  	.css('opacity', 0.4);
+
+	$('#facebox input.invite-email').last()
+		.on('focus',
+		  function () {
+				if($('#facebox input.invite-email').last().prev().val() != '') {
+				  $('#facebox .buttonbar').first()
+		      .before('<input maxlength="50" class="invite-email" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
+			  }
+			  $('#facebox input.invite-email').off('focus');
+			  $('#facebox input.invite-email').css('opacity', 1);
+				fieldAdder();
+		  });
+}

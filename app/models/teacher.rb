@@ -1071,6 +1071,12 @@ class Teacher
 
 	end
 
+	def self.newuser_email(teacherid)
+
+		UserMailer.new_user(Teacher.find(teacherid)).deliver
+
+	end
+
 	def self.seedsizes
 
 		Teacher.all.each do |teacher|
@@ -1162,7 +1168,7 @@ class Teacher
 
 		end
 
-		UserMailer.new_user(self).deliver
+		Teacher.delay(:queue => "email").newuser_email(self.id.to_s)
 
 	end
 

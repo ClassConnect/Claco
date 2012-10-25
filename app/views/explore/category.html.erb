@@ -1,0 +1,10 @@
+<%= link_to("Back to edit", admin_explore_categories_path(params[:issue], params[:name])) if @preview %><br />
+<%= link_to("Back to issue", explore_issue_path(params[:issue])) %>
+<br />
+<% @category.find_binders.each do |binder| %>
+<%= link_to(binder.title, named_binder_route(binder)) %>
+<%= binder.user %>
+<%= strip_tags(binder.body) %>
+<%= link_to(image_tag(teacher_thumb_sm(binder.find_owner)), "/#{binder.username}") %>
+<br />
+<% end %>

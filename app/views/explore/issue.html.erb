@@ -1,0 +1,6 @@
+<%= link_to("Back to edit", admin_explore_issue_path(params[:issue])) if @preview %><br />
+<%= link_to("Current Issue", explore_path) %>
+<br />
+<% @issue.categories.each do |category| %>
+	<%= link_to(category.name, explore_category_path(@issue.issue, category.name)) %>
+<% end %>

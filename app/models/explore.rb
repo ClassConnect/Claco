@@ -23,7 +23,7 @@ class Explore
 	end
 
 	def publish!
-		self.update_attributes(publish: true)
+		self.update_attributes(published: true)
 	end
 
 	def self.find_by_issue(issue)
@@ -66,6 +66,8 @@ class Category
 	include Mongoid::Document
 
 	field :name, :type => String
+	field :filter, :type => String
+	field :subtitle, :type => String
 	field :binders, :type => Array, :default => []
 
 	embedded_in :explore

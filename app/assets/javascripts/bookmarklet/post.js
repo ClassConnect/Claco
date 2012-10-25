@@ -17,7 +17,7 @@ $(document).ready(function(){
 	});
 
 	$('div.dir').on('changeBinder', function (){
-		var binderUrl = document.location.origin + $(this).attr('turl');
+		var binderUrl = $(this).attr('turl');
 		$('input[name=binderUrl]').val(binderUrl);
 		$('form#post').attr('action', binderUrl + '/createcontent')
 			.trigger('change');

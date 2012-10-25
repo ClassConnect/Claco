@@ -80,6 +80,10 @@ Claco::Application.routes.draw do
 	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
 	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
 
+	get		'/admin/noms'														=> 'admin#nominees',				:as => 'nominees'
+	get		'/admin/noms/:id/approve'											=> 'nominees#approve',				:as => 'nom_approve'
+	get		'/admin/noms/:id/deny'												=> 'nominees#deny',					:as => 'nom_deny'
+
 	##################
 	# TEACHER ROUTING#
 	##################

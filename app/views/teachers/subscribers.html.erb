@@ -14,7 +14,7 @@
         <% else %>
             <span class="pull-right">✓ Subscribed!</span>
         <% end %>
-        <h3><%= link_to(sub.full_name, sub.username) %></h3>
+        <h3><%= link_to(sub.first_last, sub.username) %></h3>
         <hr>
     </li>
     <% end %>

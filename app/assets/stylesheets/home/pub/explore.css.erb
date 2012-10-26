@@ -22,7 +22,7 @@
 }
 
 .sectr {
-  margin-top:-80px;
+  margin-top: 20px;
   padding:15px;
   background:#fff;
 
@@ -32,6 +32,10 @@
   -webkit-border-radius: 6px;
      -moz-border-radius: 6px;
           border-radius: 6px;
+}
+
+.sectr:first-child {
+  margin-top:-80px;
 }
 
 legend ul.nav {
@@ -46,10 +50,12 @@ legend ul.nav {
 
 .sectr .caption {
   padding: 8px 24px;
+  margin-top: 4px;
+  min-width: 150px;
+
   text-align: right;
   background-color: #08c;
   color: #eee;
-  margin-top: 4px;
 
   -webkit-transition: background 0.2s ease-out;
      -moz-transition: background 0.2s ease-out;
@@ -59,6 +65,7 @@ legend ul.nav {
 
 a.thumbnail {
   cursor: pointer;
+  overflow: hidden;
 }
 
 a.thumbnail:hover {

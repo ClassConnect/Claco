@@ -1,0 +1,21 @@
+<% content_for :headcon do %>
+  <%= stylesheet_link_tag  "errors", :media => "all" %>
+<% end %>
+
+<div id="error-main">
+  <div id="error-header">
+    <h1><i class="ui-icon-warning-sign icon-white"></i>404</h1>
+    <h2>The page you were looking for could not be found :(</h2>
+  </div>
+  <div id="error-content">
+    <p>You may have mistyped the address or the page may not exist anymore.</p>
+    <p>Do you think the page should be here and we got something wrong? Report please!</p>
+    <div class="error-util">
+      <div class="button-container right">
+        <a href="/" id="apply-btn" class="btn">Home</a>
+        <a href="mailto:support@claco.com?subject=Claco Feedback" class="btn">Contact Us</a> 
+      </div>
+      <div style="clear: both"></div>
+    </div>
+  </div>
+</div>

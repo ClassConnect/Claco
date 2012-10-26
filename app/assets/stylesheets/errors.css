@@ -1,0 +1,81 @@
+@-webkit-keyframes popin { 
+    0% {
+        -webkit-transform: scale3d(0.1, 0.1, 1);
+        opacity: 0;
+    }
+    45% {
+        -webkit-transform: scale3d(1.07, 1.07, 1);
+        opacity: 1;
+    }
+    70% { -webkit-transform: scale3d(0.95, 0.95, 1) }
+    100% { -webkit-transform: scale3d(1, 1, 1) }
+}
+@-moz-keyframes popin { 
+    0% {
+        -moz-transform: scale(0.1, 0.1);
+        opacity: 0;
+    }
+    45% {
+        -moz-transform: scale(1.07, 1.07);
+        opacity: 1;
+    }
+    70% { -moz-transform: scale(0.95, 0.95) }
+    100% { -moz-transform: scale(1, 1) }
+}
+.left { float: left }
+.right { float: right }
+::-webkit-input-placeholder {
+    font-style: italic;
+    color: #bababa;
+}
+:-moz-placeholder {
+    font-style: italic;
+    color: red;
+}
+
+#error-main {
+    position: relative;
+    padding-top: 2%;
+    -webkit-animation-name: popin;
+    -moz-animation-name: popin;
+    -webkit-animation-duration: .5s;
+    -moz-animation-duration: 500ms;
+  
+}
+#error-main #error-header { margin-bottom: 10px }
+#error-main #error-header h1 {
+    font: 72px 'TeXGyreScholaBold', Arial, sans-serif;
+    color: #333;
+    text-shadow: 0 1px #f7f7f7;
+    text-align: center;
+}
+#error-main #error-content {
+    position: relative;
+    margin: 0 auto 0 auto;
+    width: 600px;
+    background: white;
+    border: solid 3px #f2f2f2;
+    -moz-box-shadow: 0 0 0 1px #bfbfbf, 0 0 10px rgba(0,0,0,.10);
+    -webkit-box-shadow: 0 0 0 1px #bfbfbf, 0 0 10px rgba(0,0,0,.10);
+    box-shadow: 0 0 0 1px #bfbfbf, 0 0 10px rgba(0,0,0,.10);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#error-main h2 {
+    background-position: bottom;
+    padding: 18px 0 28px 0;
+    font: 20px 'TeXGyreScholaRegular', Arial, sans-serif;
+    color: #8e8e8e;
+    text-align: center;
+}
+#error-main #error-content p {
+    position: relative;
+    padding: 20px 30px 0px 30px;
+    font-size: 13px;
+    line-height: 1.3em;
+    color: #8e8e8e;
+}
+#error-main #error-content .error-util { margin: 10px 30px 18px 30px }
+#error-main #error-content .error-util .button-container { padding-top: 2px }

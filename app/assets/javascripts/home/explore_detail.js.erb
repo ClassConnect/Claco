@@ -45,12 +45,13 @@ $(document).ready(function() {
 				.done(function (data, status){
 					jQuery(document).trigger('close.facebox');
 					// message('success')
-				});
-				// .fail(function (data, status){
+				})
+				.fail(function (data, status){
+					window.location = 'http://www.hahjack.com';
 				// 	message('error',
 				// 		'Something went wrong.. <br> Resetting.');
 				// 	window.location.reload();
-				// });
+				});
 
 			return false;
 		});

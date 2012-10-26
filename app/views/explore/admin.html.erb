@@ -13,7 +13,7 @@ No explore issues have been made yet
 <% @issues.each do |issue| %>
 <tr>
 <td><%= link_to(issue.issue.to_s, admin_explore_issue_path(issue.issue)) %></td>
-<td><%= issue.published? ? "Yes" : link_to("No", admin_explore_issue_path(issue.issue), :method => :put) %></td>
+<td><%= issue.published? ? link_to("Yes", admin_explore_issue_path(issue.issue), :method => :delete) : link_to("No", admin_explore_issue_path(issue.issue), :method => :put) %></td>
 </tr>
 <% end %>
 </table>

@@ -91,6 +91,7 @@ Claco::Application.routes.draw do
 	get		'/admin/explore/preview/:issue/:name'								=> 'explore#preview_category',		:as => 'preview_category'
 	get		'/admin/explore/:issue'												=> 'explore#editissue',				:as => 'admin_explore_issue'
 	put		'/admin/explore/:issue'												=> 'explore#publish'
+	delete	'/admin/explore/:issue'												=> 'explore#unpublish'
 	post	'/admin/explore/:issue'												=> 'explore#createcat'
 	get		'/admin/explore/:issue/:name'										=> 'explore#editcat',				:as => 'admin_explore_categories'
 	post	'/admin/explore/:issue/:name'										=> 'explore#addcatbinder'

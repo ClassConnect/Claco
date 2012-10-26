@@ -17,6 +17,8 @@ class ExploreController < ApplicationController
 
 		exp = Explore.new
 
+		exp.categories = Explore.current_issue.categories
+
 		if exp.save
 
 			redirect_to admin_explore_issue_path(exp.issue)
@@ -58,7 +60,7 @@ class ExploreController < ApplicationController
 		Binder.find(params[:binders]) unless params[:binders].blank?
 
 		cat.update_attributes(	:binders => params[:binders].blank? ? cat.binders : (cat.binders << params[:binders]).uniq,
-								:filter => params[:category][:filter],
+								:filter => params[:category][:filter].downcase,
 								:subtitle => params[:category][:subtitle])
 
 		redirect_to admin_explore_categories_path(params[:issue], params[:name])
@@ -91,13 +93,25 @@ class ExploreController < ApplicationController
 
 	end
 
+	def unpublish
+
+		Explore.find_by_issue(params[:issue]).unpublish!
+
+		redirect_to admin_explore_path
+
+	end
+
 	def preview_issue
 
 		@issue = Explore.find_by_issue(params[:issue])
 
+		@title = "Explore Claco ##{@issue.issue}"
+
 		@categories = @issue.categories
 
 		@preview = true
+
+		@filters = @categories.map(&:filter).uniq
 
 		render :issue
 
@@ -106,6 +120,8 @@ class ExploreController < ApplicationController
 	def preview_category
 
 		@category = Explore.find_by_issue(params[:issue]).find_category(params[:name])
+
+		@title = "Explore | #{@category.name}"
 
 		@root = signed_in? ? current_teacher.binders.root_binders : []
 
@@ -124,7 +140,11 @@ class ExploreController < ApplicationController
 
 		@issue = Explore.current_issue
 
+		@title = "Explore Claco ##{@issue.issue}"
+
 		@categories = @issue.categories
+
+		@filters = @categories.map(&:filter).uniq
 
 		render :issue
 
@@ -135,9 +155,13 @@ class ExploreController < ApplicationController
 
 		@issue = Explore.published_issues.find_by_issue(params[:issue])
 
+		@title = "Explore Claco ##{@issue.issue}"
+
 		render "public/404.html", :status => 404 and return if @issue.nil?
 
 		@categories = @issue.categories
+
+		@filters = @categories.map(&:filter).uniq
 
 	end
 
@@ -145,6 +169,8 @@ class ExploreController < ApplicationController
 	def category
 
 		@category = Explore.published_issues.find_by_issue(params[:issue]).find_category(params[:name])
+
+		@title = "Explore | #{@category.name}"
 
 		@root = signed_in? ? current_teacher.binders.root_binders : []
 

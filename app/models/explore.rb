@@ -26,6 +26,10 @@ class Explore
 		self.update_attributes(published: true)
 	end
 
+	def unpublish!
+		self.update_attributes(published: false)
+	end
+
 	def self.find_by_issue(issue)
 
 		exp = Explore.where(:issue => issue.to_i).first

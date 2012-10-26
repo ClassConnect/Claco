@@ -1,9 +1,10 @@
 /**
 * @authors: diwank
 */
+
 $(document).ready(function() {
 
-	$('legend .nav a').click(function /* tabchanger */ (e){		
+	$('legend .nav a').click(function /*tabchanger*/ (e){		
 		e.preventDefault();
 		
 		var parent = $(this).closest('li'),
@@ -13,9 +14,10 @@ $(document).ready(function() {
 			  .siblings()
 			  .removeClass('active');
 
-		$('.tabcontent').addClass('hidden')
-						.filter('div[data-tabid='+tabid+']')
-						.removeClass('hidden');
+		$('.tabcontent')
+			.addClass('hidden')
+			.filter('div[data-tabid='+tabid+']')
+			.removeClass('hidden');
 	});
 
 });

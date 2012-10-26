@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
     end
 
     def authenticate_admin!
-      render "public/404.html", :status => 404 unless signed_in? && current_teacher.admin
+      render "shared/404", :status => 404 unless signed_in? && current_teacher.admin
     end
 
   	def after_sign_out_path_for(resource_or_scope)

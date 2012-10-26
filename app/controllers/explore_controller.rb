@@ -107,6 +107,8 @@ class ExploreController < ApplicationController
 
 		@category = Explore.find_by_issue(params[:issue]).find_category(params[:name])
 
+		@root = signed_in? ? current_teacher.binders.root_binders : []
+
 		@preview = true
 
 		render :category
@@ -143,6 +145,8 @@ class ExploreController < ApplicationController
 	def category
 
 		@category = Explore.published_issues.find_by_issue(params[:issue]).find_category(params[:name])
+
+		@root = signed_in? ? current_teacher.binders.root_binders : []
 
 		rescue Mongoid::Errors::DocumentNotFound
 			render "public/404.html", :status => 404

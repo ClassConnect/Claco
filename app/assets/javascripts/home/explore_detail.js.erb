@@ -4,17 +4,79 @@
 */
 $(document).ready(function() {
 
-	$('*[data-href]').click(function /* redirector */(){
+	$('*[data-href]').click(function /*redirector*/ (){
 		window.location = $(this).data('href');
 	});
 
 
-	$('.snapbtn').click(function /* binderPicker */(e){
-		// e.preventDefault();
-		if(!loggedin) window.location = 'http://' + window.location.host + '/login';
-		// alert('Yay');
-		// facebox
+	$('.snapbtn').click(function /*binderPicker*/ (e){
+		if(!loggedin)
+			window.location = 'http://' + window.location.host + '/login';
+
+		jQuery.facebox({div:'#snap-form'});
 		return false;
-	})
+	});
+	$('div.dir').on('changeBinder', function /*updateFormAction*/ (){
+		var binderUrl = $(this).attr('turl');
+		$('input[name=binderUrl]').val(binderUrl);
+
+		$('form#snap')
+			.attr('action', binderUrl + '/createcontent')
+			.trigger('change');
+	});
+
+	// -- blip --
+
+	$(document).on('reveal.facebox', function() {
+		$('#facebox form#snap').change(function /*validateForm*/ (){
+			validate($(this));
+		});
+
+		$('#facebox form#snap').submit(function /*ajaxRequester*/ (){
+			$('button[type=submit]')
+				.html('Please wait')
+				.attr('disabled','disabled');
+
+			$.ajax({
+					url: $('#facebox form#snap').attr('action'),
+					data: $('#facebox form#snap').serialize(),
+					type: "POST"
+				})
+				.done(function (data, status){
+					jQuery(document).trigger('close.facebox');
+					// message('success')
+				});
+				// .fail(function (data, status){
+				// 	message('error',
+				// 		'Something went wrong.. <br> Resetting.');
+				// 	window.location.reload();
+				// });
+
+			return false;
+		});
+	});
+
+	// -- blip --
 
 });
+
+// utilities
+function validate (form){
+	console.log(form.find('button[type=submit]'));
+	var rules = {};						// validation rules
+	rules.required =
+		['binderUrl'];
+
+	form.find('button[type=submit]')
+		.removeAttr('disabled');
+	
+	$(rules.required).each(function(i, elem){
+		var field = form.find('*[name='+elem+']');
+
+		if(!field.val()){
+			field.focus();
+			form.find('button[type=submit]')
+				.attr('disabled','disabled');
+		}
+	});
+}

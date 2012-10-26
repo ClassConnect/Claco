@@ -29,6 +29,24 @@ $(document).ready(function() {
 
 		// set the form handler
 		$('#facebox .bodcon').submit(function() {
+			var serData = $("#facebox .bodcon").serialize();
+			var newTitle = $("#facebox").find('.rename-title').val();
+			fbFormSubmitted();
+
+			$.ajax({
+				type: "PUT",
+				url: obje.find('.titler a').attr("href") + "/rename",
+				data: serData,
+				success: function(retData) {
+				if (retData == 1) {
+					closefBox();fbFormActLoad
+					obje.find('.titler a').text(newTitle);
+					setTimeout(function() {obje.effect('highlight');},100);
+				} else {
+					fbFormRevert();
+					showFormError(retData);
+				}
+			}
 		});
 	});
 

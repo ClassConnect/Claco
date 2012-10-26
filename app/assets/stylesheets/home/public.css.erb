@@ -11,13 +11,10 @@
 }
 
 
-
-
 .splashback .sectleft {
   width:540px;
   float:left;
 }
-
 
 .splashback .sectleft .tagline {
   font-size:32px;
@@ -28,10 +25,19 @@
   line-height: 1.1em
 }
 
+.splashback .sectleft #tagline2 {
+  font-size:16px;
+  line-height: 24px;
+  font-weight:bolder;
+  margin-top: 10px;
+  color: #fff;
+  text-shadow: 1px 1px 4px #000;
+}
+
 .splashback .sectleft .addtl {
   font-size:18px;
   font-weight:bolder;
-  margin-top:40px;
+  margin-top: 26px;
   padding:15px;
   background: rgba(255, 255, 255, 0.9);
   border:1px solid #999;
@@ -47,11 +53,70 @@
 
 }
 
+#tagline2 #learn-more:hover {
+  text-decoration: none;
+  color: #ddd;
+}
 
+#tagline2 #learn-more {
+  color: white;
+  line-height: 1;
+  padding: 6px 0 3px 0;
+  margin-right: 1.5em;
+  border-bottom: 1px dotted white;
+  font-size: 12px;
+  float: right;
+  text-shadow: 1px 1px 1px #000;
+}
+
+
+.separator {
+  border-left: 1px dotted #999;
+  padding: 20px 0;
+  margin-left: 25px;
+}
+
+.addtl .action-items {
+  display: inline-block;
+  float: right;
+  margin-right: 20px;
+}
+
+.addtl .action-items p {
+  margin: 10px 0 0 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.action-items .nominate-btn {
+  margin: 0 auto;
+  font-size: 12px;
+  display: block;
+  padding: 5px;
+  color: #333;
+  font-weight: bold;
+  text-shadow: 0 1px 0 #EEE;
+  width: 65%;
+}
+
+#nominate-form {
+  display: inline;
+}
+
+input.invite-email {
+  width: 95%;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+#nominate-form input[type=email]:last-of-type {
+  opacity: 0.4;
+}
 
 .splashback .sectright {
   float: right;
-  width:360px;
+  width: 360px;
 }
 
 
@@ -198,6 +263,7 @@
 
 
 #apply-btn {
+  margin: 10px;
   font-size:18px;
   padding: 15px 20px;
   color:#fff;

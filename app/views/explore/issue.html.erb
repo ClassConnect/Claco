@@ -4,31 +4,17 @@
 
 <% content_for :botcon do %>
 	<script type="text/javascript">
-		// $(function() {
-		//     var scroll_text;
-		//     $('div.container').hover(
-
-		//     function() {
-		//         var $elmt = $(this);
-		//         scroll_text = setInterval(function() {
-		//             scrollText($elmt);
-		//         }, 12);
-		//     }, function() {
-		//         clearInterval(scroll_text);
-		//         $(this).find('div.title-holder a').css({
-		//             left: 0
-		//         });
-		//     });
-
-		//     var scrollText = function($elmt) {
-		//         var left = $elmt.find('div.title-holder a').position().left - 1;
-		//         left = -left > $elmt.find('div.title-holder a').width() ? $elmt.find('div.title-holder').width() : left;
-		//         $elmt.find('div.title-holder a').css({
-		//             left: left
-		//         });
-		//     };
-
-		// });
+		$(function() {
+		    $('.thumbnail').hover(
+		    function /*onHoverIn*/() {
+		        $(this).find('.caption').css({ 
+						'margin-left': ($('.caption').text().length * -1) + 'em'
+					});
+		    }, function /*onHoverOut*/() {
+		        $(this).find('.caption')
+						 .css({ 'margin-left': 0 });
+		    });
+		});
 	</script>
 <% end %>
 
@@ -55,7 +41,13 @@
 			              <li class="span3">
 			                <a class="thumbnail" href="<%= named_binder_route(binder) %>">
 			                  <img src="<%= binder.current_version.img_thumb_lg.url %>" alt="<%= binder.title %>">
-			                  <h4 class="caption truncate"><%= binder.title %></h4>
+		                  	  <img class="binder-user" src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
+			                  <!-- <a href="/<%= binder.username %>">
+		                  	  	<img class="binder-user" src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
+		                  	  </a> -->
+			                  <div class="caption-box">
+			                  	<h4 class="caption truncate"><%= binder.title %></h4>
+		                  	  </div>
 			                </a>
 			              </li>
 			            <% end %>
@@ -73,7 +65,7 @@
 
 				<%= binder.user %>
 				<%= strip_tags(binder.body) %>
-				<%= link_to(image_tag(teacher_thumb_sm(binder.find_owner)), "/#{binder.username}") %>
+				
 	<%= link_to("Back to edit", admin_explore_issue_path(params[:issue])) if @preview %><br />
 	<%= link_to("Current Issue", explore_path) %>
 	<br />

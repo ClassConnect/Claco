@@ -499,3 +499,10 @@ footer {
   color: red;
   padding-left: 5px;
 }
+
+.hidden {
+  display: none;
+  visibility: hidden;
+  height: 0;
+  width: 0;
+}

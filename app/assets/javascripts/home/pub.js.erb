@@ -19,43 +19,46 @@ $(document).ready(function() {
 		window.location = $('a#forgot_link').attr('href');
 	});
 
-
 	$('.nominate-btn').click(function() {
-		jQuery.facebox({ div: '#nominate-form' });
+		jQuery.facebox({ div: '#nominate-popup' });
+	});
 
-		// jQuery.facebox($('#nominate-form'));
 
+  $(document).bind('reveal.facebox', function(){
 		$("#facebox .firstfocus").focus();
 
-		// set the form handler
-		$('#facebox .bodcon').submit(function() {
-			var serData = $("#facebox .bodcon").serialize();
-			var newTitle = $("#facebox").find('.rename-title').val();
-			fbFormSubmitted();
-
-			$.ajax({
-				type: "PUT",
-				url: obje.find('.titler a').attr("href") + "/rename",
-				data: serData,
-				success: function(retData) {
-				if (retData == 1) {
-					closefBox();fbFormActLoad
-					obje.find('.titler a').text(newTitle);
-					setTimeout(function() {obje.effect('highlight');},100);
-				} else {
-					fbFormRevert();
-					showFormError(retData);
-				}
-			}
-		});
-	});
-
-	$(document).bind('reveal.facebox', function() {
 		fieldAdder();
-	});
 
+		// set the form handler
+		$('#facebox #nominate-form').submit(function(e) {
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: $(this).serialize()
+			
+			}).done(function /*onSucuess*/ (data, error) {
+				notifyMessage('.alert-sucess', "Awesome! Thanks for sharing Claco with those you live");
+			}).fail(function /*onFailure*/ (data, error) {
+				notifyMessage('alert-error', data.message);
+				console.log(data);	
+			});
+
+			return false;
+	  });
+	});
 });
 
+function notifyMessage(target, message) {
+	$('#facebox #nominate-form').addClass('hidden');
+		
+		$('#facebox ' + target)
+			.removeClass('hidden')
+			.html(message);
+
+		window.setTimeout(function(){
+			$(document).trigger('close.facebox');
+		}, 700);
+};
 
 function fieldAdder() {
   $('#facebox input.invite-email').last()
@@ -66,7 +69,7 @@ function fieldAdder() {
 		  function () {
 				if($('#facebox input.invite-email').last().prev().val() != '') {
 				  $('#facebox .buttonbar').first()
-		      .before('<input maxlength="50" class="invite-email" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
+		      .before('<input maxlength="50" name="emails[]" class="invite-email" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
 			  }
 			  $('#facebox input.invite-email').off('focus');
 			  $('#facebox input.invite-email').css('opacity', 1);

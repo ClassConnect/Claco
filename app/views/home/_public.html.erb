@@ -131,21 +131,26 @@
 	<div style="clear:both"></div>
 </div>
 
-<div id="nominate-form" style="display: none;">
+
+<div id="nominate-popup" class="hidden">
   <div class="headtitle">
 		Share the love! 
   </div>
 
   <div class="errorBox"></div>
 
-  <form action="#" class="bodcon">
+	<p class="alert-success hidden"></p>
+
+	<p class="alert-error hidden"></p>
+
+  <form action="/invite" class="bodcon" id="nominate-form">
     <h3 style="font-size:11px;"> Leave your name so (s)he can thank you:</h3>
 
-    <input maxlength="50" class="firstfocus invite-email" type="text" placeholder="Your full name" />
+    <input maxlength="50" name="inviter" class="firstfocus invite-email" type="text" placeholder="Your full name" />
 
 		<h3 style="font-size:11px;"> Invite Teachers to our exclusive beta!</h3> 
-    <input maxlength="50" class="invite-email" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
-    <input maxlength="50" class="invite-email" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
+    <input maxlength="50" name="emails[]" class="invite-email" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
+    <input maxlength="50" name="emails[]" class="invite-email" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
 
     <div class="buttonbar">
        <button class="btn btn-primary showloader" type="submit">Send Nomination!</button>

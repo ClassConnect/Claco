@@ -8,7 +8,7 @@ class ExploreController < ApplicationController
 	#View to list/create issues
 	def admin
 
-		@issues = Explore.all
+		@issues = Explore.all.order_by([:issue, :asc])
 
 	end
 
@@ -60,7 +60,7 @@ class ExploreController < ApplicationController
 		Binder.find(params[:binders]) unless params[:binders].blank?
 
 		cat.update_attributes(	:binders => params[:binders].blank? ? cat.binders : (cat.binders << params[:binders]).uniq,
-								:filter => params[:category][:filter].downcase,
+								# :filter => params[:category][:filter].downcase,
 								:subtitle => params[:category][:subtitle])
 
 		redirect_to admin_explore_categories_path(params[:issue], params[:name])
@@ -111,7 +111,7 @@ class ExploreController < ApplicationController
 
 		@preview = true
 
-		@filters = @categories.map(&:filter).uniq
+		# @filters = @categories.map(&:filter).uniq
 
 		render :issue
 
@@ -146,7 +146,7 @@ class ExploreController < ApplicationController
 
 		@categories = @issue.categories
 
-		@filters = @categories.map(&:filter).uniq
+		# @filters = @categories.map(&:filter).uniq
 
 		render :issue
 

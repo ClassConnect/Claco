@@ -100,8 +100,8 @@ Claco::Application.routes.draw do
 
 	#Public
 	get		'/explore'															=> 'explore#index',					:as => 'explore'
-	get		'/explore/:issue'													=> 'explore#issue',					:as => 'explore_issue'
-	get		'/explore/:issue/:name'												=> 'explore#category',				:as => 'explore_category'
+	# get		'/explore/:issue'													=> 'explore#issue',					:as => 'explore_issue'
+	# get		'/explore/:issue/:name'												=> 'explore#category',				:as => 'explore_category'
 
 	##################
 	# TEACHER ROUTING#

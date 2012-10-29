@@ -17,7 +17,7 @@ class ExploreController < ApplicationController
 
 		exp = Explore.new
 
-		exp.categories = Explore.current_issue.categories || []
+		exp.categories = Explore.current_issue.nil? ? [] : Explore.current_issue.categories
 
 		if exp.save
 

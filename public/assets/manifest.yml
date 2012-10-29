@@ -61,6 +61,7 @@ public/devise/applybk.jpg: public/devise/applybk-d01fcc1fec3d2ad93f94fb86246f789
 public/erin.jpg: public/erin-b9b482c02accffc3b1cda1f6dd92f640.jpg
 public/explore/splash.jpg: public/explore/splash-c934b4732d87657e12148bd8f7db95ca.jpg
 public/explore/splash1.jpg: public/explore/splash1-a34de32d67f05fbf4f2b35b02c561956.jpg
+public/explore/teach.jpg: public/explore/teach-369cb1fa846e8fbb6943f0f6b4635583.jpg
 public/fast.png: public/fast-f86d4ddd6c4a8e99182b23f074ccece3.png
 public/fullcore.png: public/fullcore-c0d8006f6a24531fc1f747545eee64dd.png
 public/goodies/bookmarklet_preview.jpg: public/goodies/bookmarklet_preview-be6df12574cf08801fc7997b4689c189.jpg
@@ -171,7 +172,7 @@ gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
 home/educators.css: home/educators-d7dcc222e05084ff8471838a71aba1c8.css
 home/main.css: home/main-b4e88e858c4ba30f581eca373eac63d0.css
 home/pub/about.css: home/pub/about-903d8395c4f9a7802caf0fa0f39a5c18.css
-home/pub/explore.css: home/pub/explore-d326539a6b59e6cb40e1c77a51c69433.css
+home/pub/explore.css: home/pub/explore-5abe15dbd2003a12d41c51cd6ca5de71.css
 home/pub/explore_detail.css: home/pub/explore_detail-c162d3ba6876898bccaca4e78a80276e.css
 home/pub/pioneers.css: home/pub/pioneers-079d64301b9d8854bc0fa04053053d83.css
 home/pub/team.css: home/pub/team-ce1e43f72a8d96a8b08ce936c64f0aaf.css

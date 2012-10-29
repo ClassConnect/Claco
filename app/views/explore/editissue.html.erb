@@ -23,7 +23,8 @@ No categories have been made yet
 <br />
 <br />
 <%= link_to("Preview Issue", preview_issue_path(params[:issue])) %>
-<%= form_for Category.new, url: admin_explore_issue_path do |f| %>
+<%= link_to("Back to issues", admin_explore_path) %>
+<%= form_for Category.new, url: admin_explore_issue_path(params[:issue]) do |f| %>
 	<%= f.label :name, "Category" %>
 	<%= f.text_field :name %>
 	<%= f.submit "add" %>

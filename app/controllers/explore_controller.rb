@@ -17,7 +17,7 @@ class ExploreController < ApplicationController
 
 		exp = Explore.new
 
-		exp.categories = Explore.current_issue.categories
+		exp.categories = Explore.current_issue.categories || []
 
 		if exp.save
 
@@ -117,19 +117,19 @@ class ExploreController < ApplicationController
 
 	end
 
-	def preview_category
+	# def preview_category
 
-		@category = Explore.find_by_issue(params[:issue]).find_category(params[:name])
+	# 	@category = Explore.find_by_issue(params[:issue]).find_category(params[:name])
 
-		@title = "Explore | #{@category.name}"
+	# 	@title = "Explore | #{@category.name}"
 
-		@root = signed_in? ? current_teacher.binders.root_binders : []
+	# 	@root = signed_in? ? current_teacher.binders.root_binders : []
 
-		@preview = true
+	# 	@preview = true
 
-		render :category
+	# 	render :category
 
-	end
+	# end
 
 	####################
 	# PUBLIC FUNCTIONS #
@@ -140,7 +140,9 @@ class ExploreController < ApplicationController
 
 		@issue = Explore.current_issue
 
-		@title = "Explore Claco ##{@issue.issue}"
+		render "public/404.html", :status => 404 and return if @issue.nil?
+
+		@title = "Explore Claco"
 
 		@categories = @issue.categories
 
@@ -150,33 +152,33 @@ class ExploreController < ApplicationController
 
 	end
 
-	#/explore/:issue
-	def issue
+	# #/explore/:issue
+	# def issue
 
-		@issue = Explore.published_issues.find_by_issue(params[:issue])
+	# 	@issue = Explore.published_issues.find_by_issue(params[:issue])
 
-		@title = "Explore Claco ##{@issue.issue}"
+	# 	@title = "Explore Claco ##{@issue.issue}"
 
-		render "public/404.html", :status => 404 and return if @issue.nil?
+	# 	render "public/404.html", :status => 404 and return if @issue.nil?
 
-		@categories = @issue.categories
+	# 	@categories = @issue.categories
 
-		@filters = @categories.map(&:filter).uniq
+	# 	@filters = @categories.map(&:filter).uniq
 
-	end
+	# end
 
-	#/explore/:issue/:category
-	def category
+	# #/explore/:issue/:category
+	# def category
 
-		@category = Explore.published_issues.find_by_issue(params[:issue]).find_category(params[:name])
+	# 	@category = Explore.published_issues.find_by_issue(params[:issue]).find_category(params[:name])
 
-		@title = "Explore | #{@category.name}"
+	# 	@title = "Explore | #{@category.name}"
 
-		@root = signed_in? ? current_teacher.binders.root_binders : []
+	# 	@root = signed_in? ? current_teacher.binders.root_binders : []
 
-		rescue Mongoid::Errors::DocumentNotFound
-			render "public/404.html", :status => 404
+	# 	rescue Mongoid::Errors::DocumentNotFound
+	# 		render "public/404.html", :status => 404
 
-	end
+	# end
 
 end

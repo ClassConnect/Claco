@@ -492,3 +492,7 @@ footer {
   color: red;
   padding-left: 5px;
 }
+
+.centered {
+  margin: 0 auto;
+}

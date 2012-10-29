@@ -78,4 +78,7 @@
     color: #8e8e8e;
 }
 #error-main #error-content .error-util { margin: 10px 30px 18px 30px }
-#error-main #error-content .error-util .button-container { padding-top: 2px }
+#error-main #error-content .error-util .button-container {
+    padding-top: 2px;
+    text-align: center;
+}

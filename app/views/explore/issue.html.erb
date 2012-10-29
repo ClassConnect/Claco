@@ -1,0 +1,75 @@
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag "home/pub/explore", :media => "all" %>
+<% end %>
+
+<% content_for :botcon do %>
+	<script type="text/javascript">
+		$(function() {
+		    $('.thumbnail').hover(
+		    function /*onHoverIn*/() {
+		        $(this).find('.caption').css({ 
+						'margin-left': ($('.caption').text().length * -1) + 'em'
+					});
+		    }, function /*onHoverOut*/() {
+		        $(this).find('.caption')
+						 .css({ 'margin-left': 0 });
+		    });
+		});
+	</script>
+<% end %>
+
+<div class="splashback explore">
+	<div class="container">
+
+		<div class="tagline">
+			Discover what educators are building today.
+			<br/>
+			Tomorrow's lesson is here!
+		</div>
+
+	</div>
+</div>
+
+<div class="container">
+    <% @categories.each do |category| %>
+		<div class="sectr">
+			<legend><%= category.name %></legend>
+			<% category.find_binders.inject([[]]){|arr,n| arr.last.size == 4 ? arr << [n] : arr.last << n; arr}.each do |row| %>
+				<div class="row-fluid">
+		            <ul class="thumbnails">
+		            	<% row.each do |binder| %>
+			              <li class="span3">
+			                <a class="thumbnail" href="<%= named_binder_route(binder) %>">
+			                  <img src="<%= binder.current_version.img_thumb_lg.url %>" alt="<%= binder.title %>">
+		                  	  <img class="binder-user" src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
+			                  <!-- <a href="/<%= binder.username %>">
+		                  	  	<img class="binder-user" src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
+		                  	  </a> -->
+			                  <div class="caption-box">
+			                  	<h4 class="caption truncate"><%= binder.title %></h4>
+		                  	  </div>
+			                </a>
+			              </li>
+			            <% end %>
+		            </ul>
+		        </div>
+			<% end %>
+
+		</div>
+	<% end %>
+
+</div>
+<% if false %>
+			<% @categories.reject{|c| c.filter != filter}.inject([[]]){|arr,n| arr.last.size == 3 ? arr << [n] : arr.last << n; arr}.each do |row| %>
+	        <% end %>
+
+				<%= binder.user %>
+				<%= strip_tags(binder.body) %>
+				
+	<%= link_to("Back to edit", admin_explore_issue_path(params[:issue])) if @preview %><br />
+	<%= link_to("Current Issue", explore_path) %>
+	<br />
+	<% @issue.categories.each do |category| %>
+		<%= link_to(category.name, explore_category_path(@issue.issue, category.name)) %>
+	<% end %>
+<% end %>

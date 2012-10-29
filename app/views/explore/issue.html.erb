@@ -33,7 +33,10 @@
 <div class="container">
     <% @categories.each do |category| %>
 		<div class="sectr">
-			<legend><%= category.name %></legend>
+			<legend>
+				<%= category.name %>
+				<small><em><%= category.subtitle %></em></small>
+			</legend>
 			<% category.find_binders.inject([[]]){|arr,n| arr.last.size == 4 ? arr << [n] : arr.last << n; arr}.each do |row| %>
 				<div class="row-fluid">
 		            <ul class="thumbnails">

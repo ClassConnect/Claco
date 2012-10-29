@@ -23,7 +23,7 @@ No binders have been added yet
 <br />
 <br />
 <%= link_to("Preview this category", preview_category_path(params[:issue], @category.name)) %>
-<%= link_to("Back to issue", admin_explore_issue_path(params[:issue]) %>
+<%= link_to("Back to issue", admin_explore_issue_path(params[:issue])) %>
 <%= form_for @category, :url => admin_explore_categories_path(params[:issue], @category.name), :method => :post do |f| %>
 <%= f.label :filter, "Filter by" %>
 <%= f.text_field :filter %>

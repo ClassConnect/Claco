@@ -92,6 +92,127 @@ class AdminController < ApplicationController
 	# Concurrency fix
 	# Setting.f("sys_inv_list").v = Setting.f("sys_inv_list").v.map{|e| i = Invitation.where(:to => e["email"]).first; e["invited_at"] = i.submitted unless i.nil?; e["invited"] = true unless i.nil?; e}
 	
+	def analytics
+
+		# actions of a user
+		#   view all
+		#   slice by date (month/week/day/hour/minute)
+		#   slice by action
+
+		# actions across the site
+		#   DO NOT view all!
+		#   slice action by date (month/week/day/hour/minute)
+
+		debugger
+
+		if params['start'].nil?
+			@start = Time.now.to_datetime
+		else
+			@start = DateTime.civil(params['start']['year'].to_i,
+									params['start']['month'].to_i,
+									params['start']['day'].to_i,
+									params['start']['hour'].to_i,
+									params['start']['minute'].to_i)
+		end
+
+		if params['finish'].nil?
+			@finish = Time.now.to_datetime
+		else
+			@finish = DateTime.civil(params['finish']['year'].to_i,
+									params['finish']['month'].to_i,
+									params['finish']['day'].to_i,
+									params['finish']['hour'].to_i,
+									params['finish']['minute'].to_i)
+		end
+
+		if params['usernames'].nil?
+			@usernames = ''
+		else
+			@usernames = params['usernames'].gsub(' ','').split(',')
+		end
+
+		if params['userids'].nil?
+			@userids = ''
+		else
+			@userids = params['userids'].gsub(' ','').split(',')
+		end		
+
+		
+
+		#debugger
+
+		#start = params[:start].nil? ? (Time.now-7.days).to_datetime : params[:start].to_datetime
+		#finish = params[:finish].nil? ? Time.now.to_datetime : params[:start].to_datetime
+
+		@logs = Log.all(:conditions => { :timestamp => @start..@finish }).page(params[:page]).per(100)
+
+		# if start
+
+		# case params[:class]
+		# when 'user'
+		# 	begin
+		# 		@teacher = Teacher.find(params[:userid])
+		# 	rescue
+		# 		return
+		# 	end
+		# 	case params[:grouping]
+		# 	when 'date'
+		# 		case params[:year]
+		# 		when 'month'
+
+		# 		when 'week'
+
+		# 		when 'day'
+
+		# 		when 'hour'
+
+		# 		when 'minute'
+
+		# 		end
+		# 	when 'action'
+		# 		@logs = Log.where(:ownerid => params[:userid]).where(:method => params[:action]).page(params[:page]).per(100)
+		# 	end
+		# when 'action'
+		# 	@logs = Log.where(:method => params[:action]).page(params[:page]).per(100)
+		# end	
+
+		# case params[:class]
+		# when 'users'
+		# 	if !params[:id].nil?
+		# 		# all actions for a specific user
+		# 		@logs = Log.where(:ownerid => params[:id]).order_by(:timestamp,:asc).page(params[:page]).per(100)
+
+		# 		#render 'admin/analytics/user'
+		# 	else
+		# 		# actions for all users
+		# 		@logs = []
+		# 		Teacher.all.each do |t|
+		# 			@logs << Log.where(:ownerid => t.id.to_s).order_by(:timestamp,:asc)
+		# 		end
+		# 		@logs = @logs.flatten.page(params[:page]).per(100)
+
+		# 		#render 'admin/analytics/users'
+		# 	end
+		# when 'actions'
+		# 	if !params[:id].nil?
+		# 		# specific actions
+		# 		@logs = Log.where(:method => params[:class]).order_by(:timestamp, :asc).page(params[:page]).per(100)
+
+		# 		#render 'admin/analytics/action'
+		# 	else
+		# 		# all actions
+		# 		@logs = Log.all.order_by(:method, :asc).page(params[:page]).per(100)
+
+		# 		#render 'admin/analytics/actions'
+		# 	end
+		# #else
+		# 	#render 'admin/analytics/main'
+		# end
+
+		render 'admin/analytics'
+
+	end
+
 	def sysinvlist
 
 		@invs = Setting.f("sys_inv_list").v

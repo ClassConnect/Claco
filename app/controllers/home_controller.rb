@@ -156,7 +156,7 @@ class HomeController < ApplicationController
 			end
 		end
 
-		debugger
+		#debugger
 
 		return if false
 

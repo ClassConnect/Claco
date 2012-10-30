@@ -1,0 +1,219 @@
+<script type="text/javascript">
+	function selectval() { 
+	   var sel = document.getElementById("begin_datetime_1i");
+
+	   alert(sel.options[sel.selectedIndex].value); 
+	}
+</script>
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<%= form_tag 'analytics', :method => 'get' do %>
+	<table>
+		<tr>
+			<td>
+				<h3>Log Filters</h3>
+			</td>
+		</tr>
+		<tr><td colspan='2'><hr /></td></tr>
+		<tr>
+			<td>
+				Start Time:&nbsp;
+			</td>
+			<td>
+				<%= select_datetime(@start, :prefix => 'start') %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				End Time:&nbsp;
+			</td>
+			<td>
+				<%= select_datetime(@finish || Time.now, :prefix => 'finish') %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Usernames (comma delimited):&nbsp;
+			</td>
+			<td>
+				<%= text_field_tag :usernames, params[:usernames] %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				User IDs (comma delimited):&nbsp;
+			</td>
+			<td>
+				<%= text_field_tag :userids, params[:userids] %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Granularity:&nbsp;
+			</td>
+			<td>
+				<%= select_tag(:granularity, options_for_select([['None','none'],['Minute','minute'],['Hour','hour'],['Day','day'],['Week','week'],['Month','month']])) %>
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<table border='1'>
+					<tr>
+						<td>
+							Binder Controller
+						</td>
+						<td>
+							Conversation Controller
+						</td>
+						<td>
+							Home Controller
+						</td>
+						<td>
+							Media Server API Controller
+						</td>
+						<td>
+							Teacher Controller
+						</td>
+					</tr>
+					<tr>
+						<td valign='top'>
+							<% [['index','Index'],['create','Create folder'],['show','Show'],
+							['download','Download'],['createcontent','Add link'],['update','Update binder data'],
+							['rename','Rename item'],['updatetags','Update tags'],['createfile','Create file'],
+							['reorderitem','Reorder'],['moveitem','Move item'],['copyitem','Copy item'],
+							['setpub','Permission change'],['destroy','Delete']].each do |f| %>
+								<%= check_box_tag 'binderactions[]', f[0], !params['binderactions'].nil? && params['binderactions'].include?(f[0]) %><%= f[1] %><br />
+							<% end %>
+							<%= check_box_tag 'binderactions[]', 'index', !params['binderactions'].nil? && params['binderactions'].include?('index') %>Index<br />
+							<%= check_box_tag 'binderactions[]', 'create', !params['binderactions'].nil? && params['binderactions'].include?('create') %>Create Folder<br />
+							<%= check_box_tag 'binderactions[]', 'show', !params['binderactions'].nil? && params['binderactions'].include?('show') %>Show<br />
+							<%= check_box_tag 'binderactions[]', 'download', !params['binderactions'].nil? && params['binderactions'].include?('download') %>Download<br />
+							<%= check_box_tag 'binderactions[]', 'createcontent', !params['binderactions'].nil? && params['binderactions'].include?('createcontent')%>Add link<br />
+							<%= check_box_tag 'binderactions[]', 'update', !params['binderactions'].nil? && params['binderactions'].include?('update') %>Update<br />
+							<%= check_box_tag 'binderactions[]', 'rename', !params['binderactions'].nil? && params['binderactions'].include?('rename') %>Rename<br />
+							<%= check_box_tag 'binderactions[]', 'updatetags', !params['binderactions'].nil? && params['binderactions'].include?('updatetags') %>Update Tags<br />
+							<%= check_box_tag 'binderactions[]', 'createfile', !params['binderactions'].nil? && params['binderactions'].include?('createfile') %>Upload File<br />
+							<%= check_box_tag 'binderactions[]', 'reorderitem', !params['binderactions'].nil? && params['binderactions'].include?('reorderitem') %>Reorder<br />
+							<%= check_box_tag 'binderactions[]', 'moveitem', !params['binderactions'].nil? && params['binderactions'].include?('moveitem') %>Move<br />
+							<%= check_box_tag 'binderactions[]', 'copyitem', !params['binderactions'].nil? && params['binderactions'].include?('copyitem') %>Copy<br />
+							<%= check_box_tag 'binderactions[]', 'setpub', !params['binderactions'].nil? && params['binderactions'].include?('setpub') %>Permission change<br />
+							<%= check_box_tag 'binderactions[]', 'destroy', !params['binderactions'].nil? && params['binderactions'].include?('destroy') %>Delete<br />
+						</td>
+						<td valign='top'>
+							<% ['show','new','create','newmessage','createmessage'].each do |f| %>
+								<%= check_box_tag 'conversationactions[]', f, !params['conversationactions'].nil? && params['conversationactions'].include?(f) %>Test<br />
+							<% end %>
+							<% if false %>
+							<%= check_box_tag 'conversationactions[]', 'show', !params['conversationactions'].nil? && params['conversationactions'].include?('show') %>Show<br />
+							<%= check_box_tag 'conversationactions[]', 'new', !params['conversationactions'].nil? && params['conversationactions'].include?('new') %>New<br />
+							<%= check_box_tag 'conversationactions[]', 'create', !params['conversationactions'].nil? && params['conversationactions'].include?('create') %>Create<br />
+							<%= check_box_tag 'conversationactions[]', 'newmessage', !params['conversationactions'].nil? && params['conversationactions'].include?('newmessage') %>New Message<br />
+							<%= check_box_tag 'conversationactions[]', 'createmessage', !params['conversationactions'].nil? && params['conversationactions'].include?('createmessage') %>Create Message<br />
+							<% end %>
+						</td>
+						<td valign='top'>
+							<%= check_box_tag 'homeactions[]', 'search', !params['homeactions'].nil? && params['homeactions'].include?('search') %>Search<br />
+						</td>
+						<td valign='top'>
+							<%= check_box_tag 'mediaserverapiactions[]', 'addthumbs', !params['mediaserverapiactions'].nil? && params['mediaserverapiactions'].include?('addthumbs') %>Thumbnail Asynch Callback<br />
+						</td>
+						<td valign='top'>
+							<%= check_box_tag 'teacheractions[]', 'index', !params['teacheractions'].nil? && params['teacheractions'].include?('index') %>Index<br />
+							<%= check_box_tag 'teacheractions[]', 'show', !params['teacheractions'].nil? && params['teacheractions'].include?('show') %>Show<br />
+							<%= check_box_tag 'teacheractions[]', 'editinfo', !params['teacheractions'].nil? && params['teacheractions'].include?('editinfo') %>Edit Info<br />
+							<%= check_box_tag 'teacheractions[]', 'createavatar', !params['teacheractions'].nil? && params['teacheractions'].include?('createavatar') %>Create Avatar<br />
+							<%= check_box_tag 'teacheractions[]', 'updateinfo', !params['teacheractions'].nil? && params['teacheractions'].include?('updateinfo') %>Update Info<br />
+							<%= check_box_tag 'teacheractions[]', 'updateprefs', !params['teacheractions'].nil? && params['teacheractions'].include?('updateprefs') %>Update Preferences<br />
+							<%= check_box_tag 'teacheractions[]', 'updatepass', !params['teacheractions'].nil? && params['teacheractions'].include?('updatepass') %>Update Password<br />
+							<%= check_box_tag 'teacheractions[]', 'sub', !params['teacheractions'].nil? && params['teacheractions'].include?('sub') %>Subscribe<br />
+							<%= check_box_tag 'teacheractions[]', 'unsub', !params['teacheractions'].nil? && params['teacheractions'].include?('unsub') %>Unsubscribe<br />
+							<%= check_box_tag 'teacheractions[]', 'done', !params['teacheractions'].nil? && params['teacheractions'].include?('done') %>Complete Getting Started<br />
+							<%= check_box_tag 'teacheractions[]', 'conversations', !params['teacheractions'].nil? && params['teacheractions'].include?('conversations') %>Conversations<br />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= submit_tag "Apply Filters", :name => nil %>
+			</td>
+		</tr>
+	</table>
+<% end %>
+<% if false %>
+<br />
+<br />
+<hr />
+<br />
+User IDs (comma delimited): <input type="text" id="usersearch" /><br />
+-- or --<br />
+Usernames (comma delimited): <input type="text" id="usersearch" /><br />
+<br />
+<hr />
+<br />
+<div>
+	Use Begin Date/Time? (defaults to initial DB date/time) <%= check_box_tag("begincheck") %><br />
+	Begin Date/Time: <%= datetime_select("begin","datetime") %>
+</div>
+<br />
+<hr />
+<br />
+<div>
+	Use End Date/Time? (defaults to current date/time) <%= check_box_tag("endcheck") %><br />
+	End Date/Time: <%= datetime_select("end","datetime") %><br />
+</div>
+<br />
+<hr />
+<br />
+
+<div>
+	Granularity:&nbsp;
+	<a href=''>Month</a>&nbsp;
+	<a href=''>Week</a>&nbsp;
+	<a href=''>Day</a>&nbsp;
+	<a href=''>Hour</a>&nbsp;
+	<a href=''>Minute</a>&nbsp;
+	<a href=''>Second</a>
+</div>
+<br />
+<hr />
+<br />
+<button onclick="selectval();">Value</button>
+<button onclick="alert(document.getElementById('begincheck').checked)">Begin Check Value</button>
+<button onclick="applyfilters()">Apply Filters</button>
+<button onclick="resetfilters()">Reset Filters</button>
+<%= submit_tag#(:type => 'button') do
+	#content_tag(:strong, 'Submit')
+#end 
+%>
+<br />
+<hr />
+<br />
+<% end %>
+<table>
+	<tr>
+		<td><b>Ownerid</b></td>
+		<td><b>Timestamp</b></td>
+		<td><b>Method</b></td>
+		<td><b>Modelid</b></td>
+		<td><b>Params</b></td>
+		<td><b>Data</b></td>
+	</tr>
+<% @logs.each do |log| %>
+	<tr>
+		<td><%= log.ownerid %></td>
+		<td><%= Time.at(log.timestamp).to_datetime %></td>
+		<td><%= log.method %></td>
+		<td><%= log.modelid %></td>
+		<td><%= log.params.to_s %></td>
+		<td><%= log.data.to_s %></td>
+	</tr>
+<% end %>
+</table>
+
+<% begin %>
+	<%= paginate(@logs) %>
+	<%= page_entries_info(@logs).html_safe %>
+<% rescue %>
+<% end %>

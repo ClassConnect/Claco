@@ -79,6 +79,8 @@ Claco::Application.routes.draw do
 	get 	'/admin/updatethumbnails'											=> 'admin#choosethumbnails'			#:as => 
 	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
 	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
+	get 	'/admin/analytics'													=> 'admin#analytics',				:as => 'analytics_path'
+
 
 	##################
 	# TEACHER ROUTING#

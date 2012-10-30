@@ -1,0 +1,52 @@
+<h2>Teacher Analytics</h2>
+<hr />
+<%= form_tag 'analytics', :method => 'get' do %>
+	<table>
+		<tr>
+			<td>
+				<h3>Teacher Filters:</h3>
+			</td>
+		</tr>
+		<tr><td colspan='2'><br /></td></tr>
+		<tr>
+			<td>
+				Teachers that have logged in between ___ and ___ times.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Teachers that registered between ___ and ___ dates.  
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Teachers that have between ___ and ___ binders.  
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Teachers that have subscribed to between ___ and ___ teachers.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Teachers that have between ___ and ___ subscribers.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Have attached facebook, twitter
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Have profile pictures
+			</td>
+		</tr>
+	</table>
+<% end %>
+
+<% if false %>
+	Two groups, compare sets of these groups of IDs
+	Make group model
+<% end %>

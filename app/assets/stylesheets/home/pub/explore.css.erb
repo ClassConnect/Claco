@@ -1,0 +1,115 @@
+.splashback {
+  background-repeat:no-repeat;
+  background-position:center top; 
+  background-color:#fff;
+
+  height:250px;
+  border-bottom:1px solid #aaa;
+  margin-bottom:10px;
+}
+
+.explore {
+  background-image: url('<%= asset_path "public/explore/teach.jpg" %>');
+}
+
+.splashback .tagline {
+  font-size:32px;
+  font-weight:bolder;
+  color:#fff;
+  margin:35px 0 0 0;
+  text-shadow: 2px 2px 4px #222;
+  line-height: 1.7em;
+}
+
+.sectr {
+  margin-top: 20px;
+  padding:15px;
+  background:#fff;
+
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0px 5px rgba(0, 0, 0, 0.4);
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+
+.sectr:first-child {
+  margin-top:-80px;
+}
+
+legend ul.nav,
+legend small {
+  float:right;
+  font-size:.7em;
+  margin-right: .5em;
+}
+
+.nav li.disabled {
+  margin-right:2em;
+  line-height:2.8;
+}
+
+.sectr .caption {
+  padding: 8px 24px;
+  margin-top: 4px;
+  min-width: 150px;
+
+  text-align: right;
+  color: #eee;
+
+  -webkit-transition: margin-left 2.8s cubic-bezier(1,.16,1,1);
+     -moz-transition: margin-left 2.8s cubic-bezier(1,.16,1,1);
+       -o-transition: margin-left 2.8s cubic-bezier(1,.16,1,1);
+          transition: margin-left 2.8s cubic-bezier(1,.16,1,1);
+}
+
+.sectr .caption-box {
+  background-color: #08c;
+  width: auto;
+  height: auto;
+}
+
+a.thumbnail {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+a.thumbnail:hover {
+  text-decoration: none;
+}
+/*
+a.thumbnail:hover h4::after {
+  content: " →";
+}*/
+
+a.thumbnail:hover .caption-box {
+  background-color: #222;
+}
+
+.binder-user {
+  display: block;
+  margin: -35px 0 0 12px;
+  width: 30px;
+  
+  border: 2px solid white;
+  border-radius: 2px;
+
+  background-color: white;
+}
+
+img.binder-thumb {
+  width: 100%;
+}
+
+hr {
+  border:none !important;
+  margin-top:40px;
+}
+
+.hidden {
+  display: none;
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}

@@ -245,6 +245,10 @@ class HomeController < ApplicationController
 		# expires_in 1.hour
 	end
 
+	# def explore
+	# 	@title = "Explore"
+	# end
+
 	def goodies
 		@title = "Goodies"
 	end
@@ -260,6 +264,10 @@ class HomeController < ApplicationController
 
 		# expires_in 1.hour
 	end
+
+	# def explore_detail
+	# 	@title = "Explore Detail"
+	# end
 
 	def privacy
 		@title = "Privacy Policy"

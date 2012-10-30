@@ -82,6 +82,29 @@ Claco::Application.routes.draw do
 	get 	'/admin/analytics'													=> 'admin#analytics',				:as => 'analytics_path'
 
 
+	###################
+	# EXPLORE ROUTING #
+	###################
+
+	#Admin
+	get		'/admin/explore'													=> 'explore#admin',					:as => 'admin_explore'
+	post	'/admin/explore'													=> 'explore#create'
+	get		'/admin/explore/preview/:issue'										=> 'explore#preview_issue',			:as => 'preview_issue'
+	get		'/admin/explore/preview/:issue/:name'								=> 'explore#preview_category',		:as => 'preview_category'
+	get		'/admin/explore/:issue'												=> 'explore#editissue',				:as => 'admin_explore_issue'
+	put		'/admin/explore/:issue'												=> 'explore#publish'
+	delete	'/admin/explore/:issue'												=> 'explore#unpublish'
+	post	'/admin/explore/:issue'												=> 'explore#createcat'
+	get		'/admin/explore/:issue/:name'										=> 'explore#editcat',				:as => 'admin_explore_categories'
+	post	'/admin/explore/:issue/:name'										=> 'explore#addcatbinder'
+	delete	'/admin/explore/:issue/:name'										=> 'explore#destroycategory'
+	delete	'/admin/explore/:issue/:name/:binder'								=> 'explore#remcatbinder',			:as => 'admin_explore_rembinder'
+
+	#Public
+	get		'/explore'															=> 'explore#index',					:as => 'explore'
+	# get		'/explore/:issue'													=> 'explore#issue',					:as => 'explore_issue'
+	# get		'/explore/:issue/:name'												=> 'explore#category',				:as => 'explore_category'
+
 	##################
 	# TEACHER ROUTING#
 	##################

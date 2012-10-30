@@ -400,7 +400,7 @@ class AdminController < ApplicationController
 
 	def choosefpfeatured
 
-		@fpfeatured = Setting.f("fpfeatured").v
+		@fpfeatured = Setting.f("fpfeatured").v || []
 
 	end
 

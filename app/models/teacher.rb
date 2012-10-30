@@ -69,7 +69,8 @@ class Teacher
 
 	field :emailconfig, :type => Hash, :default => {"msg" => true,
 													"col" => true,
-													"sub" => true}
+													"sub" => true,
+													"fork" => true}
 
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
@@ -1066,7 +1067,13 @@ class Teacher
 	#DELAYED JOB
 	def self.newsub_email(subscriber, subscribee)
 
-		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && Teacher.find(subscribee).emailconfig["sub"]
+		UserMailer.new_sub(subscriber, subscribee).deliver if Log.first_subsc?(subscriber, subscribee) && (Teacher.find(subscribee).emailconfig["sub"].nil? || Teacher.find(subscribee).emailconfig["sub"])
+
+	end
+
+	def self.newuser_email(teacherid)
+
+		UserMailer.new_user(Teacher.find(teacherid)).deliver
 
 	end
 
@@ -1161,6 +1168,8 @@ class Teacher
 
 		end
 
+		Teacher.delay(:queue => "email").newuser_email(self.id.to_s)
+
 	end
 
 	private
@@ -1169,7 +1178,7 @@ class Teacher
 	# checks if the username is on a blacklist
 	def username_blacklist
 		unless @@username_blacklist
-			@@username_blacklist = Set.new ["signup"] # Put in any additional words in this array
+			@@username_blacklist = Set.new ["signup", "500.html"] # Put in any additional words in this array
 			Rails.application.routes.routes.each do |r|
 				words = r.path.spec.to_s.gsub(/(\(\.:format\)|[:()])/, "").split('/')
 				words.each {|reserved_word| @@username_blacklist << reserved_word if !reserved_word.empty?}

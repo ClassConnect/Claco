@@ -1,0 +1,35 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+
+<h1>Issue # <%= "#{params[:issue]}: #{@category.name}" %></h1>
+<% if @category.binders.empty? %>
+No binders have been added yet
+<% else %>
+<table>
+<tr>
+<td>id</td>
+<td>Author</td>
+<td>Remove Binder</td>
+</tr>
+<% @category.find_binders.each do |binder| %>
+<tr>
+<td><%= binder.id %></td>
+<td><%= binder.user %></td>
+<td><%= link_to("Remove #{binder.id}", admin_explore_rembinder_path(params[:issue], @category.name, binder.id), :method => :delete) %></td>
+</tr>
+<% end %>
+</table>
+<% end %>
+<br />
+<br />
+<%= link_to("Preview this issue", preview_issue_path(params[:issue])) %>
+<%= link_to("Back to issue", admin_explore_issue_path(params[:issue])) %>
+<%= form_for @category, :url => admin_explore_categories_path(params[:issue], @category.name), :method => :post do |f| %>
+<%# f.label :filter, "Filter by" %>
+<%# f.text_field :filter %>
+<%= f.label :subtitle, "Subtitle" %>
+<%= f.text_field :subtitle %>
+<%= f.label :binders, "Add Binder ID" %>
+<%= text_field_tag :binders %>
+<%= f.submit "add" %>
+<% end %>

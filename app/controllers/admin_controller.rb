@@ -103,7 +103,7 @@ class AdminController < ApplicationController
 		#   DO NOT view all!
 		#   slice action by date (month/week/day/hour/minute)
 
-		debugger
+		#debugger
 
 		if params['start'].nil?
 			@start = Time.now.to_datetime
@@ -126,25 +126,71 @@ class AdminController < ApplicationController
 		end
 
 		if params['usernames'].nil?
-			@usernames = ''
+			@usernames = []
 		else
-			@usernames = params['usernames'].gsub(' ','').split(',')
+			@usernames = params['usernames'].gsub(' ','').split(',').to_a.map do |f|
+				begin
+					Teacher.where(:username => f).first.id.to_s
+				rescue
+					next
+				end
+			end
 		end
 
 		if params['userids'].nil?
-			@userids = ''
+			@userids = []
 		else
-			@userids = params['userids'].gsub(' ','').split(',')
+			@userids = params['userids'].gsub(' ','').split(',').to_a
 		end		
 
-		
+		users = (@usernames | @userids).uniq.reject { |f| f.empty? }
+
+		actions = []
+
+		if !params['binderactions'].nil?
+			params['binderactions'].each do |f|
+				actions << {'method' => f, 'model' => 'binders'}
+			end
+		end
+		if !params['conversationactions'].nil?
+			params['conversationactions'].each do |f|
+				actions << {'method' => f, 'model' => 'conversations'}
+			end
+		end
+		if !params['homeactions'].nil?
+			params['homeactions'].each do |f|
+				actions << {'method' => f, 'model' => 'home'}
+			end
+		end
+		if !params['mediaserverapiactions'].nil?
+			params['mediaserverapiactions'].each do |f|
+				actions << {'method' => f}
+			end
+		end
+		if !params['teacheractions'].nil?
+			params['teacheractions'].each do |f|
+				actions << {'method' => f, 'model' => 'teachers'}
+			end
+		end
 
 		#debugger
 
 		#start = params[:start].nil? ? (Time.now-7.days).to_datetime : params[:start].to_datetime
 		#finish = params[:finish].nil? ? Time.now.to_datetime : params[:start].to_datetime
 
-		@logs = Log.all(:conditions => { :timestamp => @start..@finish }).page(params[:page]).per(100)
+		@logs = Log.all(:conditions => { :timestamp => @start..@finish })#.page(params[:page]).per(100)
+
+		#debugger
+
+		if !users.nil? && !users.empty?
+			@logs = @logs.any_in(ownerid: users)
+		end
+
+		if actions.any?
+			@logs = @logs.any_of(actions)
+		end
+
+		@logs = @logs.order_by([:timestamp, :desc]).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i)
 
 		# if start
 

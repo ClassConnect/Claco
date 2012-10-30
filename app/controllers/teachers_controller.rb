@@ -17,7 +17,7 @@ class TeachersController < ApplicationController
 
 		#@feed = Log.where( :ownerid.ne => current_teacher.id.to_s).in( method: ["create","createfile","createcontent"] ).desc(:timestamp).limit(10)
 
-		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!
+		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!	
 		#@parsed_json = JSON.parse(File.read("app/assets/json/standards.json"))
 	end
 
@@ -26,7 +26,7 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		render "public/404.html", :status => 404 and return if @teacher.nil?
+		render "errors/not_found", :status => 404 and return if @teacher.nil?
 
 		redirect_to "/#{@teacher.username}" and return if @teacher.username != params[:username]
 

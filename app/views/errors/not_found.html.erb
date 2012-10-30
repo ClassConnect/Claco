@@ -1,0 +1,22 @@
+<% content_for :headcon do %>
+  <%= stylesheet_link_tag  "errors", :media => "all" %>
+<% end %>
+
+<div id="error-main">
+  <div id="error-header">
+    <h1>404</h1>
+  </div>
+  <div id="error-content">
+    <h2>Oh No! The page you were looking for could not be found :(</h2>
+    <hr/>
+    <p>You may have mistyped the address or the page may not exist anymore.</p>
+    <p>Do you think the page should be here and we got something wrong? Report please!</p>
+    <div class="error-util">
+      <div class="button-container">
+        <a href="/" id="apply-btn" class="btn">Home</a>
+        <a href="#" class="btn" onclick="olark('api.box.expand'); return false">Contact a Human</a>
+      </div>
+      <div style="clear: both"></div>
+    </div>
+  </div>
+</div>

@@ -25,9 +25,9 @@ class PioneersController < ApplicationController
 		render "pioneers"
 
 		rescue BSON::InvalidObjectId
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 
 	end
 

@@ -155,7 +155,7 @@ class BindersController < ApplicationController
 
 		if @access == 0
 			error = true
-			render "public/403.html", :status => 403 and return
+			render "errors/forbidden", :status => 403 and return
 		end
 
 		#Rails.logger.debug @tags
@@ -182,10 +182,10 @@ class BindersController < ApplicationController
 
 		rescue BSON::InvalidObjectId
 			error = true
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
 			error = true
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 		ensure
 			if !error
 				respond_to do |format|
@@ -206,7 +206,7 @@ class BindersController < ApplicationController
 			redirect_to named_binder_route(@binder, params[:action]) and return
 		end
 
-		render "public/403.html", :status => 403 and return if @access == 0
+		render "errors/forbidden", :status => 403 and return if @access == 0
 
 		# INCREMENT DOWNLOAD COUNT
 
@@ -224,9 +224,9 @@ class BindersController < ApplicationController
 		end
 
 		rescue BSON::InvalidObjectId
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 
 	end
 
@@ -235,7 +235,7 @@ class BindersController < ApplicationController
 		@binder = Binder.find(params[:id])
 
 		if @binder.current_version.vidtype != "zen"
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 		end
 
 		render :layout => false
@@ -257,9 +257,9 @@ class BindersController < ApplicationController
 		redirect_to named_binder_route(@binder)
 
 		rescue BSON::InvalidObjectId
-			render "public/404.html", :status => 404 and return
+			render "errors/not_found", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
-			render "public/404.html", :status => 404 and return		
+			render "errors/not_found", :status => 404 and return		
 
 	end
 
@@ -1712,7 +1712,7 @@ class BindersController < ApplicationController
 
 		@tags = [[],[],[],[]]
 
-		#render "public/403.html", :status => 403 and return if params[:username] != current_teacher.username
+		#render "errors/forbidden", :status => 403 and return if params[:username] != current_teacher.username
 
 		@title = "#{current_teacher.fname} #{current_teacher.lname}'s Trash"
 	end

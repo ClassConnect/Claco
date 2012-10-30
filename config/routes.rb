@@ -234,7 +234,5 @@ Claco::Application.routes.draw do
 	end
 
 	get			'/*x'															=> 'errors#not_found'
-	get			'/404'															=> 'errors#not_found'
-	get			'/403'															=> 'errors#forbidden'
 
 end

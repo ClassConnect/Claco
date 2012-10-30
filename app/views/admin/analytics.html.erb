@@ -1,0 +1,163 @@
+<script type="text/javascript">
+	function selectval() { 
+	   var sel = document.getElementById("begin_datetime_1i");
+
+	   alert(sel.options[sel.selectedIndex].value); 
+	}
+</script>
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<%= form_tag 'analytics', :method => 'get' do %>
+	<table>
+		<tr>
+			<td>
+				<h3>Log Filters</h3>
+			</td>
+		</tr>
+		<tr><td colspan='2'><hr /></td></tr>
+		<tr>
+			<td>
+				Start Time:&nbsp;
+			</td>
+			<td>
+				<%= select_datetime(@start, :prefix => 'start') %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				End Time:&nbsp;
+			</td>
+			<td>
+				<%= select_datetime(@finish || Time.now, :prefix => 'finish') %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Usernames (comma delimited):&nbsp;
+			</td>
+			<td>
+				<%= text_field_tag :usernames, params[:usernames] %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				User IDs (comma delimited):&nbsp;
+			</td>
+			<td>
+				<%= text_field_tag :userids, params[:userids] %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Granularity (NOT WORKING):&nbsp;
+			</td>
+			<td>
+				<%= select_tag(:granularity, options_for_select([['None','none'],['Minute','minute'],['Hour','hour'],['Day','day'],['Week','week'],['Month','month']])) %>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Entries per page:&nbsp;
+			</td>
+			<td>
+				<%= select_tag(:entries, options_for_select([['25','25'],['50','50'],['100','100'],['250','250'],['500','500']],(params[:entries] || '100'))) %>
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<table border='1'>
+					<tr>
+						<td>
+							Binder Controller
+						</td>
+						<td>
+							Conversation Controller
+						</td>
+						<td>
+							Home Controller
+						</td>
+						<td>
+							Media Server API Controller
+						</td>
+						<td>
+							Teacher Controller
+						</td>
+					</tr>
+					<tr>
+						<td valign='top'>
+							<% [['index','Index'],['create','Create folder'],['show','Show'],
+							['download','Download'],['createcontent','Add link'],['update','Update binder data'],
+							['rename','Rename item'],['updatetags','Update tags'],['createfile','Create file'],
+							['reorderitem','Reorder'],['moveitem','Move item'],['copyitem','Copy item'],
+							['setpub','Permission change'],['destroy','Delete']].each do |f| %>
+								<%= check_box_tag 'binderactions[]', f[0], !params['binderactions'].nil? && params['binderactions'].include?(f[0]) %><%= f[1] %><br />
+							<% end %>
+						</td>
+						<td valign='top'>
+							<% [['show','Show'],['new','New'],['create','Create'],['newmessage','New message'],['createmessage','Create message']].each do |f| %>
+								<%= check_box_tag 'conversationactions[]', f, !params['conversationactions'].nil? && params['conversationactions'].include?(f) %><%= f[1] %><br />
+							<% end %>
+						</td>
+						<td valign='top'>
+							<%= check_box_tag 'homeactions[]', 'search', !params['homeactions'].nil? && params['homeactions'].include?('search') %>Search<br />
+						</td>
+						<td valign='top'>
+							<%= check_box_tag 'mediaserverapiactions[]', 'addthumbs', !params['mediaserverapiactions'].nil? && params['mediaserverapiactions'].include?('addthumbs') %>Thumbnail Asynch Callback<br />
+						</td>
+						<td valign='top'>
+							<% [['index','Index'],['show','Show'],['editinfo','Edit Info'],
+							['createavatar','Create avatar'],['updateinfo','Update info'],
+							['updateprefs','Update preferences'],['updatepass','Update password'],
+							['sub','Subscribe'],['unsub','Unsubscribe'],['done','Completed getting started'],
+							['conversations','Conversations']].each do |f| %>
+								<%= check_box_tag 'teacheractions[]', f[0], !params['teacheractions'].nil? && params['teacheractions'].include?(f[0]) %><%= f[1] %><br />
+							<% end %>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= submit_tag "Apply Filters", :name => nil %>
+			</td>
+		</tr>
+	</table>
+<% end %>
+<% begin %>
+	<%= paginate(@logs) %>
+	<%= page_entries_info(@logs).html_safe %>
+<% rescue %>
+<% end %>
+<br />
+<br />
+<table>
+	<tr>
+		<td><b>Log ID</b></td>
+		<td><b>Ownerid</b></td>
+		<td><b>Timestamp</b></td>
+		<td><b>Model</b></td>
+		<td><b>Method</b></td>
+		<td><b>Modelid</b></td>
+		<td><b>Params</b></td>
+		<td><b>Data</b></td>
+	</tr>
+<% @logs.each do |log| %>
+	<tr>
+		<td><%= log.id.to_s %>&nbsp;</td>
+		<td><% if !log.ownerid.empty? %><a href="/<%= Teacher.find(log.ownerid).username %>"><%= log.ownerid %></a>&nbsp;<% end %></td>
+		<td><%= Time.at(log.timestamp).strftime("%B %d, %Y - %l:%M:%S.%L %p")%>&nbsp;</td>
+		<td><%= log[:model] %>&nbsp;</td>
+		<td><%= log.method %>&nbsp;</td>
+		<td><%= log.modelid %>&nbsp;</td>
+		<td><%= log.params.to_s %>&nbsp;</td>
+		<td><%= log.data.to_s %>&nbsp;</td>
+	</tr>
+<% end %>
+</table>
+
+<% begin %>
+	<%= paginate(@logs) %>
+	<%= page_entries_info(@logs).html_safe %>
+<% rescue %>
+<% end %>

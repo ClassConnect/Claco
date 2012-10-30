@@ -1178,7 +1178,7 @@ class Teacher
 	# checks if the username is on a blacklist
 	def username_blacklist
 		unless @@username_blacklist
-			@@username_blacklist = Set.new ["signup"] # Put in any additional words in this array
+			@@username_blacklist = Set.new ["signup", "500.html"] # Put in any additional words in this array
 			Rails.application.routes.routes.each do |r|
 				words = r.path.spec.to_s.gsub(/(\(\.:format\)|[:()])/, "").split('/')
 				words.each {|reserved_word| @@username_blacklist << reserved_word if !reserved_word.empty?}

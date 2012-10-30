@@ -59,6 +59,9 @@ public/cnn.png: public/cnn-f5a12189fc7824c3f03d653397f33225.png
 public/core.png: public/core-9229a7632f41261cb83e725ca787527f.png
 public/devise/applybk.jpg: public/devise/applybk-d01fcc1fec3d2ad93f94fb86246f789e.jpg
 public/erin.jpg: public/erin-b9b482c02accffc3b1cda1f6dd92f640.jpg
+public/explore/splash.jpg: public/explore/splash-c934b4732d87657e12148bd8f7db95ca.jpg
+public/explore/splash1.jpg: public/explore/splash1-a34de32d67f05fbf4f2b35b02c561956.jpg
+public/explore/teach.jpg: public/explore/teach-369cb1fa846e8fbb6943f0f6b4635583.jpg
 public/fast.png: public/fast-f86d4ddd6c4a8e99182b23f074ccece3.png
 public/fullcore.png: public/fullcore-c0d8006f6a24531fc1f747545eee64dd.png
 public/goodies/bookmarklet_preview.jpg: public/goodies/bookmarklet_preview-be6df12574cf08801fc7997b4689c189.jpg
@@ -122,14 +125,14 @@ stockfilethumbs/wmv.png: stockfilethumbs/wmv-ffe500c9db4402e68e56f126846e3e79.pn
 stockfilethumbs/xls.png: stockfilethumbs/xls-980bc311d58b7f23802c0e12c8d66294.png
 stockfilethumbs/xlsx.png: stockfilethumbs/xlsx-618bc0693ac24e4179ffd92317a67cd6.png
 success.png: success-11af90207d2f9fb4bbeae9239725ac5c.png
-application.js: application-e4989097ee1933c7e825c1f6649a61e4.js
+application.js: application-e78cb793d095cb481deda0831ce36452.js
 binders/folder.js: binders/folder-91db727ad472f6a83e12fb3f7b3030ee.js
 binders/icheck.js: binders/icheck-5c1621b3f36a3f184889c9e35c9f8aca.js
 binders/pretags.js: binders/pretags-9aeb3580994267ddf468f4dbd4bfdffd.js
 binders/taginit.js: binders/taginit-4b62d889f8b850f4901bc88aca91d79d.js
 binders/upload/fileupload.js: binders/upload/fileupload-7c646850014f6e74fa26c0bb6cee913c.js
 binders/upload/iframe-transport.js: binders/upload/iframe-transport-7bb9ba11eea463ce30f89318c2920495.js
-bookmarklet/post.js: bookmarklet/post-8dfc04510cb29d96ac575f7c490ab336.js
+bookmarklet/post.js: bookmarklet/post-ea4a0cf0e6f740afdf3a1511fc0c0999.js
 dropdown.js: dropdown-0a0f3a61595bb7f0bbd7ac513a1c807d.js
 editinfo/apply.js: editinfo/apply-d1eab63b4b19853e365e7154c40d1b03.js
 editinfo/main.js: editinfo/main-1d9b42f3103961f266b228a1c6bcf590.js
@@ -140,6 +143,8 @@ gen/cookie.js: gen/cookie-0604f2c7b2b3900ddcacab3ef6279f15.js
 gen/guiders.js: gen/guiders-693d564bd42978b8a4bcafb2ec898d78.js
 gen/sticky.js: gen/sticky-c7405eda437c719c60a02718ab838fc1.js
 gen/wizard.js: gen/wizard-7523ae0f935550c9aff5e16185825d59.js
+home/explore.js: home/explore-70a0ac39897edd7737d322b9b342ae86.js
+home/explore_detail.js: home/explore_detail-738a058493f858212c5028550178357c.js
 home/main.js: home/main-b004fbfca0cd774f733d66cf8dddceaf.js
 home/pub.js: home/pub-befa495e6afb8f77dc9a0be74f84d0cc.js
 jqueryui.js: jqueryui-c04b8ed279f78b6387c8d090964d2e16.js
@@ -151,7 +156,7 @@ tooltip.js: tooltip-c1f31f50d05852374b1ca905917af3e6.js
 wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
 wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
-application.css: application-de73526e70c8b201dacada0accc07ed0.css
+application.css: application-f1f89dd3fa04cf0c4715f591e61d9280.css
 binders/folder.css: binders/folder-1de8750fa116b83478086f40cb130b7a.css
 bookmarklet/post.css: bookmarklet/post-7a4f3df75092e5e2caeff6d8865469ee.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
@@ -167,6 +172,8 @@ gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
 home/educators.css: home/educators-d7dcc222e05084ff8471838a71aba1c8.css
 home/main.css: home/main-b4e88e858c4ba30f581eca373eac63d0.css
 home/pub/about.css: home/pub/about-903d8395c4f9a7802caf0fa0f39a5c18.css
+home/pub/explore.css: home/pub/explore-460f5b08be69a0a309574664ac12f0a2.css
+home/pub/explore_detail.css: home/pub/explore_detail-c162d3ba6876898bccaca4e78a80276e.css
 home/pub/pioneers.css: home/pub/pioneers-079d64301b9d8854bc0fa04053053d83.css
 home/pub/team.css: home/pub/team-ce1e43f72a8d96a8b08ce936c64f0aaf.css
 home/pub/uwt.css: home/pub/uwt-1e8baecc5f7a535e85a2df14dad531cf.css

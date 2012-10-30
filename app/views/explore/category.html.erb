@@ -1,0 +1,194 @@
+<% content_for :headcon do %>
+    <%= stylesheet_link_tag "home/pub/explore_detail", :media => "all" %>
+<% end %>
+
+<% content_for :botcon do %>
+    <%= javascript_include_tag "home/explore_detail", :media => "all" %>
+<% end %>
+
+<div class="container" style="margin-top:1em;">
+  <div class="sectr">
+    <legend>
+      <a href="/explore">Explore</a> &raquo; Math
+      <small><em>Do you see a little Asian child with a blank expression?</em></small>
+    </legend>
+    <div class="item" data-binder-id="5088356bd9ade5069000002c" data-href="http://localhost:5000/diwank/portfolio/hello-world/5088356bd9ade5069000002c">
+      <img src="http://placekitten.com/g/200/150" class="scrnshot" />
+
+      <div class="description">
+        <h3>Title of the binder n shit</h3>
+
+        <p>
+          Do you see any Teletubbies in here? Do you see a slender plastic tag clipped to my shirt with my name printed on it? Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical.
+        </p>
+
+      </div>
+      
+      <div class="profile">
+        <a class="profile-name" href=".">
+          <img class="profile-avatar" src="http://img.cla.co/2912c37d04ad62de2099657014ead6a8/thumb_lg.png" />
+          William King
+        </a>
+        <button class="btn snapbtn">
+          <%= image_tag "binders/snap.png" %>
+          <div class="texter">Snap to binder</div>
+        </button>
+      </div>
+    </div>
+    
+    <div class="item" data-binder-id="5088356bd9ade5069000002c" data-href="http://localhost:5000/diwank/portfolio/hello-world/5088356bd9ade5069000002c">
+      <img src="http://placekitten.com/g/200/150" class="scrnshot"/>
+
+      <div class="description">
+        <h3>Title of the binder n shit</h3>
+
+        <p>
+          Do you see any Teletubbies in here? Do you see a slender plastic tag clipped to my shirt with my name printed on it? Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical.
+        </p>
+
+      </div>
+      
+      <div class="profile">
+        <a class="profile-name" href=".">
+          <img class="profile-avatar" src="http://img.cla.co/2912c37d04ad62de2099657014ead6a8/thumb_lg.png"/>
+          William King
+        </a>
+        <button class="btn snapbtn">
+          <%= image_tag "binders/snap.png" %>
+          <div class="texter">Snap to binder</div>
+        </button>
+      </div>
+    </div>
+    
+    <div class="item" data-binder-id="5088356bd9ade5069000002c" data-href="http://localhost:5000/diwank/portfolio/hello-world/5088356bd9ade5069000002c">
+      <img src="http://placekitten.com/g/200/150" class="scrnshot"/>
+
+      <div class="description">
+        <h3>Title of the binder n shit</h3>
+
+        <p>
+          Do you see any Teletubbies in here? Do you see a slender plastic tag clipped to my shirt with my name printed on it? Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical.
+        </p>
+
+      </div>
+      
+      <div class="profile">
+        <a class="profile-name" href=".">
+          <img class="profile-avatar" src="http://img.cla.co/2912c37d04ad62de2099657014ead6a8/thumb_lg.png"/>
+          William King
+        </a>
+        <button class="btn snapbtn">
+          <%= image_tag "binders/snap.png" %>
+          <div class="texter">Snap to binder</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+   <div id="snap-form" style="display:none">
+    <div class="headtitle">
+      Snap to binder
+    </div>
+
+    <div class="errorBox"></div>
+
+    <form action="#" class="bodcon" id="snap">
+      <div class="conitem">
+
+        <div class="fol-picker" style="margin-bottom:10px">
+
+          <div class="togbar" onclick="togglePicker(this)">
+            <span class="chosenTitle">
+              <i>Choose a binder or folder to snap this to</i>
+            </span>
+            <div class="down-arrow"></div>
+            <input type="hidden" name="folid" class="chosenOne" value="" />
+          </div>
+
+          <div class="pickerpane">
+
+            <% if !@root.nil? %>
+            <% @root.each do |binder| %>
+
+
+              <% if binder.parent["id"] == "0" %>
+
+                <div class="bndr">
+
+                  <div class="dir" folid="<%= binder.id.to_s %>" turl="<%= named_binder_route(binder) %>">
+                    <div class="arrow-right" onclick="togglePickFolder(this)"></div>
+                    <span class="dirtitle" onclick="selectPickFolder(this)">
+                      <%= image_tag "binders/folder.png", :class => "foldicon" %>
+                      <%= binder.title %>
+                    </span>
+                    <div class="dirWrap"></div>
+
+                  </div>
+                </div>
+
+              <% end %>
+
+            <% end %>
+            <% end %>
+
+
+          </div>
+        </div>
+
+ <!-- 
+<div style="margin-bottom:10px" class="fol-picker">
+
+          <div onclick="togglePicker(this)" class="togbar">
+            <span class="chosenTitle">
+              <i>Choose a binder or folder to snap this to</i>
+            </span>
+            <div class="down-arrow"></div>
+            <input type="hidden" value="" class="chosenOne" name="folid">
+          </div>
+
+          <div class="pickerpane">
+
+
+
+
+                <div class="bndr">
+
+                  <div turl="/diwank/portfolio/hello-world/5088356bd9ade5069000002c" folid="5088356bd9ade5069000002c" class="dir">
+                    <div onclick="togglePickFolder(this)" class="arrow-right"></div>
+                    <span onclick="selectPickFolder(this)" class="dirtitle">
+                      <img src="/assets/binders/folder.png" class="foldicon" alt="Folder">
+                      hello world
+                    </span>
+                    <div class="dirWrap"></div>
+
+                  </div>
+                </div>
+
+
+
+
+          </div>
+        </div>
+ -->
+      </div>
+
+      <div class="buttonbar">
+         <button class="btn btn-primary showloader" type="submit" disabled="disabled">Snap this!</button>
+         <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+      </div>
+      <input type="hidden" id="binderUrl" name="binderUrl" />
+    </form>
+  </div>
+<% if false %>
+	<%= link_to("Back to edit", admin_explore_categories_path(params[:issue], params[:name])) if @preview %><br />
+	<%= link_to("Back to issue", explore_issue_path(params[:issue])) %>
+	<br />
+	<% @category.find_binders.each do |binder| %>
+	<%= link_to(binder.title, named_binder_route(binder)) %>
+	<%= binder.user %>
+	<%= strip_tags(binder.body) %>
+	<%= link_to(image_tag(teacher_thumb_sm(binder.find_owner)), "/#{binder.username}") %>
+	<br />
+	<% end %>
+<% end %>

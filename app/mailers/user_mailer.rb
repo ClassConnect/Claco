@@ -80,7 +80,7 @@ class UserMailer < ActionMailer::Base
 	def new_msg(message, sender_id, recipient)
 		sender = Teacher.find(sender_id)
 
-		@pre = "Woah - you have a new message!"
+		@pre = "Whoa - you have a new message!"
 		@limg = teacher_thumb_lg(sender)
 		@limg_link = 'http://www.claco.com/' + sender.username
 		@head = '<a href="' + @limg_link + '" style="font-weight:bolder">' + sender.first_last + '</a>'

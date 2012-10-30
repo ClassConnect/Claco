@@ -26,7 +26,7 @@ class TeachersController < ApplicationController
 	def show
 		@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first
 
-		render "shared/404", :status => 404 and return if @teacher.nil?
+		render "errors/not_found", :status => 404 and return if @teacher.nil?
 
 		redirect_to "/#{@teacher.username}" and return if @teacher.username != params[:username]
 

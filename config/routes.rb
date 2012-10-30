@@ -208,4 +208,6 @@ Claco::Application.routes.draw do
 	
 	end
 
+	get			'/*x'															=> 'errors#not_found'
+
 end

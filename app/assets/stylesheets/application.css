@@ -493,15 +493,14 @@ footer {
   padding-left: 5px;
 }
 
-<<<<<<< HEAD
 
 .truncate {
   /*width: 250px;*/
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-=======
+}
+
 .centered {
   margin: 0 auto;
->>>>>>> feature/error-pages
 }

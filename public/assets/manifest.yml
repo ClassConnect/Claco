@@ -156,7 +156,7 @@ tooltip.js: tooltip-c1f31f50d05852374b1ca905917af3e6.js
 wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
 wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
-application.css: application-f1f89dd3fa04cf0c4715f591e61d9280.css
+application.css: application-84595cffc65a4def27310fb081dd1b4d.css
 binders/folder.css: binders/folder-1de8750fa116b83478086f40cb130b7a.css
 bookmarklet/post.css: bookmarklet/post-7a4f3df75092e5e2caeff6d8865469ee.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
@@ -168,6 +168,7 @@ buttons/zocial-regular-webfont.woff: buttons/zocial-regular-webfont-beb0af4aa85c
 devise/apply.css: devise/apply-0ad1afb7a35de94bd1e3ed2d11b7c881.css
 devise/newuser.css: devise/newuser-a46613ed3f4134cfcc494ecd49ca36e5.css
 editinfo.css: editinfo-18c1eaa9ada96e5b8c9dd1219da2e825.css
+errors.css: errors-39335cb6f0222c06624dd622790b7a4c.css
 gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
 home/educators.css: home/educators-d7dcc222e05084ff8471838a71aba1c8.css
 home/main.css: home/main-b4e88e858c4ba30f581eca373eac63d0.css

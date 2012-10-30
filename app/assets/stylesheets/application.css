@@ -500,3 +500,7 @@ footer {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.centered {
+  margin: 0 auto;
+}

@@ -3,7 +3,9 @@ module Delayed
     class Exceptional < Plugin
       module Notify
         def error(job, error)
-          ::Exceptional.handle(error, "Delayed::Job: #{job.handler}")
+          i = 0
+          dj = YAML.load(job.handler)
+          ::Exceptional.context(dj.args.map{|a| {"args#{i+=1}" => a}}).handle(error, "Delayed::Job: #{dj.object}##{dj.method_name.to_s}")
           super
         end
       end

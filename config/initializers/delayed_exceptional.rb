@@ -5,7 +5,8 @@ module Delayed
         def error(job, error)
           i = 0
           dj = YAML.load(job.handler)
-          ::Exceptional.context(dj.args.map{|a| {"args#{i+=1}" => a}}).handle(error, "Delayed::Job: #{dj.object}##{dj.method_name.to_s}")
+          ::Exceptional.context(Hash[*dj.args.map{|a| ["args#{i}", a.to_s]}.flatten])
+            .handle(error, "Delayed::Job: #{dj.object}##{dj.method_name.to_s}")
           super
         end
       end

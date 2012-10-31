@@ -40,6 +40,7 @@ Claco::Application.routes.draw do
 	get		'/about'															=> 'home#about'
 	get		'/about/team'														=> 'home#team'
 	get		'/unitedweteach'													=> 'home#united'
+	get 	'/press'															=> 'home#press'
 	get		'/goodies'															=> 'home#goodies'
 	get		'/post'																=> 'home#bookmarklet'
 

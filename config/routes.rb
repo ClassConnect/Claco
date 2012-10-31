@@ -2,7 +2,6 @@ BASE_BINDER_ROUTE = '/:username/portfolio(/:root)/:title/:id'
 
 Claco::Application.routes.draw do
 
-
 	##################
 	# DEVISE ROUTING #
 	##################

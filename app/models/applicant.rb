@@ -24,7 +24,7 @@ class Applicant
 
 	after_create do
 
-		UserMailer.request_invite(self.email).deliver
+		Applicant.delay(:queue => email).thank_for_applying(self.id.to_s)
 
 	end
 
@@ -41,6 +41,14 @@ class Applicant
 
 		self.set(:status, -1)
 
+	end
+
+	def self.thank_for_applying(id)
+
+		app = Applicant.find(id)
+
+		UserMailer.request_invite(app.email).deliver
+		
 	end
 
 	def self.seedstatus

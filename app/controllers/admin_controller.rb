@@ -192,70 +192,46 @@ class AdminController < ApplicationController
 
 		@logs = @logs.order_by([:timestamp, :desc]).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i)
 
-		# if start
-
-		# case params[:class]
-		# when 'user'
-		# 	begin
-		# 		@teacher = Teacher.find(params[:userid])
-		# 	rescue
-		# 		return
-		# 	end
-		# 	case params[:grouping]
-		# 	when 'date'
-		# 		case params[:year]
-		# 		when 'month'
-
-		# 		when 'week'
-
-		# 		when 'day'
-
-		# 		when 'hour'
-
-		# 		when 'minute'
-
-		# 		end
-		# 	when 'action'
-		# 		@logs = Log.where(:ownerid => params[:userid]).where(:method => params[:action]).page(params[:page]).per(100)
-		# 	end
-		# when 'action'
-		# 	@logs = Log.where(:method => params[:action]).page(params[:page]).per(100)
-		# end	
-
-		# case params[:class]
-		# when 'users'
-		# 	if !params[:id].nil?
-		# 		# all actions for a specific user
-		# 		@logs = Log.where(:ownerid => params[:id]).order_by(:timestamp,:asc).page(params[:page]).per(100)
-
-		# 		#render 'admin/analytics/user'
-		# 	else
-		# 		# actions for all users
-		# 		@logs = []
-		# 		Teacher.all.each do |t|
-		# 			@logs << Log.where(:ownerid => t.id.to_s).order_by(:timestamp,:asc)
-		# 		end
-		# 		@logs = @logs.flatten.page(params[:page]).per(100)
-
-		# 		#render 'admin/analytics/users'
-		# 	end
-		# when 'actions'
-		# 	if !params[:id].nil?
-		# 		# specific actions
-		# 		@logs = Log.where(:method => params[:class]).order_by(:timestamp, :asc).page(params[:page]).per(100)
-
-		# 		#render 'admin/analytics/action'
-		# 	else
-		# 		# all actions
-		# 		@logs = Log.all.order_by(:method, :asc).page(params[:page]).per(100)
-
-		# 		#render 'admin/analytics/actions'
-		# 	end
-		# #else
-		# 	#render 'admin/analytics/main'
-		# end
-
 		render 'admin/analytics'
+
+	end
+
+	def teacheranalytics
+
+		if params['start'].nil?
+			@start = Time.now.to_datetime
+		else
+			@start = DateTime.civil(params['start']['year'].to_i,
+									params['start']['month'].to_i,
+									params['start']['day'].to_i,
+									params['start']['hour'].to_i,
+									params['start']['minute'].to_i)
+		end
+
+		if params['finish'].nil?
+			@finish = Time.now.to_datetime
+		else
+			@finish = DateTime.civil(params['finish']['year'].to_i,
+									params['finish']['month'].to_i,
+									params['finish']['day'].to_i,
+									params['finish']['hour'].to_i,
+									params['finish']['minute'].to_i)
+		end
+
+		if params['registrationdates'].present?
+			@teachers = Teacher.all(:conditions => { :registered_at => @start..@finish })
+		else
+			@teachers = Teacher.all
+		end
+
+		if params['logincount'].present?
+			@teachers = @teachers.where(:sign_in_count.gte => params['logincountmin'].to_i, :sign_in_count.lte => params['logincountmax'].to_i)
+		end
+
+		if params['bindercount'].present?
+			#@teachers = @teachers.where
+		end
+
 
 	end
 

@@ -3,9 +3,13 @@ class NomineesController < ApplicationController
 
 	def create
 
-		nom = Nominee.new(params[:nominee])
+		params[:emails].each do |email|
 
-		nom.save
+			Nominee.new(:from => params[:inviter], :email => email).save unless email.blank?
+
+		end
+
+		render :text => "1"
 
 	end
 

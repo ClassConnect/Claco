@@ -95,6 +95,7 @@ Claco::Application.routes.draw do
 	post	'/updateinfo'														=> "teachers#updateinfo"
 	get		'/editavatar'														=> "teachers#editavatar"
 	get		'/editavatar/:data/:token'											=> "teachers#createavatar"
+	post	'/done'																=> 'teachers#done'
 
 
 	# resources :teachers, :only => [:show, :index]
@@ -103,6 +104,7 @@ Claco::Application.routes.draw do
 
 	get		'/legal/tos'														=> 'home#tos'
 	get		'/legal/privacy'													=> 'home#privacy'
+	get		'/gs/:provider'														=> 'home#gs'
 
 	#####################
 	# APPLICANT ROUTING #
@@ -111,8 +113,7 @@ Claco::Application.routes.draw do
 	get		'/apply'															=> 'applicants#apply'
 	post	'/apply'															=> 'applicants#create',				:as => 'applicants'
 
-	get		'/gs/:provider'														=> 'home#gs'
-	post	'/done'																=> 'teachers#done'
+	post	'/nominate'															=> 'nominees#create'
 
 	###################
 	# MESSAGE ROUTING #

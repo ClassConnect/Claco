@@ -3,6 +3,8 @@ class NomineesController < ApplicationController
 
 	def create
 
+		render :nothing => true, :status => 406 and return if params[:inviter].blank?
+
 		params[:emails].each do |email|
 
 			Nominee.new(:from => params[:inviter], :email => email).save unless email.blank?

@@ -37,16 +37,36 @@ $(document).ready(function() {
 				data: $(this).serialize()
 			
 			}).done(function /*onSucuess*/ (data, error) {
-				notifyMessage('.alert-sucess', "Awesome! Thanks for sharing Claco with those you live");
+				notifyMessage('.alert-success', "Awesome! Thanks for sharing Claco");
 			}).fail(function /*onFailure*/ (data, error) {
-				notifyMessage('alert-error', data.message);
-				console.log(data);	
+				notifyMessage('alert-error', data.statusText);
+				alert("error");
+				console.log("data", data);
+				console.log('error', error);
 			});
 
 			return false;
 	  });
 	});
 });
+
+function validate (form){
+	var rules = {};						// validation rules
+	rules.required =
+		['', 'weblink', 'binderUrl'];
+
+	form.find('button[type=submit]')
+		.removeAttr('disabled');
+	
+	$(rules.required).each(function(i, elem){
+		var field = form.find('*[name='+elem+']');
+		if(!field.val()){
+			field.focus();
+			form.find('button[type=submit]')
+				.attr('disabled','disabled');
+		}
+	});
+}
 
 function notifyMessage(target, message) {
 	$('#facebox #nominate-form').addClass('hidden');
@@ -57,7 +77,7 @@ function notifyMessage(target, message) {
 
 		window.setTimeout(function(){
 			$(document).trigger('close.facebox');
-		}, 700);
+		}, 1000);
 };
 
 function fieldAdder() {

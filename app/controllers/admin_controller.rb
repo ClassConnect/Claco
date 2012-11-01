@@ -228,9 +228,13 @@ class AdminController < ApplicationController
 			@teachers = @teachers.where(:sign_in_count.gte => params['logincountmin'].to_i, :sign_in_count.lte => params['logincountmax'].to_i)
 		end
 
-		if params['bindercount'].present?
-			#@teachers = @teachers.where
-		end
+		# if params['bindercount'].present?
+		# 	@teachers = @teachers.where(Binder.where(:owner=>))
+		# end
+
+		# if params['subscriptioncount'].present?
+		# 	@teachers = @teachers.where(:)
+		# end
 
 
 	end

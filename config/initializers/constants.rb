@@ -151,4 +151,4 @@ SUBJECT_BITMAP = 0x10
 GRADE_BITMAP =  0x20
 INVITE_BITMAP = 0x40
 
-PREFIX_EMAIL = ['Woah!', 'Nice!', 'Woohoo!', 'Awesome!']
+PREFIX_EMAIL = ['Whoa!', 'Nice!', 'Woohoo!', 'Awesome!']

@@ -43,7 +43,7 @@
 		            	<% row.each do |binder| %>
 			              <li class="span3">
 			                <a class="thumbnail" href="<%= named_binder_route(binder) %>">
-			                  <img class="binder-thumb" src="<%= binder_thumb_lg(binder) %>" alt="<%= binder.title %>">
+			                  <img class="binder-thumb" src="<%= explore_binder_thumb_lg(binder) %>" alt="<%= binder.title %>">
 		                  	  <span class="binder-user">
 		                  	  	<img src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
 		                  	  </span>

@@ -85,6 +85,14 @@ module ApplicationHelper
 		end		
 	end
 
+	def explore_binder_thumb_lg(binder)
+		if binder.type.to_i==1
+			binder_thumb_lg(Binder.find(binder.thumbimgids[0]))
+		else
+			binder_thumb_lg(binder)
+		end
+	end
+
 	def binder_contentview(binder)
 		ret = Binder.contentview(binder)
 		ret.nil? ? asset_path("common/nothumb.png") : ret

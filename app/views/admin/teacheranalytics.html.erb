@@ -1,0 +1,126 @@
+<h2>Teacher Analytics</h2>
+<hr />
+<%= form_tag 'teacheranalytics', :method => 'get' do %>
+	<table>
+		<tr>
+			<td valign='top'>
+				<h3>Teacher Filters:</h3>
+			</td>
+			<td>
+				&bull;&nbsp;'Between' filters go, from left to right, low to high<br />
+				&bull;&nbsp;Leaving an entry in a between filter blank will leave the range unconstrained<br />
+				&nbsp;&nbsp;e.g., [3] and [&nbsp;] will return results greater than 3, [&nbsp;] and [7] returns results less than 7<br /><br />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'logincount', 'logincount', params['logincount'].present? %>Use login count?&nbsp;
+			</td>
+			<td>
+				Teachers that have logged in between <%= text_field_tag :logincountmin, params[:logincountmin] %> and <%= text_field_tag :logincountmax, params[:logincountmax] %> times.
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'registrationdates', 'registrationdates', params['registrationdates'].present? %>Use registration dates?&nbsp;
+			</td>
+			<td>
+				Teachers that registered after:&nbsp;<%= select_datetime(@start || Time.now, :prefix => 'start') %><br />Teachers that registered before:&nbsp;<%= select_datetime(@finish || Time.now, :prefix => 'finish') %> 
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'bindercount', 'bindercount', params['bindercount'].present? %>Use binder counts? (NOT WORKING)&nbsp;
+			</td>
+			<td>
+				Teachers that have between <%= text_field_tag :bindermin, params[:bindermin] %> and <%= text_field_tag :bindermax, params[:bindermax] %> binders.  
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'subscriptioncount', 'subscriptioncount', params['subscriptioncount'].present? %>Use subscription counts?&nbsp;
+			</td>
+			<td>
+				Teachers that have subscribed to between <%= text_field_tag :subscriptionmin, params[:subscriptionmin] %> and <%= text_field_tag :subscriptionmax, params[:subscriptionmax] %> teachers.
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'subscribercount', 'subscribercount', params['subscribercount'].present? %>Use subscriber counts?&nbsp;
+			</td>
+			<td>
+				Teachers that have between <%= text_field_tag :subscribermin, params[:subscribermin] %> and <%= text_field_tag :subscribermax, params[:subscribermax] %> subscribers.
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'twitter', 'twitter', params['twitter'].present? %>Use twitter toggle? (leave unchecked to ignore)&nbsp;
+			</td>
+			<td>
+				<%= check_box_tag 'twitpresent', 'twitpresent', params['twitpresent'].present? %>&nbsp;Teachers that have/have not attached their Twitter accounts<br />(check for only teachers who have attached Twitter, uncheck for only teachers who have NOT attached Twitter)
+			</td>
+		</tr>
+		<tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'facebook', 'facebook', params['facebook'].present? %>Use facebook toggle? (leave unchecked to ignore)&nbsp;
+			</td>
+			<td>
+				<%= check_box_tag 'fbpresent', 'fbpresent', params['fbpresent'].present? %>&nbsp;Teachers that have/have not attached their Facebook accounts<br />(check for only teachers who have attached FB, uncheck for only teachers who have NOT attached FB)
+			</td>
+		</tr>
+			<td colspan='2'>
+				<hr />
+			</td>
+		</tr>
+		<tr>
+			<td valign='top'>
+				<%= check_box_tag 'avatar', 'avatar', params['avatar'].present? %>Use avatar toggle? (leave unchecked to ignore)&nbsp;
+			</td>
+			<td>
+				<%= check_box_tag 'avatarpresent', 'avatarpresent', params['avatarpresent'].present? %>&nbsp;Teachers that have/have not added avatar pictures<br />(check for only teachers who have added avatars, uncheck for only teachers who have NOT added avatars)
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<%= submit_tag "Apply Filters", :name => nil %>
+			</td>
+		</tr>
+	</table>
+<% end %>
+
+<% if false %>
+	Have profile pictures
+
+	Two groups, compare sets of these groups of IDs
+	Make group model
+<% end %>

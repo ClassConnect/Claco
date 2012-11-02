@@ -140,7 +140,7 @@ class ExploreController < ApplicationController
 
 		@issue = Explore.current_issue
 
-		render "public/404.html", :status => 404 and return if @issue.nil?
+		render "errors/not_found", :status => 404 and return if @issue.nil?
 
 		@title = "Explore Claco"
 
@@ -159,7 +159,7 @@ class ExploreController < ApplicationController
 
 	# 	@title = "Explore Claco ##{@issue.issue}"
 
-	# 	render "public/404.html", :status => 404 and return if @issue.nil?
+	# 	render "errors/not_found", :status => 404 and return if @issue.nil?
 
 	# 	@categories = @issue.categories
 
@@ -177,7 +177,7 @@ class ExploreController < ApplicationController
 	# 	@root = signed_in? ? current_teacher.binders.root_binders : []
 
 	# 	rescue Mongoid::Errors::DocumentNotFound
-	# 		render "public/404.html", :status => 404
+	# 		render "errors/not_found", :status => 404
 
 	# end
 

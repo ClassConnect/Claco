@@ -76,9 +76,9 @@ public/jerry.png: public/jerry-b52864f10ba5d3a1f2f01ebd9fc10cb9.png
 public/nasa.jpg: public/nasa-360489e091b9147989805e9a450e621e.jpg
 public/nbc.png: public/nbc-bd61436100abd7bd465b2e456f6b877d.png
 public/pioneers/pioneers.jpg: public/pioneers/pioneers-8b719c48402ec50191015de6c2b5e442.jpg
-public/press/fastcompany.png: public/press/fastcompany-bd3cf77450a74ea3696908eba2e69116.png
-public/press/huffington.png: public/press/huffington-2da562ee6c60ff1c169aac17b522e6c2.png
-public/press/pressback.jpg: public/press/pressback-0ab37369ccc4d20f98a7212428ea7e03.jpg
+public/press/fastcompany.jpg: public/press/fastcompany-cea0453bc411794f1a0334e68fbe8d05.jpg
+public/press/huffington.jpg: public/press/huffington-2663cc9a622078314c3bdcc63f4fd0ac.jpg
+public/press/pressback.jpg: public/press/pressback-1c725abb27228ddc31a1714057951264.jpg
 public/press/techcrunch.jpg: public/press/techcrunch-1086c2cdeb3bbdaab5c5692c0177d3fa.jpg
 public/product/applefinal.jpg: public/product/applefinal-c65a6fbe54234b57854fc1a83eed6024.jpg
 public/product/bg.jpg: public/product/bg-04f0fa0e928e9eb3518c4c230b24f935.jpg
@@ -180,7 +180,7 @@ home/pub/about.css: home/pub/about-903d8395c4f9a7802caf0fa0f39a5c18.css
 home/pub/explore.css: home/pub/explore-460f5b08be69a0a309574664ac12f0a2.css
 home/pub/explore_detail.css: home/pub/explore_detail-c162d3ba6876898bccaca4e78a80276e.css
 home/pub/pioneers.css: home/pub/pioneers-079d64301b9d8854bc0fa04053053d83.css
-home/pub/press.css: home/pub/press-d55224270a4c73b958ab613f76ff662e.css
+home/pub/press.css: home/pub/press-574b91db1e8aba26b524d98e08109fa7.css
 home/pub/team.css: home/pub/team-ce1e43f72a8d96a8b08ce936c64f0aaf.css
 home/pub/uwt.css: home/pub/uwt-1e8baecc5f7a535e85a2df14dad531cf.css
 home/public.css: home/public-35bb08bfaa76af2064bebb8bd1f8a953.css

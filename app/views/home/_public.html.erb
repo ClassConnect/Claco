@@ -6,35 +6,32 @@
 				Collaborate with the world's greatest educators.
 			</div>
 
+			<h2 id='tagline2'>
+				Find, build and share resources with teachers across the hall or across the world — aligned with Common Core
+				<a href="/about" id="learn-more">Learn more &rarr;</a>
+			</h2>
+
 
 			<div class="addtl">
-				Find, build and share resources with teachers across the hall or across the world — aligned with <%= render 'layouts/commoncorelogo' %>
-
-				<div style="margin-top:20px;margin-bottom:5px;height:50px">
-					<a href="/about" style="position:absolute;padding:15px 15px 15px 30px;text-decoration:underline">Learn more</a>
-					<a href="/apply" id="apply-btn" class="btn" style="float:right">We're in beta - request an invite!</a>
+				<!-- Find, build and share resources with teachers across the hall or across the world — aligned with <%= render 'layouts/commoncorelogo' %> -->
+				<a href="/apply" id="apply-btn" class="btn">Sign up for our Beta!</a>
+				<span class='separator'>&nbsp;</span>		
+				<div class="action-items">
+					<p>Know a great educator?</p>
+					<!-- <a href="/about" style="padding:15px 15px 15px 30px;text-decoration:underline">Learn more</a> -->
+					<a class="btn nominate-btn">Send them an invite</a>
 				</div>
-
 			</div>
-
-
 		</div>
 
-
-
-
-
 		<div class="sectright">
-
 			<div class="spotlight_feed">
 				<div class="announcer">
 					<%= image_tag('common/plane.png', :style => "margin: -2px 3px 0 0") %>
 					What's happening now
 				</div>
 
-
 				<div class="feedster">
-
 					<% (Setting.f("fpfeatured").v.nil? ? [] : [Binder.find(Setting.f("fpfeatured").v.last["top"]), Binder.find(Setting.f("fpfeatured").v.last["bot"])]).each do |binder| %>
 						<div class="itemwrap">
 							<div class="imgarea">
@@ -42,7 +39,6 @@
 									<img src="<%= teacher_thumb_md(binder.find_owner) %>" />
 								</a>
 							</div>
-
 
 							<div class="namester">
 								<a href="/<%= binder.find_owner.username %>"><%= binder.find_owner.full_name %></a> posted to <%= link_to(truncate(binder.root, :length => 30 - binder.find_owner.full_name.size, :omission => "..."), named_binder_route(binder.parent["id"])) %>
@@ -53,24 +49,17 @@
 									<%= link_to(image_tag(explore_binder_thumb_lg(binder)), named_binder_route(binder)) %>
 								</div>
 
-
 								<div class="contitle">
 									<%= link_to(binder.title, named_binder_route(binder)) %>
 								</div>
-
-
 
 								<div style="clear:both"></div>
 							</div>
 						</div>
 					<% end %>
-
 				</div>
-
 			</div>
-
 		</div>
-
 	</div>
 </div>
 
@@ -90,64 +79,83 @@
 
 
 
-		<div class="container pubfoot">
-			<div class="tribox">
-				<a href="/pioneers">
-					<div class="pioneertitle">
-						Meet the pioneers on Claco
-					</div>
-
-					<div class="conr">
-						<center>
-							<img class="pcht" src="<%= get_binder_image(Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).last) %>" />
-							<div class="tname"></div>
-						</center>
-					</div>
-				</a>
+<div class="container pubfoot">
+	<div class="tribox">
+		<a href="/pioneers">
+			<div class="pioneertitle">
+				Meet the pioneers on Claco
 			</div>
 
-
-
-<div class="tribox">
-	<a href="http://blog.claco.com/" target="_blank">
-		<div class="pioneertitle">
-			Latest from our blog
-		</div>
-
-		<div class="conr">
-			<div class="blogt"></div>
-			<div class="blogtext">
-
-				Loading...
-
+			<div class="conr">
+				<center>
+					<img class="pcht" src="<%= get_binder_image(Binder.find(Setting.f("pioneer").v).children.sort_by(&:order_index).last) %>" />
+					<div class="tname"></div>
+				</center>
 			</div>
+		</a>
+	</div>
+
+	<div class="tribox">
+		<a href="http://blog.claco.com/" target="_blank">
+			<div class="pioneertitle">
+				Latest from our blog
+			</div>
+
+			<div class="conr">
+				<div class="blogt"></div>
+				<div class="blogtext">
+					Loading...
+				</div>
+			</div>
+		</a>
+	</div>
+
+	<div class="tribox" style="border-right:none">
+		<div style="font-size:30px; font-weight:bolder; color:#555; line-height:38px; margin-left:10px">
+			We <span style="font-size:40px; color:#F70808">♥</span> educators!
 		</div>
-	</a>
-</div>
 
+		<div class="pioneertitle" style="margin:15px 5px 0 10px">
+			Spread the love :)
+		</div>
 
+		<div class="conr" style="margin-left:10px">
+			<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.claco.com&amp;send=false&amp;layout=box_count&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=90&amp;appId=213954741999891" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:50px; height:70px; margin-right:10px" allowTransparency="true"></iframe>
 
-<div class="tribox" style="border-right:none">
-	<div style="font-size:30px; font-weight:bolder; color:#555; line-height:38px; margin-left:10px">
-		We <span style="font-size:40px; color:#F70808">♥</span> educators!
-	</div>
+			<iframe allowtransparency="true" frameborder="0" marginwidth="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?url=http%3A%2F%2Fwww.claco.com%2F&amp;size=tall&amp;count=true&amp;annotation=&amp;width=120&amp;hl=en-US&amp;jsh=m%3B%2F_%2Fapps-static%2F_%2Fjs%2Fwidget%2F__features__%2Frt%3Dj%2Fver%3DSXEYxs5FO0c.en_US.%2Fsv%3D1%2Fam%3D!KW4lzGmbF_KIhSW8Og%2Fd%3D1%2F#id=I1_1327178530968&amp;parent=http%3A%2F%2Fwww.claco.com&amp;rpctoken=350075819&amp;_methods=onPlusOne%2C_ready%2C_close%2C_open%2C_resizeMe" style="border:none; overflow:hidden; width:50px; height:70px;margin-bottom:-1px;margin-right:10px" title="+1"></iframe>
 
-	<div class="pioneertitle" style="margin:15px 5px 0 10px">
-		Spread the love :)
-	</div>
-
-	<div class="conr" style="margin-left:10px">
-		<iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.claco.com&amp;send=false&amp;layout=box_count&amp;width=450&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;font&amp;height=90&amp;appId=213954741999891" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:50px; height:70px; margin-right:10px" allowTransparency="true"></iframe>
-
-		<iframe allowtransparency="true" frameborder="0" marginwidth="0" scrolling="no" src="https://plusone.google.com/_/+1/fastbutton?url=http%3A%2F%2Fwww.claco.com%2F&amp;size=tall&amp;count=true&amp;annotation=&amp;width=120&amp;hl=en-US&amp;jsh=m%3B%2F_%2Fapps-static%2F_%2Fjs%2Fwidget%2F__features__%2Frt%3Dj%2Fver%3DSXEYxs5FO0c.en_US.%2Fsv%3D1%2Fam%3D!KW4lzGmbF_KIhSW8Og%2Fd%3D1%2F#id=I1_1327178530968&amp;parent=http%3A%2F%2Fwww.claco.com&amp;rpctoken=350075819&amp;_methods=onPlusOne%2C_ready%2C_close%2C_open%2C_resizeMe" style="border:none; overflow:hidden; width:50px; height:70px;margin-bottom:-1px;margin-right:10px" title="+1"></iframe>
-
-		<iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=vertical&text=I'm a pioneer! %23UnitedWeTeach&url=http://www.claco.com" style="width:55px; height:70px;"></iframe>
+			<iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=vertical&text=I'm a pioneer! %23UnitedWeTeach&url=http://www.claco.com" style="width:55px; height:70px;"></iframe>
+		</div>
 	</div>
 	
+	<div style="clear:both"></div>
 </div>
 
 
+<div id="nominate-popup" class="hidden">
+  <div class="headtitle">
+		Share the love! 
+  </div>
 
-<div style="clear:both"></div>
+  <div class="errorBox"></div>
 
+	<p class="alert alert-success hidden"></p>
+
+	<p class="alert alert-error hidden"></p>
+
+  <form action="/nominate" class="bodcon" id="nominate-form">
+    <h3 style="font-size:11px;"> Leave your name so (s)he can thank you:</h3>
+
+    <input maxlength="50" name="inviter" class="firstfocus invite-email" type="text" placeholder="Your full name" required/>
+
+		<h3 style="font-size:11px;"> Invite Teachers to our exclusive beta!</h3> 
+    <input maxlength="50" name="emails[]" class="invite-email" type="email" placeholder="Enter an awesome teacher's email!" value="" required/>
+    <input maxlength="50" name="emails[]" class="invite-email" type="email" placeholder="Enter an awesome teacher's email!" value=""/>
+
+    <div class="buttonbar">
+       <button class="btn btn-primary showloader" type="submit">Send Nomination!</button>
+       <button class="btn" type="reset" onClick="closefBox()">Cancel</button>
+    </div>
+
+  </form>
 </div>

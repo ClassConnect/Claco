@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow, :goodies]
+	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow, :goodies, :press]
 
 	def index
 		@title = "Claco"
@@ -265,9 +265,9 @@ class HomeController < ApplicationController
 		# expires_in 1.hour
 	end
 
-	# def explore_detail
-	# 	@title = "Explore Detail"
-	# end
+	def press
+		@title = "Claco Press Kit"
+	end
 
 	def privacy
 		@title = "Privacy Policy"

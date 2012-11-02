@@ -14,7 +14,7 @@
 <div class="container">
     <div class="sectr" style="margin-top:-80px">
       <div style="float:left;margin-right:30px">
-        <%= image_tag "public/press/fastcompany.png" %>
+        <%= image_tag "public/press/fastcompany.jpg" %>
       </div>
       <div class="text" style="margin-top:20px">
         <div class="headtext">
@@ -30,7 +30,7 @@
 
     <div class="sectr">
       <div style="float:right;margin-left:30px">
-        <%= image_tag "public/press/huffington.png" %>
+        <%= image_tag "public/press/huffington.jpg" %>
       </div>
       <div class="text" style="margin-top:20px; margin-left:10px;">
         <div class="headtext">
@@ -62,8 +62,11 @@
       <div style="clear:both"></div>
     </div>
 
-    <h1 style="text-align:center;margin-top:30px"><a href="http://www.claco.com/eric/portfolio/Claco-Press/Press/505769ff2d435d000200028c">View more press here &rarr;</a></h1>
-    <h2 style="text-align:center;margin-top:0px">
-      <%= link_to('Download Press Kit', "press_kit.zip") %>
-    </h2>
+
+    <div class="buttoners pagination-centered">
+      <%= link_to('Download Press Kit', "press_kit.zip", :class => "btn") %>
+      <a class="btn btn-success" href="http://www.claco.com/eric/portfolio/Claco-Press/Press/505769ff2d435d000200028c">
+        View more press here &rarr;
+      </a>
+    </div> 
 </div>

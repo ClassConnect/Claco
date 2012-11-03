@@ -5,6 +5,7 @@
 <% else %>
 	<% content_for :headcon do %>
 		<%= stylesheet_link_tag "home/public", :media => "all" %>
+		<link rel="canonical" href="http://www.claco.com" />
 	<% end %>
 
 	<% cache('publichome') do %>

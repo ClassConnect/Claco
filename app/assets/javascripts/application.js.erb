@@ -195,9 +195,12 @@ function selectPickFolder(fObj) {
 
 }
 
+/* helpers */
+
 function getQueryHash() {
     // returns a map of query parameters
-    function getParameterByName(name) {
+    var queryMap = {},
+    	getParameterByName = function (name) {
         // returns value of named query param
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regexString = "[\\?&]" + name + "=([^&#]*)";
@@ -209,11 +212,52 @@ function getQueryHash() {
             return decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 
-    var queryMap={};
     location.search.replace(/[A-Z0-9]+?=(\w*)/gi,
         function(ae) {
             key = ae.split("=").shift();
             queryMap[key] = getParameterByName(key);
         });
+
     return queryMap;
 }
+
+// ! we all mess up sometimes -- @diwank
+// function perform (action, target) {
+// 	var actions = {};
+	
+// 	// actions library
+// 	actions.toggle = function /*toggle*/(_target) {
+// 		// coerce target & source into jQuery objects
+// 		var _source = 
+// 			(jQuery(_target).length)
+// 			? jQuery(_target)
+// 			: jQuery('[data-target='+_target+']');	// source element has data-target property
+
+// 		_target = 
+// 			(jQuery(_target).length) 
+// 			? jQuery(_target) 
+// 			: jQuery('[data-href='+_target+']'); // target element has data-href property
+		
+// 		// toggle source
+// 		_source
+// 			.parent('li')
+// 			.siblings('li')
+// 			.removeClass('active');
+// 			// ! this shouldn't be here; ask diwank to fix it
+// 		_source
+// 			.parent('li')
+// 			.addClass('active');
+		
+// 		// toggle target
+// 		_target
+// 			.siblings('[data-href]')
+// 			.addClass('hidden');
+
+// 		_target.removeClass('hidden');
+
+// 		return _target;
+// 	}
+
+// 	// do action
+// 	return actions[action](target);
+// }

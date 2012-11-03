@@ -62,9 +62,15 @@
 <div class="container">
 
 	<div id="paneleft">
-		<div class="announcer">Your Binders</div>
+		<div class="announcer">
+			<h4>Binders</h4>
+			<ul class="nav nav-pills pull-right" id="binder-tabs">
+              <li class="active"><a href="#" data-action="toggle" data-target="personal_binders">Personal</a></li>
+              <li><a href="#" data-action="toggle" data-target="shared_binders">Shared</a></li>
+            </ul>
+		</div>
 
-		<div class="whitebox">
+		<div class="whitebox" data-href="personal_binders">
 			<% Binder.where(:owner => current_teacher.id, "parent.id" => "0").each do |binder| %>
 			<a href="<%= named_binder_route(binder) %>">
 				<div class="bindir">
@@ -73,7 +79,16 @@
 				</div>
 			</a>
 			<% end %>
+		</div>
 
+		<!-- fuck you pai; fix the shared binders -->
+		<div class="whitebox hidden" data-href="shared_binders">
+			<a href="/diwank/portfolio/hello-world/5088356bd9ade5069000002c">
+				<div class="bindir">
+					<div class="binder_attr">&gt;</div>
+					<div class="binder_name">shit works</div>
+				</div>
+			</a>
 		</div>
 
 <div style="height:70px;margin-left:25px">

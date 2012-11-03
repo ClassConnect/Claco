@@ -342,7 +342,26 @@ position:absolute;
 	font-size:14px;
 	font-weight:bolder;
 	text-shadow: 0 1px 0 #fff;
-	padding:8px;
+	padding: 8px;
+}
+
+#paneleft .announcer h4 {
+	display: inline-block;
+	line-height: 1.8;
+}
+
+.announcer .nav-pills {
+	margin: 0;
+	font-size: 80%;
+	font-weight:normal;
+	text-shadow: none;
+
+}
+
+.announcer .nav-pills a {
+	/*margin: 0;*/
+	padding: 3px 6px;
+	border-radius: 2px;
 }
 
 #paneleft .whitebox{

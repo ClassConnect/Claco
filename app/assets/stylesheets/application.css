@@ -16,6 +16,13 @@ footer {
   color:#666;
 }
 
+.common-logo {
+  background: white;
+  padding: 0px 8px 1px 4px;
+  border-radius: 3px;
+  margin-left: 2px;
+}
+
 #emailInviter {
   display: none;
   text-align: center;
@@ -493,8 +500,6 @@ footer {
   padding-left: 5px;
 }
 
-/* helpers */
-
 .truncate {
   /*width: 250px;*/
   white-space: nowrap;
@@ -507,8 +512,25 @@ footer {
 }
 
 .hidden {
-  height: 0;
-  width: 0;
   display: none;
   visibility: hidden;
+  height: 0;
+  width: 0;
+}
+
+input:focus:required:invalid,
+textarea:focus:required:invalid,
+select:focus:required:invalid {
+  color: inherit;
+  border-color: #049cbd;
+}
+
+input:focus:required:invalid:focus,
+textarea:focus:required:invalid:focus,
+select:focus:required:invalid:focus {
+  border-color: rgba(82, 168, 236, 0.8);
+
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 }

@@ -19,4 +19,80 @@ $(document).ready(function() {
 		window.location = $('a#forgot_link').attr('href');
 	});
 
+	$('.nominate-btn').click(function() {
+		jQuery.facebox({ div: '#nominate-popup' });
+	});
+
+
+  $(document).bind('reveal.facebox', function(){
+		$("#facebox .firstfocus").focus();
+
+		fieldAdder();
+
+		// set the form handler
+		$('#facebox #nominate-form').submit(function(e) {
+			$.ajax({
+				type: "POST",
+				url: $(this).attr('action'),
+				data: $(this).serialize()
+			
+			}).done(function /*onSucuess*/ (data, error) {
+				notifyMessage('.alert-success', "Awesome! Thanks for sharing Claco");
+			}).fail(function /*onFailure*/ (data, error) {
+				notifyMessage('alert-error', data.statusText);
+				alert("error");
+				console.log("data", data);
+				console.log('error', error);
+			});
+
+			return false;
+	  });
+	});
 });
+
+function validate (form){
+	var rules = {};						// validation rules
+	rules.required =
+		['', 'weblink', 'binderUrl'];
+
+	form.find('button[type=submit]')
+		.removeAttr('disabled');
+	
+	$(rules.required).each(function(i, elem){
+		var field = form.find('*[name='+elem+']');
+		if(!field.val()){
+			field.focus();
+			form.find('button[type=submit]')
+				.attr('disabled','disabled');
+		}
+	});
+}
+
+function notifyMessage(target, message) {
+	$('#facebox #nominate-form').addClass('hidden');
+		
+		$('#facebox ' + target)
+			.removeClass('hidden')
+			.html(message);
+
+		window.setTimeout(function(){
+			$(document).trigger('close.facebox');
+		}, 1000);
+};
+
+function fieldAdder() {
+  $('#facebox input.invite-email').last()
+  	.css('opacity', 0.4);
+
+	$('#facebox input.invite-email').last()
+		.on('focus',
+		  function () {
+				if($('#facebox input.invite-email').last().prev().val() != '') {
+				  $('#facebox .buttonbar').first()
+		      .before('<input maxlength="50" name="emails[]" class="invite-email" type="email" placeholder="Enter an awesome teacher\'s email!" value=""/>');
+			  }
+			  $('#facebox input.invite-email').off('focus');
+			  $('#facebox input.invite-email').css('opacity', 1);
+				fieldAdder();
+		  });
+}

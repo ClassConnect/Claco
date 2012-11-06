@@ -6,8 +6,8 @@
 		<meta property="og:image" content="<%= asset_path('public/claco_solid.png') %>"/> 
 
 		<%= stylesheet_link_tag "strap", :media => "all" %>
-		<%= stylesheet_link_tag "application", :media => "all" %>
 		<%= stylesheet_link_tag "jqueryui", :media => "all" %>
+		<%= stylesheet_link_tag "application", :media => "all" %>
 
 		<%= yield :headcon %>
 		<%= csrf_meta_tags unless response.cache_control[:public] %>
@@ -40,7 +40,9 @@
 			<hr>
 
 			<footer>
-			<p>&copy; Claco 2012 &nbsp;&nbsp;&nbsp;<a href="/">Home</a> / <a href="/about">About</a> /  <a href="/unitedweteach">#UnitedWeTeach</a> / <a href="#" onclick="olark('api.box.expand'); return false">Contact</a> / <a href="/goodies">Goodies</a> <span style="float:right;font-size:11px"><a href="http://schoolspeedtest.org/" target="_blank"><%= image_tag("public/highway.jpg", :style => "margin-right:20px;opacity: 0.50;filter: alpha(opacity=50);") %></a>Claco&trade; &bull; <a href="/legal/tos" target="_blank">Terms of Service</a> &bull; <a href="/legal/privacy" target="_blank">Privacy Policy</a></span></p>
+			<p>
+				&copy; Claco 2012 &nbsp;&nbsp;&nbsp;<a href="/">Home</a> / <a href="/about/team">Team Claco</a> /  <a href="/unitedweteach">#UnitedWeTeach</a> / <a href="/press">Press</a> / <a href="/goodies">Goodies</a> <span style="float:right;font-size:11px"><a href="http://schoolspeedtest.org/" target="_blank"><%= image_tag("public/highway.jpg", :style => "margin-right:20px;opacity: 0.50;filter: alpha(opacity=50);") %></a>Claco&trade; &bull; <a href="/legal/tos" target="_blank">Terms of Service</a> &bull; <a href="/legal/privacy" target="_blank">Privacy Policy</a></span>
+			</p>
 			</footer>
 		</div>
 		<% end %>
@@ -48,6 +50,7 @@
 
 
 		<%= javascript_include_tag "application" %>
+		<%= javascript_include_tag "facebox" %>
 		<% #javascript_include_tag "dropdown", :defer => "defer" %>
 		<% if signed_in? && current_teacher.getting_started %>
 
@@ -61,7 +64,6 @@
 		<%= javascript_include_tag "gen/cookie" %>
 		<%= javascript_include_tag "gen/sticky" %>
 		<%= javascript_include_tag "gen/boxresize" %>
-		<%= javascript_include_tag "facebox" %>
 		<%= javascript_include_tag "tabs" %>
 		<%= javascript_tag "$('a.pjax').pjax('[data-pjax-container]');$.pjax.defaults.timeout = 5000;$.pjax.defaults.maxCacheLength=0;" %>
 		<%= javascript_include_tag "tooltip" %>

@@ -11,6 +11,12 @@ class AdminController < ApplicationController
 
 	end
 
+	def nominees
+
+		@nominees = Nominee.page(params[:page]).per(100)
+
+	end
+
 	def invites
 
 		@invites = Invitation.page(params[:page]).per(100)

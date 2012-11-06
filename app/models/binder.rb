@@ -544,7 +544,7 @@ class Binder
 
 		# 	#URL2PNG
 
-		# 	# debugger
+		# 	# #debugger
 
 		# 	query = {
 		# 		:url => self.current_version.data,

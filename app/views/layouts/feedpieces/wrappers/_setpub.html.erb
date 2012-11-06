@@ -1,21 +1,3 @@
-<% if !@f[:array] %>
-
-	<div class="thetitle">
-		<% if @teacher_activity.nil? || (!current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s) %>
-			You shared <a href="<%= named_binder_route(@f[:model]) %>"><%= @f[:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
-		<% else %>
-			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> shared <a href="<%= named_binder_route(@f[:model]) %>"><%= @f[:model].title %></a> <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
-		<% end %>
-	</div>
-
-<% else %>
-
-	<div class="thetitle">
-		<% if @teacher_activity.nil? || (!current_teacher.nil? && current_teacher.id.to_s==@f[:owner].id.to_s) %>
-			You shared <%= @f[:array].size %> resources <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
-		<% else %>
-			<a href="<%= "/#{@f[:owner].username}" %>"><%= "#{@f[:owner].fname} #{@f[:owner].lname}" %></a> shared <%= @f[:array].size %> resources <%= time_ago_in_words(Time.at(@f[:log]['timestamp']).to_datetime) %> ago.
-		<% end %>
-	</div>
-
-<% end %>
+<div class="thetitle">
+	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> shared <%= @howmany %> resource<%= @mult ? 's' : ''%> <%= @when %> ago.
+</div>

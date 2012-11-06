@@ -23,21 +23,21 @@ class Feedobject
 	def generate
 		raise 'Undefined feedobject class!' if self.oclass.empty?
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
-		Rails.cache.delete("#{self.id.to_s}/feedobject")
+		Rails.cache.delete("feedobject/#{self.id.to_s}")
 	end
 
-	def wipe
+	def softwipe
 		self.update_attributes(:markup => '')
 	end
 
 	# implement state machine for feedobjects, returns html
 	def html
-		html = Rails.cache.read("#{self.id.to_s}/feedobject")
+		html = Rails.cache.read("feedobject/#{self.id.to_s}")
 		if html.nil?
 			self.generate
-			Rails.cache.write("#{self.id.to_s}/feedobject",self.markup)
+			Rails.cache.write("feedobject/#{self.id.to_s}",self.markup)
 			html = self.markup
-			self.wipe
+			self.softwipe
 		end
 		html
 	end

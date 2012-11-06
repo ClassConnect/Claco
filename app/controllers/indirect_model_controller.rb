@@ -64,32 +64,77 @@ class IndirectModelController < AbstractController::Base
       # end
     elsif obj.class == Wrapper
 
+      #debugger
+
       @mult = obj.multiplicity?
-      @time = time_ago_in_words(Time.at(obj.timestamp).to_datetime)
-
-
-
-      #if obj.
+      @howmany = obj.objnum
+      @who = Teacher.find(obj.whoid)
+      @wholink = "/#{@who.username}"
+      @when = time_ago_in_words(Time.at(obj.timestamp).to_datetime)
 
       case obj.wclass
+      when 'createcontent'
+
+        @what = Binder.find(obj.whatid)
+        if @what.parents.size==2
+          @where = Binder.find(@what.parent['id'])
+          @wherelink = named_binder_route(@where)
+        else
+          @where = Binder.find(@what.parents[1]['id'])
+          @wherelink = named_binder_route(@where)
+        end
+
+        render template: "layouts/feedpieces/wrappers/_createcontent"
       when 'createfile'
 
-
+        @what = Binder.find(obj.whatid)
+        if @what.parents.size==2
+          @where = Binder.find(@what.parent['id'])
+          @wherelink = named_binder_route(@where)
+        else
+          @where = Binder.find(@what.parents[1]['id'])
+          @wherelink = named_binder_route(@where)
+        end 
 
         render template: "layouts/feedpieces/wrappers/_createfile"
       when 'update' 
 
+        @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
+        @whatlink = named_binder_route(@what)
+        if @howmany>1
+          @what2 = Binder.find(Feedobject.find(obj.feedobjectids.second).binderid)
+          @whatlink2 = named_binder_route(@what2)
+          if @howmany>2
+            @what3 = Binder.find(Feedobject.find(obj.feedobjectids.third).binderid)
+            @whatlink3 = named_binder_route(@what2)
+          end
+        end
+
         render template: "layouts/feedpieces/wrappers/_update"
       when 'forkitem' 
 
-        render template: "layouts/feedpieces/wrappers/_forkitem"
-      when 'favorite'
+        @what = Binder.find(obj.whatid)
+        @whatlink = named_binder_route(@what)
+        if !@mult
+          @whoelse = Teacher.where(:username => Log.find(Feedobject.find(obj.feedobjectids.first).logid).params['username'].to_s).first
+          @whoelselink = "/#{@whoelse.username}"
+        end
 
-        render template: "layouts/feedpieces/wrappers/_favorite"
+        render template: "layouts/feedpieces/wrappers/_forkitem"
+      # when 'favorite'
+
+      #   @what = Binder.find(self.whatid)
+      #   @where = 
+
+      #   render template: "layouts/feedpieces/wrappers/_favorite"
       when 'setpub'
+
+        # requires nothing additional
 
         render template: "layouts/feedpieces/wrappers/_setpub"
       when 'sub'
+
+        @what = Teacher.find(self.whatid)
 
         render template: "layouts/feedpieces/wrappers/_sub"
       else
@@ -98,9 +143,17 @@ class IndirectModelController < AbstractController::Base
     end
   end
 
+  def expire_fragment(id)
+
+    #debugger
+
+    expire_fragment(id)
+
+  end
+
   def render_partial(params)
 
-    debugger
+    #debugger
 
     if true
       return

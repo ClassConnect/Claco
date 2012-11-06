@@ -8,20 +8,12 @@ class Feed
 
 	embeds_many :wrappers
 
-	def size
+	def total
 		return self.wrappers.size
 	end
 
-	#def 
-
 	def generate
-
-		retstr = ''
-
-		self.wrappers.each do |f|
-			retstr += f.retrieve
-		end
-
+		self.wrappers.each { |f| f.generate }
 	end
 
 	# for now, this remains class-invariant
@@ -129,7 +121,8 @@ class Feed
 							# create a key for an owner and an action
 							similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
-							f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
+							# this can be cut down greatly
+							f = { :model => model, :ownerid => f[:ownerid].to_s, :log => f }	
 
 							# if there are no members in the duplist, create a new action in each tracking hash
 							if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
@@ -181,14 +174,16 @@ class Feed
 			@subsfeed.each do |f|
 				#self.wrappers << Wrapper.new()#.generate(f))
 				#f = [f] if f.size==1
-				debugger
-				self.wrappers << Wrapper.new(	timestamp: 	f.first[:log].timestamp,
+				#debugger
+				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],
+												whatid: 	f.first[:log].modelid,
+												timestamp: 	f.first[:log].timestamp,
 												logids: 	f.map { |g| g[:log].id.to_s },
 												wclass: 	f.first[:log][:method])
 												# :logids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
 												# :wclass => (f.class==Array ? f.first[:log][:method] : f[:method]))
 				self.save
-				self.wrappers.last.generate#(f)
+				#self.wrappers.last.generate#(f)
 				#self.wrappers.last.generate(f)
 				#debugger
 				retstr += self.wrappers.last.html
@@ -202,22 +197,27 @@ end
 class Wrapper
 	include Mongoid::Document
 
-	# model IDs
+	# model IDs for child invalidation
 	field :teachers, 		:type => Array, 	:default => []
 	field :binders, 		:type => Array, 	:default => []
 
 	# used for self-referential identification
-	field :ownerid,			:type => String, 	:default => ''
+	field :whoid,			:type => String, 	:default => ''
+	field :whatid,			:type => String, 	:default => ''
+	field :whereid,			:type => String,	:default => ''
 
 	# all feedobjects are references to the feedobject model
 	field :timestamp,		:type => Float,		:default => 0.0
-	field :content, 		:type => String, 	:default => ""
+	field :markup,	 		:type => String, 	:default => ""
 	field :logids,			:type => Array, 	:default => []
 	field :feedobjectids, 	:type => Array, 	:default => []
 	field :wclass, 			:type => String, 	:default => ""
 
 	embedded_in :feed
 
+	after_initialize do
+		self.generate
+	end
 
 	# called when retrieving or refreshing the feed
 	def html
@@ -231,27 +231,24 @@ class Wrapper
 		# end
 
 		# initially, don't cache any of this, generate on the fly
-		retstr = ''
-		#retstr = IndirectModelController.new.pseudorender(self)
-		#self.update_attributes(:content => retstr)
-		debugger
-		self.feedobjectids.each { |f| retstr += Feedobject.find(f).html }
-		retstr	
+		html = Rails.cache.read("wrapper/#{self.id.to_s}")
+		if html.nil?
+			self.generate
+			Rails.cache.write("wrapper/#{self.id.to_s}",self.markup)
+			html = self.markup
+		end
+		self.feedobjectids.each { |f| html += "<div class=\"feedcontent\">#{Feedobject.find(f).html}</div>" }
+		html = "<div class=\"newsitem\"><div class=\"imgarea\"></div>#{html}<div style=\"clear:both\"></div></div>"
+		html	
 
 	end
 
 	# this will be called on both new wrappers and already populated wrappers
 	def generate#(a=nil,b=nil,c=nil) #(feedobj)
 
-		# wrapper is not being stored 
-		# extract IDs, generate wrapper, generate feedobject(s) 
-		# if feedobj.class==Array
-		# 	self.update_attributes(	:wclass => feedobj.first[:method].to_s,
-		# 							:feedobjectids => (feedobj.map { |f| f[:log].id.to_s }))
-		# else
-		# 	self.update_attributes(	:wclass => feedobj[:method].to_s,
-		# 							:feedobjectids => [feedobj[:log].id.to_s] )
-		# end
+		raise 'Undefined wrapper class!' if self.wclass.empty?
+		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
+		Rails.cache.delete("wrapper/#{self.id.to_s}")
 
 		#debugger
 
@@ -300,6 +297,10 @@ class Wrapper
 	end
 
 	def multiplicity?
-		self.feedobjectids.size > 1
+		self.objnum > 1
+	end
+
+	def objnum
+		self.feedobjectids.size
 	end
 end

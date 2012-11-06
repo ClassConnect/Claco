@@ -77,6 +77,8 @@ class Teacher
 
 	field :feed_ids, :type => Array, :default => []
 
+	field :recommend_ids, :type => Array, :default => []
+
 	field :admin, :type => Boolean, :default => false
 
 	embeds_one :info#, autobuild: true #, validate: false
@@ -108,7 +110,7 @@ class Teacher
 
 
 	# after_save do
-	# 	debugger
+	# 	#debugger
 	# 	#Rails.logger.debug "AFTER_SAVE got here!"
 	# 	self.tire.update_index
 	# 	#self.tire.index.delete
@@ -147,6 +149,12 @@ class Teacher
 
 	end
 
+	# Tire.index 'teachers' do
+	# 	import Teacher.all do |ts|
+	# 		ts.each { |t| t[:id] = t[:id].to_s }
+	# 	end
+	# 	refresh
+	# end
 
 	settings analysis: {
 		filter: {
@@ -167,9 +175,12 @@ class Teacher
 		}
 	} 	do
 		mapping do
-			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
-			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 400.0
-			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
+			indexes :_id,		:index => 'not_analyzed',		:store => 'yes', :include_in_all => false
+			#indexes :id,		:type => 'string',	:index => 'not_analyzed',		:store => 'yes', :include_in_all => false #,		:type => 'string',	:store 	  => 'yes' #, 	:index 	  => 'not_analyzed',   :store => 'yes'
+			indexes :stringid,	:type => 'string', 	:as => 'id.to_s' #, 	:analyzer => 'ngram_analyzer'
+			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', 	:boost => 200.0
+			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', 	:boost => 400.0
+			indexes :username, 	:type => 'string', 	:boost => 100.0 # :analyzer => 'ngram_analyzer', 
 			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 			=> { :type => 'object', :properties => { :username 	=> 	{ :type => 'string', :analyzer => 'ngram_analyzer' },
 																															 	 :uid 		=> 	{ :type => 'object', :enabled => false },
 																																 :profile 	=> 	{ :type => 'object', :enabled => false },
@@ -791,7 +802,7 @@ class Teacher
 	def self.dijkstra (network,tid)
 
 
-		# debugger
+		# #debugger
 
 		#network = network_orig.clone
 
@@ -887,18 +898,24 @@ class Teacher
 
 	def recommends (count = 5)
 
-		#subs = self.subscriptions(2) - self.subscriptions(1)
 
-		# pre-seed!
+		#   invalidate the generated HTML
+		#Rails.cache.delete("recommendations/html/#{self.teacher.id.to_s}")
+		
+		#self.teacher.update_attribute(:recommend_ids,(recs = self.teacher.recommends))
 
-		# keys = Rails.cache.read("self.id.to_s}recs")
+		#   prepare the recommendation IDS for the newly generated HTML
+		#Rails.cache.write("recommendations/ids/#{self.teacher.id.to_s}",recs)
 
-		# return if keys.nil?
 
-		# Rails.cache.delete("self.id.to_s}recs")
-		#debugger
+		# no up-to-date recommendations generated
+		# if a cache instance exists, it is assumed to be up-to-date
+		#if self.recommend_ids.nil? || self.recommend_ids.empty? #Rails.cache.read("recommendations/ids/#{self.id.to_s}").nil?
 
-		if Rails.cache.read("#{self.id.to_s}recs").nil?
+			# precaution
+			#Rails.cache.delete("recommendations/html/#{self.id.to_s}")
+
+			ActionController::Base.new.expire_fragment("recommendations/#{self.id.to_s}")
 
 			subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
 
@@ -950,17 +967,19 @@ class Teacher
 				end
 			end
 
-			Rails.cache.write("#{self.id.to_s}recs",recs[0..60])
+			#Rails.cache.write("recommendations/ids/#{self.id.to_s}",recs = recs[0..59])
+
+			self.update_attribute(:recommend_ids, recs)
 
 			#debugger
 
-			return recs[0..60]
+			recs#.map { |r| Teacher.find(r).username }
+ 
+		#else
 
-		else
+			#return self.recommend_ids #Rails.cache.read("recommendations/ids/#{self.id.to_s}")
 
-			return Rails.cache.read("#{self.id.to_s}recs")
-
-		end
+		#end
 
 	end
 
@@ -1238,17 +1257,28 @@ class Relationship
 
 	# after_create do
 
-	# 	debugger
+	# 	#debugger
 	# 	Rails.cache.write("self.teacher.id.to_s}recs",true)
 
 	# end
 
 	after_save do
 
-		#debugger
-		Rails.cache.delete("#{self.teacher.id.to_s}recs")
+		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
 
+		debugger
 
+		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
+
+	end
+
+	after_destroy do
+
+		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+
+		debugger
+
+		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 
 	end
 
@@ -1345,16 +1375,26 @@ class Info
 
 		if !keys.nil?
 
-			keys.each do |f|
+			keys.each do |f|   
 				#Rails.cache.delete(f.to_s)
 				#Rails.cache.expire_fragment(f.to_s)			
 				Rails.cache.write(f.to_s,true)
 			end
 
-			Rails.cache.delete(self.teacher.id.to_s)
+			# this step may not be necessary
+			#Rails.cache.delete("recommendations/#{self.teacher.id.to_s}")
 
-			Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
+			# invalidate the generated HTML
+			#Rails.cache.delete("recommendations/html/#{self.teacher.id.to_s}")
+			#Rails.cache.delete("recommendations/ids/#{self.teacher.id.to_s}")
 
+			self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+
+			ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
+
+			# prepare the recommendation IDS for the newly generated HTML
+			#Rails.cache.write("recommendations/ids/#{self.teacher.id.to_s}",recs)
+			
 		end
 
 	end

@@ -6,6 +6,13 @@
 
 	<div style="margin-top:-15px"></div>
 	
+	<% if false %>
+
+	<% f = Feed.new %>
+	<%= raw(f.html(current_teacher.id.to_s)) %>
+
+	<% else %>
+
 	<% @subsfeed.each do |f| 
 
 		f = f.size==1 ? f.first : { :model=>f.first[:model], :owner=>f.first[:owner], :log=>f.first[:log], :array=>f } 
@@ -141,4 +148,7 @@
 			</div>
 		<% end %>
 	<% end %>
+
+	<% end %>
+
 </div>

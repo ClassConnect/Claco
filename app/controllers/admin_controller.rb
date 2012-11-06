@@ -228,13 +228,96 @@ class AdminController < ApplicationController
 			@teachers = @teachers.where(:sign_in_count.gte => params['logincountmin'].to_i, :sign_in_count.lte => params['logincountmax'].to_i)
 		end
 
-		# if params['bindercount'].present?
-		# 	@teachers = @teachers.where(Binder.where(:owner=>))
-		# end
+
+		if params['twitter'].present?
+			if params['twitpresent'].present?
+				@teachers = @teachers.where(:'omnihash.twitter'.ne => nil)
+			else
+				@teachers = @teachers.where(:'omnihash.twitter' => nil)
+			end
+		end
+
+		if params['facebook']
+			if params['fbpresent'].present?
+				@teachers = @teachers.where(:'omnihash.facebook'.ne => nil)
+			else
+				@teachers = @teachers.where(:'omnihash.facebook' => nil)
+			end
+		end
+
+		if params['avatar']
+			if params['avatarpresent'].present?
+				@teachers = @teachers.where(:'info.avatarstatus.avatar_thumb_sm.generated' => true)
+			else
+				@teachers = @teachers.where(:'info.avatarstatus.avatar_thumb_sm.generated' => false)
+			end
+		end
+
+		# bunched queries end here, tack on groups
+
+		if params['bindercount'].present?
+			#@teachers = @teachers.where(Binder.where(:owner=>))
+			#@teachers = 
+			#grouphash = {:key => 'owner',
+			#			:cond => {}, 
+			#			:initial => {:count => 0},
+			#			:reduce => "function(doc,prev) {prev.count += +1;}"}
+			#@teachers = @teachers.where(:id.in => PQuery.gen_from_groupdata(Binder,grouphash,'',params[:bindermin]..params[:bindermax]))
+			range = Range.new(params[:bindermin].to_i,params[:bindermax].to_i)
+
+			#debugger
+
+			ids = Binder.collection.group(:key => 'owner', 
+										:cond => {}, 
+										:initial => {:count=>0}, 
+										:reduce => "function(doc,prev) {prev.count += +1;}").reject{ |f| !range.cover?(f['count']) }.map{ |f| f['owner'] }#.map{ |f| { f['owner'] => f['count'].to_i } }#.reject{ |f| range.cover?(f.first[1]) }.map{ |f| f.first[0] }
+
+			#@teachers = @teachers.find(ids)
+			@teachers = @teachers.where(:_id.in => ids)
+
+		end
+
+		if params['subscriptioncount'].present?
+			range = Range.new(params[:subscriptionmin].to_i,params[:subscriptionmax].to_i)
+			map = "function() { if (this.relationships==null) return; emit(String(this._id), {count: this.relationships.length}); } }"
+			reduce = "function(key,values) { var total=0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count: total }; }" 
+			ids = Teacher.collection.map_reduce(map,reduce,:out => "mr_results").find().to_a.reject { |f| !range.cover?(f['value']['count'].to_i) }.map { |f| f['_id'] }
+			@teachers = @teachers.where(:_id.in => ids)
+		end
+
+		if params['subscribercount'].present?
+			range = Range.new(params[:subscribermin].to_i,params[:subscribermax].to_i)
+			map = "function() { if (this.relationships==null) return; for (var rel in this.relationships){ emit(this.relationships[rel].user_id, {count: 1}); } }"
+			reduce = "function(key,values) { var total=0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count: total }; }"
+			ids = Teacher.collection.map_reduce(map,reduce,:out => "mr_results").find().to_a.reject { |f| !range.cover?(f['value']['count'].to_i) }.map { |f| f['_id'] }
+			@teachers = @teachers.where(:_id.in => ids)
+		end
+
+		#debugger
+
+		#debugger
+
+		@teachers = @teachers.order_by([:registered_at, :desc]).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i)
 
 		# if params['subscriptioncount'].present?
 		# 	@teachers = @teachers.where(:)
 		# end
+
+		# MAP REDUCE
+		#
+		# this finds the number of subscribers:
+		#
+		#   map = "function() { if (this.relationships==null) return; for (var rel in this.relationships){ emit(this.relationships[rel].user_id, {count: 1}); } }"
+		#   reduce = "function(key,values) { var total=0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count: total }; }"
+		#   @results = Teacher.collection.map_reduce(map,reduce,:out => "mr_results")
+		#   @results.find().to_a
+		#   @results.find(:_id => "502ca11eaa1d2a000200000b").to_a
+
+		# subscriptions: (returns BSON ids)
+		#
+		# "function(key,values) { var total=0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count: total }; }" 
+		# map = "function() { if (this.relationships==null) return; emit(String(this._id), {count: this.relationships.length}); } }"
+		# @results = Teacher.collection.map_reduce(map,reduce,:out => "mr_results")
 
 
 	end

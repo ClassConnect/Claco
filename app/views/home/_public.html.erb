@@ -64,7 +64,11 @@
 							</div>
 						</div>
 					<% end %>
-
+					<ul class="pager">
+						<li class="next">
+						    <a href="/explore" style="margin-right: 10px">Explore &rarr;</a>
+						</li>
+					</ul>
 				</div>
 
 			</div>
@@ -78,11 +82,14 @@
 
 <div class="seenon">
 	<div class="container">
-		<div style="margin-left:150px;font-weight:bolder;font-size:14px;margin-top:-5px;margin-bottom:5px">
+		<div style="margin-left:130px;font-weight:bolder;font-size:14px;margin-top:-5px;margin-bottom:5px">
 			As seen on...
 		</div>
 		<center>
-		<%= render 'layouts/pressimgs' %>
+			<%= render 'layouts/pressimgs' %>
+			<a href="/press" class="press-link">
+				More...
+			</a>
 		</center>
 	</div>
 </div>

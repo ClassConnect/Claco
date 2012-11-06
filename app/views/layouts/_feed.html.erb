@@ -6,9 +6,11 @@
 
 	<div style="margin-top:-15px"></div>
 	
-	<% if false %>
+	<% if true %>
 
-	<% f = Feed.new %>
+	<% f = Feed.new 
+	f.save
+	%>
 	<%= raw(f.html(current_teacher.id.to_s)) %>
 
 	<% else %>

@@ -19,6 +19,8 @@ class Feed
 	# for now, this remains class-invariant
 	def html(teacherid)#,last_refresh)
 
+		#debugger
+
 		@feed = []
 		@subsfeed = []
 
@@ -168,21 +170,20 @@ class Feed
 				end
 				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 			end
+			#debugger
 
 			self.wrappers.delete_all
 
 			@subsfeed.each do |f|
 				#self.wrappers << Wrapper.new()#.generate(f))
 				#f = [f] if f.size==1
-				#debugger
-				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],
-												whatid: 	f.first[:log].modelid,
-												timestamp: 	f.first[:log].timestamp,
-												logids: 	f.map { |g| g[:log].id.to_s },
-												wclass: 	f.first[:log][:method])
+				debugger
+				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],whatid: 	f.first[:log].modelid,timestamp: 	f.first[:log].timestamp,logids: 	f.map { |g| g[:log].id.to_s },wclass: 	f.first[:log][:method])
 												# :logids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
 												# :wclass => (f.class==Array ? f.first[:log][:method] : f[:method]))
 				self.save
+
+				#debugger
 				#self.wrappers.last.generate#(f)
 				#self.wrappers.last.generate(f)
 				#debugger
@@ -215,9 +216,9 @@ class Wrapper
 
 	embedded_in :feed
 
-	after_initialize do
-		self.generate
-	end
+	#after_initialize do
+	#	self.generate
+	#end
 
 	# called when retrieving or refreshing the feed
 	def html
@@ -247,6 +248,7 @@ class Wrapper
 	def generate#(a=nil,b=nil,c=nil) #(feedobj)
 
 		raise 'Undefined wrapper class!' if self.wclass.empty?
+		debugger
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
 		Rails.cache.delete("wrapper/#{self.id.to_s}")
 

@@ -1,0 +1,39 @@
+<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
+<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<!-- <script type="text/javascript">
+	function search() {
+		window.location.href = '/admin/apps?adminq=' + document.getElementById('appsearch').value
+	}
+	function reset() {
+		window.location.href = '/admin/apps'
+	}
+</script>
+<input type="text" id="appsearch" />
+<button onclick="search()">Search</button>
+<button onclick="reset()">Reset</button> -->
+<table>
+<tr>
+<td>From</td>
+<td>Email</td>
+<td>Timestamp</td>
+<td>Status</td>
+</tr>
+<% @nominees.each do |nom| %>
+<tr>
+<td><%= nom.from %></td>
+<td><%= nom.email %></td>
+<td><%= time_ago_in_words(Time.at(nom.timestamp).to_datetime) %> ago</td>
+<td><% if nom.status == 0 %>
+		Approve<%# link_to("Approve", nom_approve_path(nom)) %> |
+		Deny<%# link_to("Deny", nom_deny_path(nom)) %>
+	<% else %>
+		<%= nom.status == 1 ? "Approved" : "Denied" %>
+	<% end %></td>
+</tr>
+<% end %>
+</table>
+<% begin %>
+	<%= paginate(@nominees) %>
+	<%= page_entries_info(@nominees).html_safe %>
+<% rescue %>
+<% end %>

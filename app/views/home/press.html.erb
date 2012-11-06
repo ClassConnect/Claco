@@ -1,0 +1,71 @@
+<% content_for :headcon do %>
+  <%= stylesheet_link_tag "home/pub/press", :media => "all" %>
+<% end %>
+
+<div class="splashback">
+  <div class="container">
+    <div class="tagline">
+      We're Team Claco.<br /><br />
+      Read about how we're changing the world.
+    </div>
+  </div>
+</div>
+
+<div class="container">
+    <div class="sectr" style="margin-top:-80px">
+      <div style="float:left;margin-right:30px">
+        <%= image_tag "public/press/fastcompany.jpg" %>
+      </div>
+      <div class="text" style="margin-top:20px">
+        <div class="headtext">
+          &ldquo;Software [that] is revolutionizing the classroom and the way kids can learn.&rdquo;
+        </div>
+        <p>
+          ~ <a href="http://www.fastcoexist.com/1680263/classconnect-a-platform-to-make-the-best-lessons-open-to-everyone" target="_blank">FastCompany</a>
+        </p>
+      </div>
+
+      <div style="clear:both"></div>
+    </div>
+
+    <div class="sectr">
+      <div style="float:right;margin-left:30px">
+        <%= image_tag "public/press/huffington.jpg" %>
+      </div>
+      <div class="text" style="margin-top:20px; margin-left:10px;">
+        <div class="headtext">
+          &ldquo;Educators need a place where we can share easily and effortlessly, and [Claco] has a shot at a long-term solution.&rdquo;
+        </div>
+
+        <p>
+          ~ <a href="http://www.huffingtonpost.com/adam-kirk-edgerton/thirty-minutes-with-eric-_b_1875909.html" target="_blank">Huffington Post</a>
+        </p>
+      </div>
+
+      <div style="clear:both"></div>
+    </div>
+
+    <div class="sectr">
+      <div style="float:left;margin-right:30px;">
+        <%= image_tag "public/press/techcrunch.jpg" %>
+      </div>
+      <div class="text" style="margin-top:20px;">
+        <div class="headtext">
+          &ldquo;Claco can become a 'teacher graph'&rdquo;
+        </div>
+
+        <p>
+          ~ <a href="http://techcrunch.com/2012/09/26/after-2-months-of-squatting-at-aol-eric-simons-launches-claco-the-github-for-teachers/" target="_blank">TechCrunch</a>
+        </p>
+      </div>
+
+      <div style="clear:both"></div>
+    </div>
+
+    <div class="buttoners pagination-centered">
+      <%= link_to('Download Press Kit', "http://static.claco.com/press_kit.zip", :class => "btn") %>
+      <a class="btn btn-success" href="http://www.claco.com/eric/portfolio/Claco-Press/Press/505769ff2d435d000200028c">
+        View more press here &rarr;
+      </a>
+    </div> 
+</div>

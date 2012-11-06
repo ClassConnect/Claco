@@ -372,7 +372,7 @@ class AdminController < ApplicationController
 		# end
 
 		render 'admin/singleteacherdata'
-
+		
 	end
 
 	def sysinvlist

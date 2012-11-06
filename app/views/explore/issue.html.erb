@@ -3,19 +3,20 @@
 <% end %>
 
 <% content_for :botcon do %>
-	<script type="text/javascript">
-		$(function() {
-		    $('.thumbnail').hover(
-		    function /*onHoverIn*/() {
-		        $(this).find('.caption').css({ 
-						'margin-left': ($('.caption').text().length * -1) + 'em'
-					});
-		    }, function /*onHoverOut*/() {
-		        $(this).find('.caption')
-						 .css({ 'margin-left': 0 });
-		    });
-		});
-	</script>
+	<!-- <script type="text/javascript">
+		/* disabled until chrome fixes jittery transitions */
+		// $(function() {
+		//     $('.thumbnail').hover(
+		//     function /*onHoverIn*/() {
+		//         $(this).find('.caption').css({ 
+		// 				'margin-left': ($('.caption').text().length * -1) + 'em'
+		// 			});
+		//     }, function /*onHoverOut*/() {
+		//         $(this).find('.caption')
+		// 				 .css({ 'margin-left': 0 });
+		//     });
+		// });
+	</script> -->
 <% end %>
 
 <div class="splashback explore">
@@ -44,13 +45,14 @@
 			              <li class="span3">
 			                <a class="thumbnail" href="<%= named_binder_route(binder) %>">
 			                  <img class="binder-thumb" src="<%= explore_binder_thumb_lg(binder) %>" alt="<%= binder.title %>">
-		                  	  <span class="binder-user">
-		                  	  	<img src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
-		                  	  </span>
 			                  <div class="caption-box">
 			                  	<h4 class="caption truncate"><%= binder.title %></h4>
 		                  	  </div>
 			                </a>
+	                  	  <label class="binder-user">
+	                  	  	<img src="<%= teacher_thumb_sm(binder.find_owner) %>" alt="<%= binder.user %>" >
+	                  	  	<a href="/<%= binder.username %>"><%= binder.fname %> <%= binder.lname %></a>
+	                  	  </label>
 			              </li>
 			            <% end %>
 		            </ul>

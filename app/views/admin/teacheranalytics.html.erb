@@ -40,7 +40,7 @@
 		</tr>
 		<tr>
 			<td valign='top'>
-				<%= check_box_tag 'bindercount', 'bindercount', params['bindercount'].present? %>Use binder counts? (NOT WORKING)&nbsp;
+				<%= check_box_tag 'bindercount', 'bindercount', params['bindercount'].present? %>Use binder counts?&nbsp;
 			</td>
 			<td>
 				Teachers that have between <%= text_field_tag :bindermin, params[:bindermin] %> and <%= text_field_tag :bindermax, params[:bindermax] %> binders.  
@@ -125,25 +125,50 @@
 		</tr>
 	</table>
 <% end %>
-<%= @teachers.size 
+<%= #@teachers.size 
 %>
 
 <% begin %>
-	<%= paginate(@logs) %>
-	<%= page_entries_info(@logs).html_safe %>
+	<%= paginate(@teachers) %>
+	<%= page_entries_info(@teachers).html_safe %>
 <% rescue %>
 <% end %>
 
 <table>
 	<tr>
 		<td>
-
+			<b>ID (links to DB info page)</b>
+		</td>
+		<td>
+			<b>Username (links to teacher profile)</b>
+		</td>
+		<td>
+			<b>First Name</b>
+		</td>
+		<td>
+			<b>Last Name
 		</td>
 	</tr>
+	<% @teachers.each do |f| %>
+	<tr>
+		<td>
+			<a href="/admin/teacheranalytics/<%= f.id.to_s %>"><%= f.id.to_s %></a>&nbsp;&nbsp;
+		</td>
+		<td>
+			<a href="/<%= f.username %>"><%= f.username %></a>
+		</td>
+		<td>
+			<%= f.fname %>
+		</td>
+		<td>
+			<%= f.lname %>
+		</td>
+	</tr>
+	<% end %>
 </table>
 
 <% begin %>
-	<%= paginate(@logs) %>
-	<%= page_entries_info(@logs).html_safe %>
+	<%= paginate(@teachers) %>
+	<%= page_entries_info(@teachers).html_safe %>
 <% rescue %>
 <% end %>

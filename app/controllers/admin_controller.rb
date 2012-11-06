@@ -255,6 +255,8 @@ class AdminController < ApplicationController
 
 		# bunched queries end here, tack on groups
 
+		# TODO: convert this to a map_reduce query
+
 		if params['bindercount'].present?
 			#@teachers = @teachers.where(Binder.where(:owner=>))
 			#@teachers = 
@@ -277,18 +279,40 @@ class AdminController < ApplicationController
 
 		end
 
+		# TODO: make these conditional, they currently dont check the boolean subscription field
+
 		if params['subscriptioncount'].present?
 			range = Range.new(params[:subscriptionmin].to_i,params[:subscriptionmax].to_i)
-			map = "function() { if (this.relationships==null) return; emit(String(this._id), {count: this.relationships.length}); } }"
-			reduce = "function(key,values) { var total=0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count: total }; }" 
+			map = 	"function() { 
+						if (this.relationships==null) return; 
+						emit(String(this._id), {count: this.relationships.length}); 
+					}"#} }"
+			reduce ="function(key,values) { 
+						var total=0; 
+						for ( var i=0; i<values.length; i++) { 
+							total += values[i].count; 
+						} 
+						return { count: total }; 
+					}" 
 			ids = Teacher.collection.map_reduce(map,reduce,:out => "mr_results").find().to_a.reject { |f| !range.cover?(f['value']['count'].to_i) }.map { |f| f['_id'] }
 			@teachers = @teachers.where(:_id.in => ids)
 		end
 
 		if params['subscribercount'].present?
 			range = Range.new(params[:subscribermin].to_i,params[:subscribermax].to_i)
-			map = "function() { if (this.relationships==null) return; for (var rel in this.relationships){ emit(this.relationships[rel].user_id, {count: 1}); } }"
-			reduce = "function(key,values) { var total=0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count: total }; }"
+			map = 	"function() { 
+						if (this.relationships==null) return; 
+						for (var rel in this.relationships) { 
+							emit(this.relationships[rel].user_id, {count: 1}); 
+						} 
+					}"
+			reduce ="function(key,values) { 
+						var total=0; 
+						for ( var i=0; i<values.length; i++) { 
+							total += values[i].count; 
+						} 
+						return { count: total }; 
+					}"
 			ids = Teacher.collection.map_reduce(map,reduce,:out => "mr_results").find().to_a.reject { |f| !range.cover?(f['value']['count'].to_i) }.map { |f| f['_id'] }
 			@teachers = @teachers.where(:_id.in => ids)
 		end
@@ -297,7 +321,9 @@ class AdminController < ApplicationController
 
 		#debugger
 
-		@teachers = @teachers.order_by([:registered_at, :desc]).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i)
+		@teachers = @teachers.order_by([:registered_at, :desc]).page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i)#.page(params[:page]).per(params[:entries].nil? ? 100 : params[:entries].to_i)
+
+		render 'admin/teacheranalytics'
 
 		# if params['subscriptioncount'].present?
 		# 	@teachers = @teachers.where(:)
@@ -319,6 +345,27 @@ class AdminController < ApplicationController
 		# map = "function() { if (this.relationships==null) return; emit(String(this._id), {count: this.relationships.length}); } }"
 		# @results = Teacher.collection.map_reduce(map,reduce,:out => "mr_results")
 
+
+	end
+
+	def singleteacherdata
+
+		begin
+			@teacher = Teacher.find(params[:id])
+		rescue
+			@teacher = nil
+		end
+
+		#debugger
+
+		# respond_to do |format|
+		# 	format.html { render :json => JSON.pretty_generate(@teacher.as_document.as_json) }
+		# end
+		# respond_to do |format|
+		# 	format.json { render :json => {}.to_json }
+		# end
+
+		render 'admin/singleteacherdata'
 
 	end
 

@@ -160,7 +160,7 @@ tooltip.js: tooltip-c1f31f50d05852374b1ca905917af3e6.js
 wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
 wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
-application.css: application-e3a1da667f695deefcdea55ba5cf2789.css
+application.css: application-708a6e2edea1399dcb61ddd11a352308.css
 binders/folder.css: binders/folder-1de8750fa116b83478086f40cb130b7a.css
 bookmarklet/post.css: bookmarklet/post-7a4f3df75092e5e2caeff6d8865469ee.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
@@ -187,10 +187,13 @@ home/public.css: home/public-c1c6b0559498bfaf92e320c3a7f56357.css
 jqueryui.css: jqueryui-3e5488d61bcd5d2d63259970ab23b226.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
-strap.css: strap-67a539b8b7564fe71daf5473f00d5735.css
 teacher.css: teacher-ec8c81086dd990ea25534ba2bb32805b.css
 widgets/icheck.css: widgets/icheck-9f8386150ad015fa20947d4a7971e1fb.css
+glyphicons-halflings-white.png: glyphicons-halflings-white-13553a5bf21ae3cc374006592488ec64.png
+glyphicons-halflings.png: glyphicons-halflings-ab3144065a860d198f1d7d9a4882640c.png
 jquery.pjax.js: jquery.pjax-d1cce8182a1606ac7252c4296716256c.js
+bootstrap.css: bootstrap-b9831a2cf978caaa958bcbb09d58475e.css
+strap.css: strap-c52761e555e581b9ade8df4fc3d1ed58.css
 video-js.css: video-js-8fba5d3e38e191d2268019543ae06d89.css
 video-js.png: video-js-dc69ccfbc38a977a032886c4cfa6920e.png
 video-js.swf: video-js-f52e4551cc58ba3396f348370703760a.swf

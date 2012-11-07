@@ -11,7 +11,9 @@
 	<% f = Feed.new 
 	f.save
 	%>
-	<%= raw(f.html(current_teacher.id.to_s)) %>
+	<%= f.html(current_teacher.id.to_s).html_safe
+		#raw(f.html(current_teacher.id.to_s)) 
+	%>
 
 	<% else %>
 

@@ -177,8 +177,12 @@ class Feed
 			@subsfeed.each do |f|
 				#self.wrappers << Wrapper.new()#.generate(f))
 				#f = [f] if f.size==1
-				debugger
-				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],whatid: 	f.first[:log].modelid,timestamp: 	f.first[:log].timestamp,logids: 	f.map { |g| g[:log].id.to_s },wclass: 	f.first[:log][:method])
+				#debugger
+				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],
+												whatid: 	f.first[:log].modelid,
+												timestamp: 	f.first[:log].timestamp,
+												logids: 	f.map { |g| g[:log].id.to_s },
+												wclass: 	f.first[:log][:method])
 												# :logids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
 												# :wclass => (f.class==Array ? f.first[:log][:method] : f[:method]))
 				self.save
@@ -187,7 +191,7 @@ class Feed
 				#self.wrappers.last.generate#(f)
 				#self.wrappers.last.generate(f)
 				#debugger
-				retstr += self.wrappers.last.html
+				retstr += self.wrappers.last.html.html_safe
 			end
 		end
 
@@ -238,19 +242,20 @@ class Wrapper
 			Rails.cache.write("wrapper/#{self.id.to_s}",self.markup)
 			html = self.markup
 		end
-		self.feedobjectids.each { |f| html += "<div class=\"feedcontent\">#{Feedobject.find(f).html}</div>" }
-		html = "<div class=\"newsitem\"><div class=\"imgarea\"></div>#{html}<div style=\"clear:both\"></div></div>"
-		html	
+		self.feedobjectids.each { |f| html += Feedobject.find(f).html.html_safe }
+		html = "<div class=\"newsitem\"><div class=\"imgarea\"></div><div class=\"feedcontent\">#{html}</div><div style=\"clear:both\"></div></div>"
+		#debugger
+		html.html_safe	
 
 	end
 
 	# this will be called on both new wrappers and already populated wrappers
 	def generate#(a=nil,b=nil,c=nil) #(feedobj)
 
-		raise 'Undefined wrapper class!' if self.wclass.empty?
-		debugger
-		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
-		Rails.cache.delete("wrapper/#{self.id.to_s}")
+		# raise 'Undefined wrapper class!' if self.wclass.empty?
+		# debugger
+		# self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
+		# Rails.cache.delete("wrapper/#{self.id.to_s}")
 
 		#debugger
 
@@ -285,6 +290,12 @@ class Wrapper
 		#else
 			# this
 		end
+
+		raise 'Undefined wrapper class!' if self.wclass.empty?
+		#debugger
+		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self).html_safe)
+		Rails.cache.delete("wrapper/#{self.id.to_s}")
+
 
 		#debugger
 

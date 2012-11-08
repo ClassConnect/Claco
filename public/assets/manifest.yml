@@ -160,8 +160,8 @@ tooltip.js: tooltip-c1f31f50d05852374b1ca905917af3e6.js
 wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
 wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
-application.css: application-708a6e2edea1399dcb61ddd11a352308.css
-binders/folder.css: binders/folder-1de8750fa116b83478086f40cb130b7a.css
+application.css: application-026fe07c4e94a263cffac1c4a8e19fee.css
+binders/folder.css: binders/folder-2faf8bd39c06df1b8bdb0b1bd0bb87e5.css
 bookmarklet/post.css: bookmarklet/post-7a4f3df75092e5e2caeff6d8865469ee.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
 buttons/buttons.css: buttons/buttons-9cca403a266424438923ea405de6337f.css
@@ -175,7 +175,7 @@ editinfo.css: editinfo-18c1eaa9ada96e5b8c9dd1219da2e825.css
 errors.css: errors-39335cb6f0222c06624dd622790b7a4c.css
 gen/guiders.css: gen/guiders-acc3fea933996e2708a585726477c0f1.css
 home/educators.css: home/educators-d7dcc222e05084ff8471838a71aba1c8.css
-home/main.css: home/main-b4e88e858c4ba30f581eca373eac63d0.css
+home/main.css: home/main-a667dede255604d5f52c354aa640af71.css
 home/pub/about.css: home/pub/about-903d8395c4f9a7802caf0fa0f39a5c18.css
 home/pub/explore.css: home/pub/explore-5a41ccc37dffb3ffd36d6f338826ee20.css
 home/pub/explore_detail.css: home/pub/explore_detail-c162d3ba6876898bccaca4e78a80276e.css

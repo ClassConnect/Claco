@@ -37,7 +37,7 @@ $(document).ready(function() {
 				data: $(this).serialize()
 			
 			}).done(function /*onSucuess*/ (data, error) {
-				notifyMessage('.alert-success', "Awesome! Thanks for sharing Claco");
+				notifyMessage('.alert-success', "Thanks for sharing Claco! The teacher(s) you nominated will hear from us within 5 days.");
 			}).fail(function /*onFailure*/ (data, error) {
 				notifyMessage('alert-error', data.statusText);
 				alert("error");

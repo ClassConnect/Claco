@@ -1,3 +1,11 @@
+p {
+    margin: 0 0 4px;
+}
+
+.pager {
+    margin: 0 0;
+}
+
 .crossout {
 	text-decoration: line-through;
 	font-style: italic;
@@ -343,6 +351,10 @@ position:absolute;
 	font-weight:bolder;
 	text-shadow: 0 1px 0 #fff;
 	padding:8px;
+}
+
+.progress {
+    margin-bottom: 0px;
 }
 
 #paneleft .whitebox{

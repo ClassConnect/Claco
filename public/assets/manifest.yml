@@ -150,7 +150,7 @@ gen/wizard.js: gen/wizard-7523ae0f935550c9aff5e16185825d59.js
 home/explore.js: home/explore-70a0ac39897edd7737d322b9b342ae86.js
 home/explore_detail.js: home/explore_detail-738a058493f858212c5028550178357c.js
 home/main.js: home/main-b004fbfca0cd774f733d66cf8dddceaf.js
-home/pub.js: home/pub-236ecf6b3fba7746be2dcf51b8cd0b1b.js
+home/pub.js: home/pub-81f8ebcf674c45871edb1a3b713787c4.js
 jqueryui.js: jqueryui-c04b8ed279f78b6387c8d090964d2e16.js
 messages/show.js: messages/show-af1bfe6546d966549eb5e11fd056910c.js
 profile/main.js: profile/main-ff0376a2336f8194e0602536646c5372.js

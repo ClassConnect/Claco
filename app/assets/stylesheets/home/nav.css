@@ -1,0 +1,189 @@
+.publink {
+  font-weight:bolder;
+  color:#fff !important;
+}
+
+.publink:hover{
+  text-decoration: underline !important;
+}
+
+.menusplitter {
+  width:1px;
+  height:30px;
+  margin-top:13px;
+  background: rgba(255, 255, 255, 0.25);
+  float:right;
+}
+
+#meoptmenu {
+  padding:24px 7px 22px 7px;
+  cursor:pointer;
+}
+
+#menuopttog:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#meoptmenu .droparr {
+  width:0px; 
+  height:0px; 
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:7px solid #FFFFFF;
+  font-size:0px;
+  line-height:0px;
+  opacity: 0.75;
+  filter: alpha(opacity=75);
+}
+
+#menuopttog:hover .droparr {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
+#nav-tags {
+  float:right;
+  padding:18px 7px 17px 7px;
+  cursor:pointer;
+}
+
+#nav-tags:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#nav-tags .fname {
+  float:left;
+  color:#fff;
+  font-size:13px;
+  font-weight:bolder;
+  opacity: 0.85;
+  filter: alpha(opacity=85);
+}
+
+#nav-tags .myprofpic {
+  height:30px;
+  width:30px;
+  float:left;
+  margin:-5px 10px -10px 0;
+}
+
+#nav-tags a:hover {
+  text-decoration: none;
+}
+
+#nav-tags:hover .fname {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+
+.top-notch-btn {
+  color:#fff;
+  font-weight:bolder;
+  text-shadow: 0 1px 0 #333;
+  background-color: #da4f49;
+  *background-color: #bd362f;
+  background-image: -ms-linear-gradient(top, #B01010, #850708);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#B01010), to(#850708));
+  background-image: -webkit-linear-gradient(top, #B01010, #850708);
+  background-image: -o-linear-gradient(top, #B01010, #850708);
+  background-image: -moz-linear-gradient(top, #B01010, #850708);
+  background-image: linear-gradient(top, #B01010, #850708);
+  background-repeat: repeat-x;
+  border-color: rgba(150, 8, 7, 0.99) rgba(114, 10, 9, 0.99) rgba(103, 1, 1, 0.99);
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#B01010', endColorstr='#850708', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+
+.top-notch-btn:hover,
+.top-notch-btn:active,
+.top-notch-btn.active,
+.top-notch-btn.disabled,
+.top-notch-btn[disabled] {
+  color:#fff;
+  font-weight:bolder;
+  background-color: #850708;
+  *background-color: #850708;
+}
+
+.top-notch-btn:active,
+.top-notch-btn.active {
+  color:#fff;
+  font-weight:bolder;
+  background-color: #942a25 \9;
+}
+
+.notch-login {
+  margin-top:12px !important;
+}
+
+.notch-nav {
+  margin-top:13px !important;
+}
+
+.notchNum {
+  font-size:11px !important;
+  text-shadow: 0px 1px 1px #999;
+  padding:0px 5px;
+  background:#F20000;
+  margin-left:15px;
+  margin-top:-30px;
+  -webkit-border-radius: 10px;
+     -moz-border-radius: 10px;
+          border-radius: 10px;
+  position:absolute;
+}
+
+.searchWrap {
+  margin-top:-34px;
+  margin-left:150px;
+  position:absolute;
+  width:207px;
+  height:27px;
+  border-top:1px solid #891312 !important;
+  border-left:1px solid #891312 !important;
+  border-right:1px solid #891312 !important;
+  border-bottom:1px solid #C54F4E !important;
+  -webkit-border-radius: 15px;
+     -moz-border-radius: 15px;
+          border-radius: 15px;
+}
+
+.topSearch {
+  height:16px !important;
+  font-size:12px !important;
+  padding-top:4px !important;
+  padding-left:10px !important;
+  width:190px;
+  -webkit-border-radius: 15px !important;
+     -moz-border-radius: 15px !important;
+          border-radius: 15px !important;
+}
+
+.topSearch:focus {
+  border-color:rgba(0, 0, 0, 0.35) !important;
+
+  -moz-box-shadow:0 1px 3px rgba(34,25,25,0.4);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.0) !important;
+}
+
+.noclose {
+  padding: 10px;
+}
+
+.noclose .login-focus {
+  margin-top:7px;
+}
+
+.async-pop {
+  font-weight:bolder;
+  display:none;
+  position:fixed;
+  top:52px;
+  left:48%;
+  z-index: 1000;
+  -moz-box-shadow:0 1px 3px rgba(34,25,25,0.4);
+  -webkit-box-shadow:0 1px 3px rgba(34,25,25,0.4);
+  box-shadow: 0 1px 3px rgba(34,25,25,0.5);
+}
+

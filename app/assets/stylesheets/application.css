@@ -71,6 +71,29 @@ ol {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 
+.nav-tabs > li > a {
+  line-height: 18px;
+  border: 1px solid transparent;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+}
+
+.btn-primary {
+  background-color: #0471B1 !important;
+  background-image: -ms-linear-gradient(top, #219FDF, #0471B1);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#219FDF), to(#0471B1));
+  background-image: -webkit-linear-gradient(top, #219FDF, #0471B1);
+  background-image: -o-linear-gradient(top, #219FDF, #0471B1);
+  background-image: -moz-linear-gradient(top, #219FDF, #0471B1);
+  background-image: linear-gradient(top, #219FDF, #0471B1);
+  background-repeat: repeat-x;
+  border-color: #05C #05C #003580;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#219FDF', endColorstr='#0471B1', GradientType=0);
+  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+}
+
 .navbar .nav > li > a {
   float: none;
   padding: 15px 12px 11px;
@@ -235,10 +258,6 @@ footer {
   width:30px;
   float:left;
   margin:-5px 10px -10px 0;
-
-  /*-moz-box-shadow:0 0px 4px rgba(34,25,25,0.4);
-  -webkit-box-shadow:0 0px 4px rgba(34,25,25,0.4);
-  box-shadow: 0 0px 4px rgba(34,25,25,0.4);*/
 }
 
 #nav-tags a:hover {
@@ -347,100 +366,6 @@ footer {
 
 .noclose .login-focus {
   margin-top:7px;
-}
-
-.signup-opt {
-  margin-top:20px;
-  padding-bottom:10px;
-  background:#eee;
-  border: 1px solid #ddd;
-  -webkit-border-radius: 3px;
-     -moz-border-radius: 3px;
-          border-radius: 3px;
-}
-
-.signup-opt .or-account {
-  text-align:center;
-  font-size:14px;
-  margin-top: 7px;
-  margin-bottom: 7px;
-  color:#666;
-
-  font-style: italic;
-}
-
-.signup-opt .no-account {
-  font-weight:bolder;
-  text-align: center;
-  font-size:14px;
-  margin:10px 0 10px 5px;
-  padding:10px 9px 10px 9px;
-  color:#745419;
-  font-weight:bolder;
-  text-shadow: 0px 1px 1px #fff;
-  background-color: #da4f49;
-  *background-color: #bd362f;
-  background-image: -ms-linear-gradient(top, #FFD356, #FEAC1A);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FFD356), to(#FEAC1A));
-  background-image: -webkit-linear-gradient(top, #FFD356, #FEAC1A);
-  background-image: -o-linear-gradient(top, #FFD356, #FEAC1A);
-  background-image: -moz-linear-gradient(top, #FFD356, #FEAC1A);
-  background-image: linear-gradient(top, #FFD356, #FEAC1A);
-  background-repeat: repeat-x;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.1);
-  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#FFD356', endColorstr='#FEAC1A', GradientType=0);
-  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
-}
-
-.signup-opt .no-account:hover,
-.signup-opt .no-account:active,
-.signup-opt .no-account.active,
-.signup-opt .no-account.disabled,
-.signup-opt .no-account[disabled] {
-  color:#745419;
-  font-weight:bolder;
-  background-color: #FEAC1A;
-  *background-color: #FEAC1A;
-}
-
-.signup-opt .no-account:active,
-.signup-opt .no-account.active {
-  color:#745419;
-  font-weight:bolder;
-  background-color: #FEAC1A \9;
-}
-
-.signup-opt .zocial {
-  font-size: 12px;
-}
-
-.signup-opt .facebook {
-  margin: 0 5px 0 7px;
-}
-
-.search-span {
-  margin-top:53px;
-  margin-left:0px;
-  z-index: 100;
-  border-bottom:none;
-}
-
-.search-span .navbar-inner {
-  color:#745419;
-  font-weight:bolder;
-  text-shadow: 0px 1px 1px #fff;
-  background-color: #E0E0E0;
-  *background-color: #E0E0E0;
-  background-image: -ms-linear-gradient(top, #ffffff, #E0E0E0);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#E0E0E0));
-  background-image: -webkit-linear-gradient(top, #ffffff, #E0E0E0);
-  background-image: -o-linear-gradient(top, #ffffff, #E0E0E0);
-  background-image: -moz-linear-gradient(top, #ffffff, #E0E0E0);
-  background-image: linear-gradient(top, #ffffff, #E0E0E0);
-  background-repeat: repeat-x;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.1);
-  filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#E0E0E0', GradientType=0);
-  filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 
 .async-pop {

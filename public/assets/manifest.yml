@@ -145,8 +145,6 @@ home/wizard.js: home/wizard-7523ae0f935550c9aff5e16185825d59.js
 messages/show.js: messages/show-4d693929057739e9e06cd354541c5492.js
 profile/main.js: profile/main-ff0376a2336f8194e0602536646c5372.js
 search/main.js: search/main-4e16709cce13c68fd83fd5fe3fce9a18.js
-wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
-wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
 application.css: application-f26fdbd38736ecfc40b37aced7770644.css
 binders/folder.css: binders/folder-2faf8bd39c06df1b8bdb0b1bd0bb87e5.css
@@ -190,6 +188,8 @@ jquery.pjax.js: jquery.pjax-d1cce8182a1606ac7252c4296716256c.js
 jqueryui.js: jqueryui-566624888bdb4175729de4e02379c59e.js
 tabs.js: tabs-c33b80148176645ee1b9efdc16eae810.js
 tooltip.js: tooltip-c1f31f50d05852374b1ca905917af3e6.js
+wy/advanced.js: wy/advanced-01d3e1942ab8766ddc228bd8ec3fbffa.js
+wy/wysi5.js: wy/wysi5-8a5037af8f1c3a6fa7d337299b216353.js
 bootstrap.css: bootstrap-b9831a2cf978caaa958bcbb09d58475e.css
 box.css: box-b8972fc537f439c7d53ccd9adfe23206.css
 jqueryui.css: jqueryui-3e5488d61bcd5d2d63259970ab23b226.css

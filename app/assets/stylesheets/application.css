@@ -592,3 +592,26 @@ h2 {
 select, textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
   font-size: 13px;
 }
+
+.btn-group > .dropdown-menu {
+  font-size: 12px;
+}
+
+.content-header .con-inner .buttonbox .dropdown-menu li > a:hover {
+  border: 1px solid #CCC;
+  color: #444;
+  text-shadow: 0 1px 1px white;
+  margin: -1px;
+  background-color: #EEE;
+  -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-menu li > a:hover {
+  background-image: -moz-linear-gradient(top, #fff, #EEE);
+  background-image: -webkit-gradient(linear, 0 0, 0 0%, from(white), to(#EEE));
+  background-image: -webkit-linear-gradient(top, #fff, #EEE);
+  background-image: -o-linear-gradient(top, #fff, #EEE);
+  background-image: linear-gradient(to bottom, #fff, #EEE);
+}

@@ -421,6 +421,67 @@ class Binder
 		return ret_set
 	end
 
+	def find_parent
+		Binder.find(self.parent["id"])
+	end
+
+	def inherit_from(parentid)
+
+		parenthash = {}
+		parentsarr = []
+		parentperarr = []
+		parent_child_count = 0
+
+		if parentid.to_s == "0"
+
+			parenthash = {	:id		=> parentid.to_s,
+							:title	=> ""}
+
+			parentsarr = [parenthash]
+
+			parent = "0"
+
+		else
+
+			parent = Binder.find(parentid)
+
+			parent_child_count = parent.children.count
+
+			parenthash = {	:id		=> parentid.to_s,
+							:title	=> parent.title}
+
+			parentsarr = parent.parents << parenthash
+
+			parentperarr = parent.parent_permissions
+
+			if !parentperarr.find{|p| p["type"] == 3}.nil? && !parent.permissions.find{|p| p["type"] == 3}.nil?
+
+				parentperarr.delete(parentperarr.find{|p| p["type"] == 3})
+
+				parent.permissions.each do |p|
+					p["folder_id"] = parentid
+					parentperarr << p
+				end
+
+			else
+
+				parent.permissions.each do |p|
+					p["folder_id"] = parentid
+					parentperarr << p
+				end
+
+			end
+
+		end
+
+		self.parent = parenthash
+		self.parents = parentsarr
+		self.parent_permissions = parentperarr
+
+		return self
+
+	end
+
 	def parent_ids
 		return parents.collect {|x| x["id"] || x[:id]}
 	end
@@ -574,9 +635,237 @@ class Binder
 
 	end
 
-	def self.fixtimetamps
+	def self.fixtimestamps
 
 		Binder.all.each{|binder| binder.update_attributes(:last_update => binder.subtree.sort_by(&:timestamp).last.last_update) if binder.type == 1}
+
+	end
+
+	def self.create_content(parentid, params, teacher)
+
+		parent = Binder.find(parentid)
+
+		error = ""
+
+		if params[:webtitle].strip.length > 0
+
+			embed = false
+			url = false
+			embedtourl = false
+
+			doc = Nokogiri::HTML(params[:weblink])
+
+			if !doc.at('iframe').nil?
+
+				uri = URI.parse(doc.at('iframe')['src'])
+				#Refactor this to also set vidtype
+				if uri.host.include?('youtube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.youtube.com/watch?v=#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
+
+					embedtourl = true
+					uri = "http://www.educreations.com/lesson/view/claco/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
+
+					embedtourl = true
+					uri = "http://vimeo.com/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('schooltube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.schooltube.com/video/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('showme.com') && uri.path.include?('sma/embed')
+
+					embedtourl = true
+					uri = "http://www.showme.com/sh/?h=#{CGI.parse(uri.query)['s'].first}"
+
+				else
+
+					embed = true
+
+				end
+
+			elsif !doc.at('embed').nil?
+
+				embed = true
+
+			end
+
+			if !embed && !embedtourl
+				# RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
+				url = true
+			end
+
+			if url || embed || embedtourl
+
+				if parent.get_access(teacher.id.to_s) == 2
+
+					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
+
+					if !((url || embedtourl) && link.empty?)
+
+						if (embed ? true : !Addressable::URI.heuristic_parse(link).host.include?("teacherspayteachers.com"))
+						
+							binder = Binder.new
+
+							binder.inherit_from(parentid)
+
+							binder.update_attributes(	:title				=> params[:webtitle].strip[0..49],
+														:owner				=> teacher.id,
+														:username			=> teacher.username,
+														:fname				=> teacher.fname,
+														:lname				=> teacher.lname,
+														:last_update		=> Time.now.to_i,
+														:last_updated_by	=> teacher.id.to_s,
+														:body				=> params[:body] || "",
+														:order_index		=> parent.children.count,
+														:files				=> 1,
+														:type				=> 2,
+														:format				=> 2)
+
+
+							binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
+															:thumbnailgen => 1, #video
+															:embed		=> embed,
+															:timestamp	=> Time.now.to_i,
+															:owner		=> teacher.id)
+
+
+							#@binder.create_binder_tags(params,teacher.id)
+
+							if binder.save
+
+
+								if url || embedtourl
+									uri = Addressable::URI.heuristic_parse(link)
+
+									stathash = binder.current_version.imgstatus
+									stathash[:imgfile][:retrieved] = true
+
+									if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+
+										# YOUTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id,Url.get_youtube_url(uri.to_s))
+										binder.current_version.vidtype = "youtube"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+
+										# VIMEO
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(binder.id,uri.to_s,{:site => 'vimeo'})
+										binder.current_version.vidtype = "vimeo"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
+
+										# EDUCREATIONS
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id,Url.get_educreations_url(uri.to_s))
+										binder.current_version.vidtype = "educreations"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+
+										# SCHOOLTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(binder.id,uri.to_s,{:site => 'schooltube'}) 
+										binder.current_version.vidtype = "schooltube"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+
+										# SHOWME
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(binder.id,uri.to_s,{:site => 'showme'})
+										binder.current_version.vidtype = "showme"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									else
+										binder.versions.last.update_attributes( :thumbnailgen => 2 )
+										# generic URL, grab Url2png
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id,Url.get_url2png_url(uri.to_s))
+
+										#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+									end
+
+								end
+
+							else
+
+								error = "There was an error adding this content."
+
+							end
+
+							binder.save
+
+							binder.create_binder_tags(params,teacher.id)
+
+							pids = binder.parent_ids
+
+							pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
+
+							Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
+
+						else
+
+							error = "Sorry, you can't link to this site. Please download any files and upload them to Claco."
+
+						end
+
+					else
+
+						error = "Invalid URL"
+
+					end
+
+				else
+
+					error = "You do not have permissions to write to #{parent.title}"
+
+				end
+
+			else
+
+				error = "Invalid input data"
+
+			end
+
+		else
+
+			error = "You must enter a title"
+
+		end
+
+		rescue BSON::InvalidObjectId
+			error = "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			error = "Invalid Request"
+		rescue RestClient::ResourceNotFound
+			error = "Invalid URL - Not Found"
+		# rescue Exception => ex
+		# 	error = "Invalid URL - #{ex.backtrace}"
+		rescue
+			error = "Invalid URL"
+		ensure
+			if error.empty?
+				return binder
+			else
+				raise error
+			end
 
 	end
 

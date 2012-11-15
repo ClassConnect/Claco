@@ -8,12 +8,24 @@
 	
 	<% if true %>
 
-	<% f = Feed.new 
-	f.save
-	%>
-	<%= f.html(current_teacher.id.to_s).html_safe
-		#raw(f.html(current_teacher.id.to_s)) 
-	%>
+		<% 
+
+		#debugger
+
+		fids = current_teacher.feed_ids.clone
+		if fids.nil? || fids[0].nil?
+			feed = Feed.new(:owner => current_teacher.id.to_s,
+							:fclass => 0)
+			feed.save
+			fids[0] = feed.id.to_s
+			current_teacher.update_attribute(:feed_ids, fids)
+		else
+			feed = Feed.find(current_teacher.feed_ids[0])
+		end 
+
+		%>
+
+		<%= feed.html(current_teacher.id.to_s).html_safe %>
 
 	<% else %>
 

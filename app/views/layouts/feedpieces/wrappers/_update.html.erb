@@ -1,11 +1,11 @@
 <div class="thetitle">
 	<% if @howmany==1 %>
-		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= @whatlink %>"><%= @what.title %></a> <%= @when %> ago.
+		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= named_binder_route(@what) %>"><%= @what.title %></a> [[[TIMESTAMP]]] ago.
 	<% elsif @howmany==2 %>
-		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= @whatlink %>"><%= @what.title %></a> and <a href="<%= @whatlink2 %>"><%= @what2.title %></a> <%= @when %> ago.
+		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= named_binder_route(@what) %>"><%= @what.title %></a> and <a href="<%= named_binder_route(@what2) %>"><%= @what2.title %></a> [[[TIMESTAMP]]] ago.
 	<% elsif @howmany==3 %>
-		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= @whatlink %>"><%= @what.title %></a>, <a href="<%= @whatlink2 %>"><%= @what2.title %></a>, and <a href="<%= @whatlink3 %>"><%= @what3.title %></a> <%= @when %> ago.
+		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= named_binder_route(@what) %>"><%= @what.title %></a>, <a href="<%= named_binder_route(@what2) %>"><%= @what2.title %></a>, and <a href="<%= named_binder_route(@what3) %>"><%= @what3.title %></a> [[[TIMESTAMP]]] ago.
 	<% else %>
-		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= @whatlink %>"><%= @what.title %></a>, <a href="<%= @whatlink2 %>"><%= @what2.title %></a>, <a href="@whatlink3 %>"><%= @what3.title %></a>, and <%= @howmany-3 %> more <%= @when %> ago.
+		<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> updated <a href="<%= named_binder_route(@what) %>"><%= @what.title %></a>, <a href="<%= named_binder_route(@what2) %>"><%= @what2.title %></a>, <a href="named_binder_route(@what3) %>"><%= @what3.title %></a>, and <%= @howmany-3 %> more [[[TIMESTAMP]]] ago.
 	<% end %>
 </div>

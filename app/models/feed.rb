@@ -2,9 +2,10 @@ class Feed
 	include Mongoid::Document
 
 	# integer timestamp used for acquiring a fresh logset from the ES server
-	field :last_retrieve, :type => Float, :default => 0.0
+	field :timerange, :type => Hash, :default => {'lower' => nil,'upper' => nil} #, :type => Float, :default => 0.0
 	field :fclass, :type => Integer, :default => 0
 	field :owner, :type => String, :default => ''
+	field :mr_logid, :type => String, :default => ''
 
 	embeds_many :wrappers
 
@@ -27,6 +28,12 @@ class Feed
 		# i = 0
 
 		retstr = ''
+		retsize = 0
+
+		most_recent_logid = ''
+		least_recent_logid = ''
+		most_recent_logtime = 0.0
+		least_recent_logtime = 0.0
 
 		feedblacklist = {}
 		duplist = {}
@@ -54,10 +61,17 @@ class Feed
 			search.filter :terms, :model => ['binders','teachers']
 			search.filter :terms, :method => FEED_METHOD_WHITELIST
 			search.filter :terms, :ownerid => subs + [teacherid]
-			# search.filter :range, :timestamp => { 	:from => last_refresh.to_f,													:include_upper => false }
-			# 										:include_lower => true,
-			# 										:include_upper => false }
-			#search.filter :terms, :logid => self.parentid.to_s
+
+			if self.timerange['upper'].present?
+				search.filter :range, :timestamp => { :gte => self.timerange['upper'].to_i }
+			#else
+				# this is to prevent multiple inclusion in the stacked feed object array
+				#search.filter :range, :timestamp => { :gte => Time.now.to_i }
+			end
+
+			#if self.timerange['lower'].present?
+			#	search.filter :numeric_range, :lte => self.timerange['lower']
+			#end
 
 			# analyze later for retention in feed object
 			search.size 100
@@ -68,12 +82,11 @@ class Feed
 
 		logs = logs.results
 
-		#debugger
-
 		if logs.any?
+
 			logs.each do |f|
 
-				#debugger
+				break if f[:id].to_s == self.mr_logid
 
 				begin
 					case f[:model].to_s
@@ -97,6 +110,7 @@ class Feed
 				if 	(f[:model].to_s=='binders' && 
 						model.parents[0]!={ "id" => "-1", "title" => "" } && 
 						model.is_pub? && 
+						Binder.thumbready?(model) &&
 						!f[:data][:src] && 
 						!(feedblacklist[f[:actionhash].to_s]) && 
 						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
@@ -119,6 +133,18 @@ class Feed
 
 						# execute blacklist exclusion
 						if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+
+							retsize += 1
+
+							if f[:timestamp] > most_recent_logtime
+								most_recent_logtime = f[:timestamp]
+								most_recent_logid = f[:id].to_s
+							end
+
+							if f[:timestamp] < least_recent_logtime
+								least_recent_logtime = f[:timestamp]
+								least_recent_logid = f[:id].to_s
+							end
 
 							# create a key for an owner and an action
 							similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
@@ -168,11 +194,22 @@ class Feed
 						end
 					end
 				end
-				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
+				# doing this calculation every iteration is inefficient
+				#break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
+
+				break if retsize == SUBSC_FEED_LENGTH
 			end
 			#debugger
 
-			self.wrappers.delete_all
+			#self.wrappers.delete_all
+
+			# keep aggregate count of most recent log ids
+
+			if !most_recent_logid.empty?
+				self.update_attributes(	:mr_logid => most_recent_logid,
+										:timerange => {	'lower' => [least_recent_logtime,self.timerange['lower'].to_f].min,
+														'upper' => [most_recent_logtime,self.timerange['upper'].to_f].max })
+			end
 
 			@subsfeed.each do |f|
 				#self.wrappers << Wrapper.new()#.generate(f))
@@ -185,13 +222,22 @@ class Feed
 												wclass: 	f.first[:log][:method])
 												# :logids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
 												# :wclass => (f.class==Array ? f.first[:log][:method] : f[:method]))
-				self.save
+				#self.save
 
 				#debugger
 				#self.wrappers.last.generate#(f)
 				#self.wrappers.last.generate(f)
 				#debugger
-				retstr += self.wrappers.last.html.html_safe
+
+				#retstr += self.wrappers.last.html.html_safe
+			end
+
+			self.save
+
+			imc = IndirectModelController.new()
+
+			self.wrappers.to_a.sort_by { |f| -f.timestamp }.each do |f|
+				retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.timestamp)).html_safe
 			end
 		end
 
@@ -207,6 +253,7 @@ class Wrapper
 	field :binders, 		:type => Array, 	:default => []
 
 	# used for self-referential identification
+	# TODO: expand these fields
 	field :whoid,			:type => String, 	:default => ''
 	field :whatid,			:type => String, 	:default => ''
 	field :whereid,			:type => String,	:default => ''
@@ -243,7 +290,18 @@ class Wrapper
 			html = self.markup
 		end
 		self.feedobjectids.each { |f| html += Feedobject.find(f).html.html_safe }
-		html = "<div class=\"newsitem\"><div class=\"imgarea\"></div><div class=\"feedcontent\">#{html}</div><div style=\"clear:both\"></div></div>"
+		html = IndirectModelController.new.feedbox(Teacher.find(self.whoid),html).html_safe
+		# html = "<div class=\"newsitem\">\
+		# 			<div class=\"imgarea\">
+		# 				<a href=\"/<%= (t = Teacher.find(self.whoid)).username %>\">\
+		# 					<img src=\"<%= Teacher.
+		# 				</a>\
+		# 			</div>\
+		# 			<div class=\"feedcontent\">\
+		# 				#{html}\
+		# 			</div>\
+		# 			<div style=\"clear:both\"></div>\
+		# 		</div>"
 		#debugger
 		html.html_safe	
 
@@ -268,19 +326,29 @@ class Wrapper
 				when 'binders'
 					self.binders << log.modelid
 					if feedobj.nil?
-						feedobj = Feedobject.new(	:binderid => log.modelid,
+						feedobj = Feedobject.new(	:superids => [{'feed' => self.feed.id.to_s,
+						 										  'wrap' => self.id.to_s }],
+													:binderid => log.modelid,
 													:logid => log.id.to_s,
 													:oclass => log.model)
-						feedobj.save
+					else
+						feedobj.superids << {'feed' => self.feed.id.to_s,
+						 					 'wrap' => self.id.to_s }
 					end
+					feedobj.save
 				when 'teachers'
 					self.teachers << log.modelid
 					if feedobj.nil?
-						feedobj = Feedobject.new(	:teacherid => log.modelid,
+						feedobj = Feedobject.new(	:superids => [{'feed' => self.feed.id.to_s,
+						 										  'wrap' => self.id.to_s }],
+													:teacherid => log.modelid,
 													:logid => log.id.to_s,
 													:oclass => log.model)
-						feedobj.save
+					else
+						feedobj.superids << {'feed' => self.feed.id.to_s,
+						 					 'wrap' => self.id.to_s }
 					end
+					feedobj.save
 				end
 				self.feedobjectids << feedobj.id.to_s
 			end
@@ -307,6 +375,18 @@ class Wrapper
 		# 	#create feedobject from log object
 		# 	Feedobject.find(f).generate
 		# end
+	end
+
+	# only called when an element is being removed from
+	def purge(id)
+		debugger
+		self.feedobjectids.delete(id)
+		self.save
+		Feedobject.find(id).delete
+		if self.feedobjectids.empty?
+			self.delete
+			Rails.cache.read("wrapper/#{self.id.to_s}")
+		end
 	end
 
 	def multiplicity?

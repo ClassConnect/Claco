@@ -32,6 +32,21 @@ class IndirectModelController < AbstractController::Base
     render template: "layouts/_commoncorelogo"
   end
 
+  def feedbox(teacher,html)
+
+    @teacher = teacher
+    @html = html
+
+    render template: "layouts/feedpieces/_feedbox"
+
+  end
+
+  def timewords(time)
+
+    time_ago_in_words(Time.at(time).to_datetime)
+
+  end
+
   def pseudorender(obj)
 
     #debugger
@@ -70,7 +85,7 @@ class IndirectModelController < AbstractController::Base
       @howmany = obj.objnum
       @who = Teacher.find(obj.whoid)
       @wholink = "/#{@who.username}"
-      @when = time_ago_in_words(Time.at(obj.timestamp).to_datetime)
+      #@when = time_ago_in_words(Time.at(obj.timestamp).to_datetime)
 
       case obj.wclass
       when 'createcontent'
@@ -80,7 +95,11 @@ class IndirectModelController < AbstractController::Base
           @where = Binder.find(@what.parent['id'])
           #@wherelink = named_binder_route(@where)
         else
-          @where = Binder.find(@what.parents[1]['id'])
+          begin
+            @where = Binder.find(@what.parents[1]['id'])
+          rescue
+            debugger
+          end
           #@wherelink = named_binder_route(@where)
         end
 

@@ -98,15 +98,32 @@ class Binder
 
 		keys = Rails.cache.read(self.id.to_s)
 
-		return if keys.nil?
+		if !keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)
-			#Rails.cache.expire_fragment(f.to_s)
-			Rails.cache.write(f.to_s,true)			
+			keys.each do |f|
+				#Rails.cache.delete(f.to_s)
+				#Rails.cache.expire_fragment(f.to_s)
+				Rails.cache.write(f.to_s,true)			
+			end
+
+			Rails.cache.delete(self.id.to_s)
+
 		end
 
-		Rails.cache.delete(self.id.to_s)
+		debugger
+
+		#wrappers = []
+
+		Feedobject.where(:binderid => self.id.to_s).each do |f|
+			f.generate(true)
+			#wrappers << f.id.to_s
+		end
+
+		#wrappers.map {|f| }
+
+
+
+		# check for private, deleted
 
 	end
 

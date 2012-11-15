@@ -1,7 +1,7 @@
 <div class="thetitle">
 	<% if !@mult %>
-	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> snapped <a href="<%= @whatlink %>"><%= @what.title  %></a> from <a href="<%= @whoelselink %>"><%= "#{@whoelse.fname} #{@whoelse.lname}" %></a> <%= @when %> ago.
+	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> snapped <a href="<%= named_binder_route(@what) %>"><%= @what.title  %></a> from <a href="<%= @whoelselink %>"><%= "#{@whoelse.fname} #{@whoelse.lname}" %></a> [[[TIMESTAMP]]] ago.
 	<% else %>
-	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> snapped <%= @howmany %> resource<%= @mult ? 's' : ''%> <%= @when %> ago.
+	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> snapped <%= @howmany %> resource<%= @mult ? 's' : ''%> [[[TIMESTAMP]]] ago.
 	<% end %>
 </div>

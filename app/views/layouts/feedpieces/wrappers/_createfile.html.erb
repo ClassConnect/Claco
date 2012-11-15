@@ -1,3 +1,3 @@
 <div class="thetitle">
-	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> added <%= @howmany %> file<%= @mult ? 's' : ''%> to <a href="<%= @wherelink %>"><%= @where.title %></a> <%= @when %> ago.
+	<a href="<%= @wholink %>"><%= "#{@who.fname} #{@who.lname}" %></a> added <%= @howmany %> file<%= @mult ? 's' : ''%> to <a href="<%= named_binder_route(@where) %>"><%= @where.title %></a> [[[TIMESTAMP]]] ago.
 </div>

@@ -75,6 +75,8 @@ class Teacher
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
 
+	# feed indices:
+	# 0 - main feed
 	field :feed_ids, :type => Array, :default => []
 
 	field :recommend_ids, :type => Array, :default => []
@@ -145,6 +147,10 @@ class Teacher
 
 			Rails.cache.write("#{self.id.to_s}educobj",true)
 
+		end
+
+		Feedobject.where(:teacherid => self.id.to_s).each do |f|
+			f.generate
 		end
 
 	end

@@ -25,7 +25,7 @@ class HomeController < ApplicationController
 			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
 
-			if true
+			if false
 
 			# pull the current teacher's subscription IDs
 			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 

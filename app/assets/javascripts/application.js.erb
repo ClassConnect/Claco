@@ -187,7 +187,7 @@ function selectPickFolder(fObj) {
 	var text = $(fObj).text();
 
 	var changeBinder = $.Event("changeBinder");		// custom event
-	$('div.dir').trigger(changeBinder);
+	$(fObj).parent().trigger(changeBinder);
 	
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);

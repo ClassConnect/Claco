@@ -1,130 +1,31 @@
 class BindersController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:show, :index, :zenframe]
+	before_filter :authenticate_teacher!, :except => [:show, :zenframe]
 	before_filter :authenticate_admin!, :only => [:regen]
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
 	end
 
-	def index
-		@owner = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first || Teacher.find(params[:username])
+	#Add Folder Function
+	def create
 
-		@children = Binder.where(:owner => @owner.id, "parent.id" => "0").sort_by { |binder| binder.order_index }
-
-		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
+		binder = Binder.create_folder((params[:id] || "0"), params, current_teacher)
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
-					@owner.id.to_s,
+					binder.id.to_s,
 					params)
 
-		# these are temporary fixes:
-		@tagset = []
-
-		@tags = [[],[],[],[]]
-	end
-
-
-	#Add Folder Function
-	def create
-
-		#Must be logged in to write
-
-		#Trim to 60 chars (old spec)
-
-		errors = []
-
-		if params[:foldertitle].strip.length > 0
-
-			if params[:id].nil?
-				@inherited = inherit_from("0")
-			else
-				@inherited = inherit_from(params[:id])
-			end
-
-			@parenthash = @inherited[:parenthash]
-			@parentsarr = @inherited[:parentsarr]
-			@parentperarr = @inherited[:parentperarr]
-
-			@parent = @inherited[:parent]
-
-			@parent_child_count = @inherited[:parent_child_count]
-
-			if @parent == "0" || @parent.get_access(current_teacher.id) == 2
-
-				#Update parents' folder counts
-				if @parentsarr.size > 1
-					pids = @parentsarr.collect {|p| p["id"] || p[:id]}
-					
-					pids.each do |pid| 
-						if pid != "0"
-							p = Binder.find(pid)
-							p.update_attributes(:folders		=> p.folders + 1,
-												:last_update	=> Time.now.to_i)
-						end
-						#Binder.find(pid).inc(:folders, 1) if pid != "0"
-					end
-
-					Binder.find(pids.last).inc(:children,1) if pids.last != "0"
-				end
-
-				new_binder = Binder.new(:owner				=> current_teacher.id,
-										:fname				=> current_teacher.fname,
-										:lname				=> current_teacher.lname,
-										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].strip[0..49],
-										:parent				=> @parenthash,
-										:parents			=> @parentsarr,
-										:body				=> params[:body],
-										# :permissions		=> (params[:public] == "on" ? [{:type		=> 3,
-										# 													:auth_level	=> params[:public] == "on" ? 1 : 0}] : []),
-										:order_index		=> @parent_child_count,
-										:parent_permissions	=> @parentperarr,
-										:last_update		=> Time.now.to_i,
-										:last_updated_by	=> current_teacher.id.to_s,
-										:type				=> 1)
-
-				new_binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if @parent == "0"
-
-				#Rails.logger.debug "METHOD got here! #{__method__}"
-
-				# new_binder.cascadetimestamp
-
-				new_binder.save
-
-				Mongo.log(	current_teacher.id.to_s,
-							__method__.to_s,
-							params[:controller].to_s,
-							new_binder.id.to_s,
-							params)
-
-				new_binder.create_binder_tags(params,current_teacher.id)
-
-			else
-
-				errors << "You do not have permissions to write to #{@parent.title}"
-
-			end
-
-		else
-
-			errors << "Please enter a title"
-
-		end
-
-		rescue BSON::InvalidObjectId
-			errors << "Invalid Request"
-		rescue Mongoid::Errors::DocumentNotFound
-			errors << "Invalid Request"
+		rescue Exception => ex
 		ensure
-			if @parent == "0" || params[:id].nil?
+			if params[:id].nil?
 				respond_to do |format|
-					format.html {render :text => errors.empty? ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : {"success" => 2, "data" => errors.map{|err| "<li>#{err}</li>"}.join.html_safe}.to_json}
+					format.html {render :text => ex.nil? ? {"success" => 1, "data" => named_binder_route(binder)}.to_json : {"success" => 2, "data" => "<li>#{ex.to_s}</li>".html_safe}.to_json}
 				end
 			else
 				respond_to do |format|
-					format.html {render :text => errors.empty? ?  1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
+					format.html {render :text => ex.nil? ?  1 : "<li>#{ex.to_s}</li>".html_safe}
 				end
 			end
 

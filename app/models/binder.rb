@@ -856,10 +856,8 @@ class Binder
 			error = "Invalid Request"
 		rescue RestClient::ResourceNotFound
 			error = "Invalid URL - Not Found"
-		# rescue Exception => ex
-		# 	error = "Invalid URL - #{ex.backtrace}"
 		rescue
-			error = "Invalid URL"
+			error = "Invalid URL" #This exception should be logged
 		ensure
 			if error.empty?
 				return binder
@@ -867,6 +865,79 @@ class Binder
 				raise error
 			end
 
+	end
+
+	def self.create_folder(parentid, params, teacher)
+
+		error = ""
+
+		if params[:foldertitle].strip.length > 0
+
+			parent = parentid == "0" ? "0" : Binder.find(parentid)
+
+			if (parent == "0" && params[:username].downcase == teacher.username.downcase) || parent.get_access(teacher.id) == 2
+
+				binder = Binder.new
+
+				binder.inherit_from(parentid)
+
+				binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if parent == "0"
+
+				binder.update_attributes(	:owner				=> teacher.id,
+											:fname				=> teacher.fname,
+											:lname				=> teacher.lname,
+											:username			=> teacher.username,
+											:title				=> params[:foldertitle].strip[0..49],
+											:body				=> params[:body],
+											:order_index		=> parent == "0" ? teacher.binders.root_binders.count : parent.children.count,
+											:last_update		=> Time.now.to_i,
+											:last_updated_by	=> teacher.id.to_s,
+											:type				=> 1)
+
+				# binder.cascadetimestamp
+
+				#Update parents' folder counts
+				if binder.parents.size > 1
+					pids = binder.parent_ids
+
+					pids.each do |pid| 
+						if pid != "0"
+							p = Binder.find(pid)
+							p.update_attributes(:folders		=> p.folders + 1,
+												:last_update	=> Time.now.to_i)
+						end
+						#Binder.find(pid).inc(:folders, 1) if pid != "0"
+					end
+
+					Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+				end
+
+				binder.create_binder_tags(params,teacher.id)
+
+			else
+
+				error = "You do not have permissions to write to #{parent.title}"
+
+			end
+
+		else
+
+			error = "Please enter a title"
+
+		end
+
+		rescue BSON::InvalidObjectId
+			error = "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			error = "Invalid Request"
+		rescue
+			error = "Invalid Request" #This exception should be logged
+		ensure
+			if error.empty?
+				return binder
+			else
+				raise error
+			end
 	end
 
 	###############################################################################################

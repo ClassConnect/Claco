@@ -1272,7 +1272,7 @@ class Relationship
 
 		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
 
-		debugger
+		#debugger
 
 		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 
@@ -1282,7 +1282,7 @@ class Relationship
 
 		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
 
-		debugger
+		#debugger
 
 		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 

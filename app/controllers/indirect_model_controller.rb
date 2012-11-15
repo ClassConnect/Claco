@@ -90,7 +90,8 @@ class IndirectModelController < AbstractController::Base
       case obj.wclass
       when 'createcontent'
 
-        @what = Binder.find(obj.whatid)
+        @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
+        #@what = Binder.find(obj.whatid)
         if @what.parents.size==2
           @where = Binder.find(@what.parent['id'])
           #@wherelink = named_binder_route(@where)
@@ -106,7 +107,8 @@ class IndirectModelController < AbstractController::Base
         render template: "layouts/feedpieces/wrappers/_createcontent"
       when 'createfile'
 
-        @what = Binder.find(obj.whatid)
+        @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
+        #@what = Binder.find(obj.whatid)
         if @what.parents.size==2
           @where = Binder.find(@what.parent['id'])
           #@wherelink = named_binder_route(@where)
@@ -135,7 +137,7 @@ class IndirectModelController < AbstractController::Base
         @what = Binder.find(obj.whatid)
         #@whatlink = named_binder_route(@what)
         if !@mult
-          debugger
+          #debugger
           @whoelse = Teacher.where(:username => Log.find(Feedobject.find(obj.feedobjectids.first).logid).params['username'].to_s).first
           @whoelselink = "/#{@whoelse.username}"
         end

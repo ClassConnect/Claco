@@ -23,18 +23,16 @@ class Feedobject
 	# 	self.generate
 	# end
 
-	# called asynchronously on initialization & callbacks
+	# called synchronously on initialization & callbacks
 	def generate(after_save=false)
 		# cannot assume state of feed object exists or is public
 
-		if after_save
+		if after_save && !self.binderid.empty?
 			debugger
-			if !self.binderid.empty?
-				model = Binder.find(self.binderid)
-				if 	model.parents[0]=={ "id" => "-1", "title" => "" } || !model.is_pub?
-					self.superids.each do |f|
-						Feed.find(f['feed']).wrappers.find(f['wrap']).purge(self.id.to_s)
-					end
+			model = Binder.find(self.binderid)
+			if model.parents[0]["id"]=="-1" || !model.is_pub?
+				self.superids.each do |f|
+					Feed.find(f['feed']).wrappers.find(f['wrap']).purge(self.id.to_s)
 				end
 			end
 		end
@@ -48,18 +46,16 @@ class Feedobject
 		end
 	end
 
-	def softwipe
-		self.update_attributes(:markup => '')
-	end
-
 	# implement state machine for feedobjects, returns html
+	# this call should be as minimal as possible in size
 	def html
 		html = Rails.cache.read("feedobject/#{self.id.to_s}")
 		if html.nil?
 			self.generate
 			Rails.cache.write("feedobject/#{self.id.to_s}",self.markup)
 			html = self.markup
-			self.softwipe
+			# this write only saves DB space, technically unnecessary
+			# self.update_attributes(:markup => '')
 		end
 		html
 	end

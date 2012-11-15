@@ -110,10 +110,10 @@ class Binder
 
 		end
 
-		debugger
+		#debugger
 
 		#wrappers = []
-
+		
 		Feedobject.where(:binderid => self.id.to_s).each do |f|
 			f.generate(true)
 			#wrappers << f.id.to_s

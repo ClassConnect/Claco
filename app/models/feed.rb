@@ -311,7 +311,7 @@ class Wrapper
 	def generate#(a=nil,b=nil,c=nil) #(feedobj)
 
 		# raise 'Undefined wrapper class!' if self.wclass.empty?
-		# debugger
+		# #debugger
 		# self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
 		# Rails.cache.delete("wrapper/#{self.id.to_s}")
 
@@ -379,14 +379,23 @@ class Wrapper
 
 	# only called when an element is being removed from
 	def purge(id)
-		debugger
+		#debugger
 		self.feedobjectids.delete(id)
-		self.save
+		#self.whatid = self.feedobjectids.first
+		#self.save
 		Feedobject.find(id).delete
 		if self.feedobjectids.empty?
 			self.delete
-			Rails.cache.read("wrapper/#{self.id.to_s}")
+			#Rails.cache.delete("wrapper/#{self.id.to_s}")
+		else
+			#debugger
+			#if id==self.whatid
+			#	debugger
+			#end
+			self.generate
 		end
+		#debugger
+		#return if false
 	end
 
 	def multiplicity?

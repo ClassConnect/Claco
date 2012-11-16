@@ -122,7 +122,7 @@ class Feed
 				if 	(f[:model].to_s=='binders' && 
 						model.parents[0]!={ "id" => "-1", "title" => "" } && 
 						model.is_pub? && 
-						#(Binder.thumbready?(model) || model.type==1)&&
+						(Binder.thumbready?(model) || model.type==1)&&
 						!f[:data][:src] && 
 						!(feedblacklist[f[:actionhash].to_s]) && 
 						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
@@ -293,14 +293,17 @@ class Wrapper
 		# initially, don't cache any of this, generate on the fly
 		html = Rails.cache.read("wrapper/#{self.id.to_s}")
 		if html.nil?
-			self.generate
-			Rails.cache.write("wrapper/#{self.id.to_s}",self.markup)
+			self.generate if self.markup.empty?
 			html = self.markup
+			self.feedobjectids.each { |f| html += Feedobject.find(f).html.html_safe }
+			html = IndirectModelController.new.feedbox(Teacher.find(self.whoid),html).html_safe
+			Rails.cache.write("wrapper/#{self.id.to_s}",html)
+			#self.update_attributes(:markup => '')
+			p "Built wrapper #{self.id.to_s} from DB"
+		else
+			p "Retrieved wrapper #{self.id.to_s} from cache"
 		end
-		self.feedobjectids.each { |f| html += Feedobject.find(f).html.html_safe }
-		html = IndirectModelController.new.feedbox(Teacher.find(self.whoid),html).html_safe
 		html.html_safe	
-
 	end
 
 	# this will be called on both new wrappers and already populated wrappers
@@ -348,6 +351,8 @@ class Wrapper
 
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self).html_safe)
 		Rails.cache.delete("wrapper/#{self.id.to_s}")
+
+		p "Generated wrapper #{self.id.to_s}"
 
 	end
 

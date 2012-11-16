@@ -19,6 +19,24 @@ class Feedobject
 	# storage of HTML
 	field :markup, :type => String, :default => ''
 
+
+	# implement state machine for feedobjects, returns html
+	# this call should be as minimal as possible in size
+	def html
+		html = Rails.cache.read("feedobject/#{self.id.to_s}")
+		if html.nil?
+			self.generate if self.markup.empty?
+			Rails.cache.write("feedobject/#{self.id.to_s}",self.markup)
+			html = self.markup
+			# this write only saves DB space, technically unnecessary
+			# self.update_attributes(:markup => '')
+			p "    Built feedobject #{self.id.to_s} from DB"
+		else
+			p "    Retrieved feedobject #{self.id.to_s} from cache"
+		end
+		html
+	end
+
 	# called synchronously on initialization & callbacks
 	def generate(after_save=false)
 		# cannot assume state of feed object exists or is public
@@ -35,23 +53,12 @@ class Feedobject
 		raise 'Undefined feedobject class!' if self.oclass.empty?
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
 		Rails.cache.delete("feedobject/#{self.id.to_s}")
-		# deleting the cache instance of the wrapper will force regeneration on next render
+		# deleting the cache instance of the wrapper will force inclusion on next render
 		self.superids.each do |f|
 			Rails.cache.delete("wrapper/#{f['wrap']}")
 		end
+
+		p "    Generated feedobject #{self.id.to_s}"
 	end
 
-	# implement state machine for feedobjects, returns html
-	# this call should be as minimal as possible in size
-	def html
-		html = Rails.cache.read("feedobject/#{self.id.to_s}")
-		if html.nil?
-			self.generate
-			Rails.cache.write("feedobject/#{self.id.to_s}",self.markup)
-			html = self.markup
-			# this write only saves DB space, technically unnecessary
-			# self.update_attributes(:markup => '')
-		end
-		html
-	end
 end

@@ -1720,6 +1720,8 @@ class BindersController < ApplicationController
 	#More validation needed, Permissions
 	def destroy
 
+		#debugger
+
 		errors = []
 
 		@binder = Binder.find(params[:id])

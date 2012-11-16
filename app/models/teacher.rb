@@ -153,9 +153,23 @@ class Teacher
 			f.generate
 		end
 
-		Feed.where(:actors => self.id.to_s) do |f|
-			f.disown(self.id.to_s)
+		Feed.where(:actors => self.id.to_s).each do |f|
+			f.wrappers.where(:whoid => self.id.to_s).each {|g| g.generate}#{|g| Rails.cache.delete("wrapper/#{g.id.to_s}")}
+			#f.generate
 		end
+
+		#debugger
+
+		#return if false
+
+		#Feed.where(:actors => self.id.to_s) do |f|
+			#f.disown(self.id.to_s)
+			#f.wrappers.where(:whoid => self.id.to_s).each {|g| g.generate}
+			#f.wrappers.where(:whoid => self.id.to_s).each {|g| Rails.cache.delete("wrapper/#{g.id.to_s}")}
+		#	f.wrappers.each do |g|
+		#		Feedobject.find(g.feedobjectids.first).generate
+		#	end
+		#end
 
 	end
 

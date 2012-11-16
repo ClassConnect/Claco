@@ -19,14 +19,20 @@ class Feed
 	end
 
 	def disown(id)
-		self.actors.delete(id)
-		self.save
+		if self.wrappers.map{|f| f.whoid}.reject{|g| g!=id}.size < 2
+			self.actors.delete(id)
+			self.save
+		end
 	end
 
 	# for now, this remains class-invariant
 	def html(teacherid)#,last_refresh)
 
 		#debugger
+
+		p ""
+		p "HTML for feed:"
+		p ""
 
 		@feed = []
 		@subsfeed = []
@@ -116,7 +122,7 @@ class Feed
 				if 	(f[:model].to_s=='binders' && 
 						model.parents[0]!={ "id" => "-1", "title" => "" } && 
 						model.is_pub? && 
-						Binder.thumbready?(model) &&
+						#(Binder.thumbready?(model) || model.type==1)&&
 						!f[:data][:src] && 
 						!(feedblacklist[f[:actionhash].to_s]) && 
 						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
@@ -210,11 +216,9 @@ class Feed
 														'upper' => [most_recent_logtime,self.timerange['upper'].to_f].max })
 			end
 
-			arr = self.actors.clone
-
 			@subsfeed.each do |f|
 
-				arr << f.first[:ownerid]
+				self.actors << f.first[:ownerid]
 				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],
 												whatid: 	f.first[:log].modelid,
 												timestamp: 	f.first[:log].timestamp,
@@ -222,7 +226,7 @@ class Feed
 												wclass: 	f.first[:log][:method])
 			end
 
-			self.actors = arr.uniq!
+			self.actors.uniq!
 
 			self.save
 
@@ -261,6 +265,26 @@ class Wrapper
 
 	before_destroy do
 		self.feed.disown(self.whoid)
+	end
+
+
+	# only called when an element is being removed from
+	def purge(id)
+		self.feedobjectids.delete(id)
+		Feedobject.find(id).delete
+		if self.feedobjectids.empty?
+			self.delete
+		else
+			self.generate
+		end
+	end
+
+	def multiplicity?
+		self.objnum > 1
+	end
+
+	def objnum
+		self.feedobjectids.size
 	end
 
 	# called when retrieving or refreshing the feed
@@ -322,29 +346,9 @@ class Wrapper
 			self.update_attributes(:logids => [])
 		end
 
-		raise 'Undefined wrapper class!' if self.wclass.empty?
-
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self).html_safe)
 		Rails.cache.delete("wrapper/#{self.id.to_s}")
 
 	end
 
-	# only called when an element is being removed from
-	def purge(id)
-		self.feedobjectids.delete(id)
-		Feedobject.find(id).delete
-		if self.feedobjectids.empty?
-			self.delete
-		else
-			self.generate
-		end
-	end
-
-	def multiplicity?
-		self.objnum > 1
-	end
-
-	def objnum
-		self.feedobjectids.size
-	end
 end

@@ -6,6 +6,7 @@ class Feed
 	field :fclass, :type => Integer, :default => 0
 	field :owner, :type => String, :default => ''
 	field :mr_logid, :type => String, :default => ''
+	field :actors, :type => Array, :default => []
 
 	embeds_many :wrappers
 
@@ -15,6 +16,11 @@ class Feed
 
 	def generate
 		self.wrappers.each { |f| f.generate }
+	end
+
+	def disown(id)
+		self.actors.delete(id)
+		self.save
 	end
 
 	# for now, this remains class-invariant
@@ -187,10 +193,6 @@ class Feed
 								duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
 							end
-							# if !Rails.cache.read(f[:log].id.to_s).nil? 
-							# 	expire_fragment(f[:log].id.to_s) 
-							# 	Rails.cache.delete(f[:log].id.to_s)
-							# end
 						end
 					end
 				end
@@ -199,9 +201,6 @@ class Feed
 
 				break if retsize == SUBSC_FEED_LENGTH
 			end
-			#debugger
-
-			#self.wrappers.delete_all
 
 			# keep aggregate count of most recent log ids
 
@@ -211,26 +210,19 @@ class Feed
 														'upper' => [most_recent_logtime,self.timerange['upper'].to_f].max })
 			end
 
+			arr = self.actors.clone
+
 			@subsfeed.each do |f|
-				#self.wrappers << Wrapper.new()#.generate(f))
-				#f = [f] if f.size==1
-				#debugger
+
+				arr << f.first[:ownerid]
 				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],
 												whatid: 	f.first[:log].modelid,
 												timestamp: 	f.first[:log].timestamp,
 												logids: 	f.map { |g| g[:log].id.to_s },
 												wclass: 	f.first[:log][:method])
-												# :logids => (f.class==Array ? (f.map { |g| g[:log].id.to_s }) : ([f[:log].id.to_s])),
-												# :wclass => (f.class==Array ? f.first[:log][:method] : f[:method]))
-				#self.save
-
-				#debugger
-				#self.wrappers.last.generate#(f)
-				#self.wrappers.last.generate(f)
-				#debugger
-
-				#retstr += self.wrappers.last.html.html_safe
 			end
+
+			self.actors = arr.uniq!
 
 			self.save
 
@@ -267,20 +259,12 @@ class Wrapper
 
 	embedded_in :feed
 
-	#after_initialize do
-	#	self.generate
-	#end
+	before_destroy do
+		self.feed.disown(self.whoid)
+	end
 
 	# called when retrieving or refreshing the feed
 	def html
-
-		# cachedata = Rails.cache.read("feedwrapper/#{self.id.to_s}")
-
-		# if cachedata.nil?
-		# 	# wrapper does not exist in cache!  
-		# 	cachedata = self.generate
-		# 	Rails.cache.write("feedwrapper/#{self.id.to_s}",cachedata)
-		# end
 
 		# initially, don't cache any of this, generate on the fly
 		html = Rails.cache.read("wrapper/#{self.id.to_s}")
@@ -291,31 +275,12 @@ class Wrapper
 		end
 		self.feedobjectids.each { |f| html += Feedobject.find(f).html.html_safe }
 		html = IndirectModelController.new.feedbox(Teacher.find(self.whoid),html).html_safe
-		# html = "<div class=\"newsitem\">\
-		# 			<div class=\"imgarea\">
-		# 				<a href=\"/<%= (t = Teacher.find(self.whoid)).username %>\">\
-		# 					<img src=\"<%= Teacher.
-		# 				</a>\
-		# 			</div>\
-		# 			<div class=\"feedcontent\">\
-		# 				#{html}\
-		# 			</div>\
-		# 			<div style=\"clear:both\"></div>\
-		# 		</div>"
-		#debugger
 		html.html_safe	
 
 	end
 
 	# this will be called on both new wrappers and already populated wrappers
-	def generate#(a=nil,b=nil,c=nil) #(feedobj)
-
-		# raise 'Undefined wrapper class!' if self.wclass.empty?
-		# #debugger
-		# self.update_attributes(:markup => IndirectModelController.new.pseudorender(self))
-		# Rails.cache.delete("wrapper/#{self.id.to_s}")
-
-		#debugger
+	def generate
 
 		if self.logids.any?
 			# this is the first generate of the wrapper
@@ -353,49 +318,26 @@ class Wrapper
 				self.feedobjectids << feedobj.id.to_s
 			end
 			self.save
-			# exit unbuilt state, presently unused
+			# exit unbuilt state
 			self.update_attributes(:logids => [])
-		#else
-			# this
 		end
 
 		raise 'Undefined wrapper class!' if self.wclass.empty?
-		#debugger
+
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self).html_safe)
 		Rails.cache.delete("wrapper/#{self.id.to_s}")
 
-
-		#debugger
-
-		return if false
-
-		# these are pre-generate on class initialization
-
-		# self.feedobjects.each do |f|
-		# 	#create feedobject from log object
-		# 	Feedobject.find(f).generate
-		# end
 	end
 
 	# only called when an element is being removed from
 	def purge(id)
-		#debugger
 		self.feedobjectids.delete(id)
-		#self.whatid = self.feedobjectids.first
-		#self.save
 		Feedobject.find(id).delete
 		if self.feedobjectids.empty?
 			self.delete
-			#Rails.cache.delete("wrapper/#{self.id.to_s}")
 		else
-			#debugger
-			#if id==self.whatid
-			#	debugger
-			#end
 			self.generate
 		end
-		#debugger
-		#return if false
 	end
 
 	def multiplicity?

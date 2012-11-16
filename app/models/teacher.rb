@@ -153,6 +153,10 @@ class Teacher
 			f.generate
 		end
 
+		Feed.where(:actors => self.id.to_s) do |f|
+			f.disown(self.id.to_s)
+		end
+
 	end
 
 	# Tire.index 'teachers' do

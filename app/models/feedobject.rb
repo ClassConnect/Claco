@@ -19,16 +19,11 @@ class Feedobject
 	# storage of HTML
 	field :markup, :type => String, :default => ''
 
-	# after_initialize do
-	# 	self.generate
-	# end
-
 	# called synchronously on initialization & callbacks
 	def generate(after_save=false)
 		# cannot assume state of feed object exists or is public
 
 		if after_save && !self.binderid.empty?
-			debugger
 			model = Binder.find(self.binderid)
 			if model.parents[0]["id"]=="-1" || !model.is_pub?
 				self.superids.each do |f|

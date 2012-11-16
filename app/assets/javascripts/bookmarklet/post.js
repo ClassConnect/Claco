@@ -26,10 +26,10 @@ $(document).ready(function(){
 	});
 
 
-	$('div.dir').on('changeBinder', function /*updateFormAction*/ (){
-		var binderUrl = $(this).attr('turl');
+	$('#chosenOne').on('changeBinder', function /*updateFormAction*/ (){
+		var binderUrl = $(this).data('turl');
 		$('input[name=binderUrl]').val(binderUrl);
-
+		
 		$('form#post')
 			.attr('action', binderUrl + '/createcontent')
 			.trigger('change');

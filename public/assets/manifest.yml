@@ -146,8 +146,8 @@ messages/show.js: messages/show-4d693929057739e9e06cd354541c5492.js
 profile/main.js: profile/main-ff0376a2336f8194e0602536646c5372.js
 search/main.js: search/main-4e16709cce13c68fd83fd5fe3fce9a18.js
 standards.json: standards-4d8d2082bb3640cdf407ce4515f8d06e.json
-application.css: application-c4bf33bcb5899ff965f59e592beb3ce3.css
-binders/folder.css: binders/folder-2faf8bd39c06df1b8bdb0b1bd0bb87e5.css
+application.css: application-3ebf9b33d17118516fb96c3976d28817.css
+binders/folder.css: binders/folder-ce09cbe82a3ea4e1fe6e93e6bce6d68c.css
 bookmarklet/post.css: bookmarklet/post-7a4f3df75092e5e2caeff6d8865469ee.css
 buttons/buttons.css: buttons/buttons-9cca403a266424438923ea405de6337f.css
 buttons/zocial-regular-webfont.eot: buttons/zocial-regular-webfont-a0e11676e0eb455a805549dfe73095b3.eot
@@ -172,7 +172,7 @@ home/pub/uwt.css: home/pub/uwt-1e8baecc5f7a535e85a2df14dad531cf.css
 home/public.css: home/public-84e3475f833513d9c9b69f0280cfc41e.css
 messages/main.css: messages/main-187b397142a653ce27d4a8a80b6efa8b.css
 search/main.css: search/main-82772556488157d592c21c6fa0f41192.css
-teacher.css: teacher-ec8c81086dd990ea25534ba2bb32805b.css
+teacher.css: teacher-88b1d2dd0a7d9b72875e59039243b076.css
 glyphicons-halflings-white.png: glyphicons-halflings-white-13553a5bf21ae3cc374006592488ec64.png
 glyphicons-halflings.png: glyphicons-halflings-ab3144065a860d198f1d7d9a4882640c.png
 binders/icheck.js: binders/icheck-5c1621b3f36a3f184889c9e35c9f8aca.js

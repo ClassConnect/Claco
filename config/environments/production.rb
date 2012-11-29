@@ -50,7 +50,7 @@ Claco::Application.configure do
   config.assets.js_compressor = Uglifier.new(:copyright => false)
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += ['*.js', '*.css', '*.eot', '*.svg', '*.woff', '*.ttf', '*.png', '*.jpg']
+  config.assets.precompile += ['*.js', '*.css']
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false

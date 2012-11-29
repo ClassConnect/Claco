@@ -352,12 +352,10 @@ class BindersController < ApplicationController
 
 					#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
+					@binder.set_owner(current_teacher)
+
 					@binder.update_attributes(	:title				=> File.basename(	params[:key].split("/").last,
 																						File.extname(params[:key].split("/").last)).strip[0..49],
-												:owner				=> current_teacher.id,
-												:fname				=> current_teacher.fname,
-												:lname				=> current_teacher.lname,
-												:username			=> current_teacher.username,
 												:parent				=> @parenthash,
 												:parents			=> @parentsarr,
 												:last_update		=> Time.now.to_i,

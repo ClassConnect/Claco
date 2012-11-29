@@ -59,7 +59,7 @@ class Binder
 	#Counts
 	field :files, :type => Integer, :default => 0
 	field :folders, :type => Integer, :default => 0
-	field :children, :type => Integer, :default => 0
+	field :children, :type => Integer, :default => 0 # This field needs to be cleanly removed... or used properly and renamed
 	field :total_size, :type => Integer, :default => 0
 	field :pub_size, :type => Integer, :default => 0
 	field :priv_size, :type => Integer, :default => 0
@@ -362,13 +362,6 @@ class Binder
 
 	end
 
-	#TODO: change this to a scoped entity
-	def get_binder_children_by_id(parent_binder_id)
-
-		return Binders.where("parent.id" => parent_binder_id)
-
-	end
-
 	# re-inherits the parent tags
 	def update_parent_tags
 
@@ -421,16 +414,15 @@ class Binder
 		return ret_set
 	end
 
-	def find_parent
-		Binder.find(self.parent["id"])
-	end
-
+	#Sets the binder's inherited permissions and parent data
+	#TODO:
+	#Change this to disallow "0"
+	#Make separate function for inheriting from "0" - should only be used for creating binders
 	def inherit_from(parentid)
 
 		parenthash = {}
 		parentsarr = []
 		parentperarr = []
-		parent_child_count = 0
 
 		if parentid.to_s == "0"
 
@@ -444,8 +436,6 @@ class Binder
 		else
 
 			parent = Binder.find(parentid)
-
-			parent_child_count = parent.children.count
 
 			parenthash = {	:id		=> parentid.to_s,
 							:title	=> parent.title}
@@ -482,16 +472,32 @@ class Binder
 
 	end
 
+	#Grab the ids of parents
 	def parent_ids
-		return parents.collect {|x| x["id"] || x[:id]}
+		parents.map{|x| x["id"] || x[:id]}
+	end
+
+	def parent_ids_without_roots
+		parent_ids.reject{|p| RESERVED_BINDER_IDS.include?(p)}
+	end
+
+	#Find immediate parent
+	def find_parent
+		Binder.find(self.parent["id"])
+	end
+
+	#Finds All parents to the binder
+	#Returns in database order
+	def find_parents
+		Binder.where(:_id.in => self.parent_ids_without_roots)
 	end
 
 	def children
-		return Binder.where("parent.id" => self.id.to_s)
+		Binder.where("parent.id" => self.id.to_s)
 	end
 
 	def subtree
-		return Binder.where("parents.id" => self.id.to_s)
+		Binder.where("parents.id" => self.id.to_s)
 	end
 
 	# when versions are implemented, this needs to be rewritten!!!!
@@ -567,9 +573,7 @@ class Binder
 
 	def cascadetimestamp
 
-		binderparents = self.parents.reject{|p| p["id"] == "0" || p[:id] == "0"}.map{|p| Binder.find(p["id"])}
-
-		binderparents.each do |binder|
+		self.find_parents.each do |binder|
 
 			binder.update_attributes(last_update: self.last_update)
 
@@ -638,6 +642,24 @@ class Binder
 	def self.fixtimestamps
 
 		Binder.all.each{|binder| binder.update_attributes(:last_update => binder.subtree.sort_by(&:timestamp).last.last_update) if binder.type == 1}
+
+	end
+
+	def self.new_folder
+
+		binder = Binder.new
+		binder.type = 1
+
+		return binder
+
+	end
+
+	def set_owner(teacher)
+
+		binder.owner = teacher.id
+		binder.username = teacher.username
+		binder.fname = teacher.fname
+		binder.lname = teacher.lname
 
 	end
 
@@ -716,11 +738,9 @@ class Binder
 
 							binder.inherit_from(parentid)
 
+							binder.set_owner(teacher)
+
 							binder.update_attributes(	:title				=> params[:webtitle].strip[0..49],
-														:owner				=> teacher.id,
-														:username			=> teacher.username,
-														:fname				=> teacher.fname,
-														:lname				=> teacher.lname,
 														:last_update		=> Time.now.to_i,
 														:last_updated_by	=> teacher.id.to_s,
 														:body				=> params[:body] || "",
@@ -814,11 +834,9 @@ class Binder
 
 							binder.create_binder_tags(params,teacher.id)
 
-							pids = binder.parent_ids
+							binder.find_parents.each{|b| b.inc(:files, 1)}
 
-							pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
-
-							Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
+							parent.inc(:children, 1) if parent != "0"
 
 						else
 
@@ -877,39 +895,39 @@ class Binder
 
 			if (parent == "0" && params[:username].downcase == teacher.username.downcase) || parent.get_access(teacher.id) == 2
 
-				binder = Binder.new
+				binder = Binder.new_folder
 
 				binder.inherit_from(parentid)
 
 				binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if parent == "0"
 
-				binder.update_attributes(	:owner				=> teacher.id,
-											:fname				=> teacher.fname,
-											:lname				=> teacher.lname,
-											:username			=> teacher.username,
-											:title				=> params[:foldertitle].strip[0..49],
+				binder.set_owner(teacher)
+
+				binder.update_attributes(	:title				=> params[:foldertitle].strip[0..49],
 											:body				=> params[:body],
 											:order_index		=> parent == "0" ? teacher.binders.root_binders.count : parent.children.count,
 											:last_update		=> Time.now.to_i,
-											:last_updated_by	=> teacher.id.to_s,
-											:type				=> 1)
+											:last_updated_by	=> teacher.id.to_s)
 
 				# binder.cascadetimestamp
 
 				#Update parents' folder counts
 				if binder.parents.size > 1
-					pids = binder.parent_ids
 
-					pids.each do |pid| 
-						if pid != "0"
-							p = Binder.find(pid)
-							p.update_attributes(:folders		=> p.folders + 1,
-												:last_update	=> Time.now.to_i)
-						end
-						#Binder.find(pid).inc(:folders, 1) if pid != "0"
-					end
+					binder.find_parents.each{|p| p.update_attributes(:folders => p.folders + 1, :last_update => Time.now.to_i)}
 
-					Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+					# pids = binder.parent_ids
+
+					# pids.each do |pid|
+					# 	if pid != "0"
+					# 		p = Binder.find(pid)
+					# 		p.update_attributes(:folders		=> p.folders + 1,
+					# 							:last_update	=> Time.now.to_i)
+					# 	end
+					# 	#Binder.find(pid).inc(:folders, 1) if pid != "0"
+					# end
+
+					# Binder.find(pids.last).inc(:children,1) if pids.last != "0"
 				end
 
 				binder.create_binder_tags(params,teacher.id)

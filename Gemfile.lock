@@ -95,6 +95,8 @@ GEM
       net-ssh (>= 2.1.3)
       nokogiri (~> 1.5.0)
       ruby-hmac
+    foreman (0.60.2)
+      thor (>= 0.13.6)
     formatador (0.2.3)
     hashie (1.2.0)
     hashr (0.0.21)
@@ -266,6 +268,7 @@ DEPENDENCIES
   dynamic_form
   exceptional
   fog (~> 1.3.1)
+  foreman
   jquery-rails
   kaminari
   log4r (= 1.1.9)

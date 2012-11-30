@@ -23,11 +23,12 @@ gem 'uglifier', '>= 1.3.0'
 
 gem "asset_sync"
 
-# group :development do
+group :development do
+	gem 'foreman'
 #   gem 'linecache19'#, '0.5.13'
 #   gem 'ruby-debug-base19'#, '0.11.26'
 #   gem 'ruby-debug19', :require => 'ruby-debug'
-# end
+end
 
 # command to properly install debugger
 #gem install ruby-debug19 -- --with-ruby-include=$rvm_path/src/ruby-1.9.2-head/

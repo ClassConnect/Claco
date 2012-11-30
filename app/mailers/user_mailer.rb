@@ -106,23 +106,31 @@ class UserMailer < ActionMailer::Base
 		end
 	end
 
+	def newsletter(teacher)
+		@pre = "Your Claco Newsletter"
+
+		mail(from: "Team Claco <support@claco.com>", to: teacher.email, subject: "Your Claco Newsletter") do |format|
+			format.html {render "newsletter"}
+		end
+	end
+
 protected
 	def named_binder_route(binder, action = "show")
 		if binder.class == Binder
 			retstr = "/#{binder.handle}/portfolio"
 
-			if binder.parents.length != 1 
-				retstr += "/#{CGI.escape(binder.root)}" 
+			if binder.parents.length != 1
+				retstr += "/#{CGI.escape(binder.root)}"
 			end
 
 			retstr += "/#{CGI.escape(binder.title)}/#{binder.id}"
 
-			if action != "show" 
-				retstr += "/#{action}" 
+			if action != "show"
+				retstr += "/#{action}"
 			end
 
 			return retstr
-		elsif binder.class == String 
+		elsif binder.class == String
 			return named_binder_route(Binder.find(binder), action)
 		else
 			return "/500.html"

@@ -1,6 +1,9 @@
 BASE_BINDER_ROUTE = '/:username/portfolio(/:root)/:title/:id'
 
 Claco::Application.routes.draw do
+	if Rails.env.development?
+	    mount MailPreview => 'mail_view'
+	end
 
 	##################
 	# DEVISE ROUTING #
@@ -76,7 +79,7 @@ Claco::Application.routes.draw do
 	get		'/admin/pioneer'													=> 'admin#choosepibinder'
 	post	'/admin/pioneer'													=> 'admin#setpibinder',				:as => 'pioneer'
 	get		'/admin/ghost/:id'													=> 'admin#ghost',					:as => 'ghost'
-	get 	'/admin/updatethumbnails'											=> 'admin#choosethumbnails'			#:as => 
+	get 	'/admin/updatethumbnails'											=> 'admin#choosethumbnails'			#:as =>
 	post 	'/admin/updatethumbnails'											=> 'admin#setthumbnails',			:as => 'updatethumbnails'
 	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
 	get 	'/admin/analytics'													=> 'admin#analytics',				:as => 'analytics_path'
@@ -184,7 +187,7 @@ Claco::Application.routes.draw do
 		#New
 		get		'/:username/portfolio/new'										=> 'binders#new',					:as => 'new_binder'
 		post	'/:username/portfolio'											=> 'binders#create',				:as => 'binders'
-		
+
 		#Trash folder
 		get		'/trash'														=> 'binders#trash',					:as => 'trash'
 
@@ -229,7 +232,7 @@ Claco::Application.routes.draw do
 		get		"#{BASE_BINDER_ROUTE}/video"									=> 'binders#zenframe'
 		get		"#{BASE_BINDER_ROUTE}"											=> 'binders#show'
 		delete	"#{BASE_BINDER_ROUTE}"											=> 'binders#destroy'
-		
+
 		#Update :body
 		put		"#{BASE_BINDER_ROUTE}"											=> 'binders#update'
 
@@ -237,7 +240,7 @@ Claco::Application.routes.draw do
 
 		#Profile Page
 		get		'/:username'													=> 'teachers#show'
-	
+
 	end
 
 	get			'/*x'															=> 'errors#not_found'

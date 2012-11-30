@@ -25,12 +25,14 @@ $(document).ready(function() {
 			setTimeout(function() {$(".login-focus").focus();},100);
 
 		}
-	    
+
 	});
 
 	$(document).bind('reveal.facebox', function() {
 		fieldAdder();
 	});
+
+  handleCollabForm();
 
 });
 
@@ -68,13 +70,35 @@ function htmlEncode(value){
         return '';
     }
 }
- 
+
 function htmlDecode(value) {
     if (value) {
         return $('<div />').html(value).text();
     } else {
         return '';
     }
+}
+
+// edit collaborators
+function handleCollabForm() {
+
+  $('#folder-collaborators')
+    .find('button[data-toggle]')
+    .click(function/*toggleForm*/(){
+
+      $('#' + $(this).data('toggle'))
+        .toggle();
+
+      $(this)
+        .toggleClass('btn-primary')
+        .text(function/*changeIfClass*/(){
+
+          if($(this).hasClass('btn-primary')) return 'Save';
+            return 'Edit';
+
+        });
+
+    });
 }
 
 // close facebox
@@ -94,13 +118,13 @@ function fbFormActRevert() {
 
 function fbFormDisable(formID) {
 	$('#facebox :input').attr('disabled', true);
- 
+
 	$('#facebox :submit').attr('disabled', true);
 }
 
 function fbFormEnable(formID) {
 	$('#facebox :input').attr('disabled', false);
- 
+
 	$('#facebox :submit').attr('disabled', false);
 }
 
@@ -146,7 +170,7 @@ function togglePickFolder(fObj) {
 	} else {
 		$(fObj).parent().find(".dirWrap").html('Loading...').show();
 		$(fObj).addClass('arrow-down').removeClass('arrow-right');
-	
+
 
 		$.getJSON($(fObj).parent().attr('turl') + '.json', function(data) {
 
@@ -188,7 +212,7 @@ function selectPickFolder(fObj) {
 
 	var changeBinder = $.Event("changeBinder");		// custom event
 	$('div.dir').trigger(changeBinder);
-	
+
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
 	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);
 	$(fObj).closest(".pickerpane").hide();
@@ -220,44 +244,3 @@ function getQueryHash() {
 
     return queryMap;
 }
-
-// ! we all mess up sometimes -- @diwank
-// function perform (action, target) {
-// 	var actions = {};
-	
-// 	// actions library
-// 	actions.toggle = function /*toggle*/(_target) {
-// 		// coerce target & source into jQuery objects
-// 		var _source = 
-// 			(jQuery(_target).length)
-// 			? jQuery(_target)
-// 			: jQuery('[data-target='+_target+']');	// source element has data-target property
-
-// 		_target = 
-// 			(jQuery(_target).length) 
-// 			? jQuery(_target) 
-// 			: jQuery('[data-href='+_target+']'); // target element has data-href property
-		
-// 		// toggle source
-// 		_source
-// 			.parent('li')
-// 			.siblings('li')
-// 			.removeClass('active');
-// 			// ! this shouldn't be here; ask diwank to fix it
-// 		_source
-// 			.parent('li')
-// 			.addClass('active');
-		
-// 		// toggle target
-// 		_target
-// 			.siblings('[data-href]')
-// 			.addClass('hidden');
-
-// 		_target.removeClass('hidden');
-
-// 		return _target;
-// 	}
-
-// 	// do action
-// 	return actions[action](target);
-// }

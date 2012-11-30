@@ -226,8 +226,8 @@ footer {
 }
 
 #meoptmenu .droparr {
-  width:0px; 
-  height:0px; 
+  width:0px;
+  height:0px;
   border-left:7px solid transparent;
   border-right:7px solid transparent;
   border-top:7px solid #FFFFFF;
@@ -428,8 +428,8 @@ footer {
 }
 
 .fol-picker .togbar .down-arrow {
-  width:0px; 
-  height:0px; 
+  width:0px;
+  height:0px;
   border-left:7px solid transparent;
   border-right:7px solid transparent;
   border-top:7px solid #666;
@@ -495,8 +495,8 @@ footer {
 }
 
 .fol-picker .pickerpane .bndr .dir .arrow-down {
-  width:0px; 
-  height:0px; 
+  width:0px;
+  height:0px;
   border-left:6px solid transparent;
   border-right:6px solid transparent;
   border-top:6px solid #666;
@@ -508,8 +508,8 @@ footer {
 }
 
 .fol-picker .pickerpane .bndr .dir .arrow-right {
-  width:0px; 
-  height:0px; 
+  width:0px;
+  height:0px;
   border-left:6px solid #666;
   border-top:6px solid transparent;
   border-bottom:6px solid transparent;
@@ -606,12 +606,4 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
   -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 0 3px rgba(0,0,0,0.1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.dropdown-menu li > a:hover {
-  background-image: -moz-linear-gradient(top, #fff, #EEE);
-  background-image: -webkit-gradient(linear, 0 0, 0 0%, from(white), to(#EEE));
-  background-image: -webkit-linear-gradient(top, #fff, #EEE);
-  background-image: -o-linear-gradient(top, #fff, #EEE);
-  background-image: linear-gradient(to bottom, #fff, #EEE);
 }

@@ -2,7 +2,6 @@ BASE_BINDER_ROUTE = '/:username/portfolio(/:root)/:title/:id'
 
 Claco::Application.routes.draw do
 
-
 	##################
 	# DEVISE ROUTING #
 	##################
@@ -82,6 +81,7 @@ Claco::Application.routes.draw do
 	get		'/admin/getthumbnails'												=> 'admin#getthumbnails'
 	get 	'/admin/analytics'													=> 'admin#analytics',				:as => 'analytics_path'
 	get 	'/admin/teacheranalytics'											=> 'admin#teacheranalytics',		:as => 'teacheranalytics_path'
+	get 	'/admin/teacheranalytics/:id'										=> 'admin#singleteacherdata',		:as => 'teacheranalytics_path'
 
 
 	###################

@@ -1,4 +1,4 @@
-<h2>Teacher Analytics</h2>
+<h2>Teacher Analytics (unfinished)</h2>
 <hr />
 <%= form_tag 'teacheranalytics', :method => 'get' do %>
 	<table>
@@ -40,7 +40,7 @@
 		</tr>
 		<tr>
 			<td valign='top'>
-				<%= check_box_tag 'bindercount', 'bindercount', params['bindercount'].present? %>Use binder counts? (NOT WORKING)&nbsp;
+				<%= check_box_tag 'bindercount', 'bindercount', params['bindercount'].present? %>Use binder counts?&nbsp;
 			</td>
 			<td>
 				Teachers that have between <%= text_field_tag :bindermin, params[:bindermin] %> and <%= text_field_tag :bindermax, params[:bindermax] %> binders.  
@@ -112,15 +112,63 @@
 		</tr>
 		<tr>
 			<td>
+				Entries per page:&nbsp;
+			</td>
+			<td>
+				<%= select_tag(:entries, options_for_select([['25','25'],['50','50'],['100','100'],['250','250'],['500','500']],(params[:entries] || '100'))) %>
+			</td>
+		</tr>
+		<tr>
+			<td>
 				<%= submit_tag "Apply Filters", :name => nil %>
 			</td>
 		</tr>
 	</table>
 <% end %>
+<%= #@teachers.size 
+%>
 
-<% if false %>
-	Have profile pictures
+<% begin %>
+	<%= paginate(@teachers) %>
+	<%= page_entries_info(@teachers).html_safe %>
+<% rescue %>
+<% end %>
 
-	Two groups, compare sets of these groups of IDs
-	Make group model
+<table>
+	<tr>
+		<td>
+			<b>ID (links to DB info page)</b>
+		</td>
+		<td>
+			<b>Username (links to teacher profile)</b>
+		</td>
+		<td>
+			<b>First Name</b>
+		</td>
+		<td>
+			<b>Last Name
+		</td>
+	</tr>
+	<% @teachers.each do |f| %>
+	<tr>
+		<td>
+			<a href="/admin/teacheranalytics/<%= f.id.to_s %>"><%= f.id.to_s %></a>&nbsp;&nbsp;
+		</td>
+		<td>
+			<a href="/<%= f.username %>"><%= f.username %></a>
+		</td>
+		<td>
+			<%= f.fname %>
+		</td>
+		<td>
+			<%= f.lname %>
+		</td>
+	</tr>
+	<% end %>
+</table>
+
+<% begin %>
+	<%= paginate(@teachers) %>
+	<%= page_entries_info(@teachers).html_safe %>
+<% rescue %>
 <% end %>

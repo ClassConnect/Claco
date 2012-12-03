@@ -1,0 +1,23 @@
+<h2>Individual Teacher Analytics</h2>
+<hr />
+<br />
+<% if @teacher.nil? %>
+	Invalid teacher id!
+<% else %>
+	<%= #raw(JSON.pretty_generate(@teacher.as_document.as_json)) 
+	%>
+	<h3>Teacher:</h3>
+	<p style="font-family:courier new;">
+		<%= raw(JSON.pretty_generate(@teacher.as_document.as_json).to_s.gsub("\n","<br />").gsub("  ","&nbsp;&nbsp;")) %>
+	</p>
+	<h3>Info:</h3>
+	<p style="font-family:courier new;">
+		<%= raw(JSON.pretty_generate(@teacher.info.as_document.as_json).to_s.gsub("\n","<br />").gsub("  ","&nbsp;&nbsp;")) %>
+	</p>
+	<h3>Relationships:</h3>
+	<p style="font-family:courier new;">
+		<% @teacher.relationships.each do |f| %>
+			<%= raw(JSON.pretty_generate(f.as_document.as_json).to_s.gsub("\n","<br />").gsub("  ","&nbsp;&nbsp;")) %><br />
+		<% end %>
+	</p>
+<% end %>

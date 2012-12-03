@@ -208,14 +208,15 @@ function togglePickFolder(fObj) {
 
 function selectPickFolder(fObj) {
 	var folid = $(fObj).parent().attr('folid');
+  var turl = $(fObj).parent().attr('turl');
 	var text = $(fObj).text();
 
-	var changeBinder = $.Event("changeBinder");		// custom event
-	$('div.dir').trigger(changeBinder);
+  $(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
+  $(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid).data('turl', turl);
+  $(fObj).closest(".pickerpane").hide();
 
-	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
-	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);
-	$(fObj).closest(".pickerpane").hide();
+	var changeBinder = $.Event("changeBinder");		// custom event
+	$('#chosenOne').trigger(changeBinder);
 
 }
 

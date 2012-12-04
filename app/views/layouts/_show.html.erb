@@ -32,7 +32,7 @@
       <div class="conbox whitester">
         <div class="headstrip" style="margin-bottom:10px;">
 
-          <div style="<%= "display:none;" if !signed_in? || (signed_in? ? current_teacher.id.to_s != @binder.owner : false) %>float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
+          <div style="<%= "display:none;" if !signed_in? || (signed_in? ? current_teacher.id.to_s != @binder.owner : false) %>float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%# 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
           <div class="inner">
           Public
           </div>
@@ -211,29 +211,43 @@
       </div>
     <% end %>
 
+    <% if signed_in? %>
     <div id="folder-collaborators" class="conbox whitester">
       <div class="headstrip">
         <div class="inner">
         Collaborators
+        <% if signed_in? && @binder.owner?(current_teacher.id.to_s) %>
           <button class="shiny btn pull-right" data-toggle="collab-form" style="margin-top:-4px;margin-right:-7px;">
           Edit
           </button>
+        <% end %>
         </div>
       </div>
       <div class="content-fill">
         <ul class="collaborators">
-          <li>
-            <a href="http://localhost:5000/diwank/portfolio/test/50a54787d9ade5102b000003" class="no-underline">
-              <img src="http://img.cla.co/e52e76e38dff8a7382e799910484d224/thumb_sm.png" class="img-rounded spaced-out pull-left" />
-              <p>
-                Jerry Bloomeengattererg<br>
-                <small class="username">booker</small>
-                <small class="pull-right">
-                  <a href="." class="red remove-btn" onclick="$(this).closest('li').hide();return false;">remove</a>
-                </small>
-              </p>
-            </a>
-          </li>
+          <% if @collaborators.empty? %>
+
+            You haven't added any collaborators... Yet!
+
+          <% else %>
+            <% @collaborators.each do |teacher| %>
+              <li>
+                <a href="/<%= teacher.username %>" class="no-underline">
+                  <img src="<%= Teacher.thumb_sm(teacher) %>" class="img-rounded spaced-out pull-left" />
+                  <p>
+                    <%= teacher.first_last %><br>
+                    <small class="username"><%= teacher.username %></small>
+                    <% if signed_in? && @binder.owner?(current_teacher.id.to_s) && !@binder.inherited_access?(teacher.id.to_s) %>
+                      <small class="pull-right">
+                        <a href="." class="red remove-btn" onclick="$(this).closest('li').hide();return false;">remove</a>
+                      </small>
+                    <% end %>
+                  </p>
+                </a>
+              </li>
+            <% end %>
+          <% end %>
+
         </ul>
         <form id="collab-form" style="display:none;" action="http://google.com">
           <div class="collab-group">
@@ -247,6 +261,7 @@
       </div>
 
     </div>
+    <% end %>
 
   </div>
 </div>

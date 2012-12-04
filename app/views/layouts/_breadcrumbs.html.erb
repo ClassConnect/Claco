@@ -37,7 +37,7 @@
       </div>
 
       <% if @binder.type == 1 %>
-      <% if signed_in? && current_teacher.id.to_s == @binder.owner %>
+      <% if signed_in? && @binder.get_access(current_teacher.id.to_s) > 1 %>
       <div class="buttonbox">
 
         <div class="btn-group">

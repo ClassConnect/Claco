@@ -71,7 +71,7 @@
 		</div>
 
 		<div class="whitebox" data-href="personal_binders">
-			<% Binder.where(:owner => current_teacher.id, "parent.id" => "0").each do |binder| %>
+			<% current_teacher.binders.root_binders.each do |binder| %>
 			<a href="<%= named_binder_route(binder) %>">
 				<div class="bindir">
 					<div class="binder_attr">&gt;</div>
@@ -80,9 +80,8 @@
 			</a>
 			<% end %>
 		</div>
-		<!-- fuck you pai; fix the shared binders -->
 		<div class="whitebox hidden" data-href="shared_binders">
-			<% Binder.where(:"permissions.shared_id.#{current_teacher}".gte => 1).each do |binder| %>
+			<% @shared_binders.each do |binder| %>
         <a href="<%= named_binder_route(binder) %>">
           <div class="bindir">
             <div class="binder_attr">&gt;</div>
@@ -90,7 +89,7 @@
           </div>
         </a>
       <% end %>
-      <% if Binder.where(:"permissions.shared_id.#{current_teacher}".gte => 1).count == 0 %>
+      <% if @shared_binders.count == 0 %>
         <strong class="bindir block">No one has shared a binder with you... yet!</strong>
       <% end %>
 		</div>

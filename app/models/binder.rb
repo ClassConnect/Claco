@@ -492,9 +492,120 @@ class Binder
 
 	end
 
+	def inherited_access?(id)
+
+		return !parent_permissions.find{|p| p["shared_id"] == id}.nil?
+
+	end
+
 	def is_pub?
 
 		return get_access == 1
+
+	end
+
+	#Type 1 permission = person
+	#Type 2 permission = group
+	#Type 3 permission = global
+	def add_collaborator!(teacher)
+
+		existing_permission = flatten_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+		if existing_permission.nil?
+
+			permissions << {"shared_id" => teacher.id.to_s, "auth_level" => 2, "type" => 1}
+
+		else
+
+			existing_permission["auth_level"] = 2
+
+		end
+
+		cascade_permission_downwards!(teacher)
+
+		return self.save
+
+	end
+
+	#Removes any explicit access given to a teacher
+	#Cascades removal downwards
+	def remove_access!(teacher)
+
+		existing_permission = permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+		if existing_permission.nil?
+
+			return true
+
+		else
+
+			permissions.delete(existing_permission)
+
+		end
+
+		cascade_remove_permission!(teacher)
+
+		return self.save
+
+	end
+
+	def cascade_permission_downwards!(teacher)
+
+		auth_level = flatten_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}["auth_level"]
+
+		subtree.each do |binder|
+
+			existing_permission = binder.parent_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+			if existing_permission.nil?
+
+				binder.parent_permissions << {"shared_id" => teacher.id.to_s, "auth_level" => auth_level, "type" => 1, "folder_id" => self.id.to_s}
+
+			else
+
+				existing_permission["auth_level"] = auth_level
+				existing_permission["folder_id"] = self.id.to_s
+
+			end
+
+			binder.save
+
+		end
+
+	end
+
+	#Removes any inherited permissions for teacher
+	def cascade_remove_permission!(teacher)
+
+		subtree.each do |binder|
+
+			existing_permission = binder.parent_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+			unless existing_permission.nil?
+
+				binder.parent_permissions.delete(existing_permission)
+
+				binder.save
+
+			end
+
+		end
+
+	end
+
+	#Returns one permission array for the binder
+	#Explicit permissions take precedence
+	def flatten_permissions
+
+		retper = permissions
+
+		parent_permissions.each do |per|
+
+			retper << per if permissions.find{|h| h["shared_id"]}.nil?
+
+		end
+
+		retper
 
 	end
 

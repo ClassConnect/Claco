@@ -1624,67 +1624,47 @@ class BindersController < ApplicationController
 
 	def add_collaborator
 
-		@binder = Binder.find(params[:id])
+		binder = Binder.find(params[:id])
 
-		# @new = false
+		if binder.owner?(current_teacher.id)
 
-		if @binder.owner?(current_teacher.id)
+			teacher = Teacher.find_by_username(params[:collab_user])
 
-			@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:collab_user])}$/i).first
+			if !teacher.has_explicit_access_to?(binder)
 
-			if @binder.add_collaborator!(@teacher)
+				if binder.add_collaborator!(teacher)
 
-				src = Mongo.log(current_teacher.id.to_s,
-								__method__.to_s,
-								params[:controller].to_s,
-								@binder.id.to_s,
-								params)
+					src = Mongo.log(current_teacher.id.to_s,
+									__method__.to_s,
+									params[:controller].to_s,
+									binder.id.to_s,
+									params)
 
-				@binder.subtree.map(&:_id).each do |childid|
+					binder.subtree.map(&:_id).each do |childid|
 
-					Mongo.log(	current_teacher.id.to_s,
-								__method__.to_s,
-								params[:controller].to_s,
-								childid.to_s,
-								params,
-								{ :src => src })
+						Mongo.log(	current_teacher.id.to_s,
+									__method__.to_s,
+									params[:controller].to_s,
+									childid.to_s,
+									params,
+									{ :src => src })
+
+					end
 
 				end
 
+			else
+
+				render :json => {"status" => "error", "message" => "#{teacher.first_last} is already a collaborator."}, :status => 422 and return
+
 			end
 
-			# @binder.permissions.each{|p| @new = true if p["shared_id"] == params[:shared_id]}
-
-			# @binder.parent_permissions.each {|pp| @new = true if pp["shared_id"] == params[:shared_id]}
-
-			# @binder.permissions << {:type		=> params[:type],
-			# 						:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-			# 						:auth_level	=> params[:auth_level]} if !@new
-
-			# @binder.save
-
-			# @binder.subtree.each do |c|
-
-			# 	if !@new
-
-			# 		c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
-			# 																			:shared_id => params[:shared_id],
-			# 																			:auth_level => params[:auth_level],
-			# 																			:folder_id => params[:id]})
-			# 		Mongo.log(	current_teacher.id.to_s,
-			# 					__method__.to_s,
-			# 					params[:controller].to_s,
-			# 					c.id.to_s,
-			# 					params,
-			# 					{ :src => src })
-
-			# 	end
-			# end
-
 		end
-		respond_to do |format|
-			format.html {render :json => {"status" => "success", "name" => @teacher.first_last, "username" => @teacher.username, "image" => Teacher.thumb_sm(@teacher)} }
-		end
+
+		render :json => {"status" => "success", "name" => teacher.first_last, "username" => teacher.username, "image" => Teacher.thumb_sm(teacher)}
+
+		rescue Mongoid::Errors::DocumentNotFound
+			render :json => {"status" => "error", "message" => "#{params[:collab_user]} was not found."}, :status => 422 and return
 	end
 
 	def destroypermission
@@ -1693,7 +1673,7 @@ class BindersController < ApplicationController
 
 		if @binder.owner?(current_teacher.id.to_s)
 
-			@teacher = Teacher.where(:username => /^#{Regexp.escape(params[:collab_user])}$/i).first
+			@teacher = Teacher.find_by_username(params[:collab_user])
 
 			@binder.remove_access!(@teacher)
 
@@ -1716,29 +1696,6 @@ class BindersController < ApplicationController
 
 		end
 
-		# pper = @binder.permissions[params[:pid].to_i]
-
-		# pper["folder_id"] = params[:id]
-
-		# @binder.permissions.delete_at(params[:pid].to_i)
-
-		# @binder.subtree.each do |c|
-		# 	c.parent_permissions.delete(pper)
-		# 	c.save
-
-		# 	Mongo.log(	current_teacher.id.to_s,
-		# 				__method__.to_s,
-		# 				params[:controller].to_s,
-		# 				c.id.to_s,
-		# 				params,
-		# 				{ :src => src })
-
-		# end
-
-		# @binder.save
-
-		#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(params[:id])
-		#Binder.generate_folder_thumbnail(params[:id])
 		Binder.generate_folder_thumbnail(@binder.parent['id'])
 
 		respond_to do |format|

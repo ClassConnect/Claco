@@ -560,6 +560,16 @@ class Teacher
 		end
 	end
 
+	def self.find_by_username(username)
+		
+		teacher = Teacher.where(username: /^#{Regexp.escape(username)}$/i).first
+
+		raise Mongoid::Errors::DocumentNotFound.new(Teacher, username) if teacher.nil?
+
+		return teacher
+
+	end
+
 	def get_unread_count
 
 		Conversation.where(:members => self.id.to_s, :"unread.#{self.id.to_s}".gte => 1).count
@@ -572,6 +582,10 @@ class Teacher
 
 	def binders
 		Binder.where(:owner => self.id.to_s)
+	end
+
+	def has_explicit_access_to?(binder)
+		return !binder.permissions.find{|h| h["shared_id"] == self.id.to_s && h["type"] == 1}.nil?
 	end
 
 	# recursively aggregates teacher subscription network

@@ -2,16 +2,22 @@ class Feed
 	include Mongoid::Document
 
 	# integer timestamp used for acquiring a fresh logset from the ES server
-	field :timerange, :type => Hash, :default => {'lower' => nil,'upper' => nil} #, :type => Float, :default => 0.0
+	#field :timerange, :type => Hash, :default => {'lower' => nil,'upper' => nil} #, :type => Float, :default => 0.0
 	field :fclass, :type => Integer, :default => 0
 	field :owner, :type => String, :default => ''
+	field :mr_timestamp, :type => Float, :default => 0.0
+	field :lr_timestamp, :type => Float, :default => 0.0
 	field :mr_logid, :type => String, :default => ''
+	field :lr_logid, :type => String, :default => ''
 	field :actors, :type => Array, :default => []
+	field :page_wrapper_indices, :type => Array, :default => []
+
+	# TODO: make the feed a pseudo-linked list
 
 	embeds_many :wrappers
 
 	def total
-		return self.wrappers.size
+		return self.wrappers.map{|f| f.objnum}.inject(:+)
 	end
 
 	def generate
@@ -25,14 +31,17 @@ class Feed
 		end
 	end
 
+	# javascript will be making requests with the current user ID and a page index
+	#def page(index)
+		#if index==0
+	#end
+
 	# for now, this remains class-invariant
-	def html(teacherid)#,last_refresh)
+	def html(teacherid,page=false)#,last_refresh)
 
 		#debugger
 
-		p ""
-		p "HTML for feed:"
-		p ""
+		# TODO: reset cursor
 
 		@feed = []
 		@subsfeed = []
@@ -74,23 +83,32 @@ class Feed
 			search.filter :terms, :method => FEED_METHOD_WHITELIST
 			search.filter :terms, :ownerid => subs + [teacherid]
 
-			if self.timerange['upper'].present?
-				search.filter :range, :timestamp => { :gte => self.timerange['upper'].to_i }
-			#else
-				# this is to prevent multiple inclusion in the stacked feed object array
-				#search.filter :range, :timestamp => { :gte => Time.now.to_i }
+			if page
+				if self.lr_timestamp!=0.0 #self.timerange['lower'].present?
+					search.filter :range, :timestamp => { :lt => self.lr_timestamp.to_i } #self.timerange['lower'] }
+				end
+			else
+				if self.mr_timestamp!=0.0 #self.timerange['upper'].present?
+					search.filter :range, :timestamp => { :gte => self.mr_timestamp.to_i } #self.timerange['upper'].to_i }
+				#else
+					# this is to prevent multiple inclusion in the stacked feed object array
+					#search.filter :range, :timestamp => { :gte => Time.now.to_i }
+				end
 			end
+
 
 			#if self.timerange['lower'].present?
 			#	search.filter :numeric_range, :lte => self.timerange['lower']
 			#end
 
-			# analyze later for retention in feed object
+			# TODO: analyze later for retention in feed object
 			search.size 100
 
 			search.sort { by :timestamp, 'desc' }
 
 		end
+
+		#debugger
 
 		logs = logs.results
 
@@ -159,10 +177,11 @@ class Feed
 							end
 
 							# create a key for an owner and an action
+							# TODO: this will not scale when extra categories are added that don't gracefully recombine
 							similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
 							# this can be cut down greatly
-							f = { :model => model, :ownerid => f[:ownerid].to_s, :log => f }	
+							f = { :model => model, :ownerid => f[:ownerid].to_s, :log => f, :similar => similar }	
 
 							# if there are no members in the duplist, create a new action in each tracking hash
 							if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
@@ -180,8 +199,8 @@ class Feed
 
 								# insert into array dependent on whether or not a thumbnail exists
 								if (f[:log].model.to_s=='binders' && 
-										(f[:model].thumbimgids[0].nil? || 
-										f[:model].thumbimgids[0].empty?)) || 
+										(f[:model].thumbimgids[0].to_s.empty? || 
+										!Binder.thumbready?(f[:model]))) || 
 									(f[:log].model.to_s=='teachers' && 
 										!Teacher.thumbready?(f[:model]))
 
@@ -210,20 +229,59 @@ class Feed
 
 			# keep aggregate count of most recent log ids
 
+			#debugger
+
 			if !most_recent_logid.empty?
 				self.update_attributes(	:mr_logid => most_recent_logid,
-										:timerange => {	'lower' => [least_recent_logtime,self.timerange['lower'].to_f].min,
-														'upper' => [most_recent_logtime,self.timerange['upper'].to_f].max })
+										:lr_logid => least_recent_logid,
+										:mr_timestamp => self.mr_timestamp==0.0 ? most_recent_logtime  : [self.mr_timestamp,most_recent_logtime].max,
+										:lr_timestamp => self.lr_timestamp==0.0 ? least_recent_logtime : [self.lr_timestamp,least_recent_logtime].min,)
+										# :timerange => {	'lower' => [least_recent_logtime,self.timerange['lower'].to_f].min,
+										# 				'upper' => [most_recent_logtime,self.timerange['upper'].to_f].max })
 			end
+
+			# here, merge subsfeed with existing wrappers
+			# if self.wrappers.any? && false
+			# 	w = self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }
+			# 	@subsfeed.each do |f|
+			# 		w.each do |g|
+			# 			if f[:similar]==g[:similar] && (f.map{|h| h[:timestamp]}.min-g.mr_timestamp<FEED_COLLAPSE_TIME)
+			# 				# move subsfeed data into wrapper, regenerate wrapper
+			# 			end
+			# 		end
+			# 	end
+			# end
+
+			#TODO: cleanup on time delay
+
+			#TODO: unsubscribing from teachers, removing binders should purge
 
 			@subsfeed.each do |f|
 
 				self.actors << f.first[:ownerid]
-				self.wrappers << Wrapper.new(	whoid: 		f.first[:ownerid],
-												whatid: 	f.first[:log].modelid,
-												timestamp: 	f.first[:log].timestamp,
-												logids: 	f.map { |g| g[:log].id.to_s },
-												wclass: 	f.first[:log][:method])
+				logarr = f.sort_by{|g| g[:log].timestamp}
+				self.wrappers << Wrapper.new(	whoid: 			f.first[:ownerid],
+												whatid: 		f.first[:log].modelid,
+												mr_logid: 		logarr.first[:log].id.to_s,
+												lr_logid: 		logarr.last[:log].id.to_s,
+												mr_timestamp: 	logarr.first[:log].timestamp, #f.map{|g| g[:log].timestamp}.sort.first,
+												lr_timestamp: 	logarr.last[:log].timestamp, #f.map{|g| g[:log].timestamp}.sort.last,
+												logids: 		f.map{|g| g[:log].id.to_s},
+												wclass: 		f.first[:log][:method],
+												similar:  		f.first[:similar])
+			end
+
+			# TODO: update model attributes dependent on the annihilate wrappers
+			if !page
+				self.wrappers.size do |size|
+					if size > 20
+						w = self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }
+						((size-20)/2.0).ceil.times do
+							w.pop.annihilate
+						end
+					end
+					#self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }.pop.annihilate
+				end
 			end
 
 			self.actors.uniq!
@@ -232,8 +290,8 @@ class Feed
 
 			imc = IndirectModelController.new()
 
-			self.wrappers.to_a.sort_by { |f| -f.timestamp }.each do |f|
-				retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.timestamp)).html_safe
+			self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }.each do |f|
+				retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
 			end
 		end
 
@@ -255,11 +313,15 @@ class Wrapper
 	field :whereid,			:type => String,	:default => ''
 
 	# all feedobjects are references to the feedobject model
-	field :timestamp,		:type => Float,		:default => 0.0
+	field :mr_timestamp,	:type => Float,		:default => 0.0
+	field :lr_timestamp,	:type => Float, 	:default => 0.0
+	field :mr_logid, 		:type => String, 	:default => ''
+	field :lr_logid, 		:type => String, 	:default => ''
 	field :markup,	 		:type => String, 	:default => ""
 	field :logids,			:type => Array, 	:default => []
 	field :feedobjectids, 	:type => Array, 	:default => []
 	field :wclass, 			:type => String, 	:default => ""
+	field :similar,			:type => String, 	:default => ""
 
 	embedded_in :feed
 
@@ -267,11 +329,25 @@ class Wrapper
 		self.feed.disown(self.whoid)
 	end
 
-
-	# only called when an element is being removed from
+	# only called when an element is removed being from
 	def purge(id)
 		self.feedobjectids.delete(id)
-		Feedobject.find(id).delete
+		Feedobject.find(id) do |f|
+			if self.mr_logid==f.logid
+				self.feedobjectids.map{|g| Log.find(Feedobject.find(g).logid)}.sort_by{|g| g.timestamp}.last do |g|
+					self.mr_logid = g.id.to_s
+					self.mr_timestamp = g.timestamp
+					self.save
+				end
+			elsif self.lr_logid==f.logid
+				self.feedobjectids.map{|g| Log.find(Feedobject.find(g).logid)}.sort_by{|g| g.timestamp}.first do |g|
+					self.lr_logid = g.id.to_s
+					self.lr_timestamp = g.timestamp
+					self.save
+				end
+			end
+			f.delete
+		end
 		if self.feedobjectids.empty?
 			self.delete
 		else
@@ -297,14 +373,13 @@ class Wrapper
 			html = self.markup
 			self.feedobjectids.each { |f| html += Feedobject.find(f).html.html_safe }
 			html = IndirectModelController.new.feedbox(Teacher.find(self.whoid),html).html_safe
-			Rails.cache.write("wrapper/#{self.id.to_s}",html)
+			Rails.cache.write("wrapper/#{self.id.to_s}",html,:expires_in => 2.hours)
 			#self.update_attributes(:markup => '')
-			p "Built wrapper #{self.id.to_s} from DB"
-		else
-			p "Retrieved wrapper #{self.id.to_s} from cache"
 		end
 		html.html_safe	
 	end
+
+	# TODO: generate is already prepped to accept new logids and automatically generate them
 
 	# this will be called on both new wrappers and already populated wrappers
 	def generate
@@ -352,8 +427,44 @@ class Wrapper
 		self.update_attributes(:markup => IndirectModelController.new.pseudorender(self).html_safe)
 		Rails.cache.delete("wrapper/#{self.id.to_s}")
 
-		p "Generated wrapper #{self.id.to_s}"
-
 	end
 
+	def annihilate
+
+		# TODO: update FEED: actors, most recent timestamp, least recent timestamp
+
+		# fix parent feed actors list, accounts for multiple inclusion corner case
+		self.teachers.each do |f|
+			if self.feed.wrappers.any_in(teachers: [f]).any?
+				self.feed.actors.delete(f)
+				self.feed.save
+			end
+		end
+
+		# fix parent feed min/max timestamps, logids
+		if Feedobject.find(self.feedobjectids).where(:logid => self.feed.mr_logid).any?
+			#self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.timestamp}.last.feedobjectids.map{|f| Feedobject.find(f)}
+			self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.timestamp}.last do |f|
+				self.feed.mr_logid = f.mr_logid
+				self.feed.mr_timestamp = f.mr_timestamp
+				self.feed.save
+			end
+		elsif Feedobject.find(self.feedobjectids).where(:logid => self.feed.lr_logid).any?
+			self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.timestamp}.first do |f|
+				self.feed.lr_logid = f.lr_logid
+				self.feed.lr_timestamp = f.lr_timestamp
+				self.feed.save
+			end
+		end
+
+		self.feedobjectids.each do |f|
+			Feedobject.find(f) do |g|
+				if g.superids.size==1
+					g.annihilate
+				end
+			end
+		end
+		Rails.cache.delete("wrapper/#{self.id.to_s}")
+		self.delete
+	end
 end

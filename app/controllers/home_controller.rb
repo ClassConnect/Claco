@@ -2,6 +2,9 @@ class HomeController < ApplicationController
 	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow, :goodies, :press]
 
 	def index
+
+		#debugger
+
 		@title = "Claco"
 		@teachers = Teacher.all
 
@@ -24,6 +27,23 @@ class HomeController < ApplicationController
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
+			@educators = []
+
+			if current_teacher.recommend_ids.to_a.empty?
+				current_teacher.update_attributes(:recommend_ids => current_teacher.recommends)
+			end
+			current_teacher.recommend_ids[0..9].shuffle.each_with_index do |f,index|
+				begin
+					teacher = Teacher.find(f.to_s)
+					if Teacher.thumbready?(teacher) || (@educators.size+6 < index)
+						@educators << teacher
+					end
+				rescue
+					Rails.logger.fatal "Recommended teacher ID invalid"
+					#next
+				end
+				break if @educators.size == 3
+			end
 
 			if false
 
@@ -161,10 +181,6 @@ class HomeController < ApplicationController
 
 		end
 
-		#debugger
-
-		return if false
-
 		rescue Errno::ECONNREFUSED
 			Rails.logger.fatal "ElasticSearch server unreachable"
 		rescue Tire::Search::SearchRequestFailed
@@ -180,7 +196,7 @@ class HomeController < ApplicationController
 		#debugger
 
 		# fallback recommendation calculation
-		if current_teacher.recommend_ids.nil? || current_teacher.recommend_ids.empty?
+		if current_teacher.recommend_ids.to_a.empty?
 			current_teacher.update_attribute(:recommend_ids, current_teacher.recommends)
 			ActionController::Base.new.expire_fragment("recommendations/#{current_teacher.id.to_s}")
 		end
@@ -193,17 +209,31 @@ class HomeController < ApplicationController
 		#Rails.cache.delete("recommendations/html/#{self.id.to_s}")
 		#ActionController::Base.new.expire_fragment("recommendations/#{current_teacher.id.to_s}")
 
-		teachers = Tire.search 'teachers' do |search|
+		# teachers = Tire.search 'teachers' do |search|
 
-			search.query do |query|
-				query.all
-			end
+		# 	search.query do |query|
+		# 		query.all
+		# 	end
 
-			search.filter :terms, :stringid => current_teacher.recommend_ids
+		# 	search.filter :terms, :stringid => current_teacher.recommend_ids
 
-		end
+		# end
 		
-		@recommends = teachers.results
+		# @recommends = teachers.results
+
+		#debugger
+		#url = 'localhost:9200/teachers/_mget'
+		#data = '{"ids":["' + current_teacher.recommend_ids.join('","') + '"]}'
+		#debugger
+		#@recommends = JSON.parse(RestClient.post(url,data))['docs'].map{|f| f.first['_source']}
+
+		#debugger
+
+		#return if false
+
+		@recommends = Teacher.any_in(_id: current_teacher.recommend_ids)
+
+		#RestClient.get()
 
 		#end
 

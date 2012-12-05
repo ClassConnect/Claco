@@ -45,7 +45,15 @@ class MediaServerApiController < ApplicationController
 
 			case params[:model][0]
 			when 'binder'
-				model.update_attributes(:thumbnails => params[:thumbs])
+				m = model.current_version
+
+				stathash = m.imgstatus
+				stathash['img_contentview']['generated'] = true
+				stathash['img_thumb_lg']['generated'] = true
+				stathash['img_thumb_sm']['generated'] = true
+
+				m.update_attributes(:thumbnails => params[:thumbs],
+									:imgstatus => stathash)
 			when 'teacher'
 				# must call save on the root class to enable ElasticSearch callbacks
 

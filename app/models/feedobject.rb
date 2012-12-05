@@ -26,27 +26,29 @@ class Feedobject
 		html = Rails.cache.read("feedobject/#{self.id.to_s}")
 		if html.nil?
 			self.generate if self.markup.empty?
-			Rails.cache.write("feedobject/#{self.id.to_s}",self.markup)
+			Rails.cache.write("feedobject/#{self.id.to_s}",self.markup,:expires_in => 2.hours)
 			html = self.markup
 			# this write only saves DB space, technically unnecessary
 			# self.update_attributes(:markup => '')
-			p "    Built feedobject #{self.id.to_s} from DB"
-		else
-			p "    Retrieved feedobject #{self.id.to_s} from cache"
 		end
 		html
 	end
 
 	# called synchronously on initialization & callbacks
-	def generate(after_save=false)
+	def generate(after_save=nil)
 		# cannot assume state of feed object exists or is public
 
-		if after_save && !self.binderid.empty?
-			model = Binder.find(self.binderid)
-			if model.parents[0]["id"]=="-1" || !model.is_pub?
-				self.superids.each do |f|
-					Feed.find(f['feed']).wrappers.find(f['wrap']).purge(self.id.to_s)
+		if after_save.present? 
+			if after_save == Binder && !self.binderid.empty?
+				model = Binder.find(self.binderid)
+				if model.parents[0]["id"]=="-1" || !model.is_pub?
+					self.superids.each do |f|
+						Feed.find(f['feed']).wrappers.find(f['wrap']).purge(self.id.to_s)
+					end
 				end
+			# elsif after_save == Teacher && !self.teacherid.empty?
+			# 	model = Teacher.find(self.teacherid)
+			# 	if model.
 			end
 		end
 
@@ -57,8 +59,10 @@ class Feedobject
 		self.superids.each do |f|
 			Rails.cache.delete("wrapper/#{f['wrap']}")
 		end
-
-		p "    Generated feedobject #{self.id.to_s}"
 	end
 
+	def annihilate
+		Rails.cache.delete("feedobject/#{self.id.to_s}")
+		self.delete
+	end
 end

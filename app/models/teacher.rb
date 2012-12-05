@@ -150,7 +150,7 @@ class Teacher
 		end
 
 		Feedobject.where(:teacherid => self.id.to_s).each do |f|
-			f.generate
+			f.generate(self.class)
 		end
 
 		Feed.where(:actors => self.id.to_s).each do |f|
@@ -242,139 +242,143 @@ class Teacher
 	# temporary method to find number of feed items in main feed
 	def feedsize
 
-		@feed = []
-		@subsfeed = []
+		return 0 if feed_ids.to_a.empty? || feed_ids[0].to_s.empty?
 
-		# i = 0
+		Feed.find(self.feed_ids[0])
 
-		feedblacklist = {}
-		duplist = {}
+		# @feed = []
+		# @subsfeed = []
 
-		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+		# # i = 0
 
-		logs = Tire.search 'logs' do |search|
+		# feedblacklist = {}
+		# duplist = {}
 
-			search.query do |query|
-				#query.string params[:q]
+		# subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
-				query.all
+		# logs = Tire.search 'logs' do |search|
 
-				#search.size 40
-			end
+		# 	search.query do |query|
+		# 		#query.string params[:q]
 
-			# technically these should be cascaded to avoid cross-method name conflicts
-			search.filter :terms, :model => ['binders','teachers']
-			search.filter :terms, :method => FEED_METHOD_WHITELIST
-			search.filter :terms, :ownerid => subs + [self.id.to_s]
+		# 		query.all
 
-			search.size 100
+		# 		#search.size 40
+		# 	end
 
-			search.sort { by :timestamp, 'desc' }
+		# 	# technically these should be cascaded to avoid cross-method name conflicts
+		# 	search.filter :terms, :model => ['binders','teachers']
+		# 	search.filter :terms, :method => FEED_METHOD_WHITELIST
+		# 	search.filter :terms, :ownerid => subs + [self.id.to_s]
 
-		end
+		# 	search.size 100
+
+		# 	search.sort { by :timestamp, 'desc' }
+
+		# end
 		
-		logs = logs.results
+		# logs = logs.results
 
-		#debugger
+		# #debugger
 		
-		if logs.any?
-			logs.each do |f|
+		# if logs.any?
+		# 	logs.each do |f|
 
-				#debugger
+		# 		#debugger
 
-				begin
-					case f[:model].to_s
-						when 'binders'
-							model = Binder.find(f[:modelid].to_s)
-						when 'teachers'
-							model = Teacher.find(f[:modelid].to_s)
-					end
-				rescue
-					Rails.logger.fatal "Invalid log model ID!"
-					next
-				end
+		# 		begin
+		# 			case f[:model].to_s
+		# 				when 'binders'
+		# 					model = Binder.find(f[:modelid].to_s)
+		# 				when 'teachers'
+		# 					model = Teacher.find(f[:modelid].to_s)
+		# 			end
+		# 		rescue
+		# 			Rails.logger.fatal "Invalid log model ID!"
+		# 			next
+		# 		end
 
-				# the binder log entry:		should not be deleted
-				# 							should not be private
-				# 							should not be sourced from another log entry
-				# 							should not have a blacklist entry
-				# 							should not be a setpub -> private
-				#
-				# the teacher log entry: 	should not have a blacklist entry
-				if 	(f[:model].to_s=='binders' && 
-						model.parents[0]!={ "id" => "-1", "title" => "" } && 
-						model.is_pub? && 
-						!f[:data][:src] && 
-						!(feedblacklist[f[:actionhash].to_s]) && 
-						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
-					(f[:model].to_s=='teachers' &&
-						!(feedblacklist[f[:actionhash].to_s]))
+		# 		# the binder log entry:		should not be deleted
+		# 		# 							should not be private
+		# 		# 							should not be sourced from another log entry
+		# 		# 							should not have a blacklist entry
+		# 		# 							should not be a setpub -> private
+		# 		#
+		# 		# the teacher log entry: 	should not have a blacklist entry
+		# 		if 	(f[:model].to_s=='binders' && 
+		# 				model.parents[0]!={ "id" => "-1", "title" => "" } && 
+		# 				model.is_pub? && 
+		# 				!f[:data][:src] && 
+		# 				!(feedblacklist[f[:actionhash].to_s]) && 
+		# 				( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
+		# 			(f[:model].to_s=='teachers' &&
+		# 				!(feedblacklist[f[:actionhash].to_s]))
 
-					# calculate number of items contributed from this teacher
-					c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+		# 			# calculate number of items contributed from this teacher
+		# 			c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
-					# must be subscribed or owned
-					# occupancy of up to 10 from any teacher
-					if ((subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == self.id.to_s)) && c<10
+		# 			# must be subscribed or owned
+		# 			# occupancy of up to 10 from any teacher
+		# 			if ((subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == self.id.to_s)) && c<10
 
-						# whether or not the item is included in the blacklist,
-						# add the actionhash and annihilation IDs to the exclusion list
-						feedblacklist[f[:actionhash].to_s] = true
+		# 				# whether or not the item is included in the blacklist,
+		# 				# add the actionhash and annihilation IDs to the exclusion list
+		# 				feedblacklist[f[:actionhash].to_s] = true
 
-						# enter all annihilation entries into blacklist hash
-						f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+		# 				# enter all annihilation entries into blacklist hash
+		# 				f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
-						# execute blacklist exclusion
-						if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+		# 				# execute blacklist exclusion
+		# 				if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
-							# create a key for an owner and an action
-							similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
+		# 					# create a key for an owner and an action
+		# 					similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
-							f = { :model => model, :owner => f[:ownerid].to_s, :log => f }	
+		# 					f = { :model => model, :owner => f[:ownerid].to_s, :log => f }	
 
-							# if there are no members in the duplist, create a new action in each tracking hash
-							if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
+		# 					# if there are no members in the duplist, create a new action in each tracking hash
+		# 					if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
 
-								# store the index at which the similar item resides, and the current time
-								duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
+		# 						# store the index at which the similar item resides, and the current time
+		# 						duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
 
-								# new array set for feed object type
-								@subsfeed << [f]
+		# 						# new array set for feed object type
+		# 						@subsfeed << [f]
 
-							# there is a similar event, combine in feed array
-							else	
+		# 					# there is a similar event, combine in feed array
+		# 					else	
 
-								#expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
+		# 						#expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
 
-								# insert into array dependent on whether or not a thumbnail exists
-								if (f[:log].model.to_s=='binders' && 
-										(f[:model].thumbimgids[0].nil? || 
-										f[:model].thumbimgids[0].empty?)) || 
-									(f[:log].model.to_s=='teachers' && 
-										!Teacher.thumbready?(f[:model]))
+		# 						# insert into array dependent on whether or not a thumbnail exists
+		# 						if (f[:log].model.to_s=='binders' && 
+		# 								(f[:model].thumbimgids[0].nil? || 
+		# 								f[:model].thumbimgids[0].empty?)) || 
+		# 							(f[:log].model.to_s=='teachers' && 
+		# 								!Teacher.thumbready?(f[:model]))
 
-									@subsfeed[duplist[similar]['index']] << f
+		# 							@subsfeed[duplist[similar]['index']] << f
 
-								else
+		# 						else
 
-									@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
+		# 							@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
 
-									duplist[similar]['blank_index'] += 1
+		# 							duplist[similar]['blank_index'] += 1
 
-								end
+		# 						end
 
-								# update to the most recent time
-								duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
+		# 						# update to the most recent time
+		# 						duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
-							end
-						end
-					end
-				end
-				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
-			end
-		end
+		# 					end
+		# 				end
+		# 			end
+		# 		end
+		# 		break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
+		# 	end
+		# end
 
-		return @subsfeed.flatten.size
+		# return @subsfeed.flatten.size
 
 	end
 
@@ -766,7 +770,7 @@ class Teacher
 
 			if degree>0
 				ids.clone.each do |f|
-					break if ids.size > 500
+					#break if ids.size > 500
 					temp = Teacher.vectors(f,degree-1,vec,ids)
 					vec = temp[0]
 					ids = (ids + temp[1]).flatten.uniq
@@ -1235,7 +1239,9 @@ end
 
 
 class Tag
-	include Mongoid::Document
+	include Mongoid::Document	
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	# presently, array undergoes batch replacements only
 	# PS, PK, K
@@ -1256,6 +1262,8 @@ end
 
 class Relationship
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	#scope :find_by_id, find_or_initialize_by(:user_id => params[:id])
 	#scope :find_by_id, lambda { |teacher_id| find_or_initialize_by(":user_id => ?", teacher_id) }
@@ -1337,6 +1345,8 @@ end
 
 class Info
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 	#include Tire::Model::Search
 	#include Tire::Model::Callbacks
 	# include Mongoid::Spacial::Document

@@ -95,10 +95,64 @@ function handleCollabForm() {
 
           if($(this).hasClass('btn-primary')) return 'Save';
             return 'Edit';
-
         });
-
     });
+
+  $('#collab-form')
+    .attr('action', location.protocol+'//'+location.host+location.pathname + '/permissions')
+    .submit(function (event){
+      event.preventDefault();
+
+      var $form = $(this);
+
+      $.ajax({
+        url: $(this).attr('action'),
+        data: $(this).serialize(),
+        type: 'post',
+        success: function(data) {
+          data = jQuery.parseJSON(data);
+
+          var userHtml = '<li>'+
+                    '<a href="/'+data.username+'" class="no-underline">'+
+                      '<img src="'+data.image+'" class="img-rounded spaced-out pull-left" />'+
+                      '<p>'+
+                        data.name+'<br>'+
+                        '<small class="username">'+data.username+'</small>'+
+                        '<small class="pull-right">'+
+                          '<a href="." id="remove-btn" class="red remove-btn" onclick="">remove</a>'+
+                        '</small>'+
+                      '</p>'+
+                    '</a>'+
+                  '</li>';
+
+          $('ul.collaborators')
+            .append(userHtml);
+
+          $('.collaborators .empty-tog').hide();
+          $form.find('input').val('');
+        }
+      });
+  });
+
+  $('#folder-collaborators .remove-btn').live('click', function(){
+    event.preventDefault();
+
+    var $removeBtn = $(this);
+
+    $.ajax({
+        url: location.protocol+'//'+location.host+location.pathname + '/permissions',
+        data: { collab_user: $removeBtn.closest('p').find('.username').text() },
+        type: 'delete',
+        success: function(data) {
+          $removeBtn.closest('li').remove();
+          if(!$('ul.collaborators').find('li').length)
+            $('.collaborators .empty-tog').show();
+        }
+      });
+
+    return false;
+  });
+
 }
 
 // close facebox

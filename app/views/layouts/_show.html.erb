@@ -42,7 +42,7 @@
 
 
         <div class="noShare" <%= "style=display:none" if @binder.is_pub? %>>
-          All folders & files that you share publicly are <strong>free storage</strong> - and you can share them on social networks!
+          All folders &amp; files that you share publicly are <strong>free storage</strong> - and you can share them on social networks!
         </div>
 
 
@@ -227,9 +227,12 @@
         <ul class="collaborators">
           <% if @collaborators.empty? %>
 
-            You haven't added any collaborators... Yet!
+            <div class="empty-tog fortags">You haven’t added any collaborators…yet!</div>
 
           <% else %>
+
+            <div class="empty-tog fortags" style="display:none">You haven’t added any collaborators…yet!</div>
+
             <% @collaborators.each do |teacher| %>
               <li>
                 <a href="/<%= teacher.username %>" class="no-underline">
@@ -239,7 +242,7 @@
                     <small class="username"><%= teacher.username %></small>
                     <% if signed_in? && @binder.owner?(current_teacher.id.to_s) && !@binder.inherited_access?(teacher.id.to_s) %>
                       <small class="pull-right">
-                        <a href="." class="red remove-btn" onclick="$(this).closest('li').hide();return false;">remove</a>
+                        <a href="." id="remove-btn" class="red remove-btn" onclick="">remove</a>
                       </small>
                     <% end %>
                   </p>
@@ -249,12 +252,12 @@
           <% end %>
 
         </ul>
-        <form id="collab-form" style="display:none;" action="http://google.com">
+        <form id="collab-form" style="display:none;">
           <div class="collab-group">
             <label class="announce" for="collaborator-id">
               Add a collaborator
             </label>
-            <input type="text" class="fit" placeholder="Enter username / email" name="collaborator-id" id="collaborator-id" />
+            <input type="text" class="fit" placeholder="Enter username / email" name="collab_user" id="collaborator-id" />
           </div>
           <div style="clear:both"></div>
         </form>

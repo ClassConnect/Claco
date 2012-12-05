@@ -1688,7 +1688,7 @@ class BindersController < ApplicationController
 					Mongo.log(	current_teacher.id.to_s,
 						__method__.to_s,
 						params[:controller].to_s,
-						c.id.to_s,
+						childid.to_s,
 						params,
 						{ :src => src })
 

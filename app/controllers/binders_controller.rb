@@ -14,7 +14,7 @@ class BindersController < ApplicationController
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
-					binder.id.to_s,
+					binder.owner,
 					params)
 
 		rescue Exception => ex

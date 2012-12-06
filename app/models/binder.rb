@@ -834,9 +834,9 @@ class Binder
 
 							binder.create_binder_tags(params,teacher.id)
 
-							binder.find_parents.each{|b| b.inc(:files, 1)}
+							binder.find_parents.each{|b| b.update_attributes(:files => b.files + 1, :last_update => binder.last_update)}
 
-							parent.inc(:children, 1) if parent != "0"
+							# parent.inc(:children, 1) if parent != "0"
 
 						else
 

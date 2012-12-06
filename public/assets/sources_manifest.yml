@@ -129,11 +129,11 @@ stockfilethumbs/wmv.png: ffe500c9db4402e68e56f126846e3e79
 stockfilethumbs/xls.png: 980bc311d58b7f23802c0e12c8d66294
 stockfilethumbs/xlsx.png: 618bc0693ac24e4179ffd92317a67cd6
 success.png: 11af90207d2f9fb4bbeae9239725ac5c
-application.js: 0c98f40a9ca334f764f3cae3b7725117
+application.js: 19465c74e6cf42314d125c67bba0721e
 binders/folder.js: 004aa1ae01cedb40856cd378758a709b
 binders/pretags.js: 668a57f8543a8e2268345c43b08cba0e
 binders/taginit.js: 03a40453f7cdc52c397c2949e6baa42f
-bookmarklet/post.js: 8ee6335e456d425b3bbcc5760b2b19d4
+bookmarklet/post.js: ead64a05988567cabcbe8f2dc9d5a7ad
 editinfo/apply.js: 3c5e85d194b3f31698b328bfe9054bc7
 editinfo/main.js: 11355133b51dede829a6f39efb31ac64
 editinfo/newuser.js: 11216e66329bd898b600be23e35b9be9
@@ -146,8 +146,8 @@ messages/show.js: b6adef9edc3c5fab24f0084a79d5a5a1
 profile/main.js: 540412160255b86147fa057c50b1ab9e
 search/main.js: 4286cb032ac967d8ca3a754c5b2a107a
 standards.json: 4d8d2082bb3640cdf407ce4515f8d06e
-application.css: 67ad5f32941eef05a143942054b5a70f
-binders/folder.css: a3d6941a8fb286f849e0b94b29d3a207
+application.css: b7036f2664198f6d508fb8495933c9b1
+binders/folder.css: f5c3edc8d03c3ff077e6172e2a926fa3
 bookmarklet/post.css: 285fe52ded6b31156f6c5aa58f43ecef
 buttons/buttons.css: d295b03ced45a00e492dec40ac1e7b65
 buttons/zocial-regular-webfont.eot: a0e11676e0eb455a805549dfe73095b3
@@ -172,7 +172,7 @@ home/pub/uwt.css: d5fcee8e77a312f9e60f2b152bad6bc8
 home/public.css: a7b24c73d2d5f66e118ae00fc88486b5
 messages/main.css: 37fbc2780e56b7e3f34555722b5a6a13
 search/main.css: d0b601db92a124c14e0836fa034aa530
-teacher.css: 12ac60d713d4f2354dd3ba2467419e22
+teacher.css: 576ce4df3f33d2ffff1adf3cfcff82d3
 glyphicons-halflings-white.png: 13553a5bf21ae3cc374006592488ec64
 glyphicons-halflings.png: ab3144065a860d198f1d7d9a4882640c
 binders/icheck.js: fe279fc187f231c8aea3c121a32e9af8

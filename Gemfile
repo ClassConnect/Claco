@@ -50,7 +50,7 @@ gem 'carrierwave-mongoid', :require => 'carrierwave/mongoid'
 gem 'carrierwave_direct'
 gem "fog", "~> 1.3.1"
 gem 'sendgrid-rails', '~> 2.0'
-gem 'newrelic_rpm'
+gem 'newrelic_rpm', '>= 3.5.3.25'
 gem 'exceptional'
 gem 'memcachier'
 gem 'dalli'

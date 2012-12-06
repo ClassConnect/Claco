@@ -242,7 +242,7 @@
                     <small class="username"><%= teacher.username %></small>
                     <% if signed_in? && @binder.owner?(current_teacher.id.to_s) && !@binder.inherited_access?(teacher.id.to_s) %>
                       <small class="pull-right">
-                        <a href="." id="remove-btn" class="red remove-btn" onclick="">remove</a>
+                        <a href="#" id="remove-btn" class="red remove-btn" onclick="">remove</a>
                       </small>
                     <% end %>
                   </p>

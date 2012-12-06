@@ -1262,8 +1262,8 @@ end
 
 class Relationship
 	include Mongoid::Document
-	include Tire::Model::Search
-	include Tire::Model::Callbacks
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
 	#scope :find_by_id, find_or_initialize_by(:user_id => params[:id])
 	#scope :find_by_id, lambda { |teacher_id| find_or_initialize_by(":user_id => ?", teacher_id) }

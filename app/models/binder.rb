@@ -3,8 +3,8 @@ class Binder
 	include Mongoid::Timestamps
 	include Sprockets::Helpers::RailsHelper
 	include Sprockets::Helpers::IsolatedHelper
-	include Tire::Model::Search
-	include Tire::Model::Callbacks
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -134,36 +134,36 @@ class Binder
 
 	end
 
-	settings analysis: {
-		filter: {
-			ngram_filter: {
-				type: 		"nGram",
-				min_gram: 	3,
-				max_gram: 	6
-			}
-		},
-		analyzer: {
-			ngram_analyzer: {
-				tokenizer: "standard",
-				filter: ["ngram_filter"],
-				type: "custom"
-				#tokenizer: "snowball",
-				#filter: ["lowercase","ngram_filter"]
-			}
-		}
-	} 	do
-		mapping do 
-			indexes :username,	:type => 'string'
-			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer'
-			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer'
-			indexes :title, 	:type => 'string',	:analyzer => 'ngram_analyzer'
-			indexes :body, 		:type => 'string', 	:analyzer => 'keyword'
-			indexes :versions,  :enabled => false
-			indexes :tag,		:type => 'object',	:properties => {:parent_tags 	=> { :type => 'string', :analyzer => 'keyword', :default => [] },
-																	:node_tags 		=> { :type => 'string', :analyzer => 'keyword', :default => [] } }
+	# settings analysis: {
+	# 	filter: {
+	# 		ngram_filter: {
+	# 			type: 		"nGram",
+	# 			min_gram: 	3,
+	# 			max_gram: 	6
+	# 		}
+	# 	},
+	# 	analyzer: {
+	# 		ngram_analyzer: {
+	# 			tokenizer: "standard",
+	# 			filter: ["ngram_filter"],
+	# 			type: "custom"
+	# 			#tokenizer: "snowball",
+	# 			#filter: ["lowercase","ngram_filter"]
+	# 		}
+	# 	}
+	# } 	do
+	# 	mapping do 
+	# 		indexes :username,	:type => 'string'
+	# 		indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer'
+	# 		indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer'
+	# 		indexes :title, 	:type => 'string',	:analyzer => 'ngram_analyzer'
+	# 		indexes :body, 		:type => 'string', 	:analyzer => 'keyword'
+	# 		indexes :versions,  :enabled => false
+	# 		indexes :tag,		:type => 'object',	:properties => {:parent_tags 	=> { :type => 'string', :analyzer => 'keyword', :default => [] },
+	# 																:node_tags 		=> { :type => 'string', :analyzer => 'keyword', :default => [] } }
 
-		end
-	end
+	# 	end
+	# end
 
 	########################################
 
@@ -1805,8 +1805,8 @@ end
 
 class Tag
 	include Mongoid::Document	
-	include Tire::Model::Search
-	include Tire::Model::Callbacks
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
 	field :parent_tags,			:type => Array,	:default => []
 	field :node_tags,			:type => Array,	:default => []

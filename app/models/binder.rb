@@ -948,8 +948,8 @@ class Binder
 			error = "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			error = "Invalid Request"
-		rescue Exception => ex
-			error = "Invalid Request - #{ex.to_s} - #{ex.backtrace}" #This exception should be logged
+		rescue
+			error = "Invalid Request" #This exception should be logged
 		ensure
 			if error.empty?
 				return binder

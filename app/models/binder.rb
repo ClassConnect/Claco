@@ -656,10 +656,10 @@ class Binder
 
 	def set_owner(teacher)
 
-		binder.owner = teacher.id
-		binder.username = teacher.username
-		binder.fname = teacher.fname
-		binder.lname = teacher.lname
+		self.owner = teacher.id
+		self.username = teacher.username
+		self.fname = teacher.fname
+		self.lname = teacher.lname
 
 	end
 
@@ -948,8 +948,8 @@ class Binder
 			error = "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
 			error = "Invalid Request"
-		rescue
-			error = "Invalid Request" #This exception should be logged
+		rescue Exception => ex
+			error = "Invalid Request - #{ex.to_s} - #{ex.backtrace}" #This exception should be logged
 		ensure
 			if error.empty?
 				return binder

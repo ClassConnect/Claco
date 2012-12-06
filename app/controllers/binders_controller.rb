@@ -1,130 +1,31 @@
 class BindersController < ApplicationController
-	before_filter :authenticate_teacher!, :except => [:show, :index, :zenframe]
+	before_filter :authenticate_teacher!, :except => [:show, :zenframe]
 	before_filter :authenticate_admin!, :only => [:regen]
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
 	end
 
-	def index
-		@owner = Teacher.where(:username => /^#{Regexp.escape(params[:username])}$/i).first || Teacher.find(params[:username])
+	#Add Folder Function
+	def create
 
-		@children = Binder.where(:owner => @owner.id, "parent.id" => "0").sort_by { |binder| binder.order_index }
-
-		@title = "#{@owner.fname} #{@owner.lname}'s Binders"
+		binder = Binder.create_folder((params[:id] || "0"), params, current_teacher)
 
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
-					@owner.id.to_s,
+					binder.owner,
 					params)
 
-		# these are temporary fixes:
-		@tagset = []
-
-		@tags = [[],[],[],[]]
-	end
-
-
-	#Add Folder Function
-	def create
-
-		#Must be logged in to write
-
-		#Trim to 60 chars (old spec)
-
-		errors = []
-
-		if params[:foldertitle].strip.length > 0
-
-			if params[:id].nil?
-				@inherited = inherit_from("0")
-			else
-				@inherited = inherit_from(params[:id])
-			end
-
-			@parenthash = @inherited[:parenthash]
-			@parentsarr = @inherited[:parentsarr]
-			@parentperarr = @inherited[:parentperarr]
-
-			@parent = @inherited[:parent]
-
-			@parent_child_count = @inherited[:parent_child_count]
-
-			if @parent == "0" || @parent.get_access(current_teacher.id) == 2
-
-				#Update parents' folder counts
-				if @parentsarr.size > 1
-					pids = @parentsarr.collect {|p| p["id"] || p[:id]}
-					
-					pids.each do |pid| 
-						if pid != "0"
-							p = Binder.find(pid)
-							p.update_attributes(:folders		=> p.folders + 1,
-												:last_update	=> Time.now.to_i)
-						end
-						#Binder.find(pid).inc(:folders, 1) if pid != "0"
-					end
-
-					Binder.find(pids.last).inc(:children,1) if pids.last != "0"
-				end
-
-				new_binder = Binder.new(:owner				=> current_teacher.id,
-										:fname				=> current_teacher.fname,
-										:lname				=> current_teacher.lname,
-										:username			=> current_teacher.username,
-										:title				=> params[:foldertitle].strip[0..49],
-										:parent				=> @parenthash,
-										:parents			=> @parentsarr,
-										:body				=> params[:body],
-										# :permissions		=> (params[:public] == "on" ? [{:type		=> 3,
-										# 													:auth_level	=> params[:public] == "on" ? 1 : 0}] : []),
-										:order_index		=> @parent_child_count,
-										:parent_permissions	=> @parentperarr,
-										:last_update		=> Time.now.to_i,
-										:last_updated_by	=> current_teacher.id.to_s,
-										:type				=> 1)
-
-				new_binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if @parent == "0"
-
-				#Rails.logger.debug "METHOD got here! #{__method__}"
-
-				# new_binder.cascadetimestamp
-
-				new_binder.save
-
-				Mongo.log(	current_teacher.id.to_s,
-							__method__.to_s,
-							params[:controller].to_s,
-							new_binder.id.to_s,
-							params)
-
-				new_binder.create_binder_tags(params,current_teacher.id)
-
-			else
-
-				errors << "You do not have permissions to write to #{@parent.title}"
-
-			end
-
-		else
-
-			errors << "Please enter a title"
-
-		end
-
-		rescue BSON::InvalidObjectId
-			errors << "Invalid Request"
-		rescue Mongoid::Errors::DocumentNotFound
-			errors << "Invalid Request"
+		rescue Exception => ex
 		ensure
-			if @parent == "0" || params[:id].nil?
+			if params[:id].nil?
 				respond_to do |format|
-					format.html {render :text => errors.empty? ? {"success" => 1, "data" => named_binder_route(new_binder)}.to_json : {"success" => 2, "data" => errors.map{|err| "<li>#{err}</li>"}.join.html_safe}.to_json}
+					format.html {render :text => ex.nil? ? {"success" => 1, "data" => named_binder_route(binder)}.to_json : {"success" => 2, "data" => "<li>#{ex.to_s}</li>".html_safe}.to_json}
 				end
 			else
 				respond_to do |format|
-					format.html {render :text => errors.empty? ?  1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
+					format.html {render :text => ex.nil? ?  1 : "<li>#{ex.to_s}</li>".html_safe}
 				end
 			end
 
@@ -265,243 +166,24 @@ class BindersController < ApplicationController
 
 	#Add links function
 	def createcontent
-		
-		errors = []
 
-		if params[:webtitle].strip.length > 0
+		@binder = Binder.create_content(params[:id], params, current_teacher)
 
-			embed = false
-			url = false
-			embedtourl = false
+		Mongo.log(	current_teacher.id.to_s,
+			__method__.to_s,
+			params[:controller].to_s,
+			@binder.id.to_s,
+			params)
 
-			doc = Nokogiri::HTML(params[:weblink])
-
-			if !doc.at('iframe').nil?
-
-				uri = URI.parse(doc.at('iframe')['src'])
-				#Refactor this to also set vidtype
-				if uri.host.include?('youtube.com') && uri.path.include?('embed')
-
-					embedtourl = true
-					uri = "http://www.youtube.com/watch?v=#{uri.path.split('/').last}"
-
-				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
-
-					embedtourl = true
-					uri = "http://www.educreations.com/lesson/view/claco/#{uri.path.split('/').last}"
-
-				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
-
-					embedtourl = true
-					uri = "http://vimeo.com/#{uri.path.split('/').last}"
-
-				elsif uri.host.include?('schooltube.com') && uri.path.include?('embed')
-
-					embedtourl = true
-					uri = "http://www.schooltube.com/video/#{uri.path.split('/').last}"
-
-				elsif uri.host.include?('showme.com') && uri.path.include?('sma/embed')
-
-					embedtourl = true
-					uri = "http://www.showme.com/sh/?h=#{CGI.parse(uri.query)['s'].first}"
-
-				else
-
-					embed = true
-
-				end
-
-			elsif !doc.at('embed').nil?
-
-				embed = true
-
-			end
-
-			if !embed && !embedtourl
-				# RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
-				url = true
-			end
-
-			if url || embed || embedtourl
-
-				@inherited = inherit_from(params[:id])
-
-				@parenthash = @inherited[:parenthash]
-				@parentsarr = @inherited[:parentsarr]
-				@parentperarr = @inherited[:parentperarr]
-
-				@parent_child_count = @inherited[:parent_child_count]
-
-				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
-
-					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
-					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
-
-					if !((url || embedtourl) && link.empty?)
-
-						if (embed ? true : !Addressable::URI.heuristic_parse(link).host.include?("teacherspayteachers.com"))
-						
-							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
-													:owner				=> current_teacher.id,
-													:username			=> current_teacher.username,
-													:fname				=> current_teacher.fname,
-													:lname				=> current_teacher.lname,
-													:parent				=> @parenthash,
-													:parents			=> @parentsarr,
-													:last_update		=> Time.now.to_i,
-													:last_updated_by	=> current_teacher.id.to_s,
-													:body				=> params[:body] || "",
-													:order_index		=> @parent_child_count,
-													:parent_permissions	=> @parentperarr,
-													:files				=> 1,
-													:type				=> 2,
-													:format				=> 2)
-
-
-							@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
-															:thumbnailgen => 1, #video
-															:embed		=> embed,
-															:timestamp	=> Time.now.to_i,
-															:owner		=> current_teacher.id)
-
-
-							#@binder.create_binder_tags(params,current_teacher.id)
-
-							if @binder.save
-
-								Mongo.log(	current_teacher.id.to_s,
-											__method__.to_s,
-											params[:controller].to_s,
-											@binder.id.to_s,
-											params)
-
-
-								if url || embedtourl
-									uri = Addressable::URI.heuristic_parse(link)
-
-									stathash = @binder.current_version.imgstatus
-									stathash[:imgfile][:retrieved] = true
-
-									if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
-
-										# YOUTUBE
-										# DELAYTAG
-										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
-										@binder.current_version.vidtype = "youtube"
-
-										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-									elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
-
-										# VIMEO
-										# DELAYTAG
-										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
-										@binder.current_version.vidtype = "vimeo"
-
-										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-									elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
-
-										# EDUCREATIONS
-										# DELAYTAG
-										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
-										@binder.current_version.vidtype = "educreations"
-
-										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-									elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
-
-										# SCHOOLTUBE
-										# DELAYTAG
-										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'}) 
-										@binder.current_version.vidtype = "schooltube"
-
-										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-									elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
-
-										# SHOWME
-										# DELAYTAG
-										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
-										@binder.current_version.vidtype = "showme"
-
-										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
-
-									else
-										@binder.versions.last.update_attributes( :thumbnailgen => 2 )
-										# generic URL, grab Url2png
-										# DELAYTAG
-										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
-
-										#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
-									end
-
-								end
-
-							else
-
-								errors << "There was an error adding this content."
-
-							end
-
-							@binder.save
-
-							@binder.create_binder_tags(params,current_teacher.id)
-
-							pids = @parentsarr.collect {|x| x["id"] || x[:id]}
-
-							pids.each {|pid| Binder.find(pid).inc(:files, 1) if pid != "0"}
-
-							Binder.find(pids.last).inc(:children, 1) if pids.last != "0"
-
-						else
-
-							errors << "Sorry, you can't link to this site. Please download any files and upload them to Claco."
-
-						end
-
-					else
-
-						errors << "Invalid URL"
-
-					end
-
-				else
-
-					errors << "You do not have permissions to write to #{@inherited[:parent].title}"
-
-				end
-
-			else
-
-				errors << "Invalid input data"
-
-			end
-
-		else
-
-			errors << "You must enter a title"
-
-		end
-
-		rescue BSON::InvalidObjectId
-			errors << "Invalid Request"
-		rescue Mongoid::Errors::DocumentNotFound
-			errors << "Invalid Request"
-		rescue RestClient::ResourceNotFound
-			errors << "Invalid URL - Not Found"
-		rescue
-			errors << "Invalid URL"
+		rescue Exception => ex
 		ensure
-			if request.get?
-				redirect_to named_binder_route(@binder) and return
-			else
-				respond_to do |format|
-					format.html {render :text => errors.empty? ? 1 : errors.map{|err| "<li>#{err}</li>"}.join.html_safe}
-				end
+		if request.get?
+			redirect_to named_binder_route(@binder) and return
+		else
+			respond_to do |format|
+				format.html {render :text => ex.nil? ? 1 : "<li>#{ex.to_s}</li>".html_safe}
 			end
-
-
+		end
 	end
 
 	def update
@@ -670,12 +352,10 @@ class BindersController < ApplicationController
 
 					#@newfile = File.open(params[:binder][:versions][:file].path,"rb")
 
+					@binder.set_owner(current_teacher)
+
 					@binder.update_attributes(	:title				=> File.basename(	params[:key].split("/").last,
 																						File.extname(params[:key].split("/").last)).strip[0..49],
-												:owner				=> current_teacher.id,
-												:fname				=> current_teacher.fname,
-												:lname				=> current_teacher.lname,
-												:username			=> current_teacher.username,
 												:parent				=> @parenthash,
 												:parents			=> @parentsarr,
 												:last_update		=> Time.now.to_i,
@@ -1850,177 +1530,6 @@ class BindersController < ApplicationController
 			log.save
 
 			return log.id.to_s
-
-		end
-	end
-
-
-	module Url
-		extend self
-		
-		def follow(url, hop = 0)
-		
-			return url if hop == 5
-
-			r = RestClient.get(url){|r1,r2,r3|r1}
-
-			return follow(r.headers[:location], hop + 1) if r.code > 300 && r.code != 304 && r.code < 400
-
-			return url if r.code == 200 || r.code == 304
-
-			rescue
-
-			return url
-
-		end
-
-		def get_youtube_url(url)
-
-			return YOUTUBE_IMG_URL + CGI.parse(URI.parse(url).query)['v'].first.to_s + YOUTUBE_IMG_FILE
-
-		end
-
-		def get_educreations_url(url)
-
-			url = URI(url)
-
-			educr_id = -1
-
-			# pull out educr video ID
-			url.path.split('/').each do |f|
-				if f.to_i.to_s.length==6
-					educr_id = f.to_i
-					break
-				end
-			end
-
-			if educr_id < 0
-				raise "Could not extract video ID from url" and return
-			end
-
-			imgkey = Digest::MD5.hexdigest(educr_id.to_s)[0..2]
-
-			return "http://media.educreations.com/recordings/#{imgkey}/#{educr_id}/thumbnail.280x175.png"
-
-		end
-
-		def get_url2png_url(url,options = {})
-
-			if options.empty?
-				bounds = URL2PNG_DEFAULT_BOUNDS
-			else
-				bounds = options[:bounds].to_s
-			end
-
-			sec_hash = Digest::MD5.hexdigest(URL2PNG_PRIVATE_KEY + '+' + URI.encode(url)).to_s
-
-			Rails.logger.debug "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{url}"
-
-			#return RestClient.get(URL2PNG_API_URL + URL2PNG_API_KEY + '/' + sec_hash + '/' + bounds + '/' + url)
-			return "#{URL2PNG_API_URL + URL2PNG_API_KEY}/#{sec_hash}/#{bounds}/#{URI.encode(url)}"
-
-		end
-
-	end
-
-	module Crocodoc
-		extend self
-
-		# passed file extension
-		# returns whether crocodoc supports it
-		def check_format_validity(extension)
-
-			return CROC_VALID_FILE_FORMATS.include? extension.downcase
-
-		end
-
-		# passed opened file or url - user will never be providing direct file path
-		# returns uuid of file
-		def upload(filestring)
-
-			require 'open-uri'
-
-			#filedata = JSON.parse(RestClient.post(CROC_API_URL + PATH_UPLOAD, :token => CROC_API_TOKEN, :url => filestring.to_s){ |response, request, result| response })
-
-			Rails.logger.debug filestring
-
-			filedata = JSON.parse(RestClient.post(CROC_API_URL+PATH_UPLOAD, :token => CROC_API_TOKEN, 
-																			#:file => File.open("#{filestring}")){ |response, request, result| response })
-																			:url => filestring.sub(/https:\/\/cdn.cla.co.s3.amazonaws.com/, "http://cdn.cla.co")))#open(filestring)){ |response, request, result| response })
-
-			Rails.logger.debug "filedata: #{filedata.to_s}"
-			Rails.logger.debug docstatus(filedata["uuid"])
-
-			if filedata["error"].nil?
-				# correctly uploaded
-				return filedata#["uuid"]
-			else
-				# there was a problem, log the error
-				Rails.logger.debug "#{filedata["error"]}"
-				return nil
-			end
-
-		end
-
-		# pass set of uuids to check the status of
-		# returns uuid,status,viewable,error
-		# QUEUED,PROCESSING,DONE,ERROR
-		def docstatus(uuid)
-			# this does not appear to work
-			#return JSON.parse(RestClient.get(CROC_API_URL + PATH_STATUS, :token => CROC_API_TOKEN, :uuids => uuid ){ |response, request, result| response })
-			
-			return JSON.parse(RestClient.get("https://crocodoc.com/api/v2/document/status?token=#{CROC_API_TOKEN}&uuids=#{uuid.to_s}"))
-
-		end
-
-		 # passed uuid of file
-		 # returns fullsize thumbnail
-		def get_thumbnail_url(uuid,options = {})
-
-			options = CROC_API_OPTIONS.merge(options).merge({:uuid => uuid, :size => '300x300'})
-
-			# # timeout 
-			# timeout = 30
-
-			# resp = 400
-
-			# while [400,401,404,500].include? resp.to_i #"{\"error\": \"internal error\"}"
-			# 	#puts "waiting..."
-			# 	sleep 0.1
-			# 	timeout -= 1
-			# 	if timeout==0
-			# 		return nil
-			# 	end
-
-			# 	#resp = RestClient.get("#{CROC_API_URL + PATH_THUMBNAIL + '?' + URI.encode_www_form(options)}"){|response, request, result| response.code }
-			# 	resp = RestClient.get(CROC_API_URL+PATH_THUMBNAIL,options){|response, request, result| response.code }
-
-			# 	Rails.logger.debug "thumbnail response: #{resp},#{timeout}"
-
-			# 	#resp = resp.code
-			# end
-
-			# # only request thumbnail once file can be accessed 
-			# RestClient.get("#{CROC_API_URL + PATH_THUMBNAIL + '?' + URI.encode_www_form(options)}")
-
-			return "#{CROC_API_URL+PATH_THUMBNAIL}?#{URI.encode_www_form(options)}"
-			#return RestClient.get(CROC_API_URL+PATH_THUMBNAIL,options)
-
-		end
-
-		def get_doctext_url(uuid,options = {})
-
-			options = CROC_API_OPTIONS.merge(options).merge({:uuid => uuid})
-
-			return "#{CROC_API_URL+PATH_TEXTGRAB}?#{URI.encode_www_form(options)}"
-
-		end
-
-		# passed the uuid of file
-		# returns the session string to view the document
-		def sessiongen(uuid)
-
-			return JSON.parse(RestClient.post(CROC_API_URL + PATH_SESSION, :token => CROC_API_TOKEN, :uuid => uuid.to_s){ |response, request, result| response })
 
 		end
 	end

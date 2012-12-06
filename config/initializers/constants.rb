@@ -135,6 +135,8 @@ else
 	APPSERVER_API_URL = 'http://claco.com/mediaserver/thumbs'
 end
 
+RESERVED_BINDER_IDS = ["0", "-1", "-2"]
+
 # dijkstra
 # allows for doubling while remaining a 4B variable
 INFINITY = 1<<30

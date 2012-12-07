@@ -130,12 +130,30 @@ function handleCollabForm() {
 
           $('.collaborators .empty-tog').hide();
           $form.find('input').val('');
+        },
+        error: function(error){
+          var res = JSON.parse(error.responseText);
+          $form
+            .find('.control-group')
+            .addClass('error')
+            .find('small')
+            .text(res.message);
         }
       });
 
       event.preventDefault();
   });
 
+  // reset error notification
+  $('#collab-form input').keypress(function/*removeErrorMsg*/(e){
+    if(e.which !== 13)
+      $(this)
+        .closest('.control-group')
+        .removeClass('error')
+        .find('small').text('');
+  });
+
+  // handle remove button
   $('#folder-collaborators .remove-btn').live('click', function(event){
     var $removeBtn = $(this);
 

@@ -35,7 +35,7 @@ class Feed
 	# returns wrappers that occur after the provided logid
 	def buffer(logid='')
 		return self.wrappers if logid.to_s.empty?
-		self.wrappers.where(:lr_timestamp.lte => Log.find(logid).timestamp)
+		self.wrappers.where(:lr_timestamp.lt => Log.find(logid).timestamp)
 	end
 
 	# javascript will be making requests with the current user ID and a page index
@@ -83,7 +83,7 @@ class Feed
 		#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 		#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
-		debugger
+		#debugger
 
 		if !page || (self.buffer(pagelogid).size < MAIN_WRAP_LENGTH)
 
@@ -107,7 +107,7 @@ class Feed
 				search.filter :terms, :method => FEED_METHOD_WHITELIST
 				search.filter :terms, :ownerid => subs + [teacherid]
 
-				debugger
+				#debugger
 
 				if page
 					if self.lr_timestamp!=0.0 #self.timerange['lower'].present?
@@ -302,75 +302,80 @@ class Feed
 
 			#TODO: unsubscribing from teachers, removing binders should purge
 		end
-			@subsfeed.each do |f|
 
-				self.actors << f.first[:ownerid]
-				logarr = f.sort_by{|g| g[:log].timestamp}
-				self.wrappers << Wrapper.new(	whoid: 			f.first[:ownerid],
-												whatid: 		f.first[:log].modelid,
-												mr_logid: 		logarr.first[:log].id.to_s,
-												lr_logid: 		logarr.last[:log].id.to_s,
-												mr_timestamp: 	logarr.first[:log].timestamp, #f.map{|g| g[:log].timestamp}.sort.first,
-												lr_timestamp: 	logarr.last[:log].timestamp, #f.map{|g| g[:log].timestamp}.sort.last,
-												logids: 		f.map{|g| g[:log].id.to_s},
-												wclass: 		f.first[:log][:method],
-												similar:  		f.first[:similar])
-			end
+		#debugger
 
-			# TODO: update model attributes dependent on the annihilate wrappers
-			#debugger
-			if !page
-				size = self.wrappers.size# do |size|
-				if size > MAIN_WRAP_LENGTH
-					w = self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }
-					((size-MAIN_WRAP_LENGTH)/2.0).ceil.times do
-						w.pop.annihilate
-					end
+		@subsfeed.each do |f|
+
+			self.actors << f.first[:ownerid]
+			logarr = f.sort_by{|g| g[:log].timestamp}
+			self.wrappers << Wrapper.new(	whoid: 			f.first[:ownerid],
+											whatid: 		f.first[:log].modelid,
+											mr_logid: 		logarr.first[:log].id.to_s,
+											lr_logid: 		logarr.last[:log].id.to_s,
+											mr_timestamp: 	logarr.first[:log].timestamp, #f.map{|g| g[:log].timestamp}.sort.first,
+											lr_timestamp: 	logarr.last[:log].timestamp, #f.map{|g| g[:log].timestamp}.sort.last,
+											logids: 		f.map{|g| g[:log].id.to_s},
+											wclass: 		f.first[:log][:method],
+											similar:  		f.first[:similar])
+		end
+
+		#debugger
+
+		# TODO: update model attributes dependent on the annihilate wrappers
+		#debugger
+		if !page
+			size = self.wrappers.size# do |size|
+			if size > MAIN_WRAP_LENGTH
+				w = self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }
+				((size-MAIN_WRAP_LENGTH)/2.0).ceil.times do
+					w.pop.annihilate
 				end
-					#self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }.pop.annihilate
-				#end
 			end
+				#self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }.pop.annihilate
+			#end
+		end
 
-			# self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
+		# self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
 
-			# self.actors.uniq!
+		# self.actors.uniq!
 
-			# self.save
-
-
-
-			# imc = IndirectModelController.new()
-
-			# # if page
-			# 	self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
-			# 		retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
-			# 	end
+		# self.save
 
 
 
- 		# 		self.wrappers.where(:mr_timestamp.lt => self.wrappers.find(self.cursor).mr_timestamp).to_a.sort_by { |f| -f.mr_timestamp }[0..19].each do |f|
- 		# 			retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
- 		# 		end
-			# 	self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
-			# else	
-				# self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }[0..19].each do |f|
-				# 	retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
-				# end
-			# 	self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
+		# imc = IndirectModelController.new()
+
+		# # if page
+		# 	self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
+		# 		retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
+		# 	end
+
+
+
+		# 		self.wrappers.where(:mr_timestamp.lt => self.wrappers.find(self.cursor).mr_timestamp).to_a.sort_by { |f| -f.mr_timestamp }[0..19].each do |f|
+		# 			retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
+		# 		end
+		# 	self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
+		# else	
+			# self.wrappers.to_a.sort_by { |f| -f.mr_timestamp }[0..19].each do |f|
+			# 	retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
 			# end
+		# 	self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
+		# end
 
-			self.actors.uniq!
+		self.actors.uniq!
 
-			self.save
-		#end
+		self.save
+	#end
 
 
-			imc = IndirectModelController.new()
+		imc = IndirectModelController.new()
 
-			# if page
-				self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
-					retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
-				end
+		# if page
+		self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
+			retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
+		end
 
 		retstr
 	end
@@ -521,13 +526,13 @@ class Wrapper
 		# fix parent feed min/max timestamps, logids
 		if (self.feedobjectids.to_a&(Feedobject.where(:logid => self.feed.mr_logid).map{|f| f.id.to_s})).any?
 			#self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.timestamp}.last.feedobjectids.map{|f| Feedobject.find(f)}
-			self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.timestamp}.last do |f|
+			self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.mr_timestamp}.last do |f|
 				self.feed.mr_logid = f.mr_logid
 				self.feed.mr_timestamp = f.mr_timestamp
 				self.feed.save
 			end
 		elsif (self.feedobjectids.to_a&(Feedobject.where(:logid => self.feed.lr_logid).map{|f| f.id.to_s})).any?
-			self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.timestamp}.first do |f|
+			self.feed.wrappers.where(:id.ne => self.id).sort_by{|f| f.mr_timestamp}.first do |f|
 				self.feed.lr_logid = f.lr_logid
 				self.feed.lr_timestamp = f.lr_timestamp
 				self.feed.save

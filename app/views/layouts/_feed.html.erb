@@ -27,6 +27,37 @@
 
 		<%= feed.html(current_teacher.id.to_s).html_safe %>
 
+		<script type="text/javascript">
+			function httpGet(theUrl)
+		    {
+			    var xmlHttp = null;
+
+			    xmlHttp = new XMLHttpRequest();
+			    xmlHttp.open( "GET", theUrl, false );
+			    xmlHttp.send( null );
+			    //return xmlHttp.responseText
+			    alert(xmlHttp.responseText)
+			    alert(eval('(' + xmlHttp.responseText + ')').html)
+			   	return eval('(' + xmlHttp.responseText + ')');
+		    }
+			function inf() {
+				//alert('test!!!')
+				response = httpGet('/inf?logid=' + document.getElementById('logid').value)
+				//alert('response: ' + response)
+				document.getElementById('inf_html').innerHTML += response.html//httpGet('/inf?logid=' + document.getElementById('logid').value)
+				document.getElementById('logid').value = response.nextlogid
+			}
+		</script>
+
+		<input id="logid" type="text" disabled="true" value="<%= feed.lr_logid %>" />
+
+		<div id="inf_html"></div>
+
+		<a onclick="inf()"><h2>MOAR</h2></a><br />
+		<a onclick="alert(document.getElementById('logid').value)">TEST LOGID</a><br />
+		<a onclick="alert('/inf?logid=' + document.getElementById('logid').value)">TEST2</a><br />
+		<a onclick="alert(httpGet('/inf?logid=' + document.getElementById('logid').value))">TEST2</a>
+
 	<% else %>
 
 	<% @subsfeed.each do |f| 

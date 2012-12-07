@@ -189,13 +189,17 @@ class HomeController < ApplicationController
 		#debugger
 	end
 
-	def feedtest
+	def inf
+
+		#debugger
+
+		feed = Feed.find(current_teacher.feed_ids[0])
 
 		respond_to do |format|
 			begin
-				format.html {render :text => Feed.find(current_teacher.feed_ids[0]).html(current_teacher.id.to_s,params[:logid])}
+				format.json {render :text => {'html' => feed.html(current_teacher.id.to_s,params[:logid]) , 'nextlogid' => feed.lr_logid}.to_json }
 			rescue
-				format.html {render :text => "teacher does not have a feed" }
+				format.json {render :text => {'html' => "teacher does not have a feed", 'nextlogid' => ''}.to_json }
 			end
 		end
 

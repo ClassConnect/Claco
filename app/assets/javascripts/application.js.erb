@@ -133,7 +133,6 @@ function handleCollabForm() {
         },
         error: function(error){
           var res = JSON.parse(error.responseText);
-          alert('yay');
           $form
             .find('.control-group')
             .addClass('error')

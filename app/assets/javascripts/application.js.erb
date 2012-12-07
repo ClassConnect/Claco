@@ -92,25 +92,25 @@ function handleCollabForm() {
       $(this)
         .toggleClass('btn-primary')
         .text(function/*changeIfClass*/(){
-
-          if($(this).hasClass('btn-primary')) return 'Save';
-            return 'Edit';
+          if($(this).hasClass('btn-primary')) {
+            $('input#collaborator-id').focus();
+            return 'Save';
+          }
+          else return 'Edit';
         });
     });
 
   $('#collab-form')
     .attr('action', location.protocol+'//'+location.host+location.pathname + '/permissions')
     .submit(function (event){
-      event.preventDefault();
-
       var $form = $(this);
 
       $.ajax({
-        url: $(this).attr('action'),
-        data: $(this).serialize(),
+        url: $form.attr('action'),
+        data: $form.serialize(),
         type: 'post',
         success: function(data) {
-          data = jQuery.parseJSON(data);
+          // data = $.isPlainObject(data) ? data : jQuery.parseJSON(data);
 
           var userHtml = '<li>'+
                     '<a href="/'+data.username+'" class="no-underline">'+
@@ -132,11 +132,11 @@ function handleCollabForm() {
           $form.find('input').val('');
         }
       });
+
+      event.preventDefault();
   });
 
   $('#folder-collaborators .remove-btn').live('click', function(event){
-    event.preventDefault();
-
     var $removeBtn = $(this);
 
     $.ajax({
@@ -150,7 +150,7 @@ function handleCollabForm() {
         }
       });
 
-    return false;
+    event.preventDefault();
   });
 
 }

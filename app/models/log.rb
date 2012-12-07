@@ -17,7 +17,7 @@ class Log
 	# :src - this log is part of a logset, src is the ID of the 'parent' log
 	field :data, :type => Hash, :default => {}
 
-	# 
+	#
 	field :actionhash, :type => String#, :default => ""
 	#field :feedhash, :type => String
 
@@ -27,7 +27,7 @@ class Log
 	# 	indexes :method,	:type => 'string'
 	# 	indexes :modelid,	:type => 'string'
 	# 	indexes :params,	:type => 'hash'
-	# end	
+	# end
 
 	# used for elasticsearch
 	def self

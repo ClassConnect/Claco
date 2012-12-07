@@ -45,7 +45,7 @@
 			<td class="labeler">Name</td>
 			<td>
 				<div class="controls controls-row">
-	  				<%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] ), {}, {:style => "width:auto"}) %>
+	  				<%= f.select(:title, options_for_select( [["",""],["Mr.","Mr."],["Mrs.","Mrs."],["Ms.","Ms."],["Dr.","Dr."]] ), {}, {:style => "width:auto; float: left;"}) %>
 	  				<%= f.text_field :fname, {:class => "span1o5", :placeholder => "First Name"} %>
 	  				<%= f.text_field :lname, {:class => "span1o5", :placeholder => "Last Name"} %>
 				</div>
@@ -67,9 +67,9 @@
 		<% end %>
 	</table>
 
-	<div style="color:#666;font-size:11px;margin-left:95px">You agree to our <a href="/legal/tos" target="_blank">terms of service</a> and <a href="/legal/privacy" target="_blank">privacy policy</a>.</div>
+	<div style="color:#666;font-size:11px;margin-left:45px">You agree to our <a href="/legal/tos" target="_blank">terms of service</a> and <a href="/legal/privacy" target="_blank">privacy policy</a>.</div>
 
-	<button type="submit" class="btn btn-primary btn-large" style="font-weight:bolder; margin-top:10px; margin-left:115px; width:215px">
+	<button type="submit" class="btn btn-primary btn-large" style="font-weight:bolder; margin-top:10px; margin-left:65px; width:215px">
 		Sign up!
 	</button>
 

@@ -5,8 +5,8 @@
   <%= javascript_include_tag "wy/advanced" %>
   <%= javascript_include_tag "wy/wysi5" %>
   <%= javascript_include_tag "binders/pretags" %>
-  <%= javascript_include_tag "binders/folder" %>
   <%= javascript_include_tag "binders/taginit" %>
+  <%= javascript_include_tag "binders/folder" %>
   <%= javascript_include_tag "binders/icheck" %>
 <% end %>
 
@@ -29,195 +29,246 @@
 	<div id="left-sidebar">
 
     <% if params[:action] == "show" %>
+      <div class="conbox whitester">
+        <div class="headstrip" style="margin-bottom:10px;">
 
-        <div class="conbox whitester">
-          <div class="headstrip" style="margin-bottom:10px;">
-
-            <div style="<%= "display:none;" if !signed_in? || (signed_in? ? current_teacher.id.to_s != @binder.owner : false) %>float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%= 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
-            <div class="inner">
-            Public 
-            </div>
-
-          </div>
-
-
-
-          <div class="noShare" <%= "style=display:none" if @binder.is_pub? %>>
-            All folders & files that you share publicly are <strong>free storage</strong> - and you can share them on social networks!
-          </div>
-
-
-          <div class="sharelinks" <%= "style=display:none" if !@binder.is_pub? %>>
-
-            <div>
-
-              <div class="input-prepend" style="margin-left:10px">
-                  <span class="add-on" style="margin-right:-14px">
-                    <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
-                  </span>
-
-                  <input id="normcurs" type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="<%= "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>" readonly="readonly" />
-              </div>
-
-            </div>
-
-
-            <div style="margin: 10px 2px 5px 0;">
-
-              <div style="margin: 0 8px 0 15px; height:20px; float:left">
-                <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= @binder.type == 1 ? (!@binder.thumbimgids[0].empty? ? CGI.escape(get_binder_image(Binder.find(@binder.thumbimgids[0]))) : CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}")) : CGI.escape(@binder.current_version.img? ? @binder.current_version.img_contentview.url : get_binder_image(@binder)) %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
-              </div>
-
-              <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=Love this! <%= CGI.escape(@binder.title) %>&url=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>
-
-              <iframe src="//www.facebook.com/plugins/like.php?href=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&send=false&layout=standard&width=450&show_faces=true&action=like&colorscheme=light&font&height=90" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
-
-            </div>
-
-            <div style="clear:both; height:7px"></div>
-
+          <div style="<%= "display:none;" if !signed_in? || (signed_in? ? current_teacher.id.to_s != @binder.owner : false) %>float:right; margin:5px 5px 0 0"><input type="checkbox" class="pub_on" <%# 'disabled' if @binder.inherited_pub? %> <%= 'checked=checked' if @binder.is_pub? %> /></div>
+          <div class="inner">
+          Public
           </div>
 
         </div>
 
+
+
+        <div class="noShare" <%= "style=display:none" if @binder.is_pub? %>>
+          All folders &amp; files that you share publicly are <strong>free storage</strong> - and you can share them on social networks!
+        </div>
+
+
+        <div class="sharelinks" <%= "style=display:none" if !@binder.is_pub? %>>
+
+          <div>
+
+            <div class="input-prepend" style="margin-left:10px">
+                <span class="add-on" style="margin-right:-14px">
+                  <%= image_tag "binders/link.png", :style => "height:14px; margin-top:-4px" %>
+                </span>
+
+                <input id="normcurs" type="text" onclick="$(this).select();" style="width:138px; margin-left:10px;background:#fff" value="<%= "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>" readonly="readonly" />
+            </div>
+
+          </div>
+
+
+          <div style="margin: 10px 2px 5px 0;">
+
+            <div style="margin: 0 8px 0 15px; height:20px; float:left">
+              <a href="http://pinterest.com/pin/create/button/?url=<%= CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&media=<%= @binder.type == 1 ? (!@binder.thumbimgids[0].empty? ? CGI.escape(get_binder_image(Binder.find(@binder.thumbimgids[0]))) : CGI.escape("#{request.protocol}#{request.host_with_port}#{request.fullpath}")) : CGI.escape(@binder.current_version.img? ? @binder.current_version.img_contentview.url : get_binder_image(@binder)) %>" class="pin-it-button" count-layout="none" target="_blank"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+            </div>
+
+            <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/tweet_button.html?count=none&text=Love this! <%= CGI.escape(@binder.title) %>&url=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>" style="width:55px; height:20px; margin-top:1px; float:left"></iframe>
+
+            <iframe src="//www.facebook.com/plugins/like.php?href=<%= URI.encode("#{request.protocol}#{request.host_with_port}#{request.fullpath}") %>&send=false&layout=standard&width=450&show_faces=true&action=like&colorscheme=light&font&height=90" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:55px; height:25px; margin:-1px 0 0 8px; float:left" allowTransparency="true"></iframe>
+
+          </div>
+
+          <div style="clear:both; height:7px"></div>
+
+        </div>
+      </div>
     <% end %>
 
-
-
-
-
-        <% if @tags.flatten.any? || (current_teacher.nil? ? false : @binder.get_access(current_teacher.id.to_s) != 1)  %>
-        <div id="folder-tags" class="conbox whitester">
-          <div class="headstrip">
-            <div class="inner">
-            Tags 
-              <% if signed_in? && @binder.get_access(current_teacher.id.to_s) == 2 %>
-              <button class="btn" id="addtags-btn">
-              Add New
-              </button>
-              <% end %>
-            </div>
-          </div>
-
-          <div class="empty-tog fortags" style="<%= @tagset.any? ? raw("opacity: 0; display: none;") : raw("") %>">You haven't added any tags...yet!</div>
-
-          <!-- <div class="content-fill" style="display:none"> -->
-          <div class="content-fill" style="<%= @tagset.any? ? raw("display:block; opacity:1;") : raw("display:none") %>">
-
-            <div class="tag-group tagged-grades" <%= tagvis(@tags[0],@tagset) %>>
-              <div class="announce">
-                Grade Levels
-              </div>
-
-              <div class="taggers">
-                <ul class="tags"> 
-                  <% if true %>
-                    <% @tags[0].each do |f| %>
-                      <li>
-                        <a href="#"><%= f["title"] %></a>
-                        <div class="delcir" onclick="delTag(this)">x</div>
-                      </li>
-                    <% end %>
-                  <% end %>
-                </ul>
-                <div style="clear:both"></div>
-              </div>
-            </div>
-
-
-            <div id="grade-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
-            %><%= boxvis(@tagset)  
-            %>>
-              <input type="text" class="add-field grade-addfield" placeholder="Ex: '1st', 'Second Grade'" />
-              <div class="empty-auto-hold">Hit enter to add tag...</div>
-            </div>
-
-
-            <div class="tag-group tagged-subjects" <%= tagvis(@tags[1],@tagset) %>>
-              <div class="announce">
-                Subjects
-              </div>
-
-              <div class="taggers">
-                <ul class="tags">
-                  <% if true %>
-                    <% @tags[1].each do |f| %>
-                      <li>
-                        <a href="#"><%= f["title"] %></a>
-                        <div class="delcir" onclick="delTag(this)">x</div>
-                      </li>
-                    <% end %>
-                  <% end %>
-                </ul>
-                <div style="clear:both"></div>
-              </div>
-            </div>
-
-
-            <div id="subject-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
-            %><%= boxvis(@tagset) 
-            %>>
-              <input type="text" class="add-field subject-addfield" placeholder="Ex: 'Math', 'History'" />
-              <div class="empty-auto-hold">Hit enter to add tag...</div>
-            </div>
-
-
-            <div class="tag-group tagged-standards" <%= tagvis(@tags[2],@tagset) %>>
-              <div class="announce">
-                Standards
-              </div>
-
-              <div class="taggers">
-                <ul class="tags">
-                  <% if true %>
-                    <% @tags[2].each do |f| %>
-                      <li>
-                        <a href="#"><%= f["title"] %></a>
-                        <div class="delcir" onclick="delTag(this)">x</div>
-                      </li>
-                    <% end %>
-                  <% end %>
-                </ul>
-                <div style="clear:both"></div>
-              </div>
-            </div>
-
-            <div id="standards-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;" 
-            %><%= boxvis(@tagset)  
-            %>>
-              <input type="text" class="add-field standards-addfield" placeholder="Ex: 'RL.K.1'" />
-              <div class="empty-auto-hold">Hit enter to add tag...</div>
-            </div>
-
-
-            <div class="tag-group tagged-other" <%= tagvis(@tags[3],@tagset) %>>
-              <div class="announce">
-                Keywords
-              </div>
-
-
-              <div class="taggers">
-                <ul class="tags">
-                  <% if true %>
-                    <% @tags[3].each do |f| %>
-                      <li>
-                        <a href="#"><%= f["title"] %></a>
-                        <div class="delcir" onclick="delTag(this)">x</div>
-                      </li>
-                    <% end %>
-                  <% end %>
-                </ul>
-                <div style="clear:both"></div>
-              </div>
-            </div>
-            <div id="other-addarea" class="add-area tagenter" <%= boxvis(@tagset) %>>
-              <input type="text" class="add-field other-addfield" placeholder="Ex: 'Civil War', 'edchat'" />
-              <div class="empty-auto-hold">Hit enter to add tag...</div>
-            </div>
+    <% if @tags.flatten.any? || (current_teacher.nil? ? false : @binder.get_access(current_teacher.id.to_s) != 1)  %>
+      <div id="folder-tags" class="conbox whitester">
+        <div class="headstrip">
+          <div class="inner">
+          Tags
+            <% if signed_in? && @binder.get_access(current_teacher.id.to_s) == 2 %>
+            <button class="shiny btn pull-right" id="addtags-btn" style="margin-top:-4px;margin-right:-7px;">
+            Add New
+            </button>
+            <% end %>
           </div>
         </div>
-        <% end %>
+
+        <div class="empty-tog fortags" style="<%= @tagset.any? ? raw("opacity: 0; display: none;") : raw("") %>">You haven't added any tags...yet!</div>
+
+        <!-- <div class="content-fill" style="display:none"> -->
+        <div class="content-fill" style="<%= @tagset.any? ? raw("display:block; opacity:1;") : raw("display:none") %>">
+
+          <div class="tag-group tagged-grades" <%= tagvis(@tags[0],@tagset) %>>
+            <div class="announce">
+              Grade Levels
+            </div>
+
+            <div class="taggers">
+              <ul class="tags">
+                <% if true %>
+                  <% @tags[0].each do |f| %>
+                    <li>
+                      <a href="#"><%= f["title"] %></a>
+                      <div class="delcir" onclick="delTag(this)">x</div>
+                    </li>
+                  <% end %>
+                <% end %>
+              </ul>
+              <div style="clear:both"></div>
+            </div>
+          </div>
+
+
+          <div id="grade-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;"
+          %><%= boxvis(@tagset)
+          %>>
+            <input type="text" class="add-field grade-addfield" placeholder="Ex: '1st', 'Second Grade'" />
+            <div class="empty-auto-hold">Hit enter to add tag...</div>
+          </div>
+
+
+          <div class="tag-group tagged-subjects" <%= tagvis(@tags[1],@tagset) %>>
+            <div class="announce">
+              Subjects
+            </div>
+
+            <div class="taggers">
+              <ul class="tags">
+                <% if true %>
+                  <% @tags[1].each do |f| %>
+                    <li>
+                      <a href="#"><%= f["title"] %></a>
+                      <div class="delcir" onclick="delTag(this)">x</div>
+                    </li>
+                  <% end %>
+                <% end %>
+              </ul>
+              <div style="clear:both"></div>
+            </div>
+          </div>
+
+
+          <div id="subject-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;"
+          %><%= boxvis(@tagset)
+          %>>
+            <input type="text" class="add-field subject-addfield" placeholder="Ex: 'Math', 'History'" />
+            <div class="empty-auto-hold">Hit enter to add tag...</div>
+          </div>
+
+
+          <div class="tag-group tagged-standards" <%= tagvis(@tags[2],@tagset) %>>
+            <div class="announce">
+              Standards
+            </div>
+
+            <div class="taggers">
+              <ul class="tags">
+                <% if true %>
+                  <% @tags[2].each do |f| %>
+                    <li>
+                      <a href="#"><%= f["title"] %></a>
+                      <div class="delcir" onclick="delTag(this)">x</div>
+                    </li>
+                  <% end %>
+                <% end %>
+              </ul>
+              <div style="clear:both"></div>
+            </div>
+          </div>
+
+          <div id="standards-addarea" class="add-area tagenter" <% #style="display: none; opacity: 0;"
+          %><%= boxvis(@tagset)
+          %>>
+            <input type="text" class="add-field standards-addfield" placeholder="Ex: 'RL.K.1'" />
+            <div class="empty-auto-hold">Hit enter to add tag...</div>
+          </div>
+
+
+          <div class="tag-group tagged-other" <%= tagvis(@tags[3],@tagset) %>>
+            <div class="announce">
+              Keywords
+            </div>
+
+
+            <div class="taggers">
+              <ul class="tags">
+                <% if true %>
+                  <% @tags[3].each do |f| %>
+                    <li>
+                      <a href="#"><%= f["title"] %></a>
+                      <div class="delcir" onclick="delTag(this)">x</div>
+                    </li>
+                  <% end %>
+                <% end %>
+              </ul>
+              <div style="clear:both"></div>
+            </div>
+          </div>
+          <div id="other-addarea" class="add-area tagenter" <%= boxvis(@tagset) %>>
+            <input type="text" class="add-field other-addfield" placeholder="Ex: 'Civil War', 'edchat'" />
+            <div class="empty-auto-hold">Hit enter to add tag...</div>
+          </div>
+        </div>
       </div>
+    <% end %>
+
+    <% if signed_in? %>
+    <div id="folder-collaborators" class="conbox whitester">
+      <div class="headstrip">
+        <div class="inner">
+        Collaborators
+        <% if signed_in? && @binder.owner?(current_teacher.id.to_s) %>
+          <button class="shiny btn pull-right" data-toggle="collab-form" style="margin-top:-4px;margin-right:-7px;">
+          Edit
+          </button>
+        <% end %>
+        </div>
+      </div>
+      <div class="content-fill">
+        <ul class="collaborators">
+          <% if @collaborators.empty? %>
+
+            <div class="empty-tog fortags">You haven’t added any collaborators…yet!</div>
+
+          <% else %>
+
+            <div class="empty-tog fortags" style="display:none">You haven’t added any collaborators…yet!</div>
+
+            <% @collaborators.each do |teacher| %>
+              <li>
+                <a href="/<%= teacher.username %>" class="no-underline">
+                  <img src="<%= Teacher.thumb_sm(teacher) %>" class="img-rounded spaced-out pull-left" />
+                  <p>
+                    <%= teacher.first_last %><br>
+                    <small class="username"><%= teacher.username %></small>
+                    <% if signed_in? && @binder.owner?(current_teacher.id.to_s) && !@binder.inherited_access?(teacher.id.to_s) %>
+                      <small class="pull-right">
+                        <a href="#" id="remove-btn" class="red remove-btn" onclick="">remove</a>
+                      </small>
+                    <% end %>
+                  </p>
+                </a>
+              </li>
+            <% end %>
+          <% end %>
+
+        </ul>
+        <form id="collab-form" style="display:none;">
+          <div class="collab-group control-group">
+            <label class="announce" for="collaborator-id">
+              Add a collaborator
+            </label>
+            <input type="text" class="fit" placeholder="Enter username" name="collab_user" id="collaborator-id" />
+            <small class="error red"></small>
+            <input type="submit" class="hidden" />
+          </div>
+          <div style="clear:both"></div>
+        </form>
+      </div>
+
+    </div>
+    <% end %>
+
+  </div>
 </div>
 
 <div id="form-helpers" style="display:none">
@@ -281,7 +332,7 @@
 
 
   <div id="addfile-form" style="display:none">
-    
+
   </div>
 
 

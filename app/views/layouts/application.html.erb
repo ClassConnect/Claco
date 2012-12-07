@@ -5,7 +5,7 @@
 
 		<meta property="og:image" content="<%= asset_path('public/claco_solid.png') %>"/> 
 
-		<%= stylesheet_link_tag "strap", :media => "all" %>
+		<%= stylesheet_link_tag "bootstrap", :media => "all" %>
 		<%= stylesheet_link_tag "jqueryui", :media => "all" %>
 		<%= stylesheet_link_tag "application", :media => "all" %>
 
@@ -55,7 +55,7 @@
 		<% if signed_in? && current_teacher.getting_started %>
 
 			<%= javascript_include_tag "gen/guiders" %>
-			<%= javascript_include_tag "gen/wizard" %>
+			<%= javascript_include_tag "home/wizard" %>
 
 		<% end %>
 		<% if params[:controller] != "home" || signed_in? %>

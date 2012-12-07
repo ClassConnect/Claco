@@ -25,12 +25,14 @@ $(document).ready(function() {
 			setTimeout(function() {$(".login-focus").focus();},100);
 
 		}
-	    
+
 	});
 
 	$(document).bind('reveal.facebox', function() {
 		fieldAdder();
 	});
+
+  handleCollabForm();
 
 });
 
@@ -68,13 +70,107 @@ function htmlEncode(value){
         return '';
     }
 }
- 
+
 function htmlDecode(value) {
     if (value) {
         return $('<div />').html(value).text();
     } else {
         return '';
     }
+}
+
+// edit collaborators
+function handleCollabForm() {
+
+  $('#folder-collaborators')
+    .find('button[data-toggle]')
+    .click(function/*toggleForm*/(){
+
+      $('#' + $(this).data('toggle'))
+        .toggle();
+
+      $(this)
+        .toggleClass('btn-primary')
+        .text(function/*changeIfClass*/(){
+          if($(this).hasClass('btn-primary')) {
+            $('input#collaborator-id').focus();
+            return 'Save';
+          }
+          else return 'Edit';
+        });
+    });
+
+  $('#collab-form')
+    .attr('action', location.protocol+'//'+location.host+location.pathname + '/permissions')
+    .submit(function (event){
+      var $form = $(this);
+
+      $.ajax({
+        url: $form.attr('action'),
+        data: $form.serialize(),
+        type: 'post',
+        success: function(data) {
+          // data = $.isPlainObject(data) ? data : jQuery.parseJSON(data);
+
+          var userHtml = '<li>'+
+                    '<a href="/'+data.username+'" class="no-underline">'+
+                      '<img src="'+data.image+'" class="img-rounded spaced-out pull-left" />'+
+                      '<p>'+
+                        data.name+'<br>'+
+                        '<small class="username">'+data.username+'</small>'+
+                        '<small class="pull-right">'+
+                          '<a href="." id="remove-btn" class="red remove-btn" onclick="">remove</a>'+
+                        '</small>'+
+                      '</p>'+
+                    '</a>'+
+                  '</li>';
+
+          $('ul.collaborators')
+            .append(userHtml);
+
+          $('.collaborators .empty-tog').hide();
+          $form.find('input').val('');
+        },
+        error: function(error){
+          var res = JSON.parse(error.responseText);
+          $form
+            .find('.control-group')
+            .addClass('error')
+            .find('small')
+            .text(res.message);
+        }
+      });
+
+      event.preventDefault();
+  });
+
+  // reset error notification
+  $('#collab-form input').keydown(function/*removeErrorMsg*/(e){
+    if(e.which !== 13)
+      $(this)
+        .closest('.control-group')
+        .removeClass('error')
+        .find('small').text('');
+  });
+
+  // handle remove button
+  $('#folder-collaborators .remove-btn').live('click', function(event){
+    var $removeBtn = $(this);
+
+    $.ajax({
+        url: location.protocol+'//'+location.host+location.pathname + '/permissions',
+        data: { collab_user: $removeBtn.closest('p').find('.username').text() },
+        type: 'delete',
+        success: function(data) {
+          $removeBtn.closest('li').remove();
+          if(!$('ul.collaborators').find('li').length)
+            $('.collaborators .empty-tog').show();
+        }
+      });
+
+    event.preventDefault();
+  });
+
 }
 
 // close facebox
@@ -94,13 +190,13 @@ function fbFormActRevert() {
 
 function fbFormDisable(formID) {
 	$('#facebox :input').attr('disabled', true);
- 
+
 	$('#facebox :submit').attr('disabled', true);
 }
 
 function fbFormEnable(formID) {
 	$('#facebox :input').attr('disabled', false);
- 
+
 	$('#facebox :submit').attr('disabled', false);
 }
 
@@ -146,7 +242,7 @@ function togglePickFolder(fObj) {
 	} else {
 		$(fObj).parent().find(".dirWrap").html('Loading...').show();
 		$(fObj).addClass('arrow-down').removeClass('arrow-right');
-	
+
 
 		$.getJSON($(fObj).parent().attr('turl') + '.json', function(data) {
 
@@ -184,20 +280,28 @@ function togglePickFolder(fObj) {
 
 function selectPickFolder(fObj) {
 	var folid = $(fObj).parent().attr('folid');
+  var turl = $(fObj).parent().attr('turl');
 	var text = $(fObj).text();
+  
+  $(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
+  $(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid).data('turl', turl);
+  $(fObj).closest(".pickerpane").hide();
+
+  $(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
+  $(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid).data('turl', turl);
+  $(fObj).closest(".pickerpane").hide();
 
 	var changeBinder = $.Event("changeBinder");		// custom event
-	$('div.dir').trigger(changeBinder);
-	
-	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenTitle').html(text);
-	$(fObj).closest(".bndr").parent().parent().find('.togbar').find('.chosenOne').val(folid);
-	$(fObj).closest(".pickerpane").hide();
+	$('#chosenOne').trigger(changeBinder);
 
 }
 
+/* helpers */
+
 function getQueryHash() {
     // returns a map of query parameters
-    function getParameterByName(name) {
+    var queryMap = {},
+    	getParameterByName = function (name) {
         // returns value of named query param
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regexString = "[\\?&]" + name + "=([^&#]*)";
@@ -209,11 +313,11 @@ function getQueryHash() {
             return decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 
-    var queryMap={};
     location.search.replace(/[A-Z0-9]+?=(\w*)/gi,
         function(ae) {
             key = ae.split("=").shift();
             queryMap[key] = getParameterByName(key);
         });
+
     return queryMap;
 }

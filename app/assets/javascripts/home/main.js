@@ -1,4 +1,32 @@
 $(document).ready(function() {
+  // activate binders-list tabs
+  $('#binder-tabs a').click(function /*toggle*/(event) {
+    event.preventDefault();
+
+    // coerce target & source into jQuery objects
+    var _source = $(this),
+        _target = jQuery('[data-href='+_source.data('target')+']');
+        // target element has data-href property
+
+    // toggle source
+    _source
+      .parent('li')
+      .siblings('li')
+      .removeClass('active');
+      // ! this shouldn't be here; ask diwank to fix it
+    _source
+      .parent('li')
+      .addClass('active');
+
+    // toggle target
+    _target
+      .siblings('[data-href]')
+      .addClass('hidden');
+
+    _target.removeClass('hidden');
+
+    return _target;
+  });
 
 	$('#newbinder').click(function() {
 

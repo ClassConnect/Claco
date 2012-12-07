@@ -46,7 +46,7 @@ class BindersController < ApplicationController
 		@root = signed_in? ? current_teacher.binders.root_binders : []
 
 		@access = signed_in? ? @binder.get_access(current_teacher.id) : @binder.get_access
-		
+
 		@is_self = signed_in? ? current_teacher.username.downcase == params[:username].downcase : false
 
 		if !binder_routing_ok?(@binder, params[:action])
@@ -72,12 +72,14 @@ class BindersController < ApplicationController
 		if @tagset.any?
 			@tagset.each do |tag|
 				@tags[tag['type']] << tag
-			end		
+			end
 		end
 
 		@title = @binder.title
 
 		@children = (teacher_signed_in? ? @binder.children.reject {|c| c.get_access(current_teacher.id) == 0} : @binder.children.reject {|c| c.get_access == 0}).sort_by {|c| c.order_index}
+
+		@collaborators = Teacher.find(@binder.flatten_permissions.select{|h| h["type"] == 1}.map{|p| p["shared_id"]})
 
 		error = false
 
@@ -121,7 +123,7 @@ class BindersController < ApplicationController
 						@binder.id.to_s,
 						params)
 
-			redirect_to @binder.current_version.file.url.sub(/https:\/\/#{@binder.current_version.file.fog_directory}.s3.amazonaws.com/, @binder.current_version.file.fog_host) and return 
+			redirect_to @binder.current_version.file.url.sub(/https:\/\/#{@binder.current_version.file.fog_directory}.s3.amazonaws.com/, @binder.current_version.file.fog_host) and return
 		end
 
 		rescue BSON::InvalidObjectId
@@ -160,12 +162,187 @@ class BindersController < ApplicationController
 		rescue BSON::InvalidObjectId
 			render "errors/not_found", :status => 404 and return
 		rescue Mongoid::Errors::DocumentNotFound
-			render "errors/not_found", :status => 404 and return		
+			render "errors/not_found", :status => 404 and return
 
 	end
 
 	#Add links function
 	def createcontent
+<<<<<<< HEAD
+=======
+
+		errors = []
+
+		if params[:webtitle].strip.length > 0
+
+			embed = false
+			url = false
+			embedtourl = false
+
+			doc = Nokogiri::HTML(params[:weblink])
+
+			if !doc.at('iframe').nil?
+
+				uri = URI.parse(doc.at('iframe')['src'])
+				#Refactor this to also set vidtype
+				if uri.host.include?('youtube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.youtube.com/watch?v=#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
+
+					embedtourl = true
+					uri = "http://www.educreations.com/lesson/view/claco/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
+
+					embedtourl = true
+					uri = "http://vimeo.com/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('schooltube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.schooltube.com/video/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('showme.com') && uri.path.include?('sma/embed')
+
+					embedtourl = true
+					uri = "http://www.showme.com/sh/?h=#{CGI.parse(uri.query)['s'].first}"
+
+				else
+
+					embed = true
+
+				end
+
+			elsif !doc.at('embed').nil?
+
+				embed = true
+
+			end
+
+			if !embed && !embedtourl
+				# RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
+				url = true
+			end
+
+			if url || embed || embedtourl
+
+				@inherited = inherit_from(params[:id])
+
+				@parenthash = @inherited[:parenthash]
+				@parentsarr = @inherited[:parentsarr]
+				@parentperarr = @inherited[:parentperarr]
+
+				@parent_child_count = @inherited[:parent_child_count]
+
+				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
+
+					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
+
+					if !((url || embedtourl) && link.empty?)
+
+						if (embed ? true : !Addressable::URI.heuristic_parse(link).host.include?("teacherspayteachers.com"))
+
+							@binder = Binder.new(	:title				=> params[:webtitle].strip[0..49],
+													:owner				=> current_teacher.id,
+													:username			=> current_teacher.username,
+													:fname				=> current_teacher.fname,
+													:lname				=> current_teacher.lname,
+													:parent				=> @parenthash,
+													:parents			=> @parentsarr,
+													:last_update		=> Time.now.to_i,
+													:last_updated_by	=> current_teacher.id.to_s,
+													:body				=> params[:body] || "",
+													:order_index		=> @parent_child_count,
+													:parent_permissions	=> @parentperarr,
+													:files				=> 1,
+													:type				=> 2,
+													:format				=> 2)
+
+
+							@binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
+															:thumbnailgen => 1, #video
+															:embed		=> embed,
+															:timestamp	=> Time.now.to_i,
+															:owner		=> current_teacher.id)
+
+
+							#@binder.create_binder_tags(params,current_teacher.id)
+
+							if @binder.save
+
+								Mongo.log(	current_teacher.id.to_s,
+											__method__.to_s,
+											params[:controller].to_s,
+											@binder.id.to_s,
+											params)
+
+
+								if url || embedtourl
+									uri = Addressable::URI.heuristic_parse(link)
+
+									stathash = @binder.current_version.imgstatus
+									stathash[:imgfile][:retrieved] = true
+
+									if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+
+										# YOUTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_youtube_url(uri.to_s))
+										@binder.current_version.vidtype = "youtube"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+									elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+
+										# VIMEO
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'vimeo'})
+										@binder.current_version.vidtype = "vimeo"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+									elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
+
+										# EDUCREATIONS
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_educreations_url(uri.to_s))
+										@binder.current_version.vidtype = "educreations"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+									elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+
+										# SCHOOLTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'schooltube'})
+										@binder.current_version.vidtype = "schooltube"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+									elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+
+										# SHOWME
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(@binder.id,uri.to_s,{:site => 'showme'})
+										@binder.current_version.vidtype = "showme"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(@binder.id)
+
+									else
+										@binder.versions.last.update_attributes( :thumbnailgen => 2 )
+										# generic URL, grab Url2png
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(@binder.id,Url.get_url2png_url(uri.to_s))
+
+										#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+									end
+
+								end
+>>>>>>> feature/collaboration
 
 		@binder = Binder.create_content(params[:id], params, current_teacher)
 
@@ -339,7 +516,7 @@ class BindersController < ApplicationController
 				@inherited = inherit_from(params[:id])
 
 				if @inherited[:parent].get_access(current_teacher.id.to_s) == 2
-					
+
 					@binder = Binder.new
 
 					@parenthash = @inherited[:parenthash]
@@ -383,7 +560,7 @@ class BindersController < ApplicationController
 
 					#logger.debug DataUploader.new(params[:binder][:versions][:file]).current_path
 					#temp.file = params[:binder][:versions][:file]
-			 
+
 					#logger.debug(params[:binder][:versions][:file].class)
 
 					@binder.versions.new
@@ -436,7 +613,7 @@ class BindersController < ApplicationController
 								#Rails.logger.debug "<<< URL: #{@binder.current_version.file.url.to_s} >>>"
 
 								filedata = Crocodoc.upload(@binder.current_version.file.url)
-									
+
 								filedata = filedata["uuid"] if !filedata.nil?
 
 								@binder.current_version.update_attributes(:croc_uuid => filedata)
@@ -497,7 +674,7 @@ class BindersController < ApplicationController
 
 
 						@binder.create_binder_tags(params,current_teacher.id)
-				 
+
 						pids = @parentsarr.collect {|x| x["id"] || x[:id]}
 
 						pids.each do |id|
@@ -581,7 +758,7 @@ class BindersController < ApplicationController
 
 			src = ""
 
-			@children.each do |c| 
+			@children.each do |c|
 
 				c.update_attributes(:order_index => params[:data].index(c.id.to_s))
 
@@ -660,11 +837,11 @@ class BindersController < ApplicationController
 												:files		=> op.files - @binder.files,
 												:folders	=> op.folders - @binder.folders - (@binder.type == 1 ? 1 : 0),
 												:total_size	=> op.total_size - @binder.total_size,
-												:pub_size	=> op.pub_size - @binder.pub_size, 
+												:pub_size	=> op.pub_size - @binder.pub_size,
 												:priv_size	=> op.priv_size - @binder.priv_size)
 					end
 				end
-		 
+
 				#Binder.find(op.last).inc(:children,-1)
 
 				# DELAYTAG
@@ -682,7 +859,7 @@ class BindersController < ApplicationController
 				# DELAYTAG
 				Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
-				# must update the common ancestor of the children before 
+				# must update the common ancestor of the children before
 				@binder.update_parent_tags()
 
 				#@binder is the object being moved
@@ -699,7 +876,7 @@ class BindersController < ApplicationController
 						@size = @current_parents.size
 
 						@npperarr = h.parent_permissions
-						
+
 						@ppers.each {|p| @npperarr.delete(p)}
 
 						h.update_attributes(:parents			=> @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)],
@@ -836,7 +1013,7 @@ class BindersController < ApplicationController
 					@binder.inc(:fav_total, 1)
 				elsif fork
 					method = "forkitem"
-					# fork_total is 
+					# fork_total is
 					@binder.inc(:fork_total, 1)
 
 					Binder.delay(:queue => "email").sendforkemail(@binder.id.to_s, @new_parent.id.to_s)
@@ -925,7 +1102,7 @@ class BindersController < ApplicationController
 												:priv_size			=> h.priv_size,
 												:fav_total			=> h.fav_total,
 												:thumbimgids		=> @binder.thumbimgids,)
-		
+
 						# @new_node.versions << Version.new(	:owner		=> h.current_version.owner,
 						# 									:file_hash	=> h.current_version.file_hash,
 						# 									:timestamp	=> h.current_version.timestamp,
@@ -936,7 +1113,7 @@ class BindersController < ApplicationController
 						# 									:imgfile	=> h.current_version.imgfile,
 						# 									:file		=> h.format == 1 ? h.current_version.file : nil) if h.type == 2
 
-						
+
 						@new_node.versions << h.current_version
 
 						#TODO: copy related images?
@@ -1013,7 +1190,7 @@ class BindersController < ApplicationController
 		# send file to crocodoc if the format is supported
 		#if check_format_validity(File.extname(params[:binder][:versions][:file].original_filename))
 		#	filedata = upload(params[:binder][:versions][:file])
-		#		
+		#
 		#	filedata = filedata["uuid"] if !filedata.nil?
 		#end
 
@@ -1026,7 +1203,7 @@ class BindersController < ApplicationController
 										:timestamp	=> Time.now.to_i,
 										:active		=> true)
 
-		
+
 
 		@binder.save
 
@@ -1038,7 +1215,7 @@ class BindersController < ApplicationController
 
 		if Crocodoc.check_format_validity(@binder.current_version.ext)
 			filedata = Crocodoc.upload(@binder.current_version.file.current_path)
-				
+
 			filedata = filedata["uuid"] if !filedata.nil?
 
 			# create thumbnail!!!!
@@ -1206,8 +1383,8 @@ class BindersController < ApplicationController
 					if params[:enabled]=="true"
 						@binder.pub_size = @binder.pub_size + @binder.priv_size
 						@binder.priv_size = 0
-						
-						@binder.parents.each do |f| 
+
+						@binder.parents.each do |f|
 							if f['id'].to_s!='0'
 								g = Binder.find(f['id'].to_s)
 								g.update_attributes(:pub_size => g.pub_size + @binder.priv_size,
@@ -1217,8 +1394,8 @@ class BindersController < ApplicationController
 					else
 						@binder.priv_size = @binder.priv_size + @binder.pub_size
 						@binder.pub_size = 0
-						
-						@binder.parents.each do |f| 
+
+						@binder.parents.each do |f|
 							if f['id'].to_s!='0'
 								g = Binder.find(f['id'].to_s)
 								g.update_attributes(:pub_size => 0,
@@ -1242,7 +1419,7 @@ class BindersController < ApplicationController
 						h.permissions.find{|p| p["type"] == 3}["auth_level"] = params[:enabled] == "true" ? 1 : 0 if !h.permissions.find{|p| p["type"] == 3}.nil?
 
 						if h.parent_permissions.find {|p| p["type"] == 3}.nil?
-							
+
 							h.parent_permissions << {	:type		=> 3,
 														:folder_id => params[:id],
 														:auth_level	=> params[:enabled] == "true" ? 1 : 0}
@@ -1288,7 +1465,7 @@ class BindersController < ApplicationController
 			error = "You are not allowed to change permissions on this item."
 
 		end
-		
+
 		rescue BSON::InvalidObjectId
 			error = "Invalid Request"
 		rescue Mongoid::Errors::DocumentNotFound
@@ -1300,84 +1477,90 @@ class BindersController < ApplicationController
 
 	end
 
-	# def createpermission
-	# 	@binder = Binder.find(params[:id])
+	def add_collaborator
 
-	# 	@new = false
+		binder = Binder.find(params[:id])
 
-	# 	src = Mongo.log(current_teacher.id.to_s,
-	# 					__method__.to_s,
-	# 					params[:controller].to_s,
-	# 					@binder.id.to_s,
-	# 					params)
+		if binder.owner?(current_teacher.id)
 
-	# 	@binder.permissions.each {|p| @new = true if p["shared_id"] == params[:shared_id]}
+			teacher = Teacher.find_by_username(params[:collab_user])
 
-	# 	@binder.parent_permissions.each {|pp| @new = true if pp["shared_id"] == params[:shared_id]} 
+			if !teacher.has_explicit_access_to?(binder)
 
-	# 	@binder.permissions << {:type		=> params[:type],
-	# 							:shared_id	=> (params[:type] == "1" ? params[:shared_id] : "0"),
-	# 							:auth_level	=> params[:auth_level]} if !@new
+				if binder.add_collaborator!(teacher)
 
-	# 	@binder.save
+					src = Mongo.log(current_teacher.id.to_s,
+									__method__.to_s,
+									params[:controller].to_s,
+									binder.id.to_s,
+									params)
 
-	# 	@binder.subtree.each do |c| 
+					binder.subtree.map(&:_id).each do |childid|
 
-	# 		if !@new
+						Mongo.log(	current_teacher.id.to_s,
+									__method__.to_s,
+									params[:controller].to_s,
+									childid.to_s,
+									params,
+									{ :src => src })
 
-	# 			c.update_attributes(:parent_permissions => c.parent_permissions << {:type => params[:type],
-	# 																				:shared_id => params[:shared_id],
-	# 																				:auth_level => params[:auth_level],
-	# 																				:folder_id => params[:id]}) 
-	# 			Mongo.log(	current_teacher.id.to_s,
-	# 						__method__.to_s,
-	# 						params[:controller].to_s,
-	# 						c.id.to_s,
-	# 						params,
-	# 						{ :src => src })
+					end
 
-	# 		end
-	# 	end
+				end
 
-	# 	redirect_to named_binder_route(@binder, "permissions")
-	# end
+			else
 
-	# def destroypermission
-	# 	@binder = Binder.find(params[:id])
+				render :json => {"status" => "error", "message" => "#{teacher.first_last} is already a collaborator."}, :status => 422 and return
 
-	# 	src = Mongo.log(current_teacher.id.to_s,
-	# 					__method__.to_s,
-	# 					params[:controller].to_s,
-	# 					@binder.id.to_s,
-	# 					params)
+			end
 
-	# 	pper = @binder.permissions[params[:pid].to_i]
+		end
 
-	# 	pper["folder_id"] = params[:id]
+		render :json => {"status" => "success", "name" => teacher.first_last, "username" => teacher.username, "image" => Teacher.thumb_sm(teacher)}
 
-	# 	@binder.permissions.delete_at(params[:pid].to_i)
+		rescue Mongoid::Errors::DocumentNotFound
+			render :json => {"status" => "error", "message" => "#{params[:collab_user]} was not found."}, :status => 422 and return
+	end
 
-	# 	@binder.subtree.each do |c|
-	# 		c.parent_permissions.delete(pper)
-	# 		c.save
+	def destroypermission
 
-	# 		Mongo.log(	current_teacher.id.to_s,
-	# 					__method__.to_s,
-	# 					params[:controller].to_s,
-	# 					c.id.to_s,
-	# 					params,
-	# 					{ :src => src })
+		@binder = Binder.find(params[:id])
 
-	# 	end
+		if @binder.owner?(current_teacher.id.to_s)
 
-	# 	@binder.save
+			@teacher = Teacher.find_by_username(params[:collab_user])
 
-	# 	#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(params[:id])
-	# 	#Binder.generate_folder_thumbnail(params[:id])
-	# 	Binder.generate_folder_thumbnail(@binder.parent['id'])
+			@binder.remove_access!(@teacher)
 
-	# 	redirect_to named_binder_route(@binder, "permissions")
-	# end
+			src = Mongo.log(current_teacher.id.to_s,
+							__method__.to_s,
+							params[:controller].to_s,
+							@binder.id.to_s,
+							params)
+
+			@binder.subtree.map(&:_id).each do |childid|
+
+					Mongo.log(	current_teacher.id.to_s,
+						__method__.to_s,
+						params[:controller].to_s,
+						childid.to_s,
+						params,
+						{ :src => src })
+
+			end
+
+		end
+
+		Binder.generate_folder_thumbnail(@binder.parent['id'])
+
+		respond_to do |format|
+
+			format.html {render :text => 1}
+
+		end
+
+		# redirect_to named_binder_route(@binder, "permissions")
+	end
 
 	def trash
 		@children = Binder.where(:owner => current_teacher.id, "parent.id" => "-1")
@@ -1445,7 +1628,7 @@ class BindersController < ApplicationController
 					@current_parents = h.parents
 					@size = @current_parents.size
 					h.update_attributes(:parents => @parentsarr + @current_parents[(@current_parents.index({"id" => @binder.id.to_s, "title" => @binder.title}))..(@size - 1)])
-					
+
 					Mongo.log(	current_teacher.id.to_s,
 								__method__.to_s,
 								params[:controller].to_s,
@@ -1503,9 +1686,9 @@ class BindersController < ApplicationController
 
 	###############################################################################################
 
-							#    #  ##### #     #####  ##### #####   #### 
+							#    #  ##### #     #####  ##### #####   ####
 							#    #  #     #     #    # #     #    # #    #
-							#    #  #     #     #    # #     #    # # 
+							#    #  #     #     #    # #     #    # #
 							######  ####  #     #####  ####  #####   ####
 							#    #  #     #     #      #     #  #        #
 							#    #  #     #     #      #     #   #  #    #
@@ -1583,10 +1766,10 @@ class BindersController < ApplicationController
 
 		end
 
-		return {:parenthash => parenthash, 
+		return {:parenthash => parenthash,
 				:parentsarr => parentsarr,
-				:parentperarr => parentperarr, 
-				:parent => parent, 
+				:parentperarr => parentperarr,
+				:parent => parent,
 				:parent_child_count => parent_child_count}
 
 	end
@@ -1607,14 +1790,14 @@ class BindersController < ApplicationController
 		if binder.class == Binder
 			retstr = "/#{binder.handle}/portfolio"
 
-			if binder.parents.length != 1 
+			if binder.parents.length != 1
 				retstr += "/#{CGI.escape(binder.root.gsub(" ", "-"))}"
 			end
 
 			retstr += "/#{CGI.escape(binder.title.gsub(" ", "-"))}/#{binder.id}"
 
-			if action != "show" 
-				retstr += "/#{action}" 
+			if action != "show"
+				retstr += "/#{action}"
 			end
 
 			return retstr

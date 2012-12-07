@@ -562,6 +562,26 @@ select:focus:required:invalid:focus {
           box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 }
 
+.img-rounded {
+  border-radius: 2px;
+}
+
+input.fit {
+  max-width: 90%;
+  display: block;
+  margin: auto;
+}
+
+.block {
+  display: block;
+}
+
+/* colors */
+
+.red {
+  color: #DA0606;
+}
+
 .btn-medium {
   font-size: 13px;
 }

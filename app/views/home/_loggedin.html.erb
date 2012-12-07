@@ -21,7 +21,7 @@
 
 
 				<div class="listitem">
-					<div class="numbul">1</div> 
+					<div class="numbul">1</div>
 					<div class="linker">
 						<a id="task4" onclick="wizardFocus(4)">Subscribe to your favorite colleagues, educators and organizations</a>
 					</div>
@@ -42,7 +42,7 @@
 				</div>
 
 				<div class="listitem">
-					<div class="numbul">4</div> 
+					<div class="numbul">4</div>
 					<div class="linker">
 						<a id="task1" onclick="wizardFocus(1)">Edit your profile information</a>
 					</div>
@@ -62,18 +62,36 @@
 <div class="container">
 
 	<div id="paneleft">
-		<div class="announcer">Your Binders</div>
+		<div class="announcer">
+			<h4>Binders</h4>
+			<ul class="nav nav-pills pull-right" id="binder-tabs">
+              <li class="active"><a href="#" data-action="toggle" data-target="personal_binders">Personal</a></li>
+              <li><a href="#" data-action="toggle" data-target="shared_binders">Shared</a></li>
+            </ul>
+		</div>
 
-		<div class="whitebox">
-			<% Binder.where(:owner => current_teacher.id, "parent.id" => "0").each do |binder| %>
+		<div class="whitebox" data-href="personal_binders">
+			<% current_teacher.binders.root_binders.each do |binder| %>
 			<a href="<%= named_binder_route(binder) %>">
 				<div class="bindir">
-					<div class="binder_attr">></div>
+					<div class="binder_attr">&gt;</div>
 					<div class="binder_name"><%= binder.title %></div>
 				</div>
 			</a>
 			<% end %>
-
+		</div>
+		<div class="whitebox hidden" data-href="shared_binders">
+			<% @shared_binders.each do |binder| %>
+        <a href="<%= named_binder_route(binder) %>">
+          <div class="bindir">
+            <div class="binder_attr">&gt;</div>
+            <div class="binder_name"><%= binder.title %></div>
+          </div>
+        </a>
+      <% end %>
+      <% if @shared_binders.count == 0 %>
+        <strong class="bindir block">No one has shared a binder with you... yet!</strong>
+      <% end %>
 		</div>
 
 <div style="height:70px;margin-left:25px">
@@ -90,7 +108,7 @@
 	<span class="inlay"><small><%= @size_percent_used.to_i %>% of <%= number_to_human_size(current_teacher.size_cap) %> used.</small></span>
 	<hr />
 	<p>Looking for Free Storage?</p>
-<!-- 	<%= @invcount %> Invites Used --><!-- 
+<!-- 	<%= @invcount %> Invites Used --><!--
 	<a href="#" style="float:right" onclick="jQuery.facebox({ ajax: '/invite' });return false">Invite Colleagues</a> -->
 	<div class="invite-btn">
 		<ul class="pager">
@@ -124,7 +142,7 @@
 			<div class="findppl">
 				<div class="boxyleft">
 
-		<% #educators = current_teacher.recommends[0..8].shuffle[0..2].map{ |f| Teacher.find(f.to_s) } 
+		<% #educators = current_teacher.recommends[0..8].shuffle[0..2].map{ |f| Teacher.find(f.to_s) }
 
 			# because I'm fucking lazy
 			educators = []
@@ -137,15 +155,15 @@
 			end
 
 		%>
-	
+
 		<% if !educators[0].nil? %>
 
 		<div class="listitem" style="margin-left:15px">
-			
+
 			<a href="/<%= educators[0].username %>">
 				<img src="<%= teacher_thumb_md(educators[0]) %>" class="thumbster" />
 			</a>
-			
+
 			<div class="infowrap">
 				<div class="bigtitle">
 					<a href="/<%= educators[0].username %>"><%= "#{educators[0].fname} #{educators[0].lname}" %></a>
@@ -169,11 +187,11 @@
 		<% if !educators[1].nil? %>
 
 		<div class="listitem mid">
-			
+
 			<a href="/<%= educators[1].username %>">
 				<img src="<%= teacher_thumb_md(educators[1]) %>" class="thumbster" />
 			</a>
-			
+
 			<div class="infowrap">
 				<div class="bigtitle">
 					<a href="/<%= educators[1].username %>"><%= "#{educators[1].fname} #{educators[1].lname}" %></a>
@@ -197,11 +215,11 @@
 		<% if !educators[2].nil? %>
 
 		<div class="listitem" style="border-right:none">
-			
+
 			<a href="/<%= educators[2].username %>">
 				<img src="<%= teacher_thumb_md(educators[2]) %>" class="thumbster" />
 			</a>
-			
+
 			<div class="infowrap">
 				<div class="bigtitle">
 					<a href="/<%= educators[2].username %>"><%= "#{educators[2].fname} #{educators[2].lname}" %></a>
@@ -224,7 +242,7 @@
 
 		<% end %>
 
-	
+
 
 <ul class="pager">
 			<li class="next">
@@ -235,14 +253,14 @@
 
 					<div class="maintxt">
 							Find colleagues &nbsp;&nbsp;&nbsp;
-						
+
 
 						<% if current_teacher.omnihash["twitter"].nil? %>
 							<a href="/gs/twitter" class="zocial twitter">Connect with Twitter</a>
 						<% end %>
-					
 
-					
+
+
 						<% if current_teacher.omnihash["facebook"].nil? %>
 							<a href="/gs/facebook" class="zocial facebook">Connect with Facebook</a>
 						<% end %>
@@ -251,12 +269,12 @@
 					</div>
 
 					<% end %>
-					
-					
+
+
 
 				</div>
 
-				
+
 				<div style="clear:both"></div>
 			</div>
 

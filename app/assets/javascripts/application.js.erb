@@ -145,7 +145,7 @@ function handleCollabForm() {
   });
 
   // reset error notification
-  $('#collab-form input').keypress(function/*removeErrorMsg*/(e){
+  $('#collab-form input').keydown(function/*removeErrorMsg*/(e){
     if(e.which !== 13)
       $(this)
         .closest('.control-group')

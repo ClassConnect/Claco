@@ -33,8 +33,8 @@ class Feed
 	end
 
 	# returns wrappers that occur after the provided logid
-	def buffer(logid)
-		return self.wrappers if logid.empty?
+	def buffer(logid='')
+		return self.wrappers if logid.to_s.empty?
 		self.wrappers.where(:lr_timestamp.lte => Log.find(logid).timestamp)
 	end
 
@@ -51,7 +51,7 @@ class Feed
 
 		# TODO: reset cursor to PROPER location instead of just to blank
 
-		page = !pagelogid.empty?
+		page = !pagelogid.to_s.empty?
 
 		# if !page
 		# 	self.cursor = ''
@@ -60,6 +60,7 @@ class Feed
 
 		@feed = []
 		@subsfeed = []
+		logs = []
 
 		# i = 0
 
@@ -82,56 +83,65 @@ class Feed
 		#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 		#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
+		debugger
 
-		# pull the current teacher's subscription IDs
-		subs = (teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+		if !page || (self.buffer(pagelogid).size < MAIN_WRAP_LENGTH)
 
-			# self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
+			# pull the current teacher's subscription IDs
+			subs = (teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
-			# self.actors.uniq!
+				# self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
 
-			# self.save
+				# self.actors.uniq!
 
-		logs = Tire.search 'logs' do |search|
+				# self.save
 
-			search.query do |query|
-				query.all
+			logs = Tire.search 'logs' do |search|
+
+				search.query do |query|
+					query.all
+				end
+
+				# technically these should be cascaded to avoid cross-method name conflicts
+				search.filter :terms, :model => ['binders','teachers']
+				search.filter :terms, :method => FEED_METHOD_WHITELIST
+				search.filter :terms, :ownerid => subs + [teacherid]
+
+				debugger
+
+				if page
+					if self.lr_timestamp!=0.0 #self.timerange['lower'].present?
+						# TODO: throw out matching logids at head of list
+						search.filter :range, :timestamp => { :lt => self.lr_timestamp.ceil } #self.timerange['lower'] }
+					end
+				else
+					if self.mr_timestamp!=0.0 #self.timerange['upper'].present?
+						search.filter :range, :timestamp => { :gte => self.mr_timestamp.floor } #self.timerange['upper'].to_i }
+					#else
+						# this is to prevent multiple inclusion in the stacked feed object array
+						#search.filter :range, :timestamp => { :gte => Time.now.to_i }
+					end
+				end
+
+
+				#if self.timerange['lower'].present?
+				#	search.filter :numeric_range, :lte => self.timerange['lower']
+				#end
+
+				# TODO: analyze later for retention in feed object
+				search.size 100
+
+				search.sort { by :timestamp, 'desc' }
+
 			end
 
-			# technically these should be cascaded to avoid cross-method name conflicts
-			search.filter :terms, :model => ['binders','teachers']
-			search.filter :terms, :method => FEED_METHOD_WHITELIST
-			search.filter :terms, :ownerid => subs + [teacherid]
+			#debugger
 
-			if page
-				if self.lr_timestamp!=0.0 #self.timerange['lower'].present?
-					# TODO: throw out matching logids at head of list
-					search.filter :range, :timestamp => { :lt => self.lr_timestamp.ceil } #self.timerange['lower'] }
-				end
-			else
-				if self.mr_timestamp!=0.0 #self.timerange['upper'].present?
-					search.filter :range, :timestamp => { :gte => self.mr_timestamp.floor } #self.timerange['upper'].to_i }
-				#else
-					# this is to prevent multiple inclusion in the stacked feed object array
-					#search.filter :range, :timestamp => { :gte => Time.now.to_i }
-				end
-			end
-
-
-			#if self.timerange['lower'].present?
-			#	search.filter :numeric_range, :lte => self.timerange['lower']
-			#end
-
-			# TODO: analyze later for retention in feed object
-			search.size 100
-
-			search.sort { by :timestamp, 'desc' }
+			logs = logs.results
 
 		end
 
 		#debugger
-
-		logs = logs.results
 
 		if logs.any?
 
@@ -201,7 +211,7 @@ class Feed
 								most_recent_logid = f[:id].to_s
 							end
 
-							if f[:timestamp] < least_recent_logtime
+							if f[:timestamp] < least_recent_logtime || least_recent_logtime==0.0
 								least_recent_logtime = f[:timestamp]
 								least_recent_logid = f[:id].to_s
 							end
@@ -291,7 +301,7 @@ class Feed
 			#TODO: cleanup on time delay
 
 			#TODO: unsubscribing from teachers, removing binders should purge
-
+		end
 			@subsfeed.each do |f|
 
 				self.actors << f.first[:ownerid]
@@ -327,12 +337,17 @@ class Feed
 
 			# self.save
 
-			imc = IndirectModelController.new()
 
-			# if page
-				self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
-					retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
-				end
+
+			# imc = IndirectModelController.new()
+
+			# # if page
+			# 	self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
+			# 		retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
+			# 	end
+
+
+
  		# 		self.wrappers.where(:mr_timestamp.lt => self.wrappers.find(self.cursor).mr_timestamp).to_a.sort_by { |f| -f.mr_timestamp }[0..19].each do |f|
  		# 			retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
  		# 		end
@@ -347,7 +362,15 @@ class Feed
 			self.actors.uniq!
 
 			self.save
-		end
+		#end
+
+
+			imc = IndirectModelController.new()
+
+			# if page
+				self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
+					retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
+				end
 
 		retstr
 	end

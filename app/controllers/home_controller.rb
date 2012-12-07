@@ -189,6 +189,18 @@ class HomeController < ApplicationController
 		#debugger
 	end
 
+	def feedtest
+
+		respond_to do |format|
+			begin
+				format.html {render :text => Feed.find(current_teacher.feed_ids[0]).html(current_teacher.id.to_s,params[:logid])}
+			rescue
+				format.html {render :text => "teacher does not have a feed" }
+			end
+		end
+
+	end
+
 	def educators
 
 		@title = "Educators you may know"

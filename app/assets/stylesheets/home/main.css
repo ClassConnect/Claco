@@ -1,3 +1,11 @@
+p {
+    margin: 0 0 4px;
+}
+
+.pager {
+    margin: 0 0;
+}
+
 .crossout {
 	text-decoration: line-through;
 	font-style: italic;
@@ -55,11 +63,6 @@
      -moz-border-radius: 20px;
           border-radius: 20px;
 }
-
-
-
-
-
 
 #paneright {
 	margin-top:20px;
@@ -320,17 +323,6 @@ position:absolute;
 	text-decoration: none;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 #paneleft {
 	margin-top:20px;
 	width:250px;
@@ -342,7 +334,34 @@ position:absolute;
 	font-size:14px;
 	font-weight:bolder;
 	text-shadow: 0 1px 0 #fff;
-	padding:8px;
+	padding: 8px;
+}
+
+#paneleft .announcer h4 {
+	display: inline-block;
+	line-height: 1.8;
+}
+
+.announcer .nav-pills {
+	margin: 0;
+	font-size: 80%;
+	font-weight:normal;
+	text-shadow: none;
+
+}
+
+.announcer .nav-pills a {
+	/*margin: 0;*/
+	padding: 3px 6px;
+	border-radius: 2px;
+}
+
+.progress {
+    margin-bottom: 0px;
+}
+
+.progress {
+    margin-bottom: 0px;
 }
 
 #paneleft .whitebox{
@@ -397,4 +416,56 @@ position:absolute;
   -webkit-border-radius: 5px;
      -moz-border-radius: 5px;
           border-radius: 5px;
+}
+
+#emailInviter {
+  display: none;
+  text-align: center;
+}
+
+#emailInviter input[type=text] {
+  min-width:80%;
+}
+
+#emailInviter input[type=text]:last-of-type {
+
+  opacity: 0.4;
+}
+
+.invite-btn {
+  padding-top:5px;
+}
+
+.invite-btn-grp {
+  text-align: center;
+  padding: 2px 0;
+}
+
+.invite-btn-grp a {
+  margin-right: 3px;
+}
+
+.invite-btn-grp a:last-child {
+  margin-right: 0;
+}
+
+.url-container {
+  text-align:center;
+}
+
+.url-container input[type=text]{
+  min-width: 80%;
+  margin-left:10px;
+  background:#fff;
+}
+
+.inlay {
+  margin-top:-2px;
+  text-align:right;
+  display:block;
+}
+
+.inlay small {
+  color:#999;
+  text-shadow:0 1px 0 #eee;
 }

@@ -22,6 +22,7 @@ class HomeController < ApplicationController
 
 			@invcount = Invitation.where(:from => current_teacher.id.to_s).count
 			@size_percent_used = (current_teacher.priv_size / current_teacher.size_cap.to_f) * 100
+			@shared_binders = Binder.where(:"permissions.shared_id" => current_teacher.id.to_s).reject{|b| b.get_access(current_teacher.id.to_s) < 1}
 
 			# pull logs of relevant content, sort them, iterate through them, break when 10 are found
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)

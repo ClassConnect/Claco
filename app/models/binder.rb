@@ -61,7 +61,7 @@ class Binder
 	#Counts
 	field :files, :type => Integer, :default => 0
 	field :folders, :type => Integer, :default => 0
-	field :children, :type => Integer, :default => 0
+	field :children, :type => Integer, :default => 0 # This field needs to be cleanly removed... or used properly and renamed
 	field :total_size, :type => Integer, :default => 0
 	field :pub_size, :type => Integer, :default => 0
 	field :priv_size, :type => Integer, :default => 0
@@ -432,13 +432,6 @@ class Binder
 
 	end
 
-	#TODO: change this to a scoped entity
-	def get_binder_children_by_id(parent_binder_id)
-
-		return Binders.where("parent.id" => parent_binder_id)
-
-	end
-
 	# re-inherits the parent tags
 	def update_parent_tags
 
@@ -491,16 +484,90 @@ class Binder
 		return ret_set
 	end
 
+	#Sets the binder's inherited permissions and parent data
+	#TODO:
+	#Change this to disallow "0"
+	#Make separate function for inheriting from "0" - should only be used for creating binders
+	def inherit_from(parentid)
+
+		parenthash = {}
+		parentsarr = []
+		parentperarr = []
+
+		if parentid.to_s == "0"
+
+			parenthash = {	:id		=> parentid.to_s,
+							:title	=> ""}
+
+			parentsarr = [parenthash]
+
+			parent = "0"
+
+		else
+
+			parent = Binder.find(parentid)
+
+			parenthash = {	:id		=> parentid.to_s,
+							:title	=> parent.title}
+
+			parentsarr = parent.parents << parenthash
+
+			parentperarr = parent.parent_permissions
+
+			if !parentperarr.find{|p| p["type"] == 3}.nil? && !parent.permissions.find{|p| p["type"] == 3}.nil?
+
+				parentperarr.delete(parentperarr.find{|p| p["type"] == 3})
+
+				parent.permissions.each do |p|
+					p["folder_id"] = parentid
+					parentperarr << p
+				end
+
+			else
+
+				parent.permissions.each do |p|
+					p["folder_id"] = parentid
+					parentperarr << p
+				end
+
+			end
+
+		end
+
+		self.parent = parenthash
+		self.parents = parentsarr
+		self.parent_permissions = parentperarr
+
+		return self
+
+	end
+
+	#Grab the ids of parents
 	def parent_ids
-		return parents.collect {|x| x["id"] || x[:id]}
+		parents.map{|x| x["id"] || x[:id]}
+	end
+
+	def parent_ids_without_roots
+		parent_ids.reject{|p| RESERVED_BINDER_IDS.include?(p)}
+	end
+
+	#Find immediate parent
+	def find_parent
+		Binder.find(self.parent["id"])
+	end
+
+	#Finds All parents to the binder
+	#Returns in database order
+	def find_parents
+		Binder.where(:_id.in => self.parent_ids_without_roots)
 	end
 
 	def children
-		return Binder.where("parent.id" => self.id.to_s)
+		Binder.where("parent.id" => self.id.to_s)
 	end
 
 	def subtree
-		return Binder.where("parents.id" => self.id.to_s)
+		Binder.where("parents.id" => self.id.to_s)
 	end
 
 	# when versions are implemented, this needs to be rewritten!!!!
@@ -562,9 +629,120 @@ class Binder
 
 	end
 
+	def inherited_access?(id)
+
+		return !parent_permissions.find{|p| p["shared_id"] == id}.nil?
+
+	end
+
 	def is_pub?
 
 		return get_access == 1
+
+	end
+
+	#Type 1 permission = person
+	#Type 2 permission = group
+	#Type 3 permission = global
+	def add_collaborator!(teacher)
+
+		existing_permission = flatten_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+		if existing_permission.nil?
+
+			permissions << {"shared_id" => teacher.id.to_s, "auth_level" => 2, "type" => 1}
+
+		else
+
+			existing_permission["auth_level"] = 2
+
+		end
+
+		cascade_permission_downwards!(teacher)
+
+		return self.save
+
+	end
+
+	#Removes any explicit access given to a teacher
+	#Cascades removal downwards
+	def remove_access!(teacher)
+
+		existing_permission = permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+		if existing_permission.nil?
+
+			return true
+
+		else
+
+			permissions.delete(existing_permission)
+
+		end
+
+		cascade_remove_permission!(teacher)
+
+		return self.save
+
+	end
+
+	def cascade_permission_downwards!(teacher)
+
+		auth_level = flatten_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}["auth_level"]
+
+		subtree.each do |binder|
+
+			existing_permission = binder.parent_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+			if existing_permission.nil?
+
+				binder.parent_permissions << {"shared_id" => teacher.id.to_s, "auth_level" => auth_level, "type" => 1, "folder_id" => self.id.to_s}
+
+			else
+
+				existing_permission["auth_level"] = auth_level
+				existing_permission["folder_id"] = self.id.to_s
+
+			end
+
+			binder.save
+
+		end
+
+	end
+
+	#Removes any inherited permissions for teacher
+	def cascade_remove_permission!(teacher)
+
+		subtree.each do |binder|
+
+			existing_permission = binder.parent_permissions.find{|h| h["shared_id"] == teacher.id.to_s && h["type"] == 1}
+
+			unless existing_permission.nil?
+
+				binder.parent_permissions.delete(existing_permission)
+
+				binder.save
+
+			end
+
+		end
+
+	end
+
+	#Returns one permission array for the binder
+	#Explicit permissions take precedence
+	def flatten_permissions
+
+		retper = permissions
+
+		parent_permissions.each do |per|
+
+			retper << per if permissions.find{|h| h["shared_id"]}.nil?
+
+		end
+
+		retper
 
 	end
 
@@ -576,9 +754,7 @@ class Binder
 
 	def cascadetimestamp
 
-		binderparents = self.parents.reject{|p| p["id"] == "0" || p[:id] == "0"}.map{|p| Binder.find(p["id"])}
-
-		binderparents.each do |binder|
+		self.find_parents.each do |binder|
 
 			binder.update_attributes(last_update: self.last_update)
 
@@ -644,10 +820,323 @@ class Binder
 
 	end
 
-	def self.fixtimetamps
+	def self.fixtimestamps
 
 		Binder.all.each{|binder| binder.update_attributes(:last_update => binder.subtree.sort_by(&:timestamp).last.last_update) if binder.type == 1}
 
+	end
+
+	def self.new_folder
+
+		binder = Binder.new
+		binder.type = 1
+
+		return binder
+
+	end
+
+	def set_owner(teacher)
+
+		self.owner = teacher.id
+		self.username = teacher.username
+		self.fname = teacher.fname
+		self.lname = teacher.lname
+
+	end
+
+	def self.create_content(parentid, params, teacher)
+
+		parent = Binder.find(parentid)
+
+		error = ""
+
+		if params[:webtitle].strip.length > 0
+
+			embed = false
+			url = false
+			embedtourl = false
+
+			doc = Nokogiri::HTML(params[:weblink])
+
+			if !doc.at('iframe').nil?
+
+				uri = URI.parse(doc.at('iframe')['src'])
+				#Refactor this to also set vidtype
+				if uri.host.include?('youtube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.youtube.com/watch?v=#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('educreations.com') && uri.path.include?('lesson/embed')
+
+					embedtourl = true
+					uri = "http://www.educreations.com/lesson/view/claco/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('player.vimeo.com') && uri.path.include?('video')
+
+					embedtourl = true
+					uri = "http://vimeo.com/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('schooltube.com') && uri.path.include?('embed')
+
+					embedtourl = true
+					uri = "http://www.schooltube.com/video/#{uri.path.split('/').last}"
+
+				elsif uri.host.include?('showme.com') && uri.path.include?('sma/embed')
+
+					embedtourl = true
+					uri = "http://www.showme.com/sh/?h=#{CGI.parse(uri.query)['s'].first}"
+
+				else
+
+					embed = true
+
+				end
+
+			elsif !doc.at('embed').nil?
+
+				embed = true
+
+			end
+
+			if !embed && !embedtourl
+				# RestClient.get(params[:weblink]) # This line throws an exception if the url is invalid
+				url = true
+			end
+
+			if url || embed || embedtourl
+
+				if parent.get_access(teacher.id.to_s) == 2
+
+					link = Addressable::URI.heuristic_parse(Url.follow(params[:weblink])).to_s if url
+					link = Addressable::URI.heuristic_parse(Url.follow(uri)).to_s if embedtourl
+
+					if !((url || embedtourl) && link.empty?)
+
+						if (embed ? true : !Addressable::URI.heuristic_parse(link).host.include?("teacherspayteachers.com"))
+						
+							binder = Binder.new
+
+							binder.inherit_from(parentid)
+
+							binder.set_owner(teacher)
+
+							binder.update_attributes(	:title				=> params[:webtitle].strip[0..49],
+														:last_update		=> Time.now.to_i,
+														:last_updated_by	=> teacher.id.to_s,
+														:body				=> params[:body] || "",
+														:order_index		=> parent.children.count,
+														:files				=> 1,
+														:type				=> 2,
+														:format				=> 2)
+
+
+							binder.versions << Version.new(:data		=> url || embedtourl ? link : params[:weblink],
+															:thumbnailgen => 1, #video
+															:embed		=> embed,
+															:timestamp	=> Time.now.to_i,
+															:owner		=> teacher.id)
+
+
+							#@binder.create_binder_tags(params,teacher.id)
+
+							if binder.save
+
+
+								if url || embedtourl
+									uri = Addressable::URI.heuristic_parse(link)
+
+									stathash = binder.current_version.imgstatus
+									stathash[:imgfile][:retrieved] = true
+
+									if (uri.host.to_s.include? 'youtube.com') && (uri.path.to_s.include? '/watch')
+
+										# YOUTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id,Url.get_youtube_url(uri.to_s))
+										binder.current_version.vidtype = "youtube"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'vimeo.com') && (uri.path.to_s.length > 0)# && (uri.path.to_s[-8..-1].join.to_i > 0)
+
+										# VIMEO
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(binder.id,uri.to_s,{:site => 'vimeo'})
+										binder.current_version.vidtype = "vimeo"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'educreations.com') && (uri.path.to_s.length > 1)
+
+										# EDUCREATIONS
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id,Url.get_educreations_url(uri.to_s))
+										binder.current_version.vidtype = "educreations"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'schooltube.com') && (uri.path.to_s.length > 0)
+
+										# SCHOOLTUBE
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(binder.id,uri.to_s,{:site => 'schooltube'}) 
+										binder.current_version.vidtype = "schooltube"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									elsif (uri.host.to_s.include? 'showme.com') && (uri.path.to_s.include? '/sh')
+
+										# SHOWME
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_api(binder.id,uri.to_s,{:site => 'showme'})
+										binder.current_version.vidtype = "showme"
+
+										#Binder.delay(:queue => 'thumbgen').gen_video_thumbnails(binder.id)
+
+									else
+										binder.versions.last.update_attributes( :thumbnailgen => 2 )
+										# generic URL, grab Url2png
+										# DELAYTAG
+										Binder.delay(:queue => 'thumbgen').get_thumbnail_from_url(binder.id,Url.get_url2png_url(uri.to_s))
+
+										#Binder.delay(:queue => 'thumbgen').gen_url_thumbnails(@binder.id)
+									end
+
+								end
+
+							else
+
+								error = "There was an error adding this content."
+
+							end
+
+							binder.save
+
+							binder.create_binder_tags(params,teacher.id)
+
+							binder.find_parents.each{|b| b.update_attributes(:files => b.files + 1, :last_update => binder.last_update)}
+
+							# parent.inc(:children, 1) if parent != "0"
+
+						else
+
+							error = "Sorry, you can't link to this site. Please download any files and upload them to Claco."
+
+						end
+
+					else
+
+						error = "Invalid URL"
+
+					end
+
+				else
+
+					error = "You do not have permissions to write to #{parent.title}"
+
+				end
+
+			else
+
+				error = "Invalid input data"
+
+			end
+
+		else
+
+			error = "You must enter a title"
+
+		end
+
+		rescue BSON::InvalidObjectId
+			error = "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			error = "Invalid Request"
+		rescue RestClient::ResourceNotFound
+			error = "Invalid URL - Not Found"
+		rescue
+			error = "Invalid URL" #This exception should be logged
+		ensure
+			if error.empty?
+				return binder
+			else
+				raise error
+			end
+
+	end
+
+	def self.create_folder(parentid, params, teacher)
+
+		error = ""
+
+		if params[:foldertitle].strip.length > 0
+
+			parent = parentid == "0" ? "0" : Binder.find(parentid)
+
+			if (parent == "0" && params[:username].downcase == teacher.username.downcase) || parent.get_access(teacher.id) == 2
+
+				binder = Binder.new_folder
+
+				binder.inherit_from(parentid)
+
+				binder.permissions = [{:type => 3, :auth_level => params[:public] == "on" ? 1 : 0}] if parent == "0"
+
+				binder.set_owner(teacher)
+
+				binder.update_attributes(	:title				=> params[:foldertitle].strip[0..49],
+											:body				=> params[:body],
+											:order_index		=> parent == "0" ? teacher.binders.root_binders.count : parent.children.count,
+											:last_update		=> Time.now.to_i,
+											:last_updated_by	=> teacher.id.to_s)
+
+				# binder.cascadetimestamp
+
+				#Update parents' folder counts
+				if binder.parents.size > 1
+
+					binder.find_parents.each{|p| p.update_attributes(:folders => p.folders + 1, :last_update => Time.now.to_i)}
+
+					# pids = binder.parent_ids
+
+					# pids.each do |pid|
+					# 	if pid != "0"
+					# 		p = Binder.find(pid)
+					# 		p.update_attributes(:folders		=> p.folders + 1,
+					# 							:last_update	=> Time.now.to_i)
+					# 	end
+					# 	#Binder.find(pid).inc(:folders, 1) if pid != "0"
+					# end
+
+					# Binder.find(pids.last).inc(:children,1) if pids.last != "0"
+				end
+
+				binder.create_binder_tags(params,teacher.id)
+
+			else
+
+				error = "You do not have permissions to write to #{parent.title}"
+
+			end
+
+		else
+
+			error = "Please enter a title"
+
+		end
+
+		rescue BSON::InvalidObjectId
+			error = "Invalid Request"
+		rescue Mongoid::Errors::DocumentNotFound
+			error = "Invalid Request"
+		rescue
+			error = "Invalid Request" #This exception should be logged
+		ensure
+			if error.empty?
+				return binder
+			else
+				raise error
+			end
 	end
 
 	###############################################################################################

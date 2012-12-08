@@ -1,3 +1,7 @@
+<% content_for :headcon do %>
+  <%= stylesheet_link_tag "home/nav", :media => "all" %>
+<% end %>
+
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">
@@ -86,7 +90,7 @@
                 
                 <%= f.password_field :password, :class => "span3", :placeholder => "Password" %>
                 
-                <div style="font-size:10px; float:left; margin-top:8px">
+                <div style="font-size:10px; float:left; margin-top:8px; margin-left:15px;">
                   <a id="forgot_link" href="<%= new_password_path('teacher') %>">Forgot your password?</a>
                 </div>
                 <button type="submit" class="btn" style="float:right">Sign in</button>

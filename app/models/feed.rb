@@ -65,6 +65,7 @@ class Feed
 		# i = 0
 
 		retstr = ''
+		lastlogid = ''
 		retsize = 0
 
 		most_recent_logid = self.mr_logid
@@ -379,9 +380,10 @@ class Feed
 		# if page
 		self.buffer(pagelogid).to_a.sort_by { |f| -f.mr_timestamp }[0..(MAIN_WRAP_LENGTH-1)].each do |f|
 			retstr += f.html.sub('[[[TIMESTAMP]]]',imc.timewords(f.mr_timestamp)).html_safe
+			lastlogid = f.lr_logid
 		end
 
-		retstr
+		{'html' => retstr, 'logid' => lastlogid}
 	end
 end
 

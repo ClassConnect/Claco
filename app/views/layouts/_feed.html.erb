@@ -23,28 +23,13 @@
 			feed = Feed.find(current_teacher.feed_ids[0])
 		end
 
+		feedhash = feed.html(current_teacher.id.to_s)#['html'].html_safe 
+
 		%>
 
-		<%= feed.html(current_teacher.id.to_s).html_safe %>
+		<%= feedhash['html'].html_safe %>
 
-		<script type="text/javascript">
-			// function httpGet(theUrl)
-		 //    {
-			//     var xmlHttp = null;
-
-			//     xmlHttp = new XMLHttpRequest();
-			//     xmlHttp.open( "GET", theUrl, false );
-			//     xmlHttp.send( null );
-			//    	return eval('(' + xmlHttp.responseText + ')');
-		 //    }
-			// function inf() {
-			// 	response = httpGet('/inf?logid=' + document.getElementById('logid').value)
-			// 	document.getElementById('inf_html').innerHTML += response.html
-			// 	document.getElementById('logid').value = response.nextlogid
-			// }
-		</script>
-
-		<input id="feedCursor" type="hidden" value="<%= feed.lr_logid %>" />
+		<input id="feedCursor" type="hidden" value="<%= feedhash['logid'] %>" />
 
 	<% else %>
 

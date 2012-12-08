@@ -110,9 +110,13 @@ class Feed
 				#debugger
 
 				if page
-					if self.lr_timestamp!=0.0 #self.timerange['lower'].present?
-						# TODO: throw out matching logids at head of list
-						search.filter :range, :timestamp => { :lt => self.lr_timestamp.ceil } #self.timerange['lower'] }
+					begin
+						search.filter :range, :timestamp => { :lt => Log.find(pagelogid).timestamp.ceil }
+					rescue
+						if self.lr_timestamp!=0.0 #self.timerange['lower'].present?
+							# TODO: throw out matching logids at head of list
+							search.filter :range, :timestamp => { :lt => self.lr_timestamp.ceil } #self.timerange['lower'] }
+						end
 					end
 				else
 					if self.mr_timestamp!=0.0 #self.timerange['upper'].present?

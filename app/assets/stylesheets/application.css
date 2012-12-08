@@ -538,6 +538,10 @@ footer {
   margin: 0 auto;
 }
 
+.centered-text {
+  text-align: center;
+}
+
 .hidden {
   display: none;
   visibility: hidden;

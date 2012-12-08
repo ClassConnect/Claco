@@ -311,7 +311,7 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		debugger
+		#debugger
 
 		current_teacher.info = Info.new if current_teacher.info.nil?
 

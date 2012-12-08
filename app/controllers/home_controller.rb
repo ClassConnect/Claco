@@ -2,6 +2,9 @@ class HomeController < ApplicationController
 	before_filter :authenticate_teacher!, :except => [:index, :autocomplete, :tos, :privacy, :about, :united, :team, :pioneers, :pioneersshow, :goodies, :press]
 
 	def index
+
+		#debugger
+
 		@title = "Claco"
 		@teachers = Teacher.all
 
@@ -25,6 +28,25 @@ class HomeController < ApplicationController
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
+			@educators = []
+
+			if current_teacher.recommend_ids.to_a.empty?
+				current_teacher.update_attributes(:recommend_ids => current_teacher.recommends)
+			end
+			current_teacher.recommend_ids[0..9].shuffle.each_with_index do |f,index|
+				begin
+					teacher = Teacher.find(f.to_s)
+					if Teacher.thumbready?(teacher) || (@educators.size+6 < index)
+						@educators << teacher
+					end
+				rescue
+					Rails.logger.fatal "Recommended teacher ID invalid"
+					#next
+				end
+				break if @educators.size == 3
+			end
+
+			if false
 
 			# pull the current teacher's subscription IDs
 			subs = (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
@@ -155,11 +177,10 @@ class HomeController < ApplicationController
 					break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 				end
 			end
+
+			end
+
 		end
-
-		#debugger
-
-		return if false
 
 		rescue Errno::ECONNREFUSED
 			Rails.logger.fatal "ElasticSearch server unreachable"
@@ -169,19 +190,70 @@ class HomeController < ApplicationController
 		#debugger
 	end
 
+	def inf
+
+		#debugger
+
+		feed = Feed.find(current_teacher.feed_ids[0])
+		feedhash = feed.html(current_teacher.id.to_s,params[:logid])
+
+		respond_to do |format|
+			begin
+				format.json {render :text => {'html' => feedhash['html'] , 'nextlogid' => feedhash['logid']}.to_json }
+			rescue
+				format.json {render :text => {'html' => "teacher does not have a feed", 'nextlogid' => ''}.to_json }
+			end
+		end
+
+	end
+
 	def educators
 
 		@title = "Educators you may know"
 
 		#debugger
 
-		current_teacher.recommends.each do |f|
-			if !Rails.cache.read("#{f.to_s}educobj").nil?
-				#debugger
-				expire_fragment("#{f.to_s}educobj") 
-				Rails.cache.delete("#{f.to_s}educobj")
-			end
+		# fallback recommendation calculation
+		if current_teacher.recommend_ids.to_a.empty?
+			current_teacher.update_attribute(:recommend_ids, current_teacher.recommends)
+			ActionController::Base.new.expire_fragment("recommendations/#{current_teacher.id.to_s}")
 		end
+
+		#@recommends = current_teacher.recommend_ids #Rails.cache.read("recommendations/ids/#{self.id.to_s}")
+
+		#if @recommends.nil? || @recommends.empty?
+
+		# precaution
+		#Rails.cache.delete("recommendations/html/#{self.id.to_s}")
+		#ActionController::Base.new.expire_fragment("recommendations/#{current_teacher.id.to_s}")
+
+		# teachers = Tire.search 'teachers' do |search|
+
+		# 	search.query do |query|
+		# 		query.all
+		# 	end
+
+		# 	search.filter :terms, :stringid => current_teacher.recommend_ids
+
+		# end
+		
+		# @recommends = teachers.results
+
+		#debugger
+		#url = 'localhost:9200/teachers/_mget'
+		#data = '{"ids":["' + current_teacher.recommend_ids.join('","') + '"]}'
+		#debugger
+		#@recommends = JSON.parse(RestClient.post(url,data))['docs'].map{|f| f.first['_source']}
+
+		#debugger
+
+		#return if false
+
+		@recommends = Teacher.any_in(_id: current_teacher.recommend_ids)
+
+		#RestClient.get()
+
+		#end
 
 		render 'educators'
 
@@ -313,6 +385,8 @@ class HomeController < ApplicationController
 			#debugger
 
 			@teachers=@teachers.results.to_a
+
+			#debugger
 
 			if @teachers.map { |f| f.id.to_s }.include? current_teacher.id.to_s
 				@teachers = @teachers.unshift @teachers.delete_at( @teachers.index { |f| f.id.to_s==current_teacher.id.to_s } )

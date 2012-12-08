@@ -1,20 +1,13 @@
-<script type="text/javascript">
-	function selectval() { 
-	   var sel = document.getElementById("begin_datetime_1i");
-
-	   alert(sel.options[sel.selectedIndex].value); 
-	}
-</script>
-<h2>app/views/<%= params[:controller] %>/<%= params[:action] %></h2>
-<h2><%= params[:controller] %>#<%= params[:action] %></h2>
+<h2>Log Entry Analytics</h2>
+<hr />
 <%= form_tag 'analytics', :method => 'get' do %>
 	<table>
 		<tr>
 			<td>
-				<h3>Log Filters</h3>
+				<h3>Log Filters:</h3>
 			</td>
 		</tr>
-		<tr><td colspan='2'><hr /></td></tr>
+		<tr><td colspan='2'><br /></td></tr>
 		<tr>
 			<td>
 				Start Time:&nbsp;

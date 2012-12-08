@@ -54,6 +54,8 @@ Claco::Application.routes.draw do
 	get		'/invite'															=> 'invitations#invite'
 	post	'/invite'															=> 'invitations#create'
 
+	get 	'/inf' 																=> 'home#inf'
+
 	#################
 	# ADMIN ROUTING #
 	#################

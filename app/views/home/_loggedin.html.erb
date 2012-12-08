@@ -142,38 +142,25 @@
 			<div class="findppl">
 				<div class="boxyleft">
 
-		<% #educators = current_teacher.recommends[0..8].shuffle[0..2].map{ |f| Teacher.find(f.to_s) }
-
-			# because I'm fucking lazy
-			educators = []
-			current_teacher.recommends[0..8].shuffle[0..2].each do |f|
-				begin
-					educators << Teacher.find(f.to_s)
-				rescue
-					next
-				end
-			end
-
-		%>
-
-		<% if !educators[0].nil? %>
+		<% if !@educators[0].nil? %>
 
 		<div class="listitem" style="margin-left:15px">
 
-			<a href="/<%= educators[0].username %>">
-				<img src="<%= teacher_thumb_md(educators[0]) %>" class="thumbster" />
+			<a href="/<%= @educators[0].username %>">
+				<img src="<%= teacher_thumb_md(@educators[0]) %>" class="thumbster" />
+
 			</a>
 
 			<div class="infowrap">
 				<div class="bigtitle">
-					<a href="/<%= educators[0].username %>"><%= "#{educators[0].fname} #{educators[0].lname}" %></a>
+					<a href="/<%= @educators[0].username %>"><%= "#{@educators[0].fname} #{@educators[0].lname}" %></a>
 				</div>
 
-				<% if !educators[0].info.nil? && !educators[0].info.subjects.nil? && !educators[0].info.subjects.empty? %>
+				<% if !@educators[0].info.nil? && !@educators[0].info.subjects.nil? && !@educators[0].info.subjects.empty? %>
 				<div class="medata">
 					<span>
 						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
-						<%= educators[0].info.subjects.first %>
+						<%= @educators[0].info.subjects.first %>
 					</span>
 				</div>
 				<% end %>
@@ -184,24 +171,24 @@
 
 		<% end %>
 
-		<% if !educators[1].nil? %>
+		<% if !@educators[1].nil? %>
 
 		<div class="listitem mid">
 
-			<a href="/<%= educators[1].username %>">
-				<img src="<%= teacher_thumb_md(educators[1]) %>" class="thumbster" />
+			<a href="/<%= @educators[1].username %>">
+				<img src="<%= teacher_thumb_md(@educators[1]) %>" class="thumbster" />
 			</a>
 
 			<div class="infowrap">
 				<div class="bigtitle">
-					<a href="/<%= educators[1].username %>"><%= "#{educators[1].fname} #{educators[1].lname}" %></a>
+					<a href="/<%= @educators[1].username %>"><%= "#{@educators[1].fname} #{@educators[1].lname}" %></a>
 				</div>
 
-				<% if !educators[1].info.nil? && !educators[1].info.subjects.nil? && !educators[1].info.subjects.empty? %>
+				<% if !@educators[1].info.nil? && !@educators[1].info.subjects.nil? && !@educators[1].info.subjects.empty? %>
 				<div class="medata">
 					<span>
 						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
-						<%= educators[1].info.subjects.first %>
+						<%= @educators[1].info.subjects.first %>
 					</span>
 				</div>
 				<% end %>
@@ -212,24 +199,24 @@
 
 		<% end %>
 
-		<% if !educators[2].nil? %>
+		<% if !@educators[2].nil? %>
 
 		<div class="listitem" style="border-right:none">
 
-			<a href="/<%= educators[2].username %>">
-				<img src="<%= teacher_thumb_md(educators[2]) %>" class="thumbster" />
+			<a href="/<%= @educators[2].username %>">
+				<img src="<%= teacher_thumb_md(@educators[2]) %>" class="thumbster" />
 			</a>
 
 			<div class="infowrap">
 				<div class="bigtitle">
-					<a href="/<%= educators[2].username %>"><%= "#{educators[2].fname} #{educators[2].lname}" %></a>
+					<a href="/<%= @educators[2].username %>"><%= "#{@educators[2].fname} #{@educators[2].lname}" %></a>
 				</div>
 
-				<% if !educators[2].info.nil? && !educators[2].info.subjects.nil? && !educators[2].info.subjects.empty? %>
+				<% if !@educators[2].info.nil? && !@educators[2].info.subjects.nil? && !@educators[2].info.subjects.empty? %>
 				<div class="medata">
 					<span>
 						<img alt="Subject" src="http://static2.claco.com/assets/profile/subject-b45001b14b3cf8d458bc12a55b86bec0.png">
-						<%= educators[2].info.subjects.first %>
+						<%= @educators[2].info.subjects.first %>
 					</span>
 				</div>
 				<% end %>
@@ -287,6 +274,8 @@
 		</div>
 
 			<%= render 'layouts/feed' %>
+
+
 
 <% end %>
 

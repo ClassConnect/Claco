@@ -3,6 +3,8 @@ class Binder
 	include Mongoid::Timestamps
 	include Sprockets::Helpers::RailsHelper
 	include Sprockets::Helpers::IsolatedHelper
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
 	class FilelessIO < StringIO
 		attr_accessor :original_filename
@@ -16,11 +18,11 @@ class Binder
 	#validates :title, :presence => true
 
 	# validate embedded document with parent document
-	validates_associated :tag
+	#validates_associated :tag
 
 	# allows submitting a nested has with attributes for the embedded tag object
 	# Employee.new({ :first_name => "John", :address => { :street => "Baker St." } })
-	accepts_nested_attributes_for :tag
+	#accepts_nested_attributes_for :tag
 
 	#File/Directory-specific Attributes
 	field :owner, :type => String
@@ -89,28 +91,96 @@ class Binder
 	# tag contains both local and parent tag data
 	embeds_one :tag
 
-	embeds_one :imageset
+	#embeds_one :imageset
 
 
 	after_save do
 
 		#debugger
 
-		keys = Rails.cache.read(self.id.to_s)
+		# keys = Rails.cache.read(self.id.to_s)
 
-		return if keys.nil?
+		# if !keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)
-			#Rails.cache.expire_fragment(f.to_s)
-			Rails.cache.write(f.to_s,true)			
+		# 	keys.each do |f|
+		# 		#Rails.cache.delete(f.to_s)
+		# 		#Rails.cache.expire_fragment(f.to_s)
+		# 		Rails.cache.write(f.to_s,true)			
+		# 	end
+
+		# 	Rails.cache.delete(self.id.to_s)
+
+		# end
+
+		#debugger
+
+		#wrappers = []
+
+		Feedobject.where(:binderid => self.id.to_s).each do |f|
+			f.generate(self.class)
+			#wrappers << f.id.to_s
 		end
 
-		Rails.cache.delete(self.id.to_s)
+		Feed.where(:actors => self.id.to_s).each do |f|
+			f.wrappers.where(:whoid => self.id.to_s).each {|g| g.generate}#{|g| Rails.cache.delete("wrapper/#{g.id.to_s}")}
+			#f.generate
+		end
+
+		#wrappers.map {|f| }
+
+
+
+		# check for private, deleted
 
 	end
 
+	# settings analysis: {
+	# 	filter: {
+	# 		ngram_filter: {
+	# 			type: 		"nGram",
+	# 			min_gram: 	3,
+	# 			max_gram: 	6
+	# 		}
+	# 	},
+	# 	analyzer: {
+	# 		ngram_analyzer: {
+	# 			tokenizer: "standard",
+	# 			filter: ["ngram_filter"],
+	# 			type: "custom"
+	# 			#tokenizer: "snowball",
+	# 			#filter: ["lowercase","ngram_filter"]
+	# 		}
+	# 	}
+	# } 	do
+	# 	mapping do 
+	# 		indexes :username,	:type => 'string'
+	# 		indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer'
+	# 		indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer'
+	# 		indexes :title, 	:type => 'string',	:analyzer => 'ngram_analyzer'
+	# 		indexes :body, 		:type => 'string', 	:analyzer => 'keyword'
+	# 		indexes :versions,  :enabled => false
+	# 		indexes :tag,		:type => 'object',	:properties => {:parent_tags 	=> { :type => 'string', :analyzer => 'keyword', :default => [] },
+	# 																:node_tags 		=> { :type => 'string', :analyzer => 'keyword', :default => [] } }
+
+	# 	end
+	# end
+
 	########################################
+
+	# used for elasticsearch
+	def self
+    	#to_indexed_json.as_json
+    	to_indexed_json.to_json
+	end
+
+	def self.imageable? (binder)
+
+		return 	!binder.nil? &&
+				!binder.current_version.nil? &&
+				!binder.current_version.imgstatus.nil? &&
+				!binder.current_version.imgstatus['imageable']
+
+	end
 
 	def self.thumbready? (binder,image='img_thumb_lg')
 
@@ -720,7 +790,7 @@ class Binder
 
 		# 	#URL2PNG
 
-		# 	# debugger
+		# 	# #debugger
 
 		# 	query = {
 		# 		:url => self.current_version.data,
@@ -1160,246 +1230,35 @@ class Binder
 
 		binder = Binder.find(id.to_s)
 
-		# BEGIN IMAGE SERVER
+		if USE_IMG_SERVER
 
-		# binder = Binder.find(id.to_s)
-
-		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
-
-		# url = binder.current_version.imgfile.url.to_s
-
-		# model = [binder.id.to_s,binder.current_version.id.to_s]
-
-		# datahash = Digest::MD5.hexdigest(storedir + 'url' + url + model.to_s + TX_PRIVATE_KEY).to_s
-
-		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
-		# 												:class => 'url',
-		# 												:url => url,
-		# 												:model => model,
-		# 												:datahash => datahash })
-
-		# END IMAGE SERVER
-
-		origimg = Magick::ImageList.new
-
-		# retrieve fullsize image from S3 store, read into an ImageList object
-		open(binder.current_version.imgfile.url.to_s) do |f|
-			origimg.from_blob(f.read)
-		end
-
-        origimg.format = BLOB_FILETYPE
-
-		# Wrap filestring as pseudo-IO object, compress if width exceeds 700
-		if !(origimg.columns.to_i < CV_WIDTH)
-
-			binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
-
-			# shrink image to be reasonably processed (this is what the thumb algos will use)
-			#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-		else
-
-			binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
-
-		end
-
-		GC.start
-
-		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::NorthGravity).to_blob).set_filename(LTHUMB_FILENAME))
-
-		GC.start
-
-		stathash = binder.current_version.imgstatus
-		stathash['img_contentview']['generated'] = true
-		stathash['img_thumb_lg']['generated'] = true
-		stathash['img_thumb_sm']['generated'] = true
-
-		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob).set_filename(STHUMB_FILENAME),
-													:imgstatus => stathash)
-
-		origimg.destroy!
-
-		GC.start
-
-
-
-	end
-
-	def self.gen_video_thumbnails(id)
-
-		binder = Binder.find(id.to_s)
-
-		# BEGIN IMAGE SERVER
-
-		# binder = Binder.find(id.to_s)
-
-		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
-
-		# url = binder.current_version.imgfile.url.to_s
-
-		# model = [binder.id.to_s,binder.current_version.id.to_s]
-
-		# datahash = Digest::MD5.hexdigest(storedir + 'video' + url + model.to_s + TX_PRIVATE_KEY).to_s
-
-		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
-		# 												:class => 'video',
-		# 												:url => url,
-		# 												:model => model,
-		# 												:datahash => datahash })
-
-		# END IMAGE SERVER
-
-		origimg = Magick::ImageList.new
-
-		# retrieve fullsize image from S3 store, read into an ImageList object
-		open(binder.current_version.imgfile.url.to_s) do |f|
-			origimg.from_blob(f.read)
-		end
-
-        origimg.format = BLOB_FILETYPE
-
-		if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
-			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-		end
-
-		GC.start
-
-		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
-
-		GC.start
-
-		stathash = binder.current_version.imgstatus
-		stathash['img_thumb_lg']['generated'] = true
-		stathash['img_thumb_sm']['generated'] = true
-
-		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-													:imgstatus => stathash)
-
-		origimg.destroy!
-
-		GC.start
-	end
-
-	def self.gen_croc_thumbnails(id)
-
-		#Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
-
-		#debugger
-
-		# BEGIN IMAGE SERVER
-
-		# binder = Binder.find(id.to_s)
-
-		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
-
-		# url = binder.current_version.imgfile.url.to_s
-
-		# model = [binder.id.to_s,binder.current_version.id.to_s]
-
-		# datahash = Digest::MD5.hexdigest(storedir + 'croc' + url + model.to_s + TX_PRIVATE_KEY).to_s
-
-		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
-		# 												:class => 'croc',
-		# 												:url => url,
-		# 												:model => model,
-		# 												:datahash => datahash })
-
-		# END IMAGE SERVER
-
-		binder = Binder.find(id.to_s)
-
-		origimg = Magick::ImageList.new
-
-		# retrieve fullsize image from S3 store, read into an ImageList object
-		open(binder.current_version.imgfile.url.to_s) do |f|
-			origimg.from_blob(f.read)
-		end
-
-        origimg.format = BLOB_FILETYPE
-
-		if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
-			origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-		end
-
-		GC.start
-
-		new_img_lg = Magick::ImageList.new
-		new_img_lg << Magick::Image.new(LTHUMB_W,LTHUMB_H)
-		filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
-		filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
-		filled_lg.format = BLOB_FILETYPE
-
-		binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(filled_lg.to_blob).set_filename(LTHUMB_FILENAME))
-
-		new_img_lg.destroy!
-		filled_lg.destroy!
-
-		GC.start
-
-		new_img_sm = Magick::ImageList.new
-		new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
-		filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
-		filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
-		filled_sm.format = BLOB_FILETYPE
-
-		stathash = binder.current_version.imgstatus
-		stathash['img_thumb_lg']['generated'] = true
-		stathash['img_thumb_sm']['generated'] = true
-
-		#debugger
-
-		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(filled_sm.to_blob).set_filename(STHUMB_FILENAME),
-													:imgstatus => stathash)
-
-		new_img_sm.destroy!
-		filled_sm.destroy!
-		origimg.destroy!
-
-		GC.start
-
-	end
-
-	def self.gen_smart_thumbnails(id)
-
-		#include Magick
-
-		#debugger
-
-		# BEGIN IMAGE SERVER
-
-		# binder = Binder.find(id.to_s)
-
-		# storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
-
-		# url = binder.current_version.imgfile.url.to_s
-
-		# model = [binder.id.to_s,binder.current_version.id.to_s]
-
-		# datahash = Digest::MD5.hexdigest(storedir + 'image' + url + model.to_s + TX_PRIVATE_KEY).to_s
-
-		# response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
-		# 												:class => 'image',
-		# 												:url => url,
-		# 												:model => model,
-		# 												:datahash => datahash })
-
-		# END IMAGE SERVER
-
-		if true
+			# BEGIN IMAGE SERVER
 
 			binder = Binder.find(id.to_s)
 
-			#Rails.logger.debug "about to initialize origimg: #{`ps -o rss= -p #{$$}`}"
+			storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+			url = binder.current_version.imgfile.url.to_s
+
+			model = [binder.id.to_s,binder.current_version.id.to_s]
+
+			datahash = Digest::MD5.hexdigest(storedir + 'url' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+			response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+															:class => 'url',
+															:url => url,
+															:model => model,
+															:datahash => datahash })
+			# END IMAGE SERVER
+
+		else
 
 			origimg = Magick::ImageList.new
-
-			#Rails.logger.debug "after initializing origimg: #{`ps -o rss= -p #{$$}`}"
 
 			# retrieve fullsize image from S3 store, read into an ImageList object
 			open(binder.current_version.imgfile.url.to_s) do |f|
 				origimg.from_blob(f.read)
 			end
-
-			#Rails.logger.debug "after reading image from blob: #{`ps -o rss= -p #{$$}`}"
 
 	        origimg.format = BLOB_FILETYPE
 
@@ -1418,368 +1277,600 @@ class Binder
 
 			GC.start
 
+			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::NorthGravity).to_blob).set_filename(LTHUMB_FILENAME))
+
+			GC.start
+
+			stathash = binder.current_version.imgstatus
+			stathash['img_contentview']['generated'] = true
+			stathash['img_thumb_lg']['generated'] = true
+			stathash['img_thumb_sm']['generated'] = true
+
+			binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::NorthGravity).to_blob).set_filename(STHUMB_FILENAME),
+														:imgstatus => stathash)
+
+			origimg.destroy!
+
+			GC.start
+
+		end
+
+	end
+
+	def self.gen_video_thumbnails(id)
+
+		binder = Binder.find(id.to_s)
+
+		if USE_IMG_SERVER
+
+			# BEGIN IMAGE SERVER
+
+			binder = Binder.find(id.to_s)
+
+			storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+			url = binder.current_version.imgfile.url.to_s
+
+			model = [binder.id.to_s,binder.current_version.id.to_s]
+
+			datahash = Digest::MD5.hexdigest(storedir + 'video' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+			response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+															:class => 'video',
+															:url => url,
+															:model => model,
+															:datahash => datahash })
+			# END IMAGE SERVER
+
+		else
+
+			origimg = Magick::ImageList.new
+
+			# retrieve fullsize image from S3 store, read into an ImageList object
+			open(binder.current_version.imgfile.url.to_s) do |f|
+				origimg.from_blob(f.read)
+			end
+
+	        origimg.format = BLOB_FILETYPE
+
+			if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
+				origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+			end
+
+			GC.start
+
 			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
 
 			GC.start
 
 			stathash = binder.current_version.imgstatus
-			stathash['smart_thumb'] = false
-			stathash['img_contentview']['generated'] = true
 			stathash['img_thumb_lg']['generated'] = true
 			stathash['img_thumb_sm']['generated'] = true
 
 			binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
 														:imgstatus => stathash)
 
-			#Rails.logger.debug "before destroying origimg: #{`ps -o rss= -p #{$$}`}"
-
 			origimg.destroy!
-
-			#Rails.logger.debug "after destroy img: #{`ps -o rss= -p #{$$}`}"
 
 			GC.start
 
-			#Rails.logger.debug "after garbage collect: #{`ps -o rss= -p #{$$}`}"
+		end
 
-		# actual algorithm
+	end
 
-		else
+	def self.gen_croc_thumbnails(id)
+
+		binder = Binder.find(id.to_s)
+
+		#Digest::MD5.hexdigest(model.owner + model.timestamp.to_s + model.data)
+
+		#debugger
+
+		if USE_IMG_SERVER
+
+			# BEGIN IMAGE SERVER
 
 			binder = Binder.find(id.to_s)
+
+			storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+			url = binder.current_version.imgfile.url.to_s
+
+			model = [binder.id.to_s,binder.current_version.id.to_s]
+
+			datahash = Digest::MD5.hexdigest(storedir + 'croc' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+			response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+															:class => 'croc',
+															:url => url,
+															:model => model,
+															:datahash => datahash })
+
+			# END IMAGE SERVER
+
+		else
 
 			origimg = Magick::ImageList.new
 
 			# retrieve fullsize image from S3 store, read into an ImageList object
-			open(binder.current_version.imgfile.compressed.url.to_s) do |f|
+			open(binder.current_version.imgfile.url.to_s) do |f|
 				origimg.from_blob(f.read)
 			end
 
 	        origimg.format = BLOB_FILETYPE
 
-			# Wrap filestring as pseudo-IO object, compress if width exceeds 700
-			if !(origimg.columns.to_i < CV_WIDTH)
-
-				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
-
-				# shrink image to be reasonably processed (this is what the thumb algos will use)
-				#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-			else
-
-				binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
-
+			if (origimg.columns.to_i > IMGSCALE || origimg.rows.to_i > IMGSCALE)
+				origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
 			end
 
 			GC.start
 
-			# # Wrap filestring as pseudo-IO object, compress if width exceeds 700
-			# if !(origimg.columns.to_i < CV_WIDTH)
-			# 	io_cv = FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob)
-			# 	# shrink image to be reasonably processed (this is what the thumb algos will use)
-			# 	origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
-			# else
-			# 	io_cv = FilelessIO.new(origimg.to_blob)
-			# end
+			new_img_lg = Magick::ImageList.new
+			new_img_lg << Magick::Image.new(LTHUMB_W,LTHUMB_H)
+			filled_lg = new_img_lg.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+			filled_lg.composite!(origimg.resize_to_fit(LTHUMB_W-4,LTHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+			filled_lg.format = BLOB_FILETYPE
 
-			#Rails.logger.debug "origimg width: #{origimg.columns}"
-			#Rails.logger.debug "origimg height: #{origimg.rows}"
+			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(filled_lg.to_blob).set_filename(LTHUMB_FILENAME))
 
-			# bring edge-detected image into memory
-			# a weight of 4 ensures that edges which are too tightly packed are weighted less
-			img = origimg.edge(4)
-
-	        xcount = 0
-	        ycount = 0
-	        xsum = 0
-	        ysum = 0
-	        xsqr = 0
-	        ysqr = 0
-	        xcube = 0
-	        ycube = 0
-
-	        width = img.columns
-	        height = img.rows
-
-	        imgview = img.view(0,0,width,height)
-
-	        height.times do |y|
-	          width.times do |x|
-	            pixel = imgview[y][x]
-
-	            if pixel.red > EDGEPIX_THRESH_PRIMARY || pixel.green > EDGEPIX_THRESH_PRIMARY || pixel.blue > EDGEPIX_THRESH_PRIMARY
-	              xcount += 1
-	              ycount += 1
-	              xsum += x
-	              ysum += y
-	              xsqr += x**2
-	              ysqr += y**2
-	              xcube += x**3
-	              ycube += y**3
-	            end
-	          end
-	        end
-
-	        # calculation of global statistical data
-
-	        xcentroid = Float(xsum)/Float(xcount)
-	        ycentroid = Float(ysum)/Float(ycount)
-
-	        # Unused
-	        xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
-	        yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
-
-	        # Unused
-	        xsigma = Math.sqrt(xvariance)
-	        ysigma = Math.sqrt(yvariance)
-
-	        #Rails.logger.debug "xcentroid #{xcentroid}"
-	        #Rails.logger.debug "ycentroid #{ycentroid}"
-	        #Rails.logger.debug "xsigma: #{xsigma}"
-	        #Rails.logger.debug "ysigma: #{ysigma}"
-
-	        xEX3 = Float(xcube)/Float(xcount)
-	        yEX3 = Float(ycube)/Float(ycount)
-
-	        xskew =  Float(xEX3 - (3 * xcentroid  * xvariance)  - (xcentroid)**3)  / Float(xsigma**3)
-	        yskew =  Float(yEX3 - (3 * ycentroid  * yvariance)  - (ycentroid)**3)  / Float(ysigma**3)
-
-	        #Rails.logger.debug "xskew: #{xskew}"
-	        #Rails.logger.debug "yskew: #{yskew}"
-
-			topcount = 0
-	        topsum = 0
-	        topsqr = 0
-	        topcube = 0
-	        bottomcount = 0
-	        bottomsum = 0
-	        bottomsqr = 0
-	        bottomcube = 0
-	        leftcount = 0
-	        leftsum = 0
-	        leftsqr = 0
-	        leftcube = 0
-	        rightcount = 0
-	        rightsum = 0
-	        rightsqr = 0
-	        rightcube = 0
-
-	        height.times do |y|
-	          width.times do |x|
-	            pixel = imgview[y][x]
-
-	            if pixel.red > EDGEPIX_THRESH_SECONDARY || pixel.green > EDGEPIX_THRESH_SECONDARY || pixel.blue > EDGEPIX_THRESH_SECONDARY
-	              if x < xcentroid
-	                leftcount += 1
-	                leftsum += x
-	                leftsqr += x**2
-	                leftcube += x**3
-	              else
-	                rightcount += 1
-	                rightsum += x
-	                rightsqr += x**2
-	                rightcube += x**3
-	              end
-
-	              if y < ycentroid
-	                topcount += 1
-	                topsum += y
-	                topsqr += y**2
-	                topcube += y**3
-	              else
-	                bottomcount += 1
-	                bottomsum += y
-	                bottomsqr += y**2
-	                bottomcube += y**3
-	              end
-	            end
-	          end
-	        end
-
-	        img.destroy!
-	        #imgview.destroy!
-
-	        GC.start
-
-	        # calculation of quadrant-relative statistical data
-
-	        topcentroid = Float(topsum)/Float(topcount)
-	        bottomcentroid = Float(bottomsum)/Float(bottomcount)
-	        leftcentroid = Float(leftsum)/Float(leftcount)
-	        rightcentroid = Float(rightsum)/Float(rightcount)
-
-	        topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
-	        bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
-	        leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
-	        rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
-
-	        topsigma = Math.sqrt(topvariance)
-	        bottomsigma = Math.sqrt(bottomvariance)
-	        leftsigma = Math.sqrt(leftvariance)
-	        rightsigma = Math.sqrt(rightvariance)
-
-	        #topEX3 = Float(topcube)/Float(topcount)
-	        #bottomEX3 = Float(bottomcube)/Float(bottomcount)
-	        #leftEX3 = Float(leftcube)/Float(leftcount)
-	        #rightEX3 = Float(rightcube)/Float(rightcount)
-
-	        #topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
-	        #bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
-	        #leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
-	        #rightskew =   Float(rightEX3 -  (3 * rightcentroid   * rightvariance)   - (rightcentroid)**3)   / Float(rightsigma**3)
-
-	        #Rails.logger.debug "topskew:    #{topskew.to_s}"
-	        #Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
-	        #Rails.logger.debug "leftskew:   #{leftskew.to_s}"
-	        #Rails.logger.debug "rightskew:  #{rightskew.to_s}"
-
-	        topedge = Integer(topcentroid - topsigma)
-	        bottomedge = Integer(bottomcentroid + bottomsigma)
-	        leftedge = Integer(leftcentroid - leftsigma)
-	        rightedge = Integer(rightcentroid + rightsigma)
-
-	        xskew = -1.0 if xskew < -1.0
-	        xskew = 1.0 if xskew > 1.0
-	        yskew = -1.0 if yskew < -1.0
-	        yskew = 1.0 if yskew > 1.0
-
-	        # calculate skew shift
-	        if xskew > 0
-	        	xadj = Integer((rightedge-width)*xskew)
-	        else
-	        	xadj = Integer((0-leftedge)*xskew)
-	        end
-
-	        if yskew > 0
-	        	yadj = Integer((bottomedge-height)*yskew)
-	        else
-	        	yadj = Integer((0-topedge)*yskew)
-	        end
-
-	        #Rails.logger.debug "xadj: #{xadj}"
-	        #Rails.logger.debug "yadj: #{yadj}"
-
-	        thumb_width = rightedge-leftedge
-	        thumb_height = bottomedge-topedge
-
-	        # calculate differential to align aspect ratios
-	        if Float(thumb_height)/Float(thumb_width) > Float(LTHUMB_H)/Float(LTHUMB_W)
-	          # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
-	          y = Integer(thumb_height-(LTHUMB_H*thumb_width)/LTHUMB_W)/2
-
-	          topedge += y
-	          bottomedge -= y
-
-	        else
-	          # smartselect aspect ratio is taller than thumbnail aspect ratio, crop down horizontally
-	          x = Integer(thumb_width-(LTHUMB_W*thumb_height)/LTHUMB_H)/2
-
-	          leftedge += x
-	          rightedge -= x
-
-	        end
-
-	    	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
-
-	    	#Rails.logger.debug "Before crop"
-	    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
-	    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
-
-
-
-	    	if !(((rightedge-leftedge).to_i<LTHUMB_W.to_i) || ((bottomedge-topedge).to_i<LTHUMB_H.to_i))
-	    		#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
-	    	#else
-	    		origimg.crop!(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge),true)
-
-	    		#Rails.logger.debug "After crop, before resize_to_fill"
-		    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
-		    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
-
-	    		#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))#.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
-	    	end
-
-			binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))#.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
-	    	
-	    	#Rails.logger.debug "After resize_to_fill"
-	    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
-	    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
-
-			#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+			new_img_lg.destroy!
+			filled_lg.destroy!
 
 			GC.start
 
-	        # reset edge data for small thumb generation
-	        topedge = Integer(topcentroid - topsigma)
-	        bottomedge = Integer(bottomcentroid + bottomsigma)
-	        leftedge = Integer(leftcentroid - leftsigma)
-	        rightedge = Integer(rightcentroid + rightsigma)
+			new_img_sm = Magick::ImageList.new
+			new_img_sm << Magick::Image.new(STHUMB_W,STHUMB_H)
+			filled_sm = new_img_sm.first.color_floodfill(1,1,Magick::Pixel.from_color(CROC_BACKGROUND_COLOR))
+			filled_sm.composite!(origimg.resize_to_fit(STHUMB_W-4,STHUMB_H-4).border(1,1,CROC_BORDER_COLOR),Magick::CenterGravity,Magick::OverCompositeOp)
+			filled_sm.format = BLOB_FILETYPE
 
-	        thumb_width = rightedge-leftedge
-	        thumb_height = bottomedge-topedge
-
-	        # calculate differential to align aspect ratios
-	        if Float(thumb_height)/Float(thumb_width) > STHUMB_H/STHUMB_W
-	          # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
-	          y = Integer(thumb_height-(STHUMB_H*thumb_width)/STHUMB_W)/2
-
-	          topedge += y
-	          bottomedge -= y
-
-	        else
-	          # smartselect aspect ratio is taller than thumbnail aspect ratio, crop down horizontally
-	          x = Integer(thumb_width-(STHUMB_W*thumb_height)/STHUMB_H)/2
-
-	          leftedge += x
-	          rightedge -= x
-
-	        end
-
-	    	#io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
-
-
-
-	        # set filenames of pseudoIO objects
-	        #io_cv.original_filename = CV_FILENAME
-	        #io_lg.original_filename = LTHUMB_FILENAME
-	        #io_sm.original_filename = STHUMB_FILENAME
-
-	        # set flags in the stathash
-	        stathash = binder.current_version.imgstatus
-			stathash['img_contentview']['generated'] = true
+			stathash = binder.current_version.imgstatus
 			stathash['img_thumb_lg']['generated'] = true
 			stathash['img_thumb_sm']['generated'] = true
 
-	    	#Rails.logger.debug "SWDIMS: #{(rightedge-leftedge).to_i} #{STHUMB_W.to_i}"
-	    	#Rails.logger.debug "SHDIMS: #{(bottomedge-topedge).to_i} #{STHUMB_H.to_i}"
+			#debugger
 
-			# if ((rightedge-leftedge).to_i<STHUMB_W.to_i) || ((bottomedge-topedge).to_i<STHUMB_H.to_i)
-	  #   		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.crop_resized!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-			# 												:imgstatus => stathash)   
-	  #   	else
-				binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-															:imgstatus => stathash)    	
-			# end
+			binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(filled_sm.to_blob).set_filename(STHUMB_FILENAME),
+														:imgstatus => stathash)
 
-			#binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
-			#											:imgstatus => stathash)
-
+			new_img_sm.destroy!
+			filled_sm.destroy!
 			origimg.destroy!
 
 			GC.start
 
-			# write to DB/S3
-			#binder.current_version.update_attributes(	:img_contentview => io_cv,
-			#											:img_thumb_lg => io_lg,
-			#											:img_thumb_sm => io_sm,
-			#											:imgstatus => stathash)
-
-			#GC.start
 		end
 
-		# BEGIN IMAGE SERVER
+	end
 
-		Binder.generate_folder_thumbnail(id)
+	def self.gen_smart_thumbnails(id)
 
-		# END IMAGE SERVER
+		#include Magick
+
+		#debugger
+
+		if USE_IMG_SERVER
+
+			# BEGIN IMAGE SERVER
+
+			binder = Binder.find(id.to_s)
+
+			storedir = Digest::MD5.hexdigest(binder.current_version.owner + binder.current_version.timestamp.to_s + binder.current_version.data).to_s
+
+			url = binder.current_version.imgfile.url.to_s
+
+			model = [binder.id.to_s,binder.current_version.id.to_s]
+
+			datahash = Digest::MD5.hexdigest(storedir + 'image' + url + model.to_s + TX_PRIVATE_KEY).to_s
+
+			response = RestClient.post(MEDIASERVER_API_URL,{ :storedir => storedir,
+															:class => 'image',
+															:url => url,
+															:model => model,
+															:datahash => datahash })
+
+			# END IMAGE SERVER
+
+		else
+
+			if true
+
+				binder = Binder.find(id.to_s)
+
+				#Rails.logger.debug "about to initialize origimg: #{`ps -o rss= -p #{$$}`}"
+
+				origimg = Magick::ImageList.new
+
+				#Rails.logger.debug "after initializing origimg: #{`ps -o rss= -p #{$$}`}"
+
+				# retrieve fullsize image from S3 store, read into an ImageList object
+				open(binder.current_version.imgfile.url.to_s) do |f|
+					origimg.from_blob(f.read)
+				end
+
+				#Rails.logger.debug "after reading image from blob: #{`ps -o rss= -p #{$$}`}"
+
+		        origimg.format = BLOB_FILETYPE
+
+				# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+				if !(origimg.columns.to_i < CV_WIDTH)
+
+					binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit!(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
+
+					# shrink image to be reasonably processed (this is what the thumb algos will use)
+					#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+				else
+
+					binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
+
+				end
+
+				GC.start
+
+				binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+
+				GC.start
+
+				stathash = binder.current_version.imgstatus
+				stathash['smart_thumb'] = false
+				stathash['img_contentview']['generated'] = true
+				stathash['img_thumb_lg']['generated'] = true
+				stathash['img_thumb_sm']['generated'] = true
+
+				binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+															:imgstatus => stathash)
+
+				#Rails.logger.debug "before destroying origimg: #{`ps -o rss= -p #{$$}`}"
+
+				origimg.destroy!
+
+				#Rails.logger.debug "after destroy img: #{`ps -o rss= -p #{$$}`}"
+
+				GC.start
+
+				#Rails.logger.debug "after garbage collect: #{`ps -o rss= -p #{$$}`}"
+
+			# actual algorithm
+
+			else
+
+				binder = Binder.find(id.to_s)
+
+				origimg = Magick::ImageList.new
+
+				# retrieve fullsize image from S3 store, read into an ImageList object
+				open(binder.current_version.imgfile.compressed.url.to_s) do |f|
+					origimg.from_blob(f.read)
+				end
+
+		        origimg.format = BLOB_FILETYPE
+
+				# Wrap filestring as pseudo-IO object, compress if width exceeds 700
+				if !(origimg.columns.to_i < CV_WIDTH)
+
+					binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob).set_filename(CV_FILENAME))
+
+					# shrink image to be reasonably processed (this is what the thumb algos will use)
+					#origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+				else
+
+					binder.current_version.update_attributes(	:img_contentview => FilelessIO.new(origimg.to_blob).set_filename(CV_FILENAME))
+
+				end
+
+				GC.start
+
+				# # Wrap filestring as pseudo-IO object, compress if width exceeds 700
+				# if !(origimg.columns.to_i < CV_WIDTH)
+				# 	io_cv = FilelessIO.new(origimg.resize_to_fit(CV_WIDTH,nil).to_blob)
+				# 	# shrink image to be reasonably processed (this is what the thumb algos will use)
+				# 	origimg.resize_to_fit!(IMGSCALE,IMGSCALE)
+				# else
+				# 	io_cv = FilelessIO.new(origimg.to_blob)
+				# end
+
+				#Rails.logger.debug "origimg width: #{origimg.columns}"
+				#Rails.logger.debug "origimg height: #{origimg.rows}"
+
+				# bring edge-detected image into memory
+				# a weight of 4 ensures that edges which are too tightly packed are weighted less
+				img = origimg.edge(4)
+
+		        xcount = 0
+		        ycount = 0
+		        xsum = 0
+		        ysum = 0
+		        xsqr = 0
+		        ysqr = 0
+		        xcube = 0
+		        ycube = 0
+
+		        width = img.columns
+		        height = img.rows
+
+		        imgview = img.view(0,0,width,height)
+
+		        height.times do |y|
+		          width.times do |x|
+		            pixel = imgview[y][x]
+
+		            if pixel.red > EDGEPIX_THRESH_PRIMARY || pixel.green > EDGEPIX_THRESH_PRIMARY || pixel.blue > EDGEPIX_THRESH_PRIMARY
+		              xcount += 1
+		              ycount += 1
+		              xsum += x
+		              ysum += y
+		              xsqr += x**2
+		              ysqr += y**2
+		              xcube += x**3
+		              ycube += y**3
+		            end
+		          end
+		        end
+
+		        # calculation of global statistical data
+
+		        xcentroid = Float(xsum)/Float(xcount)
+		        ycentroid = Float(ysum)/Float(ycount)
+
+		        # Unused
+		        xvariance = (Float(xsqr)/Float(xcount))-xcentroid**2
+		        yvariance = (Float(ysqr)/Float(ycount))-ycentroid**2
+
+		        # Unused
+		        xsigma = Math.sqrt(xvariance)
+		        ysigma = Math.sqrt(yvariance)
+
+		        #Rails.logger.debug "xcentroid #{xcentroid}"
+		        #Rails.logger.debug "ycentroid #{ycentroid}"
+		        #Rails.logger.debug "xsigma: #{xsigma}"
+		        #Rails.logger.debug "ysigma: #{ysigma}"
+
+		        xEX3 = Float(xcube)/Float(xcount)
+		        yEX3 = Float(ycube)/Float(ycount)
+
+		        xskew =  Float(xEX3 - (3 * xcentroid  * xvariance)  - (xcentroid)**3)  / Float(xsigma**3)
+		        yskew =  Float(yEX3 - (3 * ycentroid  * yvariance)  - (ycentroid)**3)  / Float(ysigma**3)
+
+		        #Rails.logger.debug "xskew: #{xskew}"
+		        #Rails.logger.debug "yskew: #{yskew}"
+
+				topcount = 0
+		        topsum = 0
+		        topsqr = 0
+		        topcube = 0
+		        bottomcount = 0
+		        bottomsum = 0
+		        bottomsqr = 0
+		        bottomcube = 0
+		        leftcount = 0
+		        leftsum = 0
+		        leftsqr = 0
+		        leftcube = 0
+		        rightcount = 0
+		        rightsum = 0
+		        rightsqr = 0
+		        rightcube = 0
+
+		        height.times do |y|
+		          width.times do |x|
+		            pixel = imgview[y][x]
+
+		            if pixel.red > EDGEPIX_THRESH_SECONDARY || pixel.green > EDGEPIX_THRESH_SECONDARY || pixel.blue > EDGEPIX_THRESH_SECONDARY
+		              if x < xcentroid
+		                leftcount += 1
+		                leftsum += x
+		                leftsqr += x**2
+		                leftcube += x**3
+		              else
+		                rightcount += 1
+		                rightsum += x
+		                rightsqr += x**2
+		                rightcube += x**3
+		              end
+
+		              if y < ycentroid
+		                topcount += 1
+		                topsum += y
+		                topsqr += y**2
+		                topcube += y**3
+		              else
+		                bottomcount += 1
+		                bottomsum += y
+		                bottomsqr += y**2
+		                bottomcube += y**3
+		              end
+		            end
+		          end
+		        end
+
+		        img.destroy!
+		        #imgview.destroy!
+
+		        GC.start
+
+		        # calculation of quadrant-relative statistical data
+
+		        topcentroid = Float(topsum)/Float(topcount)
+		        bottomcentroid = Float(bottomsum)/Float(bottomcount)
+		        leftcentroid = Float(leftsum)/Float(leftcount)
+		        rightcentroid = Float(rightsum)/Float(rightcount)
+
+		        topvariance   = (Float(topsqr)/   Float(topcount   ))-topcentroid**2
+		        bottomvariance  = (Float(bottomsqr)/Float(bottomcount))-bottomcentroid**2
+		        leftvariance  = (Float(leftsqr)/  Float(leftcount  ))-leftcentroid**2
+		        rightvariance   = (Float(rightsqr)/ Float(rightcount ))-rightcentroid**2
+
+		        topsigma = Math.sqrt(topvariance)
+		        bottomsigma = Math.sqrt(bottomvariance)
+		        leftsigma = Math.sqrt(leftvariance)
+		        rightsigma = Math.sqrt(rightvariance)
+
+		        #topEX3 = Float(topcube)/Float(topcount)
+		        #bottomEX3 = Float(bottomcube)/Float(bottomcount)
+		        #leftEX3 = Float(leftcube)/Float(leftcount)
+		        #rightEX3 = Float(rightcube)/Float(rightcount)
+
+		        #topskew =     Float(topEX3 -    (3 * topcentroid     * topvariance)     - (topcentroid)**3)     / Float(topsigma**3)
+		        #bottomskew =  Float(bottomEX3 - (3 * bottomcentroid  * bottomvariance)  - (bottomcentroid)**3)  / Float(bottomsigma**3)
+		        #leftskew =    Float(leftEX3 -   (3 * leftcentroid    * leftvariance)    - (leftcentroid)**3)    / Float(leftsigma**3)
+		        #rightskew =   Float(rightEX3 -  (3 * rightcentroid   * rightvariance)   - (rightcentroid)**3)   / Float(rightsigma**3)
+
+		        #Rails.logger.debug "topskew:    #{topskew.to_s}"
+		        #Rails.logger.debug "bottomskew: #{bottomskew.to_s}"
+		        #Rails.logger.debug "leftskew:   #{leftskew.to_s}"
+		        #Rails.logger.debug "rightskew:  #{rightskew.to_s}"
+
+		        topedge = Integer(topcentroid - topsigma)
+		        bottomedge = Integer(bottomcentroid + bottomsigma)
+		        leftedge = Integer(leftcentroid - leftsigma)
+		        rightedge = Integer(rightcentroid + rightsigma)
+
+		        xskew = -1.0 if xskew < -1.0
+		        xskew = 1.0 if xskew > 1.0
+		        yskew = -1.0 if yskew < -1.0
+		        yskew = 1.0 if yskew > 1.0
+
+		        # calculate skew shift
+		        if xskew > 0
+		        	xadj = Integer((rightedge-width)*xskew)
+		        else
+		        	xadj = Integer((0-leftedge)*xskew)
+		        end
+
+		        if yskew > 0
+		        	yadj = Integer((bottomedge-height)*yskew)
+		        else
+		        	yadj = Integer((0-topedge)*yskew)
+		        end
+
+		        #Rails.logger.debug "xadj: #{xadj}"
+		        #Rails.logger.debug "yadj: #{yadj}"
+
+		        thumb_width = rightedge-leftedge
+		        thumb_height = bottomedge-topedge
+
+		        # calculate differential to align aspect ratios
+		        if Float(thumb_height)/Float(thumb_width) > Float(LTHUMB_H)/Float(LTHUMB_W)
+		          # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
+		          y = Integer(thumb_height-(LTHUMB_H*thumb_width)/LTHUMB_W)/2
+
+		          topedge += y
+		          bottomedge -= y
+
+		        else
+		          # smartselect aspect ratio is taller than thumbnail aspect ratio, crop down horizontally
+		          x = Integer(thumb_width-(LTHUMB_W*thumb_height)/LTHUMB_H)/2
+
+		          leftedge += x
+		          rightedge -= x
+
+		        end
+
+		    	#io_lg = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob)
+
+		    	#Rails.logger.debug "Before crop"
+		    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
+		    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
+
+
+
+		    	if !(((rightedge-leftedge).to_i<LTHUMB_W.to_i) || ((bottomedge-topedge).to_i<LTHUMB_H.to_i))
+		    		#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+		    	#else
+		    		origimg.crop!(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge),true)
+
+		    		#Rails.logger.debug "After crop, before resize_to_fill"
+			    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
+			    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
+
+		    		#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))#.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+		    	end
+
+				binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))#.resize_to_fill!(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+		    	
+		    	#Rails.logger.debug "After resize_to_fill"
+		    	#Rails.logger.debug "LWDIMS: #{origimg.columns.to_i} #{LTHUMB_W.to_i}"
+		    	#Rails.logger.debug "LHDIMS: #{origimg.rows.to_i} #{LTHUMB_H.to_i}"
+
+				#binder.current_version.update_attributes(	:img_thumb_lg => FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(LTHUMB_W,LTHUMB_H,Magick::CenterGravity).to_blob).set_filename(LTHUMB_FILENAME))
+
+				GC.start
+
+		        # reset edge data for small thumb generation
+		        topedge = Integer(topcentroid - topsigma)
+		        bottomedge = Integer(bottomcentroid + bottomsigma)
+		        leftedge = Integer(leftcentroid - leftsigma)
+		        rightedge = Integer(rightcentroid + rightsigma)
+
+		        thumb_width = rightedge-leftedge
+		        thumb_height = bottomedge-topedge
+
+		        # calculate differential to align aspect ratios
+		        if Float(thumb_height)/Float(thumb_width) > STHUMB_H/STHUMB_W
+		          # smartselect aspect ratio is wider than thumbnail aspect ratio, crop down vertically
+		          y = Integer(thumb_height-(STHUMB_H*thumb_width)/STHUMB_W)/2
+
+		          topedge += y
+		          bottomedge -= y
+
+		        else
+		          # smartselect aspect ratio is taller than thumbnail aspect ratio, crop down horizontally
+		          x = Integer(thumb_width-(STHUMB_W*thumb_height)/STHUMB_H)/2
+
+		          leftedge += x
+		          rightedge -= x
+
+		        end
+
+		    	#io_sm = FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob)
+
+
+
+		        # set filenames of pseudoIO objects
+		        #io_cv.original_filename = CV_FILENAME
+		        #io_lg.original_filename = LTHUMB_FILENAME
+		        #io_sm.original_filename = STHUMB_FILENAME
+
+		        # set flags in the stathash
+		        stathash = binder.current_version.imgstatus
+				stathash['img_contentview']['generated'] = true
+				stathash['img_thumb_lg']['generated'] = true
+				stathash['img_thumb_sm']['generated'] = true
+
+		    	#Rails.logger.debug "SWDIMS: #{(rightedge-leftedge).to_i} #{STHUMB_W.to_i}"
+		    	#Rails.logger.debug "SHDIMS: #{(bottomedge-topedge).to_i} #{STHUMB_H.to_i}"
+
+				# if ((rightedge-leftedge).to_i<STHUMB_W.to_i) || ((bottomedge-topedge).to_i<STHUMB_H.to_i)
+		  #   		binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.crop_resized!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+				# 												:imgstatus => stathash)   
+		  #   	else
+					binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.resize_to_fill!(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+																:imgstatus => stathash)    	
+				# end
+
+				#binder.current_version.update_attributes(	:img_thumb_sm => FilelessIO.new(origimg.crop(leftedge+xadj,topedge+yadj,(rightedge-leftedge),(bottomedge-topedge)).crop_resized(STHUMB_W,STHUMB_H,Magick::CenterGravity).to_blob).set_filename(STHUMB_FILENAME),
+				#											:imgstatus => stathash)
+
+				origimg.destroy!
+
+				GC.start
+
+				# write to DB/S3
+				#binder.current_version.update_attributes(	:img_contentview => io_cv,
+				#											:img_thumb_lg => io_lg,
+				#											:img_thumb_sm => io_sm,
+				#											:imgstatus => stathash)
+
+				#GC.start
+			end
+
+			# BEGIN IMAGE SERVER
+
+			Binder.generate_folder_thumbnail(id)
+
+			# END IMAGE SERVER
+
+		end
 
 	end
 
@@ -1955,6 +2046,8 @@ end
 
 class Version
 	include Mongoid::Document
+	#include Tire::Model::Search
+	#include Tire::Model::Callbacks
 	# include CarrierWaveDirect::Mount
 
 	#attr_accessible :thumbnailgen
@@ -2016,7 +2109,7 @@ class Version
 	# MD5 hash of the uploaded image
 	field :imghash
 
-	# this hash is updated when the image is retrieved, almost always asynchronously
+	# this hash is updated when the image is retrieved, almoVersionst always asynchronously
 	# the :imgfile uploader cannot be reliably queried to determine if a file exists or not
 	field :imgstatus, 	:type => Hash, 	:default => { 	:imageable => 		true,		
 														:imgfile => 		{ :retrieved => false },
@@ -2043,18 +2136,35 @@ class Version
 
 		#debugger
 
-		keys = Rails.cache.read(self.binder.id.to_s)
+		# keys = Rails.cache.read(self.binder.id.to_s)
 
-		return if keys.nil?
+		# return if keys.nil?
 
-		keys.each do |f|
-			#Rails.cache.delete(f.to_s)	
-			#Rails.cache.expire_fragment(f.to_s)
-			Rails.cache.write(f.to_s,true)		
-		end
+		# keys.each do |f|
+		# 	#Rails.cache.delete(f.to_s)	
+		# 	#Rails.cache.expire_fragment(f.to_s)
+		# 	Rails.cache.write(f.to_s,true)		
+		# end
 
-		Rails.cache.delete(self.binder.id.to_s)
+		# Rails.cache.delete(self.binder.id.to_s)
 
+	end
+
+	def self
+		p "Called self!"
+   		#to_indexed_json.as_json
+    	to_indexed_json.to_json
+	end
+	# def self
+	# 	{}.to_json
+	# end
+
+	def to_indexed_json
+		{}.to_json
+	end
+
+	def to_json
+		{}.to_json
 	end
 
 	def thumbnailgen
@@ -2183,7 +2293,9 @@ end
 # 	 3: other
 
 class Tag
-	include Mongoid::Document
+	include Mongoid::Document	
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
 	field :parent_tags,			:type => Array,	:default => []
 	field :node_tags,			:type => Array,	:default => []
@@ -2193,6 +2305,12 @@ class Tag
 	embedded_in :binder
 
 	# Class Methods
+
+	# used for elasticsearch
+	def self
+    	#to_indexed_json.as_json
+    	to_indexed_json.to_json
+	end
 
 	def get_tags()
 

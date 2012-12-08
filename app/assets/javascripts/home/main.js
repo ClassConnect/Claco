@@ -31,14 +31,11 @@ $(document).ready(function() {
 	$('#newbinder').click(function() {
 
 		$.facebox({ div: '#addbinder-form' });
-
 		$("#facebox .firstfocus").focus();
-
 		$('#facebox .pub_on').iphoneStyle({
 			checkedLabel: 'Public',
 			uncheckedLabel: 'Private'
 		});
-
 
 		// set the form handler
 		$('#facebox .bodcon').submit(function() {
@@ -61,5 +58,30 @@ $(document).ready(function() {
       });
       return false;
 		});
-	});
+  });
+
+  // infinite scroll
+  $(window).scroll(function/*loadFeed*/(){
+    if ($(window).scrollTop() + $(window).height() == $(document).height()) {
+      // alert('hah');
+      var cursor = $('#feedCursor').val();
+      if(cursor) {
+        $.ajax({
+          type: "GET",
+          url:  "inf",
+          data: {"logid": cursor},
+          success: function(data) {
+            var nextCursor = '<input id="feedCursor" type="hidden" value="' + data.nextlogid + '" />';
+
+            $('#feedCursor').remove();
+            $('#feed')
+              .append(data.html)
+              .append(nextCursor);
+            console.log(data);
+          }
+        });
+      }
+      // else $('#feed').append('<hr />');
+    }
+  });
 });

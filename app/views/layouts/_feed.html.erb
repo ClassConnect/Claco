@@ -1,14 +1,14 @@
 
-<% 
-# this layout view is pretty disgusting, but the block variable's scope is limited to here, so the entirety of the content is stuck in this file 
+<%
+# this layout view is pretty disgusting, but the block variable's scope is limited to here, so the entirety of the content is stuck in this file
 %>
-<div class="whitebox">
+<div class="whitebox" id="feed">
 
 	<div style="margin-top:-15px"></div>
-	
+
 	<% if true %>
 
-		<% 
+		<%
 
 		#debugger
 
@@ -21,38 +21,36 @@
 			current_teacher.update_attribute(:feed_ids, fids)
 		else
 			feed = Feed.find(current_teacher.feed_ids[0])
-		end 
+		end
 
 		%>
 
 		<%= feed.html(current_teacher.id.to_s).html_safe %>
 
 		<script type="text/javascript">
-			function httpGet(theUrl)
-		    {
-			    var xmlHttp = null;
+			// function httpGet(theUrl)
+		 //    {
+			//     var xmlHttp = null;
 
-			    xmlHttp = new XMLHttpRequest();
-			    xmlHttp.open( "GET", theUrl, false );
-			    xmlHttp.send( null );
-			   	return eval('(' + xmlHttp.responseText + ')');
-		    }
-			function inf() {
-				response = httpGet('/inf?logid=' + document.getElementById('logid').value)
-				document.getElementById('inf_html').innerHTML += response.html
-				document.getElementById('logid').value = response.nextlogid
-			}
+			//     xmlHttp = new XMLHttpRequest();
+			//     xmlHttp.open( "GET", theUrl, false );
+			//     xmlHttp.send( null );
+			//    	return eval('(' + xmlHttp.responseText + ')');
+		 //    }
+			// function inf() {
+			// 	response = httpGet('/inf?logid=' + document.getElementById('logid').value)
+			// 	document.getElementById('inf_html').innerHTML += response.html
+			// 	document.getElementById('logid').value = response.nextlogid
+			// }
 		</script>
 
-		<input id="logid" type="text" disabled="true" value="<%= feed.lr_logid %>" />
-		<div id="inf_html"></div>
-		<a onclick="inf()"><h2>MOAR</h2></a><br />
+		<input id="feedCursor" type="hidden" value="<%= feed.lr_logid %>" />
 
 	<% else %>
 
-	<% @subsfeed.each do |f| 
+	<% @subsfeed.each do |f|
 
-		f = f.size==1 ? f.first : { :model=>f.first[:model], :owner=>f.first[:owner], :log=>f.first[:log], :array=>f } 
+		f = f.size==1 ? f.first : { :model=>f.first[:model], :owner=>f.first[:owner], :log=>f.first[:log], :array=>f }
 
 		@f = f
 
@@ -64,8 +62,8 @@
 					<img src="<%= teacher_thumb_md(f[:owner]) %>" >
 				</a>
 			</div>
-			<% 
-			case f[:log]['method'].to_s 
+			<%
+			case f[:log]['method'].to_s
 			when "createfile" %>
 
 				<div class="feedcontent">
@@ -97,7 +95,7 @@
 			<% when "update" %>
 
 				<div class="feedcontent">
-					
+
 					<% cache("#{signed_in? ? current_teacher.id.to_s : @teacher.id.to_s}#{f[:log].id}", :expires_in => 1.minutes) do %>
 
 					<%= render 'layouts/feedpieces/updateheader' %>
@@ -152,8 +150,8 @@
 
 			<% when 'sub' %>
 
-				<% # fix this!!! 
-				
+				<% # fix this!!!
+
 				@subscribee = Teacher.where(:username => /^#{Regexp.escape(f[:log].params['username'].to_s)}$/i).first %>
 
 				<div class="feedcontent">

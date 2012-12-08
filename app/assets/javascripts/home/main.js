@@ -62,9 +62,9 @@ $(document).ready(function() {
 
   // infinite scroll
   $(window).scroll(function/*loadFeed*/(){
-    if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-      // alert('hah');
+    if ($(window).scrollTop() + $(window).height() >= ($(document).height() * 0.85)) {
       var cursor = $('#feedCursor').val();
+
       if(cursor) {
         $.ajax({
           type: "GET",
@@ -77,11 +77,12 @@ $(document).ready(function() {
             $('#feed')
               .append(data.html)
               .append(nextCursor);
-            console.log(data);
           }
         });
       }
-      // else $('#feed').append('<hr />');
+      else $('#feed')
+        .parent().find('small.warning')
+        .show();
     }
   });
 });

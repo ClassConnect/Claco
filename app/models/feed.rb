@@ -89,7 +89,11 @@ class Feed
 		if !page || (self.buffer(pagelogid).size < MAIN_WRAP_LENGTH)
 
 			# pull the current teacher's subscription IDs
-			subs = (teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+			if [0].include? self.fclass
+				subs = (teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+			else
+				subs = []
+			end
 
 				# self.cursor = self.wrappers.to_a.sort_by{|f| f.mr_timestamp}.first.id.to_s
 
@@ -106,7 +110,13 @@ class Feed
 				# technically these should be cascaded to avoid cross-method name conflicts
 				search.filter :terms, :model => ['binders','teachers']
 				search.filter :terms, :method => FEED_METHOD_WHITELIST
-				search.filter :terms, :ownerid => subs + [teacherid]
+				case self.fclass
+				when 0
+					search.filter :terms, :ownerid => subs + [teacherid]
+				when 1
+					search.filter :terms, :ownerid => [teacherid]
+				end
+
 
 				#debugger
 

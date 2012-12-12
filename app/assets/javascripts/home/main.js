@@ -64,6 +64,7 @@ $(document).ready(function() {
   $(window).scroll(function/*loadFeed*/(){
     if ($(window).scrollTop() + $(window).height() >= ($(document).height() * 0.85)) {
       var cursor = $('#feedCursor').val();
+      $('#feedCursor').val('');
 
       if(cursor) {
         $.ajax({
@@ -71,12 +72,17 @@ $(document).ready(function() {
           url:  "inf",
           data: {"logid": cursor},
           success: function(data) {
-            var nextCursor = '<input id="feedCursor" type="hidden" value="' + data.nextlogid + '" />';
+            // var nextCursor = '<input id="feedCursor" type="hidden" value="' + data.nextlogid + '" />';
 
-            $('#feedCursor').remove();
+            // $('#feedCursor').remove();
+            //alert('trigger');
             $('#feed')
-              .append(data.html)
-              .append(nextCursor);
+              .append(data.html);
+              // .append(nextCursor);
+            $('#feedCursor').val(data.nextlogid);
+          },
+          error: function (){
+            $('#feedCursor').val(cursor);
           }
         });
       }

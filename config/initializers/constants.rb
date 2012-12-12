@@ -159,4 +159,4 @@ INVITE_BITMAP = 0x40
 
 PREFIX_EMAIL = ['Whoa!', 'Nice!', 'Woohoo!', 'Awesome!']
 
-USE_IMG_SERVER = false
+USE_IMG_SERVER = true

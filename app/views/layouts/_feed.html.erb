@@ -14,14 +14,14 @@
 			#debugger
 
 			fids = current_teacher.feed_ids.clone
-			if fids.nil? || fids[0].nil?
+			if fids.nil? || fids[@feedindex].nil?
 				feed = Feed.new(:owner => current_teacher.id.to_s,
-								:fclass => 0)
+								:fclass => @feedindex)
 				feed.save
-				fids[0] = feed.id.to_s
+				fids[@feedindex] = feed.id.to_s
 				current_teacher.update_attribute(:feed_ids, fids)
 			else
-				feed = Feed.find(current_teacher.feed_ids[0])
+				feed = Feed.find(current_teacher.feed_ids[@feedindex])
 			end
 
 			feedhash = feed.html(current_teacher.id.to_s)#['html'].html_safe

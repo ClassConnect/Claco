@@ -9,7 +9,6 @@ class MediaServerApiController < ApplicationController
 		# thumbs is an array of all the thumbnail URLs
 		# model is an array of the model name, as a string, and the model id, as a string
 
-		#debugger
 
 		Mongo.log(	'',
 					__method__.to_s,
@@ -45,15 +44,16 @@ class MediaServerApiController < ApplicationController
 
 			case params[:model][0]
 			when 'binder'
-				m = model.current_version
+				#debugger
+				#m = model.current_version
 
-				stathash = m.imgstatus
+				stathash = model.imgstatus
 				stathash['img_contentview']['generated'] = true
 				stathash['img_thumb_lg']['generated'] = true
 				stathash['img_thumb_sm']['generated'] = true
 
-				m.update_attributes(:thumbnails => params[:thumbs],
-									:imgstatus => stathash)
+				model.update_attributes(:thumbnails => params[:thumbs],
+										:imgstatus => stathash)
 			when 'teacher'
 				# must call save on the root class to enable ElasticSearch callbacks
 

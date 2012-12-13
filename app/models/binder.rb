@@ -199,11 +199,12 @@ class Binder
 				!binder.current_version.nil? &&
 				!binder.current_version.imgfile.nil? &&
 				# these can be migrated to the imgstatus hash
-				!binder.current_version.img_thumb_lg.nil? &&
-				!binder.current_version.img_thumb_lg.url.nil? &&
-				#!binder.current_version.imgstatus.nil? &&
-				#!binder.current_version.imgstatus[image].nil? &
-				binder.current_version.imgstatus[image]['generated']
+				#!binder.current_version.img_thumb_lg.nil? &&
+				#!binder.current_version.img_thumb_lg.url.nil? &&
+				!binder.current_version.imgstatus.nil? &&
+				!binder.current_version.imgstatus[image].nil? &
+				binder.current_version.imgstatus[image]['generated'] &&
+				binder.current_version.thumbnails.any?
 
 	end
 
@@ -216,7 +217,9 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_contentview']['generated'] ? binder.current_version.img_contentview.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : nil #asset_path("common/nothumb.png")
+		
+		#Binder.thumbready?(binder,'img_contentview') ? binder.current_version.img_contentview.url.to_s : nil #asset_path("common/nothumb.png")
+		Binder.thumbready?(binder,'img_contentview') ? binder.current_version.thumbnails[0] : nil
 
 	end
 
@@ -229,7 +232,10 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_thumb_lg']['generated'] ? binder.current_version.img_thumb_lg.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : nil #asset_path("common/nothumb.png")
+		
+		#Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.img_thumb_lg.url.to_s : nil #asset_path("common/nothumb.png")
+		
+		Binder.thumbready?(binder,'img_thumb_lg') ? binder.current_version.thumbnails[1] : nil
 	end
 
 
@@ -242,8 +248,9 @@ class Binder
 		# 	return "/assets/common/nothumb.png"
 		# end
 		#binder.current_version.imgstatus['img_thumb_sm']['generated'] ? binder.current_version.img_thumb_sm.url.to_s : "/assets/common/nothumb.png"
-		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : nil #asset_path("common/nothumb.png")
-
+		
+		#Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.img_thumb_sm.url.to_s : nil #asset_path("common/nothumb.png")
+		Binder.thumbready?(binder,'img_thumb_sm') ? binder.current_version.thumbnails[2] : nil
 	end
 
 

@@ -77,6 +77,9 @@ class TeachersController < ApplicationController
 		#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 		#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
+		@feedindex = 1
+
+		if false
 
 		# pull the current teacher's subscription IDs
 		subs = signed_in? ? (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } : []
@@ -200,6 +203,8 @@ class TeachersController < ApplicationController
 
 				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
 			end
+		end
+
 		end
 
 		#feed.map { |f| f.modelid.to_s } if feed.any?

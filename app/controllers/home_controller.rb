@@ -28,6 +28,8 @@ class HomeController < ApplicationController
 			#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 			#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
+			#debugger
+
 			@educators = []
 
 			if current_teacher.recommend_ids.to_a.empty?
@@ -45,6 +47,8 @@ class HomeController < ApplicationController
 				end
 				break if @educators.size == 3
 			end
+
+			@feedindex = 0
 
 			if false
 
@@ -200,6 +204,7 @@ class HomeController < ApplicationController
 		respond_to do |format|
 			begin
 				format.json {render :text => {'html' => feedhash['html'] , 'nextlogid' => feedhash['logid']}.to_json }
+				# format.json {render :text => {'html' => 'ABCDE' , 'nextlogid' => feedhash['logid']}.to_json }
 			rescue
 				format.json {render :text => {'html' => "teacher does not have a feed", 'nextlogid' => ''}.to_json }
 			end
@@ -217,6 +222,15 @@ class HomeController < ApplicationController
 		if current_teacher.recommend_ids.to_a.empty?
 			current_teacher.update_attribute(:recommend_ids, current_teacher.recommends)
 			ActionController::Base.new.expire_fragment("recommendations/#{current_teacher.id.to_s}")
+		end
+
+		h={}
+		i=0
+		@recommends=[]
+
+		current_teacher.recommend_ids.each do |f|
+			h[f] = i
+			i += 1
 		end
 
 		#@recommends = current_teacher.recommend_ids #Rails.cache.read("recommendations/ids/#{self.id.to_s}")
@@ -249,7 +263,12 @@ class HomeController < ApplicationController
 
 		#return if false
 
-		@recommends = Teacher.any_in(_id: current_teacher.recommend_ids)
+		# this query returns teachers in the order they were entered into the database
+		#@recommends = Teacher.any_in(_id: current_teacher.recommend_ids)
+
+		Teacher.any_in(_id: current_teacher.recommend_ids).each do |f|
+			@recommends[h[f.id.to_s]]=f
+		end
 
 		#RestClient.get()
 

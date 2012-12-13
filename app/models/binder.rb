@@ -1255,7 +1255,8 @@ class Binder
 															:class => 'url',
 															:url => url,
 															:model => model,
-															:datahash => datahash })
+															:datahash => datahash,
+															:origin => ENV['SERVERCLASS']=='staging' })
 			# END IMAGE SERVER
 
 		else
@@ -1326,7 +1327,9 @@ class Binder
 															:class => 'video',
 															:url => url,
 															:model => model,
-															:datahash => datahash })
+															:datahash => datahash,
+															:origin => ENV['SERVERCLASS']=='staging' })
+			# END IMAGE SERVER
 			# END IMAGE SERVER
 
 		else
@@ -1391,7 +1394,9 @@ class Binder
 															:class => 'croc',
 															:url => url,
 															:model => model,
-															:datahash => datahash })
+															:datahash => datahash,
+															:origin => ENV['SERVERCLASS']=='staging' })
+			# END IMAGE SERVER
 
 			# END IMAGE SERVER
 
@@ -1474,7 +1479,9 @@ class Binder
 															:class => 'image',
 															:url => url,
 															:model => model,
-															:datahash => datahash })
+															:datahash => datahash,
+															:origin => ENV['SERVERCLASS']=='staging' })
+			# END IMAGE SERVER
 
 			# END IMAGE SERVER
 

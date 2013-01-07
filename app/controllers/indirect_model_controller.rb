@@ -12,6 +12,8 @@ class IndirectModelController < AbstractController::Base
   include Rails.application.routes.url_helpers
 
   include ActionView::Helpers::DateHelper
+  include Sprockets::Helpers::RailsHelper
+  include Sprockets::Helpers::IsolatedHelper
 
   # Uncomment if you want to use helpers 
   # defined in ApplicationHelper in your views

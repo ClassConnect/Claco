@@ -75,7 +75,11 @@ class Teacher
 	field :allow_short_username, :type => Boolean, :default => false
 	field :getting_started, :type => Boolean, :default => true
 
+	# feed indices:
+	# 0 - main feed
 	field :feed_ids, :type => Array, :default => []
+
+	field :recommend_ids, :type => Array, :default => []
 
 	field :admin, :type => Boolean, :default => false
 
@@ -108,7 +112,7 @@ class Teacher
 
 
 	# after_save do
-	# 	debugger
+	# 	#debugger
 	# 	#Rails.logger.debug "AFTER_SAVE got here!"
 	# 	self.tire.update_index
 	# 	#self.tire.index.delete
@@ -145,8 +149,36 @@ class Teacher
 
 		end
 
+		Feedobject.where(:teacherid => self.id.to_s).each do |f|
+			f.generate(self.class)
+		end
+
+		Feed.where(:actors => self.id.to_s).each do |f|
+			f.wrappers.where(:whoid => self.id.to_s).each {|g| g.generate}#{|g| Rails.cache.delete("wrapper/#{g.id.to_s}")}
+			#f.generate
+		end
+
+		#debugger
+
+		#return if false
+
+		#Feed.where(:actors => self.id.to_s) do |f|
+			#f.disown(self.id.to_s)
+			#f.wrappers.where(:whoid => self.id.to_s).each {|g| g.generate}
+			#f.wrappers.where(:whoid => self.id.to_s).each {|g| Rails.cache.delete("wrapper/#{g.id.to_s}")}
+		#	f.wrappers.each do |g|
+		#		Feedobject.find(g.feedobjectids.first).generate
+		#	end
+		#end
+
 	end
 
+	# Tire.index 'teachers' do
+	# 	import Teacher.all do |ts|
+	# 		ts.each { |t| t[:id] = t[:id].to_s }
+	# 	end
+	# 	refresh
+	# end
 
 	settings analysis: {
 		filter: {
@@ -167,9 +199,12 @@ class Teacher
 		}
 	} 	do
 		mapping do
-			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 200.0
-			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 400.0
-			indexes :username, 	:type => 'string', 	:analyzer => 'ngram_analyzer', :boost => 100.0
+			indexes :_id,		:index => 'not_analyzed',		:store => 'yes', :include_in_all => false
+			#indexes :id,		:type => 'string',	:index => 'not_analyzed',		:store => 'yes', :include_in_all => false #,		:type => 'string',	:store 	  => 'yes' #, 	:index 	  => 'not_analyzed',   :store => 'yes'
+			indexes :stringid,	:type => 'string', 	:as => 'id.to_s' #, 	:analyzer => 'ngram_analyzer'
+			indexes :fname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', 	:boost => 200.0
+			indexes :lname, 	:type => 'string', 	:analyzer => 'ngram_analyzer', 	:boost => 400.0
+			indexes :username, 	:type => 'string', 	:boost => 100.0 # :analyzer => 'ngram_analyzer', 
 			indexes :omnihash, 	:type => 'object', 	:properties => {:twitter 			=> { :type => 'object', :properties => { :username 	=> 	{ :type => 'string', :analyzer => 'ngram_analyzer' },
 																															 	 :uid 		=> 	{ :type => 'object', :enabled => false },
 																																 :profile 	=> 	{ :type => 'object', :enabled => false },
@@ -207,139 +242,143 @@ class Teacher
 	# temporary method to find number of feed items in main feed
 	def feedsize
 
-		@feed = []
-		@subsfeed = []
+		return 0 if feed_ids.to_a.empty? || feed_ids[0].to_s.empty?
 
-		# i = 0
+		Feed.find(self.feed_ids[0])
 
-		feedblacklist = {}
-		duplist = {}
+		# @feed = []
+		# @subsfeed = []
 
-		subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
+		# # i = 0
 
-		logs = Tire.search 'logs' do |search|
+		# feedblacklist = {}
+		# duplist = {}
 
-			search.query do |query|
-				#query.string params[:q]
+		# subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 
 
-				query.all
+		# logs = Tire.search 'logs' do |search|
 
-				#search.size 40
-			end
+		# 	search.query do |query|
+		# 		#query.string params[:q]
 
-			# technically these should be cascaded to avoid cross-method name conflicts
-			search.filter :terms, :model => ['binders','teachers']
-			search.filter :terms, :method => FEED_METHOD_WHITELIST
-			search.filter :terms, :ownerid => subs + [self.id.to_s]
+		# 		query.all
 
-			search.size 100
+		# 		#search.size 40
+		# 	end
 
-			search.sort { by :timestamp, 'desc' }
+		# 	# technically these should be cascaded to avoid cross-method name conflicts
+		# 	search.filter :terms, :model => ['binders','teachers']
+		# 	search.filter :terms, :method => FEED_METHOD_WHITELIST
+		# 	search.filter :terms, :ownerid => subs + [self.id.to_s]
 
-		end
+		# 	search.size 100
+
+		# 	search.sort { by :timestamp, 'desc' }
+
+		# end
 		
-		logs = logs.results
+		# logs = logs.results
 
-		#debugger
+		# #debugger
 		
-		if logs.any?
-			logs.each do |f|
+		# if logs.any?
+		# 	logs.each do |f|
 
-				#debugger
+		# 		#debugger
 
-				begin
-					case f[:model].to_s
-						when 'binders'
-							model = Binder.find(f[:modelid].to_s)
-						when 'teachers'
-							model = Teacher.find(f[:modelid].to_s)
-					end
-				rescue
-					Rails.logger.fatal "Invalid log model ID!"
-					next
-				end
+		# 		begin
+		# 			case f[:model].to_s
+		# 				when 'binders'
+		# 					model = Binder.find(f[:modelid].to_s)
+		# 				when 'teachers'
+		# 					model = Teacher.find(f[:modelid].to_s)
+		# 			end
+		# 		rescue
+		# 			Rails.logger.fatal "Invalid log model ID!"
+		# 			next
+		# 		end
 
-				# the binder log entry:		should not be deleted
-				# 							should not be private
-				# 							should not be sourced from another log entry
-				# 							should not have a blacklist entry
-				# 							should not be a setpub -> private
-				#
-				# the teacher log entry: 	should not have a blacklist entry
-				if 	(f[:model].to_s=='binders' && 
-						model.parents[0]!={ "id" => "-1", "title" => "" } && 
-						model.is_pub? && 
-						!f[:data][:src] && 
-						!(feedblacklist[f[:actionhash].to_s]) && 
-						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
-					(f[:model].to_s=='teachers' &&
-						!(feedblacklist[f[:actionhash].to_s]))
+		# 		# the binder log entry:		should not be deleted
+		# 		# 							should not be private
+		# 		# 							should not be sourced from another log entry
+		# 		# 							should not have a blacklist entry
+		# 		# 							should not be a setpub -> private
+		# 		#
+		# 		# the teacher log entry: 	should not have a blacklist entry
+		# 		if 	(f[:model].to_s=='binders' && 
+		# 				model.parents[0]!={ "id" => "-1", "title" => "" } && 
+		# 				model.is_pub? && 
+		# 				!f[:data][:src] && 
+		# 				!(feedblacklist[f[:actionhash].to_s]) && 
+		# 				( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
+		# 			(f[:model].to_s=='teachers' &&
+		# 				!(feedblacklist[f[:actionhash].to_s]))
 
-					# calculate number of items contributed from this teacher
-					c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
+		# 			# calculate number of items contributed from this teacher
+		# 			c = (@subsfeed.flatten.reject { |h| h[:log][:ownerid].to_s!=f[:ownerid].to_s }).size
 
-					# must be subscribed or owned
-					# occupancy of up to 10 from any teacher
-					if ((subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == self.id.to_s)) && c<10
+		# 			# must be subscribed or owned
+		# 			# occupancy of up to 10 from any teacher
+		# 			if ((subs.include? f[:ownerid].to_s) || (f[:ownerid].to_s == self.id.to_s)) && c<10
 
-						# whether or not the item is included in the blacklist,
-						# add the actionhash and annihilation IDs to the exclusion list
-						feedblacklist[f[:actionhash].to_s] = true
+		# 				# whether or not the item is included in the blacklist,
+		# 				# add the actionhash and annihilation IDs to the exclusion list
+		# 				feedblacklist[f[:actionhash].to_s] = true
 
-						# enter all annihilation entries into blacklist hash
-						f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
+		# 				# enter all annihilation entries into blacklist hash
+		# 				f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
-						# execute blacklist exclusion
-						if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+		# 				# execute blacklist exclusion
+		# 				if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
 
-							# create a key for an owner and an action
-							similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
+		# 					# create a key for an owner and an action
+		# 					similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
-							f = { :model => model, :owner => f[:ownerid].to_s, :log => f }	
+		# 					f = { :model => model, :owner => f[:ownerid].to_s, :log => f }	
 
-							# if there are no members in the duplist, create a new action in each tracking hash
-							if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
+		# 					# if there are no members in the duplist, create a new action in each tracking hash
+		# 					if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
 
-								# store the index at which the similar item resides, and the current time
-								duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
+		# 						# store the index at which the similar item resides, and the current time
+		# 						duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
 
-								# new array set for feed object type
-								@subsfeed << [f]
+		# 						# new array set for feed object type
+		# 						@subsfeed << [f]
 
-							# there is a similar event, combine in feed array
-							else	
+		# 					# there is a similar event, combine in feed array
+		# 					else	
 
-								#expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
+		# 						#expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
 
-								# insert into array dependent on whether or not a thumbnail exists
-								if (f[:log].model.to_s=='binders' && 
-										(f[:model].thumbimgids[0].nil? || 
-										f[:model].thumbimgids[0].empty?)) || 
-									(f[:log].model.to_s=='teachers' && 
-										!Teacher.thumbready?(f[:model]))
+		# 						# insert into array dependent on whether or not a thumbnail exists
+		# 						if (f[:log].model.to_s=='binders' && 
+		# 								(f[:model].thumbimgids[0].nil? || 
+		# 								f[:model].thumbimgids[0].empty?)) || 
+		# 							(f[:log].model.to_s=='teachers' && 
+		# 								!Teacher.thumbready?(f[:model]))
 
-									@subsfeed[duplist[similar]['index']] << f
+		# 							@subsfeed[duplist[similar]['index']] << f
 
-								else
+		# 						else
 
-									@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
+		# 							@subsfeed[duplist[similar]['index']].insert(duplist[similar]['blank_index'],f)
 
-									duplist[similar]['blank_index'] += 1
+		# 							duplist[similar]['blank_index'] += 1
 
-								end
+		# 						end
 
-								# update to the most recent time
-								duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
+		# 						# update to the most recent time
+		# 						duplist[similar]['timestamp'] = f[:log][:timestamp].to_i
 
-							end
-						end
-					end
-				end
-				break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
-			end
-		end
+		# 					end
+		# 				end
+		# 			end
+		# 		end
+		# 		break if @subsfeed.flatten.size == SUBSC_FEED_LENGTH
+		# 	end
+		# end
 
-		return @subsfeed.flatten.size
+		# return @subsfeed.flatten.size
 
 	end
 
@@ -560,6 +599,16 @@ class Teacher
 		end
 	end
 
+	def self.find_by_username(username)
+		
+		teacher = Teacher.where(username: /^#{Regexp.escape(username)}$/i).first
+
+		raise Mongoid::Errors::DocumentNotFound.new(Teacher, username) if teacher.nil?
+
+		return teacher
+
+	end
+
 	def get_unread_count
 
 		Conversation.where(:members => self.id.to_s, :"unread.#{self.id.to_s}".gte => 1).count
@@ -572,6 +621,10 @@ class Teacher
 
 	def binders
 		Binder.where(:owner => self.id.to_s)
+	end
+
+	def has_explicit_access_to?(binder)
+		return !binder.permissions.find{|h| h["shared_id"] == self.id.to_s && h["type"] == 1}.nil?
 	end
 
 	# recursively aggregates teacher subscription network
@@ -731,7 +784,7 @@ class Teacher
 
 			if degree>0
 				ids.clone.each do |f|
-					break if ids.size > 500
+					#break if ids.size > 500
 					temp = Teacher.vectors(f,degree-1,vec,ids)
 					vec = temp[0]
 					ids = (ids + temp[1]).flatten.uniq
@@ -791,7 +844,7 @@ class Teacher
 	def self.dijkstra (network,tid)
 
 
-		# debugger
+		# #debugger
 
 		#network = network_orig.clone
 
@@ -887,18 +940,24 @@ class Teacher
 
 	def recommends (count = 5)
 
-		#subs = self.subscriptions(2) - self.subscriptions(1)
 
-		# pre-seed!
+		#   invalidate the generated HTML
+		#Rails.cache.delete("recommendations/html/#{self.teacher.id.to_s}")
+		
+		#self.teacher.update_attribute(:recommend_ids,(recs = self.teacher.recommends))
 
-		# keys = Rails.cache.read("self.id.to_s}recs")
+		#   prepare the recommendation IDS for the newly generated HTML
+		#Rails.cache.write("recommendations/ids/#{self.teacher.id.to_s}",recs)
 
-		# return if keys.nil?
 
-		# Rails.cache.delete("self.id.to_s}recs")
-		#debugger
+		# no up-to-date recommendations generated
+		# if a cache instance exists, it is assumed to be up-to-date
+		#if self.recommend_ids.nil? || self.recommend_ids.empty? #Rails.cache.read("recommendations/ids/#{self.id.to_s}").nil?
 
-		if Rails.cache.read("#{self.id.to_s}recs").nil?
+			# precaution
+			#Rails.cache.delete("recommendations/html/#{self.id.to_s}")
+
+			ActionController::Base.new.expire_fragment("recommendations/#{self.id.to_s}")
 
 			subs = (self.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } 		
 
@@ -950,17 +1009,19 @@ class Teacher
 				end
 			end
 
-			Rails.cache.write("#{self.id.to_s}recs",recs[0..60])
+			#Rails.cache.write("recommendations/ids/#{self.id.to_s}",recs = recs[0..59])
+
+			self.update_attribute(:recommend_ids, recs)
 
 			#debugger
 
-			return recs[0..60]
+			recs#.map { |r| Teacher.find(r).username }
+ 
+		#else
 
-		else
+			#return self.recommend_ids #Rails.cache.read("recommendations/ids/#{self.id.to_s}")
 
-			return Rails.cache.read("#{self.id.to_s}recs")
-
-		end
+		#end
 
 	end
 
@@ -1192,7 +1253,9 @@ end
 
 
 class Tag
-	include Mongoid::Document
+	include Mongoid::Document	
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 
 	# presently, array undergoes batch replacements only
 	# PS, PK, K
@@ -1213,6 +1276,8 @@ end
 
 class Relationship
 	include Mongoid::Document
+	# include Tire::Model::Search
+	# include Tire::Model::Callbacks
 
 	#scope :find_by_id, find_or_initialize_by(:user_id => params[:id])
 	#scope :find_by_id, lambda { |teacher_id| find_or_initialize_by(":user_id => ?", teacher_id) }
@@ -1238,17 +1303,28 @@ class Relationship
 
 	# after_create do
 
-	# 	debugger
+	# 	#debugger
 	# 	Rails.cache.write("self.teacher.id.to_s}recs",true)
 
 	# end
 
 	after_save do
 
+		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+
 		#debugger
-		Rails.cache.delete("#{self.teacher.id.to_s}recs")
 
+		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 
+	end
+
+	after_destroy do
+
+		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+
+		#debugger
+
+		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 
 	end
 
@@ -1283,6 +1359,8 @@ end
 
 class Info
 	include Mongoid::Document
+	include Tire::Model::Search
+	include Tire::Model::Callbacks
 	#include Tire::Model::Search
 	#include Tire::Model::Callbacks
 	# include Mongoid::Spacial::Document
@@ -1345,16 +1423,26 @@ class Info
 
 		if !keys.nil?
 
-			keys.each do |f|
+			keys.each do |f|   
 				#Rails.cache.delete(f.to_s)
 				#Rails.cache.expire_fragment(f.to_s)			
 				Rails.cache.write(f.to_s,true)
 			end
 
-			Rails.cache.delete(self.teacher.id.to_s)
+			# this step may not be necessary
+			#Rails.cache.delete("recommendations/#{self.teacher.id.to_s}")
 
-			Rails.cache.write("#{self.teacher.id.to_s}educobj",true)
+			# invalidate the generated HTML
+			#Rails.cache.delete("recommendations/html/#{self.teacher.id.to_s}")
+			#Rails.cache.delete("recommendations/ids/#{self.teacher.id.to_s}")
 
+			self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+
+			ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
+
+			# prepare the recommendation IDS for the newly generated HTML
+			#Rails.cache.write("recommendations/ids/#{self.teacher.id.to_s}",recs)
+			
 		end
 
 	end

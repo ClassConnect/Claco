@@ -1,18 +1,10 @@
 
-  /*
-  $( ".content-item" ).draggable({
-    revert: "invalid",
-    distance: 20,
-    zIndex: 99999
-  });
-
-  $( ".content-list" ).sortable();*/
-hovBool = false;
-isDropped = false;
-noteClick = false;
-noteInit = false;
-scrollBottom = false;
-permissionFail = false;
+var hovBool = false
+    , isDropped = false
+    , noteClick = false
+    , noteInit = false
+    , scrollBottom = false
+    , permissionFail = false;
 
 
 function initPage() {
@@ -55,7 +47,7 @@ $(document).on('pjax:start', function() {
   } else {
     scrollBottom = false;
   }
-  
+
   // show loading
   initAsyc('<img src=\'<%= asset_path "miniload.gif" %>\' style=\'float:left; margin-right:15px;margin-top:4px\' /> Loading...');
 
@@ -89,7 +81,7 @@ function viewInit() {
   $('.snapbtn').click(function() {
     popForm('snap-form', $(this).closest('.content-item'));
   });
-  
+
   // CONTENT SPECIFIC FUNCTIONS GO HERE!
   // if this is a website, fade in the overlay and stuff on hover
   if ($('.embedlink').length) {
@@ -155,13 +147,13 @@ function contentInit() {
   $('.content-actions').scrollToFixed( {
         bottom: -3,
         limit: $('.content-actions').offset().top,
-        preFixed: function() { 
+        preFixed: function() {
           $(this).addClass('actions-float');
-          
+
         },
         postFixed: function() {
           $(this).removeClass('actions-float');
-          
+
         }
     });
 
@@ -199,7 +191,7 @@ function editInit() {
         permissionFail = false;
         return false;
       }
-      
+
       pubshare = { enabled: value };
 
       $.ajax({
@@ -253,7 +245,7 @@ function editInit() {
     if (container.hasClass('act-live')) {
 
       tagdata = tagsToJSON('#folder-tags');
-      
+
       $.ajax({
         url: location.protocol+'//'+location.host+location.pathname + '/tags',
         data: tagdata,
@@ -284,7 +276,7 @@ function editInit() {
         container.find('.content-fill').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
       container.find('.fortags').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
       }
-      
+
 
 
 
@@ -330,7 +322,7 @@ function editInit() {
     if (container.hasClass('act-live')) {
 
       //tagdata = tagsToJSON('#folder-sharing');
-      
+
       $.ajax({
         url: location.protocol+'//'+location.host+location.pathname + '/sharing',
         data: '',
@@ -361,7 +353,7 @@ function editInit() {
         container.find('.content-fill').css('opacity', 1).slideUp(150).animate({ opacity: 0 },{ queue: false, duration: 150});
         container.find('.forshare').css('opacity', 0).slideDown(150).animate({ opacity: 1 },{ queue: false, duration: 150});
       }
-      
+
 
 
 
@@ -536,7 +528,7 @@ function editInit() {
         }, 200, function() {
           // Animation complete.
         });
-        
+
       },
       drop: function( event, ui ) {
         // set the dropped variable
@@ -556,7 +548,7 @@ function editInit() {
         // find position and move the element
         pos1 = $(this).find('.folder-preview').offset();
         pos2 = $('.dropper-tog').find('.folder-preview').offset();
-   
+
         topfin = pos1.top - pos2.top + 15;
         leftfin = pos1.left - pos2.left + 15;
 
@@ -654,7 +646,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -689,7 +681,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -728,7 +720,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -776,7 +768,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -813,7 +805,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -888,7 +880,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -925,7 +917,7 @@ function popForm(formID, obje) {
           }
 
         }
-        
+
       });
 
       return false;
@@ -966,7 +958,7 @@ function popForm(formID, obje) {
 
 
 // helper for removing hash
-function removeHash () { 
+function removeHash () {
     var scrollV, scrollH, loc = window.location;
     if ("pushState" in history)
         history.pushState("", document.title, loc.pathname + loc.search);

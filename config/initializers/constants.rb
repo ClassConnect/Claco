@@ -100,6 +100,10 @@ MAIN_FEED_LENGTH = 50
 SUBSC_FEED_LENGTH = 50
 PERSONAL_FEED_LENGTH = 50
 
+MAIN_WRAP_LENGTH = 10
+SUBSC_WRAP_LENGTH = 30
+PERSONAL_WRAP_LENGTH = 30
+
 # MAIN_FEED_STORAGE = 50
 # SUBSC_FEED_STORAGE = 50
 # PERSONAL_FEED_STORAGE = 50
@@ -135,6 +139,8 @@ else
 	APPSERVER_API_URL = 'http://claco.com/mediaserver/thumbs'
 end
 
+RESERVED_BINDER_IDS = ["0", "-1", "-2"]
+
 # dijkstra
 # allows for doubling while remaining a 4B variable
 INFINITY = 1<<30
@@ -152,3 +158,5 @@ GRADE_BITMAP =  0x20
 INVITE_BITMAP = 0x40
 
 PREFIX_EMAIL = ['Whoa!', 'Nice!', 'Woohoo!', 'Awesome!']
+
+USE_IMG_SERVER = true

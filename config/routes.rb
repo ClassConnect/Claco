@@ -54,6 +54,8 @@ Claco::Application.routes.draw do
 	get		'/invite'															=> 'invitations#invite'
 	post	'/invite'															=> 'invitations#create'
 
+	get 	'/inf' 																=> 'home#inf'
+
 	#################
 	# ADMIN ROUTING #
 	#################
@@ -215,8 +217,8 @@ Claco::Application.routes.draw do
 		put		"#{BASE_BINDER_ROUTE}/update"									=> 'binders#createversion'
 
 		# #Permissions
-		# put		"#{BASE_BINDER_ROUTE}/permissions"								=> 'binders#createpermission'
-		# delete	"#{BASE_BINDER_ROUTE}/permissions/:pid"							=> 'binders#destroypermission'
+		post	"#{BASE_BINDER_ROUTE}/permissions"								=> 'binders#add_collaborator'
+		delete	"#{BASE_BINDER_ROUTE}/permissions"								=> 'binders#destroypermission'
 		# get		"#{BASE_BINDER_ROUTE}/permissions/:pid"				=> redirect("/%{username}/portfolio/%{root}/%{title}/%{id}/permissions")
 		post	"#{BASE_BINDER_ROUTE}/setpub"									=> 'binders#setpub'
 

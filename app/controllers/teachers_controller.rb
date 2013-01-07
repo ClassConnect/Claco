@@ -17,7 +17,7 @@ class TeachersController < ApplicationController
 
 		#@feed = Log.where( :ownerid.ne => current_teacher.id.to_s).in( method: ["create","createfile","createcontent"] ).desc(:timestamp).limit(10)
 
-		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!	
+		# JSON.parse utilizes the C unicode library, MUCH FASTER!!!!
 		#@parsed_json = JSON.parse(File.read("app/assets/json/standards.json"))
 	end
 
@@ -59,7 +59,7 @@ class TeachersController < ApplicationController
 		#@colleagues = (current_teacher.relationships.where(:colleague_status => 3).entries).map { |c| Teacher.find(c["user_id"]) }
 
 		#@subscriptions = current_teacher.relationships.where(:subscribed => true).entries
-		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])} 
+		@subscriptions = (@teacher.relationships.where(:subscribed => true).entries).map {|r| Teacher.find(r["user_id"])}
 
 		@subscribers = Teacher.where("relationships.subscribed" => true, "relationships.user_id" => @teacher.id.to_s)
 
@@ -77,6 +77,9 @@ class TeachersController < ApplicationController
 		#logs = Log.where( :model => "binders", "data.src" => nil  ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 		#logs = Log.where( "data.src" => nil ).in( model: ['binders','teachers'] ).in( method: FEED_METHOD_WHITELIST ).desc(:timestamp)
 
+		@feedindex = 1
+
+		if false
 
 		# pull the current teacher's subscription IDs
 		subs = signed_in? ? (current_teacher.relationships.where(:subscribed => true).entries).map { |r| r["user_id"].to_s } : []
@@ -102,11 +105,11 @@ class TeachersController < ApplicationController
 			search.sort { by :timestamp, 'desc' }
 
 		end
-		
+
 		logs = logs.results
 
 		#debugger
-		
+
 		if logs.any?
 			logs.each do |f|
 
@@ -131,12 +134,12 @@ class TeachersController < ApplicationController
 				# 							should not be a setpub -> private
 				#
 				# the teacher log entry: 	should not have a blacklist entry
-				if 	(f[:model].to_s=='binders' && 
-						model.parents[0]!={ "id" => "-1", "title" => "" } && 
-						model.is_pub? && 
-						!f[:data][:src] && 
-						!(feedblacklist[f[:actionhash].to_s]) && 
-						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 
+				if 	(f[:model].to_s=='binders' &&
+						model.parents[0]!={ "id" => "-1", "title" => "" } &&
+						model.is_pub? &&
+						!f[:data][:src] &&
+						!(feedblacklist[f[:actionhash].to_s]) &&
+						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) ||
 					(f[:model].to_s=='teachers' &&
 						!(feedblacklist[f[:actionhash].to_s]))
 
@@ -155,15 +158,15 @@ class TeachersController < ApplicationController
 					f[:data][:annihilate].each { |a| feedblacklist[a.to_s] = true } if f[:data][:annihilate]
 
 					# execute blacklist exclusion
-					if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# && 
+					if !(FEED_DISPLAY_BLACKLIST.include? f[:method].to_s)# &&
 
 						# create a key for an owner and an action
 						similar = Digest::MD5.hexdigest(f[:ownerid].to_s + f[:method].to_s).to_s
 
-						f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }	
+						f = { :model => model, :owner => Teacher.find(f[:ownerid].to_s), :log => f }
 
 						# if there are no members in the duplist, create a new action in each tracking hash
-						if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)	
+						if !(duplist[similar]) || ((duplist[similar]['timestamp'].to_i-f[:log][:timestamp].to_i) > FEED_COLLAPSE_TIME)
 
 							# store the index at which the similar item resides, and the current time
 							duplist[similar] = { 'index' => @subsfeed.size, 'blank_index' => 0, 'timestamp' => f[:log][:timestamp].to_i }
@@ -172,13 +175,13 @@ class TeachersController < ApplicationController
 							@subsfeed << [f]
 
 						# there is a similar event, combine in feed array
-						else	
+						else
 
-							expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s) 
+							expire_fragment(f[:log].id.to_s) if Rails.cache.read(f[:log].id.to_s)
 
 							if (f[:model].to_s=='binders' && Binder.thumbready?(f[:model])) ||
-									# (f[:model].thumbimgids[0].nil? || 
-									# f[:model].thumbimgids[0].empty?)) || 
+									# (f[:model].thumbimgids[0].nil? ||
+									# f[:model].thumbimgids[0].empty?)) ||
 								(f[:model].to_s=='teachers' && Teacher.thumbready?(f[:model]))
 
 								@subsfeed[duplist[similar]['index']] << f
@@ -202,11 +205,13 @@ class TeachersController < ApplicationController
 			end
 		end
 
+		end
+
 		#feed.map { |f| f.modelid.to_s } if feed.any?
 
 		#Rails.logger.debug "feed: #{feed.map { |f| f.modelid.to_s }.to_s} "
 
-		#@binder_create = Binder.where( 	:owner.ne => current_teacher.id.to_s, 
+		#@binder_create = Binder.where( 	:owner.ne => current_teacher.id.to_s,
 		#								"parents.id" => { "$ne" => "-1"}).in( _id: feed.map { |f| f.modelid.to_s } )
 
 		# fetch root level directories that are owned by the teacher
@@ -288,7 +293,7 @@ class TeachersController < ApplicationController
 
 				raise "Submission error" if response['status'].to_s!='1'
 			rescue
-				Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)				
+				Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
 			end
 
 			#if response['status']
@@ -311,7 +316,7 @@ class TeachersController < ApplicationController
 	#PUT /updateinfo
 	def updateinfo
 
-		debugger
+		#debugger
 
 		current_teacher.info = Info.new if current_teacher.info.nil?
 
@@ -369,7 +374,7 @@ class TeachersController < ApplicationController
 					current_teacher.id.to_s,
 					# params)
 					altparams.nil? ? params : altparams)
-		
+
 		redirect_to teacher_omniauth_authorize_path(params[:buttonredirect]) and return if !params[:buttonredirect].nil?
 
 		if current_teacher.info.errors.empty? && current_teacher.errors.empty?
@@ -517,9 +522,9 @@ class TeachersController < ApplicationController
 					params[:controller].to_s,
 					@teacher.id.to_s,
 					params,
-					{ 	:relationship => @relationship.id.to_s, 
+					{ 	:relationship => @relationship.id.to_s,
 						:affected_relationship => @affected_relationship.id.to_s,
-						:annihilate => [Digest::MD5.hexdigest(current_teacher.id.to_s+'sub'+@teacher.id.to_s)]}) 
+						:annihilate => [Digest::MD5.hexdigest(current_teacher.id.to_s+'sub'+@teacher.id.to_s)]})
 
 		rescue BSON::InvalidObjectId
 			errors << "Invalid Request"
@@ -615,7 +620,7 @@ class TeachersController < ApplicationController
 					params[:controller].to_s,
 					@teacher.id.to_s,
 					params,
-					{ 	:relationship => @relationship.id.to_s, 
+					{ 	:relationship => @relationship.id.to_s,
 						:affected_relationship => @affected_relationship.id.to_s })
 
 		rescue BSON::InvalidObjectId
@@ -668,13 +673,13 @@ class TeachersController < ApplicationController
 
 #			@affected_relationship.delete
 		end
- 
+
 		Mongo.log(	current_teacher.id.to_s,
 					__method__.to_s,
 					params[:controller].to_s,
 					@teacher.id.to_s,
 					params,
-					{ 	:relationship => @relationship.id.to_s, 
+					{ 	:relationship => @relationship.id.to_s,
 						:affected_relationship => @affected_relationship.id.to_s })
 
 		redirect_to teacher_path(@teacher)
@@ -700,7 +705,7 @@ class TeachersController < ApplicationController
 	# 		@binder_parent_id_array << nodeparent["id"].to_s
 	# 	end
 
-		
+
 	# 	# if @child_binders.empty?
 	# 	# 	@child_binders = Binder.new()
 	# 	# end
@@ -744,9 +749,9 @@ class TeachersController < ApplicationController
 
 	###############################################################################################
 
-							#    #  ##### #     #####  ##### #####   #### 
+							#    #  ##### #     #####  ##### #####   ####
 							#    #  #     #     #    # #     #    # #    #
-							#    #  #     #     #    # #     #    # # 
+							#    #  #     #     #    # #     #    # #
 							######  ####  #     #####  ####  #####   ####
 							#    #  #     #     #      #     #  #        #
 							#    #  #     #     #      #     #   #  #    #

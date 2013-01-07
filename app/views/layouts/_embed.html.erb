@@ -32,7 +32,8 @@
 
 <% elsif @binder.current_version.img? %>
 
-	<center><%= link_to(	image_tag(@binder.current_version.img_contentview.url, :class => "embeddrop"),
+	<center><%= #link_to(	image_tag(@binder.current_version.img_contentview.url, :class => "embeddrop"),
+				link_to(	image_tag(Binder.contentview(@binder), :class => "embeddrop"),
 					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
 					:target => "_blank") %></center>
 
@@ -50,7 +51,9 @@
 
 		<div class="whitelay"></div>
 
-	<%= image_tag(@binder.current_version.img_contentview.url) %>
+	<%= #image_tag(@binder.current_version.img_contentview.url) 
+		image_tag(Binder.contentview(@binder))
+	%>
 	</div>
 </a>
 

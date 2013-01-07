@@ -277,24 +277,24 @@ class TeachersController < ApplicationController
 
 			current_teacher.info.update_attributes(:avatarstatus => stathash)
 
-			# storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
+			storedir = Digest::MD5.hexdigest(current_teacher.id.to_s + current_teacher.info.size.to_s + current_teacher.info.data.to_s)
 
-			# datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
+			datahash = Digest::MD5.hexdigest(storedir + 'avatar' + current_teacher.info.avatar.url.to_s + [current_teacher.id.to_s].to_s + TX_PRIVATE_KEY)
 
 			#debugger
 
-			# begin
-			# 	response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
-			# 													:class => 'avatar',
-			# 													:url => current_teacher.info.avatar.url.to_s,
-			# 													:model => [current_teacher.id.to_s],
-			# 													:datahash => datahash.to_s,
-			# 													:origin => ENV['SERVERCLASS']=='staging' })
+			begin
+				response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
+																:class => 'avatar',
+																:url => current_teacher.info.avatar.url.to_s,
+																:model => [current_teacher.id.to_s],
+																:datahash => datahash.to_s,
+																:origin => ENV['SERVERCLASS']=='staging' })
 
-			# 	raise "Submission error" if response['status'].to_s!='1'
-			# rescue
+				raise "Submission error" if response['status'].to_s!='1'
+			rescue
 				Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
-			# end
+			end
 
 			#if response['status']
 
@@ -302,8 +302,8 @@ class TeachersController < ApplicationController
 						__method__.to_s,
 						params[:controller].to_s,
 						current_teacher.id.to_s,
-						params})#,
-						#{ :response => response })
+						params,
+						{ :response => response })
 
 			#Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)
 

@@ -50,10 +50,7 @@
 		</div>
 
 		<div class="whitelay"></div>
-
-	<%= #image_tag(@binder.current_version.img_contentview.url) 
-		image_tag(Binder.contentview(@binder))
-	%>
+		<img src="<%= Binder.contentview(@binder) %>" />
 	</div>
 </a>
 

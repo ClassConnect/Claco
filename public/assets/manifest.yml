@@ -139,7 +139,7 @@ editinfo/main.js: editinfo/main-504baa779c02a6c8b4b65db651c61053.js
 editinfo/newuser.js: editinfo/newuser-f2d4be827e93ce0525cbf912c4337cfe.js
 home/explore.js: home/explore-70a0ac39897edd7737d322b9b342ae86.js
 home/explore_detail.js: home/explore_detail-738a058493f858212c5028550178357c.js
-home/main.js: home/main-4c97f79a82955d4c994383e990a55d87.js
+home/main.js: home/main-c40f3145131f694fde577fc376b0b476.js
 home/pub.js: home/pub-b7480cb12f259c319ff6fa13a0fa9e0f.js
 home/wizard.js: home/wizard-7523ae0f935550c9aff5e16185825d59.js
 messages/show.js: messages/show-4d693929057739e9e06cd354541c5492.js

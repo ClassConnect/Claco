@@ -13,7 +13,7 @@
 
 			#debugger
 
-			fids = current_teacher.feed_ids.clone
+			fids = @teacher.feed_ids.clone
 			if fids.nil? || fids[@feedindex].nil?
 				feed = Feed.new(:owner => current_teacher.id.to_s,
 								:fclass => @feedindex)

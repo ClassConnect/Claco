@@ -20,6 +20,8 @@ class HomeController < ApplicationController
 
 		if signed_in?
 
+			@teacher=current_teacher	
+
 			@invcount = Invitation.where(:from => current_teacher.id.to_s).count
 			@size_percent_used = (current_teacher.priv_size / current_teacher.size_cap.to_f) * 100
 			@shared_binders = Binder.where(:"permissions.shared_id" => current_teacher.id.to_s).reject{|b| b.get_access(current_teacher.id.to_s) < 1}

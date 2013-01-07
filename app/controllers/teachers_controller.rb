@@ -302,7 +302,7 @@ class TeachersController < ApplicationController
 						__method__.to_s,
 						params[:controller].to_s,
 						current_teacher.id.to_s,
-						params})#,
+						params)#,
 						#{ :response => response })
 
 			#Teacher.delay(:queue => 'thumbgen').gen_thumbnails(current_teacher.id.to_s)

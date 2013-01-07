@@ -1097,30 +1097,28 @@ class Teacher
 				stathash['avatar_thumb_md']['scheduled'] = true
 				stathash['avatar_thumb_sm']['scheduled'] = true
 
-				self.info.update_attributes(:data => url.to_s,
-											:size => 0,
-											:remote_avatar_url => url.to_s,
-											:avatarstatus => stathash)
+				# self.info.update_attributes(:data => url.to_s,
+				# 							:size => 0,
+				# 							:remote_avatar_url => url.to_s,
+				# 							:avatarstatus => stathash)
 
 
-				storedir = Digest::MD5.hexdigest(self.id.to_s + self.info.size.to_s + self.info.data.to_s)
+				# storedir = Digest::MD5.hexdigest(self.id.to_s + self.info.size.to_s + self.info.data.to_s)
 
-				datahash = Digest::MD5.hexdigest(storedir + 'avatar' + url.to_s + [self.id.to_s].to_s + TX_PRIVATE_KEY)
+				# datahash = Digest::MD5.hexdigest(storedir + 'avatar' + url.to_s + [self.id.to_s].to_s + TX_PRIVATE_KEY)
 
-				#debugger
+				# begin
+				# 	response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
+				# 													:class => 'avatar',
+				# 													:url => url.to_s,
+				# 													:model => [self.id.to_s],
+				# 													:datahash => datahash.to_s,
+				# 													:origin => ENV['SERVERCLASS']=='staging' })
 
-				begin
-					response = RestClient.post(MEDIASERVER_API_URL,{:storedir => storedir.to_s,
-																	:class => 'avatar',
-																	:url => url.to_s,
-																	:model => [self.id.to_s],
-																	:datahash => datahash.to_s,
-																	:origin => ENV['SERVERCLASS']=='staging' })
-
-					raise "Submission error" if response!="{\"status\":1}"
-				rescue
+				# 	raise "Submission error" if response!="{\"status\":1}"
+				# rescue
 					Teacher.delay(:queue => 'thumbgen').gen_thumbnails(self.id.to_s)				
-				end
+				# end
 			end
 		end
 	end

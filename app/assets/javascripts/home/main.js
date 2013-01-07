@@ -61,9 +61,16 @@ $(document).ready(function() {
   });
 
   // infinite scroll
+  var scrollLoading = false;
+  var scrollLimit = $(document).height() * 0.85;
+
   $(window).scroll(function/*loadFeed*/(){
-    if ($(window).scrollTop() + $(window).height() >= ($(document).height() * 0.85)) {
+    var scrollPosition = $(window).scrollTop() + $(window).height();
+
+    if ((scrollPosition >= scrollLimit) && !scrollLoading) {
       var cursor = $('#feedCursor').val();
+      scrollLoading = true;
+
       $('#feedCursor').val('');
 
       if(cursor) {
@@ -71,24 +78,28 @@ $(document).ready(function() {
           type: "GET",
           url:  "inf",
           data: {"logid": cursor},
-          success: function(data) {
-            // var nextCursor = '<input id="feedCursor" type="hidden" value="' + data.nextlogid + '" />';
 
-            // $('#feedCursor').remove();
-            //alert('trigger');
+          success: function(data) {
             $('#feed')
               .append(data.html);
-              // .append(nextCursor);
+
             $('#feedCursor').val(data.nextlogid);
           },
+
           error: function (){
             $('#feedCursor').val(cursor);
+          },
+
+          complete: function(){
+            scrollLoading = false;
           }
         });
       }
-      else $('#feed')
-        .parent().find('small.warning')
-        .show();
+      else {
+        $('#feed')
+          .parent().find('small.warning')
+          .show();
+        }
     }
   });
 });

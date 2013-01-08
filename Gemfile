@@ -56,8 +56,8 @@ gem 'memcachier'
 gem 'dalli'
 gem 'sitemap_generator'
 
-gem 'mini_magick'
-gem 'rmagick'
+# gem 'mini_magick'
+# gem 'rmagick'
 
 gem 'log4r', '1.1.9'
 

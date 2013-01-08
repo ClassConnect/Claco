@@ -480,9 +480,9 @@ class BindersController < ApplicationController
 								# DELAYTAG
 								#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
-							elsif ZENCODER_SUPPORTED_VIDEO_EXTS.include? @binder.current_version.ext.downcase
+							# elsif ZENCODER_SUPPORTED_VIDEO_EXTS.include? @binder.current_version.ext.downcase
 
-								Binder.delay(:queue => 'encode').encode(@binder.id.to_s)
+							# 	Binder.delay(:queue => 'encode').encode(@binder.id.to_s)
 
 							elsif @binder.current_version.ext.downcase == ".notebook"
 

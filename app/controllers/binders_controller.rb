@@ -429,33 +429,34 @@ class BindersController < ApplicationController
 						#logger.debug params[:binder][:versions][:file].current_path
 						if CLACO_SUPPORTED_THUMBNAIL_FILETYPES.include? @binder.current_version.ext.downcase
 							# send file to crocodoc if the format is supported
-							if Crocodoc.check_format_validity(@binder.current_version.ext.downcase)
+							# if Crocodoc.check_format_validity(@binder.current_version.ext.downcase)
 
-								#Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
+							# 	#Rails.logger.debug "current path: #{@binder.current_version.file.current_path.to_s}"
 
-								@binder.current_version.update_attributes( :thumbnailgen => 3 )
+							# 	@binder.current_version.update_attributes( :thumbnailgen => 3 )
 
-								#Rails.logger.debug "<<< URL: #{@binder.current_version.file.url.to_s} >>>"
+							# 	#Rails.logger.debug "<<< URL: #{@binder.current_version.file.url.to_s} >>>"
 
-								filedata = Crocodoc.upload(@binder.current_version.file.url)
+							# 	filedata = Crocodoc.upload(@binder.current_version.file.url)
 
-								filedata = filedata["uuid"] if !filedata.nil?
+							# 	filedata = filedata["uuid"] if !filedata.nil?
 
-								@binder.current_version.update_attributes(:croc_uuid => filedata)
+							# 	@binder.current_version.update_attributes(:croc_uuid => filedata)
 
-								# delegate image fetch to Delayed Job worker
-								#Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
+							# 	# delegate image fetch to Delayed Job worker
+							# 	#Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id,Crocodoc.get_thumbnail_url(filedata))
 
-								# DELAYTAG
-								# .delay(:queue => 'thumbgen')
-								Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
+							# 	# DELAYTAG
+							# 	# .delay(:queue => 'thumbgen')
+							# 	Binder.delay(:queue => 'thumbgen').get_croc_thumbnail(@binder.id, Crocodoc.get_thumbnail_url(filedata))
 
-								Binder.delay.get_croc_doctext(@binder.id, Crocodoc.get_doctext_url(filedata))
+							# 	Binder.delay.get_croc_doctext(@binder.id, Crocodoc.get_doctext_url(filedata))
 
 								# delay(:queue => 'thumbgen').
 								#Binder.delay(:queue => 'thumbgen').gen_croc_thumbnails(@binder.id)
 
-							elsif CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
+							#els
+							if CLACO_VALID_IMAGE_FILETYPES.include? @binder.current_version.ext.downcase
 								# for now, image will be added as file AND as imgfile
 								stathash = @binder.current_version.imgstatus#[:imgfile][:retrieved]
 								stathash[:imgfile][:retrieved] = true
@@ -479,9 +480,9 @@ class BindersController < ApplicationController
 								# DELAYTAG
 								#Binder.delay(:queue => 'thumbgen').generate_folder_thumbnail(@binder.parent["id"] || @binder.parent[:id])
 
-							elsif ZENCODER_SUPPORTED_VIDEO_EXTS.include? @binder.current_version.ext.downcase
+							# elsif ZENCODER_SUPPORTED_VIDEO_EXTS.include? @binder.current_version.ext.downcase
 
-								Binder.delay(:queue => 'encode').encode(@binder.id.to_s)
+							# 	Binder.delay(:queue => 'encode').encode(@binder.id.to_s)
 
 							elsif @binder.current_version.ext.downcase == ".notebook"
 

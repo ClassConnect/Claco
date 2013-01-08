@@ -1,8 +1,5 @@
-<% if @binder.current_version.croc? %>
 
-	<center><iframe id="crocFrame" width="700" height="600" class="embeddrop" frameborder="0" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe></center>
-
-<% elsif !@binder.current_version.vidtype.empty? %>
+<% if !@binder.current_version.vidtype.empty? %>
 
 	<% if @binder.current_version.vidtype == "zen" %>
 
@@ -33,7 +30,7 @@
 <% elsif @binder.current_version.img? %>
 
 	<center><%= #link_to(	image_tag(@binder.current_version.img_contentview.url, :class => "embeddrop"),
-				link_to(	image_tag(Binder.contentview(@binder), :class => "embeddrop"),
+				link_to(	"<img src=\"#{Binder.contentview(@binder)}\" class=\"embeddrop\" />".html_safe,
 					@binder.format == 1 ? named_binder_route(@binder, "download") : @binder.current_version.data,
 					:target => "_blank") %></center>
 

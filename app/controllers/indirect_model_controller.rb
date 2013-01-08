@@ -22,6 +22,7 @@ class IndirectModelController < AbstractController::Base
 
   # Make sure your controller can find views
   self.view_paths = "app/views"
+  self.asset_host = ActionController::Base.asset_host
 
   # You can define custom helper methods to be used in views here
   # helper_method :current_admin

@@ -1386,10 +1386,10 @@ class Info
 														"avatar_thumb_sm" => { "generated" => false, "scheduled" => false } }
 
 	mount_uploader :avatar, AvatarUploader
-	mount_uploader :avatar_thumb_lg, AvatarUploader
-	mount_uploader :avatar_thumb_mg, AvatarUploader
-	mount_uploader :avatar_thumb_md, AvatarUploader
-	mount_uploader :avatar_thumb_sm, AvatarUploader
+	mount_uploader :avatar_thumb_lg, AvatarthumbUploader
+	mount_uploader :avatar_thumb_mg, AvatarthumbUploader
+	mount_uploader :avatar_thumb_md, AvatarthumbUploader
+	mount_uploader :avatar_thumb_sm, AvatarthumbUploader
 
 	field :thumbnails, :type => Array, :default => [nil,nil,nil,nil]
 

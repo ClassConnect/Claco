@@ -195,7 +195,8 @@ class Feed
 				if 	(f[:model].to_s=='binders' && 
 						model.parents[0]!={ "id" => "-1", "title" => "" } && 
 						model.is_pub? && 
-						(Binder.thumbready?(model) || model.type==1)&&
+						#(Binder.thumbready?(model) || model.type==1)&&
+						#model.type==1 &&
 						!f[:data][:src] && 
 						!(feedblacklist[f[:actionhash].to_s]) && 
 						( f[:method] == "setpub" ? ( f[:params]["enabled"] == "true" ) : true )) || 

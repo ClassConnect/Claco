@@ -24,7 +24,16 @@ class Applicant
 
 	after_create do
 
-		Applicant.delay(:queue => email).thank_for_applying(self.id.to_s)
+		Applicant.delay(:queue => "email").thank_for_applying(self.id.to_s)
+		Applicant.delay(:queue => "scheduled_auto_accept", :run_at => 3.days.from_now).schedule_auto_accept(self.id.to_s)
+
+	end
+
+	def self.schedule_auto_accept(id)
+
+		app = Applicant.find(id)
+
+		app.approve if app.status == 0
 
 	end
 

@@ -1136,6 +1136,12 @@ class Teacher
 
 	end
 
+	def self.collab_announce_email(teacherid)
+
+		UserMailer.collab_announce(Teacher.find(teacherid)).deliver
+
+	end
+
 	def self.seedsizes
 
 		Teacher.all.each do |teacher|

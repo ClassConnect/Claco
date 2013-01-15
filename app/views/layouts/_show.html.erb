@@ -227,7 +227,7 @@
         <ul class="collaborators">
           <% if @collaborators.empty? %>
 
-            <div class="empty-tog fortags">You haven’t added any collaborators…yet!</div>
+            <div class="empty-tog fortags" <%= "style=\"display:none\"" if !@is_self %> >You haven’t added any collaborators…yet!</div>
 
           <% else %>
 

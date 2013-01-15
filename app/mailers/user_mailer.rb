@@ -106,6 +106,14 @@ class UserMailer < ActionMailer::Base
 		end
 	end
 
+	def collab_announce(teacher)
+
+		mail(from: "Team Claco <support@claco.com>", to: teacher.email, subject:"Exciting updates from Team Claco") do
+			format.html {render "collab_announce"}
+		end
+
+	end
+
 protected
 	def named_binder_route(binder, action = "show")
 		if binder.class == Binder

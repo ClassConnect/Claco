@@ -4,7 +4,7 @@ namespace :email do
 
 		Teacher.all.each do |teacher|
 
-			UserMailer.send_collab_email(teacher).deliver
+			UserMailer.collab_announce(teacher).deliver
 
 		end
 

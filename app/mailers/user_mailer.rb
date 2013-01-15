@@ -108,7 +108,7 @@ class UserMailer < ActionMailer::Base
 
 	def collab_announce(teacher)
 
-		mail(from: "Team Claco <support@claco.com>", to: teacher.email, subject:"Exciting updates from Team Claco") do
+		mail(from: "Team Claco <support@claco.com>", to: teacher.email, subject:"Exciting updates from Team Claco") do |format|
 			format.html {render "collab_announce"}
 		end
 

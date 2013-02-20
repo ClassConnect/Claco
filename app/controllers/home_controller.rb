@@ -34,10 +34,15 @@ class HomeController < ApplicationController
 
 			@educators = []
 
+			reclist = []
+
 			if current_teacher.recommend_ids.to_a.empty?
-				current_teacher.update_attributes(:recommend_ids => current_teacher.recommends)
+				# current_teacher.update_attributes(:recommend_ids => current_teacher.delay.recommends)
+				current_teacher.delay.emptyrecbuild
+				reclist = ['502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','50451ebd7b2f1d0002000035']
 			end
-			current_teacher.recommend_ids[0..9].shuffle.each_with_index do |f,index|
+			reclist = current_teacher.recommend_ids[0..9].shuffle
+			reclist.each_with_index do |f,index|
 				begin
 					teacher = Teacher.find(f.to_s)
 					if Teacher.thumbready?(teacher) || (@educators.size+6 < index)

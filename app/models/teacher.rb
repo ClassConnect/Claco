@@ -938,6 +938,12 @@ class Teacher
 		min
 	end
 
+	def emptyrecbuild
+
+		self.update_attributes(:recommend_ids => self.recommends)
+
+	end
+
 	def recommends (count = 5)
 
 

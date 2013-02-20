@@ -189,6 +189,7 @@ GEM
     rake (10.0.3)
     rdoc (3.12)
       json (~> 1.4)
+    redis (3.0.1)
     ref (1.0.2)
     rest-client (1.6.7)
       mime-types (>= 1.16)
@@ -279,6 +280,7 @@ DEPENDENCIES
   omniauth-twitter
   rack-pjax
   rails (= 3.2.11)
+  redis
   rest-client
   rubyzip
   sass-rails (~> 3.2.3)

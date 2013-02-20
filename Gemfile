@@ -89,6 +89,7 @@ gem 'kaminari'
 
 gem 'mongoid_spacial'
 
+gem "redis"
 
 # Soulmate
 # gem 'rack-contrib'

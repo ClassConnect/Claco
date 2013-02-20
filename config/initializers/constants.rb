@@ -160,3 +160,76 @@ INVITE_BITMAP = 0x40
 PREFIX_EMAIL = ['Whoa!', 'Nice!', 'Woohoo!', 'Awesome!']
 
 USE_IMG_SERVER = true
+
+# # Porter Stemming algorithm
+
+# STEP_2_LIST = {
+# 	'ational'=>'ate', 'tional'=>'tion', 'enci'=>'ence', 'anci'=>'ance',
+# 	'izer'=>'ize', 'bli'=>'ble',
+# 	'alli'=>'al', 'entli'=>'ent', 'eli'=>'e', 'ousli'=>'ous',
+# 	'ization'=>'ize', 'ation'=>'ate',
+# 	'ator'=>'ate', 'alism'=>'al', 'iveness'=>'ive', 'fulness'=>'ful',
+# 	'ousness'=>'ous', 'aliti'=>'al',
+# 	'iviti'=>'ive', 'biliti'=>'ble', 'logi'=>'log'
+# }
+
+# STEP_3_LIST = {
+# 	'icate'=>'ic', 'ative'=>'', 'alize'=>'al', 'iciti'=>'ic',
+# 	'ical'=>'ic', 'ful'=>'', 'ness'=>''
+# }
+
+
+# SUFFIX_1_REGEXP = /(
+# 					ational  |
+# 					tional   |
+# 					enci     |
+# 					anci     |
+# 					izer     |
+# 					bli      |
+# 					alli     |
+# 					entli    |
+# 					eli      |
+# 					ousli    |
+# 					ization  |
+# 					ation    |
+# 					ator     |
+# 					alism    |
+# 					iveness  |
+# 					fulness  |
+# 					ousness  |
+# 					aliti    |
+# 					iviti    |
+# 					biliti   |
+# 					logi)$/x
+
+
+# SUFFIX_2_REGEXP = /(
+# 					al       |
+# 					ance     |
+# 					ence     |
+# 					er       |
+# 					ic       |
+# 					able     |
+# 					ible     |
+# 					ant      |
+# 					ement    |
+# 					ment     |
+# 					ent      |
+# 					ou       |
+# 					ism      |
+# 					ate      |
+# 					iti      |
+# 					ous      |
+# 					ive      |
+# 					ize)$/x
+
+
+# C = "[^aeiou]"         # consonant
+# V = "[aeiouy]"         # vowel
+# CC = "#{C}(?>[^aeiouy]*)"  # consonant sequence
+# VV = "#{V}(?>[aeiou]*)"    # vowel sequence
+
+# MGR0 = /^(#{CC})?#{VV}#{CC}/o                # [cc]vvcc... is m>0
+# MEQ1 = /^(#{CC})?#{VV}#{CC}(#{VV})?$/o       # [cc]vvcc[vv] is m=1
+# MGR1 = /^(#{CC})?#{VV}#{CC}#{VV}#{CC}/o      # [cc]vvccvvcc... is m>1
+# VOWEL_IN_STEM   = /^(#{CC})?#{V}/o                      # vowel in stem

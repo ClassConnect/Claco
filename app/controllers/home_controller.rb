@@ -38,8 +38,8 @@ class HomeController < ApplicationController
 
 			if current_teacher.recommend_ids.to_a.empty?
 				# current_teacher.update_attributes(:recommend_ids => current_teacher.delay.recommends)
-				current_teacher.delay.emptyrecbuild
-				reclist = ['502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','50451ebd7b2f1d0002000035']
+				Teacher.delay.recbuild(current_teacher.id.to_s)
+				# reclist = ['502d3edd2fc61000020000bf','5049718bf5d9ab00020000a7','50451ebd7b2f1d0002000035']
 			end
 			reclist = current_teacher.recommend_ids[0..9].shuffle
 			reclist.each_with_index do |f,index|

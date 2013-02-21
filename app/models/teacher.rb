@@ -1314,7 +1314,7 @@ class Relationship
 
 	after_save do
 
-		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+		self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
 
 		#debugger
 
@@ -1324,7 +1324,7 @@ class Relationship
 
 	after_destroy do
 
-		self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+		self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
 
 		#debugger
 

@@ -938,9 +938,13 @@ class Teacher
 		min
 	end
 
-	def emptyrecbuild
+	def self.recbuild(tid)
 
-		self.update_attributes(:recommend_ids => self.recommends)
+		teacher = Teacher.find(tid)
+
+		teacher.update_attributes(:recommend_ids => teacher.recommends)
+
+		ActionController::Base.new.expire_fragment("recommendations/#{tid}")
 
 	end
 
@@ -1314,21 +1318,25 @@ class Relationship
 
 	after_save do
 
-		self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
+		Teacher.delay.recbuild(self.teacher.id.to_s)
 
-		#debugger
+		# self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
 
-		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
+		# #debugger
+
+		# ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 
 	end
 
 	after_destroy do
 
-		self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
+		Teacher.delay.recbuild(self.teacher.id.to_s)
 
-		#debugger
+		# self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
 
-		ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
+		# #debugger
+
+		# ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 
 	end
 
@@ -1440,7 +1448,7 @@ class Info
 			#Rails.cache.delete("recommendations/html/#{self.teacher.id.to_s}")
 			#Rails.cache.delete("recommendations/ids/#{self.teacher.id.to_s}")
 
-			self.teacher.update_attribute(:recommend_ids,self.teacher.recommends)
+			self.teacher.delay.update_attribute(:recommend_ids,self.teacher.recommends)
 
 			ActionController::Base.new.expire_fragment("recommendations/#{self.teacher.id.to_s}")
 

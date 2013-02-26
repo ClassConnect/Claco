@@ -93,30 +93,30 @@ class IndirectModelController < AbstractController::Base
 
         @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
         #@what = Binder.find(obj.whatid)
-        if @what.parents.size==2
+        # if @what.parents.size==2
           @where = Binder.find(@what.parent['id'])
           #@wherelink = named_binder_route(@where)
-        else
-          begin
-            @where = Binder.find(@what.parents[1]['id'])
-          rescue
-            debugger
-          end
-          #@wherelink = named_binder_route(@where)
-        end
+        # else
+        #   begin
+        #     @where = Binder.find(@what.parents[1]['id'])
+        #   rescue
+        #     debugger
+        #   end
+        #   #@wherelink = named_binder_route(@where)
+        # end
 
         render template: "layouts/feedpieces/wrappers/_createcontent"
       when 'createfile'
 
         @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
         #@what = Binder.find(obj.whatid)
-        if @what.parents.size==2
+        # if @what.parents.size==2
           @where = Binder.find(@what.parent['id'])
           #@wherelink = named_binder_route(@where)
-        else
-          @where = Binder.find(@what.parents[1]['id'])
+        # else
+          # @where = Binder.find(@what.parents[1]['id'])
           #@wherelink = named_binder_route(@where)
-        end 
+        # end 
 
         render template: "layouts/feedpieces/wrappers/_createfile"
       when 'update' 

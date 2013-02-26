@@ -94,7 +94,11 @@ class IndirectModelController < AbstractController::Base
         @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
         #@what = Binder.find(obj.whatid)
         # if @what.parents.size==2
+        begin
           @where = Binder.find(@what.parent['id'])
+        rescue
+          @where = nil
+        end
           #@wherelink = named_binder_route(@where)
         # else
         #   begin
@@ -111,7 +115,11 @@ class IndirectModelController < AbstractController::Base
         @what = Binder.find(Feedobject.find(obj.feedobjectids.first).binderid)
         #@what = Binder.find(obj.whatid)
         # if @what.parents.size==2
+        begin
           @where = Binder.find(@what.parent['id'])
+        rescue
+          @where = nil
+        end
           #@wherelink = named_binder_route(@where)
         # else
           # @where = Binder.find(@what.parents[1]['id'])

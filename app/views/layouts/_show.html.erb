@@ -27,7 +27,7 @@
 	</div>
 
 	<div id="left-sidebar">
-    <% if @binder.type == 2 && @binder.current_version.scootpad? %>
+    <% if !signed_in? && @binder.type == 2 && @binder.current_version.scootpad? %>
     <script type="text/javascript"><!--
     google_ad_client = "ca-pub-7036745116663906";
     /* lefter */

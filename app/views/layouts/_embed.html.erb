@@ -1,6 +1,6 @@
 
-		<% if @binder.current_version.scootpad? %>
-		<div style="width:710px;height:90px;margin-left:-15px;margin-top:-15px;margin-bottom:-15px;z-index:9999">
+		<% if @binder.current_version.scootpad? && !signed_in? %>
+		<div style="width:710px;height:90px;margin-top:-15px;z-index:9999">
 <script type="text/javascript"><!--
 google_ad_client = "ca-pub-7036745116663906";
 /* monmake */
@@ -82,6 +82,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 	<div class="content-actions">
 		<!-- put ad in div -->
 		<% if @binder.current_version.scootpad? %>
+		<% unless signed_in? %>
 		<div style="width:710px;height:90px;margin-left:-15px;margin-top:-15px;margin-bottom:-15px">
 <script type="text/javascript"><!--
 google_ad_client = "ca-pub-7036745116663906";
@@ -95,7 +96,7 @@ google_ad_height = 90;
 src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 </div>
-		<% else %>
+<% end %>
 <% if false %>
 		<button id="favbtn" class="btn">
 			<%= image_tag "binders/fav.png" %>

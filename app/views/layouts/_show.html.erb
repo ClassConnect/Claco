@@ -27,6 +27,19 @@
 	</div>
 
 	<div id="left-sidebar">
+    <% if @binder.type == 2 && @binder.current_version.scootpad? %>
+    <script type="text/javascript"><!--
+    google_ad_client = "ca-pub-7036745116663906";
+    /* lefter */
+    google_ad_slot = "3368875282";
+    google_ad_width = 160;
+    google_ad_height = 600;
+    //-->
+    </script>
+    <script type="text/javascript"
+    src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+    <% end %>
 
     <% if params[:action] == "show" %>
       <div class="conbox whitester">

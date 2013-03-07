@@ -64,6 +64,22 @@
 
 <div class="actionswrap">
 	<div class="content-actions">
+		<!-- put ad in div -->
+		<% if @binder.current_version.scootpad? %>
+		<div style="width:710px;height:90px;margin-left:-15px;margin-top:-15px;margin-bottom:-15px">
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-7036745116663906";
+/* monmake */
+google_ad_slot = "6461942489";
+google_ad_width = 710;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+		<% else %>
 <% if false %>
 		<button id="favbtn" class="btn">
 			<%= image_tag "binders/fav.png" %>
@@ -89,6 +105,6 @@
 	<% end %>
 	</div>
 
-
+	<% end %>
 	</div>
 </div>

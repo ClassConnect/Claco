@@ -1,4 +1,20 @@
 
+		<% if @binder.current_version.scootpad? %>
+		<div style="width:710px;height:90px;margin-left:-15px;margin-top:-15px;margin-bottom:-15px">
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-7036745116663906";
+/* monmake */
+google_ad_slot = "6461942489";
+google_ad_width = 710;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</div>
+<% end %>
+
 <% if @binder.current_version.croc? %>
 	 
 	<center><iframe id="crocFrame" width="700" height="600" class="embeddrop" frameborder="0" src="https://crocodoc.com/view/<%= @binder.current_version.get_croc_session %>" ></iframe></center>

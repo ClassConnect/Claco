@@ -2297,6 +2297,15 @@ class Version
 		return imgclass == 0
 	end
 
+	def scootpad?
+		uri = URI.parse(data)
+
+		return uri.host.nil? ? false : uri.host.include?('scootpad') 
+
+		rescue URI::InvalidURIError
+			return false
+	end
+
 end
 
 
